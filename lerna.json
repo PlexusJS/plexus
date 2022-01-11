@@ -1,0 +1,15 @@
+{
+  "npmClient": "yarn",
+  "packages": ["packages/*"],
+  "command": {
+    "version": {
+      "exact": true
+    },
+    "publish": {
+      "npmClient": "yarn",
+      "allowBranch": ["master", "canary"],
+      "registry": "https://registry.npmjs.org/"
+    }
+  },
+  "version": "2.1.6"
+}
