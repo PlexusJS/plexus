@@ -1,3 +1,4 @@
+import { deepMerge, isObject } from './helpers'
 import { PlexusInstance, PlexStateInternalStore } from "./interfaces"
 
 export const state = function<PlexStateValue=any>(instance: () => PlexusInstance, _init: PlexStateValue) {
@@ -15,10 +16,10 @@ export const state = function<PlexStateValue=any>(instance: () => PlexusInstance
 	instance()._states.add(this)
 
 	
-	const set = function(value: PlexStateValue) {
-		// TODO: this needs to check if the given type is an object/array. If so we need to deep clone the object/array
-		_internalStore._lastValue = _internalStore._value
-		_internalStore._value = value
+	const set = function (value: PlexStateValue) {
+		if (isObject(_internalStore._value) && isObject(value)) value = deepMerge(_internalStore._value, value);
+		_internalStore._lastValue = _internalStore._value;
+		_internalStore._value = value;
 	}
 	return {
 		set,
