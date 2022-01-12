@@ -20,6 +20,8 @@ export const state = function<PlexStateValue=any>(instance: () => PlexusInstance
 	
 	const set = function(value: PlexStateValue) {
 		// TODO: this needs to check if the given type is an object/array. If so we need to deep clone the object/array
+		// -> if (isObject(_internalStore._value) && isObject(value)) value = deepMerge(_internalStore._value, value);
+		// That being said, shouldn't we only deepmerge objects from a .patch function, and not .set ?
 		_internalStore._lastValue = _internalStore._value
 		_internalStore._value = value
 		if(_internalStore._watchers.size > 0){
