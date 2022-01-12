@@ -6,8 +6,9 @@ export interface PlexusInstance {
 }
 
 export type PxState<Value=any> = {
-	set: (item: Value) => void,
-	value: Value
+	set: (item: Value) => void;
+	value: Value;
+	lastValue: Value;
 } 
 export type state = <PxStateValue=any>(instance: () => PlexusInstance, input: PxStateValue) => PxState<PxStateValue>
 

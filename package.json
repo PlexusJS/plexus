@@ -9,7 +9,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev --parallel --no-cache",
+    "dev": "yarn && turbo run dev --parallel --no-cache",
     "clean-build": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
     "build": "yarn clean-build && turbo run build",
     "prepublish": "lerna run prepublish",
