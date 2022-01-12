@@ -12,7 +12,9 @@ export type PxState<Value=any> = {
 export type state = <PxStateValue=any>(instance: () => PlexusInstance, input: PxStateValue) => PxState<PxStateValue>
 
 export interface PlexStateInternalStore<Value> {
+	_lastValue: Value | null
 	_value: Value
-	_lastValue: Value
+	_nextValue: Value
+	_watchers: Set<(value: Value) => void>
 }
 
