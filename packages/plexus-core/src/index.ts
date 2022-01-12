@@ -1,6 +1,6 @@
 import { _instance } from './instance'
 import { PlexusInstance } from './interfaces'
-import { state as _state } from './state'
+import { _state } from './state'
 
 const instance: PlexusInstance =  _instance()
 

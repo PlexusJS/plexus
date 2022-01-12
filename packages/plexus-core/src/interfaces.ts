@@ -1,22 +1,31 @@
+import { _runtime } from "./runtime";
+
+export type PlexusRuntime = ReturnType<typeof _runtime>
+
 export interface PlexusInstance {
 	ready: boolean;
 	genNonce(): number | string;
 	_states: Set<PxStateInstance>
+	_runtime: PlexusRuntime,
 	_computedStates: Set<any>,
 	_collections: Set<any>,
 	_settings: {}
+	_storage: PxStorageInstance;
+	
 }
 
 export type PxStateInstance<Value=any> = {
 	set(item: Value): void;
 	patch(item: Value): void;
-	watch(keyOrCallback: string | number | PxStateWathcer<Value>,  callback?: PxStateWathcer<Value>): void;
+	watch(keyOrCallback: string | number | PxStateWathcer<Value>,  callback?: PxStateWathcer<Value>): string|number;
 	removeWatcher(key: string|number): boolean
 	undo(): void;
 	reset(): void;
-
+	persist(name?: string): void;
 	value: Value;
 	lastValue: Value;
+	name: string | number;
+	watchers: any
 } 
 export type PxStateType = Object | Array<unknown> | string | number | boolean | null | undefined 
 export type PxState = <PxStateValue=any>(instance: () => PlexusInstance, input: PxStateValue) => PxStateInstance<PxStateValue>
@@ -27,6 +36,18 @@ export interface PlexStateInternalStore<Value> {
 	_lastValue: Value | null
 	_value: Value
 	_nextValue: Value
-	_watchers: Map<number | string, (value: Value) => void>
+	_watchers: Set<number | string>
+	_name: string | number
 }
 
+
+
+export interface PxCollectionInstance<DataType=any> {
+	collect(data: DataType): void;
+}
+
+export interface PxStorageInstance {
+	get(key: string): any;
+	set(key: string, value: any): void;
+	remove(key: string): void;
+}

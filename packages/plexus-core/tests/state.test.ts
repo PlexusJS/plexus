@@ -1,4 +1,5 @@
 import { state } from '../src'
+import { _instance } from '../src/instance';
 import { PxState, PxStateInstance } from '../src/interfaces';
 let booleanState: PxStateInstance<boolean>,
  stringState: PxStateInstance<string>,
@@ -59,5 +60,25 @@ describe('Testing State Function', () => {
 		expect(arrayState.value[0].item2).toStrictEqual({ subitem: 'World' })
 		expect(arrayState.value[1].item).toBe('Goodbye')
 
+	})
+
+	test('Checking state.watch()', () => {
+		let callbackCalled = false;
+		const callback = () => {
+			// console.log('callback called', stringState.watchers)
+			callbackCalled = !callbackCalled;
+		}
+		// can add watcher
+		const watcherKey = stringState.watch(callback);
+		stringState.set('Hello World');
+		expect(callbackCalled).toBe(true);
+		console.log(_instance()._runtime.getWatchers())
+		// can remove watcher
+		stringState.removeWatcher(watcherKey);
+		console.log(_instance()._runtime.getWatchers())
+		stringState.set('new value');
+		expect(callbackCalled).toBe(true);
+		
+		
 	})
 })
