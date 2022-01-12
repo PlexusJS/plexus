@@ -1,13 +1,13 @@
 import { deepMerge, isObject } from './helpers'
-import { PlexusInstance, PlexStateInternalStore } from "./interfaces"
+import { PlexusInstance, PlexStateInternalStore, PxState } from "./interfaces"
 
-export const state = function<PlexStateValue=any>(instance: () => PlexusInstance, _init: PlexStateValue) {
+export const state = function<PlexStateValue=any>(instance: () => PlexusInstance, _init: PlexStateValue): PxState<PlexStateValue> {
 	const _internalStore: PlexStateInternalStore<PlexStateValue> = {
 		_value: _init,
 		_lastValue: _init
 	}
 	// inital setup
-	if(instance()._states.has(this)){
+	if (instance()._states.has(this)) {
 		instance()._states.delete(this)
 	}
 	// instance()._states.forEach(state_ => {
