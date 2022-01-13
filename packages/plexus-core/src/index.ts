@@ -5,6 +5,7 @@ import { _state } from './state'
 export function state<Value=any>(item: Value) {
 	return _state(() => _instance(), item)
 }
+export {route, PlexusRoute, PlexusRouteConfig} from './route' 
 
 export function setCore<CoreObj=Record<string, any>>(coreObj: CoreObj){
 
