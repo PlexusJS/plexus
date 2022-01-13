@@ -16,8 +16,9 @@ export interface PlexusInstance {
 	_computedStates: Set<any>,
 	_collections: Map<number | string, any>,
 	_settings: {}
-	_storage: PxStorageInstance;
-	
+	storageEngine: string | undefined,
+	_storages: Map<string, PxStorageInstance>;
+	get storage(): PxStorageInstance;
 }
 
 export type PxStateInstance<Value=any> = {
@@ -59,4 +60,5 @@ export interface PxStorageInstance {
 	get(key: string): any;
 	set(key: string, value: any): void;
 	remove(key: string): void;
+	patch(key: string, value: any): void;
 }
