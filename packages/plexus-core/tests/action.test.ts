@@ -36,7 +36,7 @@ describe('Testing Action Function', () => {
 		const successMsg = 'waited 1000 seconds'
 		const myAction = action(async ({onCatch}) => {
 			onCatch(console.error)
-			return await new Promise(resolve => setTimeout(() => resolve(successMsg), 1000))
+			return await new Promise(resolve => setTimeout(() => resolve(successMsg), 100))
 		})
 		const data = await myAction()
 		expect(data).toBe(successMsg)
