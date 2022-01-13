@@ -7,7 +7,6 @@ import { storage } from "./storage";
 export function _instance(): PlexusInstance {
 	const _internalStore = {
 		_nonce: 0,
-		runtime: _runtime(() => _instance())
 	}
 	if(globalThis.__plexusInstance__ === undefined){
 		globalThis.__plexusInstance__ = {
@@ -16,10 +15,11 @@ export function _instance(): PlexusInstance {
 				_internalStore._nonce = ++_internalStore._nonce
 				return _internalStore._nonce
 			},
-			_runtime: _internalStore.runtime,
+			_runtime: _runtime(() => _instance()),
 			_computedStates: new Set(),
-			_states: new Set(),
-			_collections: new Set(),
+			_states: new Map(),
+			_plugins: new Map(),
+			_collections: new Map(),
 			_settings: {},
 			_storage: storage(() => (this))
 		} as PlexusInstance
