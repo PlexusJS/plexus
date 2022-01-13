@@ -16,7 +16,7 @@ const getLocalStorage = () => {
 }
 
 type AlmostAnything = string | number | symbol | Record<any, any> | Array<any>;
-type Override = {
+export type StorageOverride = {
   prefix: string,
   get(key: string): AlmostAnything | Promise<any>,
 	set(key: string, value: any): AlmostAnything | Promise<any>,
@@ -24,7 +24,7 @@ type Override = {
 	patch(key: string, value: any): AlmostAnything | Promise<any>,
 }
 // storage func -> called from instance OR by integration -> hooks up to the instance
-export function storage (instance: () => PlexusInstance, name?: string, override?: Override): PxStorageInstance {
+export function storage (instance: () => PlexusInstance, name?: string, override?: StorageOverride): PxStorageInstance {
   
   const getKey = (key: string) => `${_internalStore._prefix}${key}`
   
