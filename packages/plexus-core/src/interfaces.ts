@@ -41,6 +41,7 @@ export interface PlexStateInternalStore<Value> {
 	_nextValue: Value
 	_watchers: Map<number | string, DestroyFn>
 	_name: string | number
+	_persist: boolean
 	externalName: string
 }
 export type PxStateType = Object | Array<unknown> | string | number | boolean | null | undefined 
