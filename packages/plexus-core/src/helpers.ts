@@ -21,6 +21,28 @@ export function deepMerge (target: Object, source: Object): any {
   return output;
 }
 
+// a deep clone of an object
+export function deepClone (obj: any): any {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (obj instanceof Date) {
+    return new Date(obj.getTime());
+  }
+  if (obj instanceof RegExp) {
+    return new RegExp(obj);
+  }
+  const cloned = new obj.constructor();
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+
+      cloned[key] = deepClone(obj[key]);
+    }
+  }
+  return cloned;
+}
+
+
 export class EventEmitter<Data=any> {
   events: Map<string|number, Data>
   constructor() {

@@ -1,4 +1,4 @@
-import { deepMerge, isObject } from './helpers'
+import { deepClone, deepMerge, isObject } from './helpers'
 import { PlexusInstance, PlexStateInternalStore, PxState, PxStateType, PxStateInstance, PxStateWatcher } from "./interfaces"
 
 export function _state<PxStateValue extends PxStateType>(instance: () => PlexusInstance, _init: PxStateValue): PxStateInstance<PxStateValue> {
@@ -11,7 +11,9 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		_lastValue: _init,
 		_watchers: new Map(),
 		_name: `_plexus_state_${instance().genNonce()}`,
-		externalName: ''
+		_persist: false,
+		externalName: '',
+
 	}
 	
 	// Methods //
@@ -19,17 +21,26 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		// TODO: this needs to check if the given type is an object/array. If so we need to deep clone the object/array
 		// -> if (isObject(_internalStore._value) && isObject(value)) value = deepMerge(_internalStore._value, value);
 		// That being said, shouldn't we only deepmerge objects from a .patch function, and not .set ?
-		
-		// yes, we should only deepmerge in patch, not in set. Set should do a hard overwrite of the value.
+
 		_internalStore._lastValue = _internalStore._value
+		if(isObject(value) && isObject(_internalStore._value)) {
+			_internalStore._lastValue = deepClone(_internalStore._value)
+		}
+		else if(Array.isArray(value) && Array.isArray(_internalStore._value)) {
+			const obj = deepMerge(_internalStore._value, value)
+			_internalStore._lastValue = (Object.values(obj) as PxStateValue)
+		}
+		else{
+			_internalStore._lastValue = _internalStore._value
+		}
 		_internalStore._value = value
 		_internalStore._nextValue = value
 
 		// update the runtime conductor
 		instance()._runtime.stateChange(_internalStore._name, value)
+		if(_internalStore._persist) instance().storage.set(_internalStore.externalName, _internalStore._value)
 	}
 	function patch(value: PxStateValue) {
-		
 		
 		if(isObject(value) && isObject(_internalStore._value)) {
 			set(deepMerge(_internalStore._value, value))
@@ -42,6 +53,7 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		else{
 			set(value)
 		}
+		if(_internalStore._persist) instance().storage.set(_internalStore.externalName, _internalStore._value)
 
 	}
 
@@ -77,7 +89,11 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 	function persist(name?: string ){
 		// if there is a name, change the states internal name 
 		if(name) _internalStore.externalName = `_plexus_state_${name}`
-		// instance()._runtime.persist(name, _internalStore._value)
+
+		if(instance().storage){ 
+			instance().storage.set(_internalStore.externalName, _internalStore._value)
+			_internalStore._persist = true
+		}
 
 	}
 
