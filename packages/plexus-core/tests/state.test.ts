@@ -72,10 +72,10 @@ describe('Testing State Function', () => {
 		const watcherKey = stringState.watch(callback);
 		stringState.set('Hello World');
 		expect(callbackCalled).toBe(true);
-		console.log(_instance()._runtime.getWatchers())
+		// console.log(_instance()._runtime.getWatchers())
 		// can remove watcher
 		stringState.removeWatcher(watcherKey);
-		console.log(_instance()._runtime.getWatchers())
+		// console.log(_instance()._runtime.getWatchers())
 		stringState.set('new value');
 		expect(callbackCalled).toBe(true);
 		
