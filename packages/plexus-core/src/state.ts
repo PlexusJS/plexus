@@ -1,5 +1,5 @@
 import { deepMerge, isObject } from './helpers'
-import { PlexusInstance, PlexStateInternalStore, PxState, PxStateType, PxStateWathcer, PxStateInstance } from "./interfaces"
+import { PlexusInstance, PlexStateInternalStore, PxState, PxStateType, PxStateInstance, PxStateWatcher } from "./interfaces"
 
 export function _state<PxStateValue extends PxStateType>(instance: () => PlexusInstance, _init: PxStateValue): PxStateInstance<PxStateValue> {
 
@@ -9,19 +9,10 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		_value: _init,
 		_initialValue: _init,
 		_lastValue: _init,
-		_watchers: new Set(),
+		_watchers: new Map(),
 		_name: `_plexus_state_${instance().genNonce()}`,
+		externalName: ''
 	}
-
-	// initalization //
-	if (instance()._states.has(this)) {
-		instance()._states.delete(this)
-	}
-	// instance()._states.forEach(state_ => {
-	// 	state_.name
-	// })
-	instance()._states.add(this)
-
 	
 	// Methods //
 	function set(value: PxStateValue) {
@@ -33,13 +24,6 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		_internalStore._lastValue = _internalStore._value
 		_internalStore._value = value
 		_internalStore._nextValue = value
-
-		// // if there are watchers, call them
-		// if(_internalStore._watchers.size > 0){
-		// 	_internalStore._watchers.forEach(watcher => {
-		// 		instance()._runtime.runSideEffects(value)
-		// 	})
-		// }
 
 		// update the runtime conductor
 		instance()._runtime.stateChange(_internalStore._name, value)
@@ -61,9 +45,9 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 
 	}
 
-	function watch(callback: PxStateWathcer<PxStateValue>)
-	function watch(key: string | number, callback: PxStateWathcer<PxStateValue>)
-	function watch(keyOrCallback: string | number | PxStateWathcer<PxStateValue>,  callback?: PxStateWathcer<PxStateValue>) {
+	function watch(callback: PxStateWatcher<PxStateValue>)
+	function watch(key: string | number, callback: PxStateWatcher<PxStateValue>)
+	function watch(keyOrCallback: string | number | PxStateWatcher<PxStateValue>,  callback?: PxStateWatcher<PxStateValue>) {
 		if(typeof keyOrCallback === 'function'){
 			callback = keyOrCallback
 			// generate a nonce from global instance
@@ -71,19 +55,28 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		}
 
 		// add to internal list of named watchers
-		_internalStore._watchers.add(keyOrCallback)
-		instance()._runtime.subscribe(_internalStore._name, keyOrCallback, callback)
+		const destroy = instance()._runtime.subscribe(_internalStore._name, callback)
+		_internalStore._watchers.set(keyOrCallback, destroy)
 		return keyOrCallback
 	}
 	function removeWatcher(key: string | number){
-		instance()._runtime.unsubscribe(_internalStore._name, key)
+		// instance()._runtime.unsubscribe(_internalStore._name, key)
+		const destroy = _internalStore._watchers.get(key)
+		if(destroy) destroy()
 		return _internalStore._watchers.delete(key)
 
+	}
+	function removeAllWatchers(){
+		// instance()._runtime.unsubscribe(_internalStore._name, key)
+		_internalStore._watchers.forEach(destroy => {
+			if(destroy) destroy()
+		})
+		return _internalStore._watchers.clear()
 	}
 
 	function persist(name?: string ){
 		// if there is a name, change the states internal name 
-		if(name) _internalStore._name = `_plexus_state_${name}`
+		if(name) _internalStore.externalName = `_plexus_state_${name}`
 		// instance()._runtime.persist(name, _internalStore._value)
 
 	}
@@ -97,7 +90,7 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 	}
 	
 
-	return {
+	const state = {
 		set,
 		patch,
 		watch,
@@ -115,7 +108,20 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 			return _internalStore._name
 		},
 		get watchers(){
-			return instance()._runtime.getWatchers(_internalStore._name)
+			return instance()._runtime.getWatchers(_internalStore.externalName)
 		}
 	}
+
+
+	// initalization //
+	if (instance()._states.has(this)) {
+		instance()._states.delete(this)
+	}
+	// instance()._states.forEach(state_ => {
+	// 	state_.name
+	// })
+	instance()._states.set(_internalStore._name+"", state)
+
+
+	return state
 }
