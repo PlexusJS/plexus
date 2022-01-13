@@ -14,9 +14,17 @@ const getLocalStorage = () => {
     return null;
   }
 }
-type Override = {prefix: string}
+
+type AlmostAnything = string | number | symbol | Record<any, any> | Array<any>;
+type Override = {
+  prefix: string,
+  get(key: string): AlmostAnything | Promise<any>,
+	set(key: string, value: any): AlmostAnything | Promise<any>,
+	remove(key: string): void | Promise<void>,
+	patch(key: string, value: any): AlmostAnything | Promise<any>,
+}
 // storage func -> called from instance OR by integration -> hooks up to the instance
-export function storage (instance: () => PlexusInstance, name?: string, override?: Override & PxStorageInstance): PxStorageInstance {
+export function storage (instance: () => PlexusInstance, name?: string, override?: Override): PxStorageInstance {
   
   const getKey = (key: string) => `${_internalStore._prefix}${key}`
   
@@ -27,19 +35,13 @@ export function storage (instance: () => PlexusInstance, name?: string, override
   }
 
   const get = (key: string): any => {
-    // if there is an override, use that
-    if(override?.get) return override.get(key)
-
-    // otherwise, try to run with localstorage
+    // try to run with localstorage
     if (getLocalStorage() === null) return null;
     return getLocalStorage().getItem(getKey(key));
   }
 
   const set = (key: string, value: any): void => {
-    // if there is an override, use that
-    if(override?.set) return override.set(key, value)
-
-    // otherwise, try to run with localstorage
+    // try to run with localstorage
     if (getLocalStorage() === null) return;
     if(isObject(value)){
      getLocalStorage().setItem(getKey(key), JSON.stringify(value))
@@ -53,10 +55,7 @@ export function storage (instance: () => PlexusInstance, name?: string, override
   }
 
   const patch = (key: string, value: any): void => {
-    // if there is an override, use that
-    if(override?.patch) return override.patch(key, value)
-
-    // otherwise, try to run with localstorage
+    // try to run with localstorage
     if (getLocalStorage() === null) return;
     if(isObject(value)){
      getLocalStorage().setItem(getKey(key), JSON.stringify(deepMerge(getLocalStorage().getItem(key), value)))
@@ -72,20 +71,17 @@ export function storage (instance: () => PlexusInstance, name?: string, override
 
   }
   const remove = (key: string): void => {
-    // if there is an override, use that
-    if(override?.remove) return override.remove(key)
-
-    // otherwise, try to run with localstorage
+    // try to run with localstorage
     if (getLocalStorage() === null) return;
     getLocalStorage().removeItem(getKey(key));
   }
 
   
   const store = {
-    get,
-    set,
-    remove,
-    patch
+    get: override?.get || get,
+    set: override?.set || set,
+    remove: override?.remove || remove,
+    patch: override?.patch || patch,
   }
   instance()._storages.set(name, store)
   return store
