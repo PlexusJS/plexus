@@ -19,6 +19,7 @@ export function _runtime(instance: () => PlexusInstance){
 	 * 
 	 * @param _key The key of the object being wathced
 	 * @param _callback The function to call when the value changes
+	 * @returns A function to remove the watcher
 	 */
 	function subscribe<Value=PxStateType>(_key: string | number, _callback: (value: Value) => void){
 		function callback(data: {key: string | number, value: Value}){
@@ -42,7 +43,7 @@ export function _runtime(instance: () => PlexusInstance){
 		// // add the watcher to the list
 		// _internalStore._watchers.get(_key).set(watcherKey, _callback)
 
-		// return the watcher key
+		// return the watcher unsubscribe function
 		return unsub
 	}
 

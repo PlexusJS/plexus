@@ -18,9 +18,6 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 	
 	// Methods //
 	function set(value: PxStateValue) {
-		// TODO: this needs to check if the given type is an object/array. If so we need to deep clone the object/array
-		// -> if (isObject(_internalStore._value) && isObject(value)) value = deepMerge(_internalStore._value, value);
-		// That being said, shouldn't we only deepmerge objects from a .patch function, and not .set ?
 
 		_internalStore._lastValue = _internalStore._value
 		if(isObject(value) && isObject(_internalStore._value)) {
