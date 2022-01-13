@@ -21,19 +21,19 @@ export function deepMerge (target: Object, source: Object): any {
   return output;
 }
 
-export class EventEmitter {
-  events: Record<string|number, any>
+export class EventEmitter<Data=any> {
+  events: Map<string|number, Data>
   constructor() {
-    this.events = {};
+    this.events = new Map();
   }
-  on(event, listener) {
+  on(event: string | number, listener: (...args: any[]) => void) {
     if (!(event in this.events)) {
       this.events[event] = [];
     }
     this.events[event].push(listener);
     return () => this.removeListener(event, listener);
   }
-  removeListener(event, listener) {
+  removeListener(event: string | number, listener: (...args: any[]) => void) {
     if (!(event in this.events)) {
        return;
     }
@@ -45,13 +45,13 @@ export class EventEmitter {
       delete this.events[event];
     }
   }
-  emit(event, ...args) {
+  emit(event: string | number, ...args: any) {
     if (!(event in this.events)) {
         return;
      }
     this.events[event].forEach(listener => listener(...args));
   }
-  once(event, listener) {
+  once(event: string | number, listener: (...args: any[]) => void) {
      const remove = this.on(event, (...args) => {
        remove();
        listener(...args);
