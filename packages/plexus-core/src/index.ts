@@ -9,8 +9,10 @@ export function state<Value=any>(item: Value) {
 export function storage(name?: string, override?: StorageOverride){
 	return _storage(() => _instance(), name, override)
 }
-export {route, PlexusRoute, PlexusRouteConfig} from './route' 
 
+
+export {route, PlexusRoute, PlexusRouteConfig} from './route' 
+export {action, PlexusAction, PlexusActionHelpers} from './action'
 
 export function setCore<CoreObj=Record<string, any>>(coreObj: CoreObj){
 
