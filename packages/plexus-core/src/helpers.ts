@@ -1,3 +1,4 @@
+export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object;
 
 export function isObject (item: any): item is Object {
   return item && typeof item === 'object' && !Array.isArray(item);
@@ -22,24 +23,28 @@ export function deepMerge (target: Object, source: Object): any {
 }
 
 // a deep clone of an object
-export function deepClone (obj: any): any {
+export function deepClone<Type = AlmostAnything>(obj: Type): Type {
   if (obj === null || typeof obj !== 'object') {
     return obj;
   }
   if (obj instanceof Date) {
-    return new Date(obj.getTime());
+    return new Date(obj.getTime()) as any as Type;
   }
   if (obj instanceof RegExp) {
-    return new RegExp(obj);
+    return new RegExp(obj) as any as Type;
   }
-  const cloned = new obj.constructor();
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+  // must be an object
+  if(isObject(obj)){
+    
+    const cloned: Type= Object.create(obj as Object);
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
 
-      cloned[key] = deepClone(obj[key]);
+        cloned[key] = deepClone(obj[key]);
+      }
     }
+    return cloned;
   }
-  return cloned;
 }
 
 
