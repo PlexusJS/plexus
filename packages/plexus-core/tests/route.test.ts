@@ -16,7 +16,7 @@ describe('Testing Route Function', () => {
 				custom: 'header'
 			}
 		})
-		console.log(myRoute.config)
+		// console.log(myRoute.config)
 		expect(myRoute.config).toBeDefined()
 		expect(myRoute.config.headers).toBeDefined()
 		expect(myRoute.config.headers['custom']).toBe('header')

@@ -64,7 +64,7 @@ export function route(baseURL: string='', router: PlexusRouteConfig={}): PlexusR
 	try {
 		if(fetch){}
 	} catch(e) {
-		console.warn('%cPlexus WARN:%c Fetch is not supported in this browser', 'color: #f00;', 'color: #FFF;')
+		console.warn('%cPlexus WARN:%c Fetch is not supported in this environment.', 'color: #f00;', 'color: #FFF;')
 		_internalStore._noFetch = true
 	}
 
