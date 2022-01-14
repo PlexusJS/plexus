@@ -1,5 +1,9 @@
 import { route, PlexusRoute } from '../src'
 import { PxState, PxStateInstance } from '../src/interfaces';
+import fetch from 'node-fetch';
+
+if(globalThis.fetch === undefined) globalThis.fetch = fetch as any as (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+
 let myRoute: PlexusRoute
 
 

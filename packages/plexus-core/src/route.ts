@@ -1,4 +1,5 @@
 import { deepClone, deepMerge } from "./helpers"
+import { instance } from "./instance"
 export interface PlexusRouteConfig {
 	options?: RequestInit
 }
@@ -27,8 +28,10 @@ export function route(baseURL: string='', router: PlexusRouteConfig={}): PlexusR
 		_noFetch: false,
 	}
 	async function send<ResponseDataType>(path: string): Promise<PlexusRouteRes<ResponseDataType>>{
-		if(_internalStore._options.headers['Content-Type'] === undefined) _internalStore._options.headers['Content-Type'] = 'application/json'
+		if(_internalStore._options.headers['Content-Type'] === undefined) _internalStore._options.headers['Content-Type'] = 'text/html'
 		if(_internalStore._options.method === undefined) _internalStore._options.method = "GET"
+
+		if(_internalStore._options.method === 'GET' && _internalStore._options.headers['Content-Type'] === undefined) _internalStore._options.headers['Content-Type'] = 'application/json'
 		
 
 		const res = await fetch(`${path.match(/^http(s)?/g).length > 0 ? path : `${_internalStore._baseURL}${path.length > 0 ? '/' : ''}${path}`}`, _internalStore._options)
@@ -64,7 +67,7 @@ export function route(baseURL: string='', router: PlexusRouteConfig={}): PlexusR
 	try {
 		if(fetch){}
 	} catch(e) {
-		console.warn('%cPlexus WARN:%c Fetch is not supported in this environment.', 'color: #f00;', 'color: #FFF;')
+		instance()._runtime.log('warn', 'Fetch is not supported in this environment; route will not work.')
 		_internalStore._noFetch = true
 	}
 
