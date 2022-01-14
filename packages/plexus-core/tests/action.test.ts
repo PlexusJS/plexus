@@ -14,7 +14,7 @@ describe('Testing Action Function', () => {
 
 	test('Can catch an error', () => {
 		const myAction = action(({onCatch}) => {
-			onCatch(console.error)
+			onCatch(() => console.log('error caught successfully!'))
 
 			throw new Error('A test error')
 		})
@@ -33,7 +33,7 @@ describe('Testing Action Function', () => {
 	})
 	
 	test('Can handle async functions', async () => {
-		const successMsg = 'waited 1000 seconds'
+		const successMsg = 'waited 100 seconds'
 		const myAction = action(async ({onCatch}) => {
 			onCatch(console.error)
 			return await new Promise(resolve => setTimeout(() => resolve(successMsg), 100))
