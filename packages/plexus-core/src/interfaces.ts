@@ -15,10 +15,11 @@ export interface PlexusInstance {
 	_plugins: Map<string, PlexusPlugin>,
 	_runtime: PlexusRuntime,
 	_computedStates: Set<any>,
-	_collections: Map<number | string, any>,
+	_collections: Map<number | string, any>
 	_settings: {}
-	storageEngine: string | undefined,
-	_storages: Map<string, PxStorageInstance>;
+	get storageEngine(): (string | undefined)
+	set storageEngine(name: string)
+	_storages: Map<string, PxStorageInstance>
 	get storage(): PxStorageInstance;
 }
 

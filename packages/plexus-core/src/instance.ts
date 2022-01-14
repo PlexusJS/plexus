@@ -30,7 +30,10 @@ export const getPlexusInstance = (name?: string) => globalThis[`__plexusInstance
 export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance {
 	const _internalStore = {
 		_nonce: 0,
-		_id: config.instanceId || ``,
+		_id: config?.instanceId || ``,
+		_selectedStorage: undefined,
+		_settings: {},
+		_ready: false,
 	}
 	/**
 	 * Get the correctly formatted instance name
@@ -50,9 +53,14 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 	// if the instance is not created, create it
 	if(globalThis[getInstanceName()] === undefined){
 		const newInstance: PlexusInstance = Object.freeze({
-			ready: false,
+			get ready(){ return _internalStore._ready },
+			set ready(isReady: boolean){ _internalStore._ready = isReady },
+			get _settings(){ return _internalStore._settings },
+			get storageEngine(){ return _internalStore._selectedStorage },
+			set storageEngine(name: string){ _internalStore._selectedStorage = name },
+			get storage(){ return (this as PlexusInstance)._storages.get((this as PlexusInstance).storageEngine) },
 			genNonce(){
-				_internalStore._nonce = ++_internalStore._nonce
+				_internalStore._nonce += 1
 				return _internalStore._nonce
 			},
 			_runtime: _runtime(() => instance()),
@@ -60,24 +68,19 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 			_states: new Map(),
 			_plugins: new Map(),
 			_collections: new Map(),
-			_settings: {},
 			_storages: new Map(),
-			storageEngine: undefined,
-			get storage(){
-				return (this as PlexusInstance)._storages.get((this as PlexusInstance).storageEngine)
-			}
 		})
 		
 		globalThis[getInstanceName()] = newInstance
 		// add the instance to the master
-		getPlexusMasterInstance()._instances.set(getInstanceName(), () => getPlexusInstance(getInstanceName()))
+		getPlexusMasterInstance()._instances.set(getInstanceName(), () => getPlexusInstance(_internalStore._id))
 
 		// initail instance configuration, do all pre-init stuff here
-		getPlexusInstance(getInstanceName())._storages.set('default', storage(() => instance()))
-		getPlexusInstance(getInstanceName()).storageEngine = 'default'
+		getPlexusInstance(_internalStore._id)._storages.set('default', storage(() => instance()))
+		getPlexusInstance(_internalStore._id).storageEngine = 'default'
 
 		// instance is done initializing
-		getPlexusInstance(getInstanceName()).ready = true
+		getPlexusInstance(_internalStore._id).ready = true
 	}
 	// return the instance
 	return globalThis[getInstanceName()] as PlexusInstance
