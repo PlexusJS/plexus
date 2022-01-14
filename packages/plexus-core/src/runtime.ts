@@ -2,10 +2,16 @@ import {EventEmitter} from "./helpers";
 import { PlexusInstance, PxStateType } from "./interfaces";
 type Fn<Value> = (value: Value) => void
 type SubscriptionTypes = 'stateChange' | 'event' | 'storage' | `plugin_${string}`
+
+/**
+ * Create a runtime for an instance NOTE: NOT FOR PUBLIC USE
+ * @param instance the instance the runtime is running on
+ * @returns 
+ */
 export function _runtime(instance: () => PlexusInstance){
 	const _internalStore = {
 		_conductor: new EventEmitter<{key: string|number, value: any}>(),
-		_watchers: new Map<string|number, Map<string|Number, (v: any) => void>>()
+		_watchers: new Map<string|number, Map<string|Number, (v: any) => void>>(),
 	}
 
 	const genEventName = (key: string) => `stateChange_${key}`
@@ -70,8 +76,13 @@ export function _runtime(instance: () => PlexusInstance){
 		return _internalStore._conductor.events.get(`stateChange_${key}`)
 	}
 
-	function log(...args: any){
-		console.log('', ...args)
+	function log(type: 'warn' | 'info' | 'error', message: string){
+		const typeColors = {
+			'info': '#4281A4',
+			'warn': '#E9D985',
+			'error': '#CE2D4F'
+		}
+		console[type](`%cPlexus(${instance().name}) ${type.toUpperCase()}:%c ${message}`, `color: ${typeColors[type]};`, 'color: unset;')
 	}
 	
 	return {
@@ -80,5 +91,6 @@ export function _runtime(instance: () => PlexusInstance){
 		subscribe,
 		unsubscribe,
 		getWatchers,
+		log
 	}
 }
