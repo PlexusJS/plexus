@@ -77,12 +77,12 @@ export function storage (instance: () => PlexusInstance, name?: string, override
   }
 
   
-  const store = {
+  const store = Object.freeze({
     get: override?.get || get,
     set: override?.set || set,
     remove: override?.remove || remove,
     patch: override?.patch || patch,
-  }
+  })
   instance()._storages.set(name, store)
   return store
 }

@@ -29,11 +29,11 @@ export function action<Type extends FunctionType = FunctionType>(fn: Type){
 
 	} 
 
-	const helpers: PlexusActionHelpers = {
+	const helpers: PlexusActionHelpers = Object.freeze({
 		onCatch: (handler: (error: any) => void = () => {}) => {
 			_internalStore._errorHandlers.add(handler)
 		}
-	}
+	})
 
 
 	if(fn.constructor.name === 'Function'){

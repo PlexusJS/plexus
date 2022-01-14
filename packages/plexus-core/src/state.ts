@@ -103,7 +103,7 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 	}
 	
 
-	const state = {
+	const state = Object.freeze({
 		set,
 		patch,
 		watch,
@@ -123,7 +123,7 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		get watchers(){
 			return instance()._runtime.getWatchers(_internalStore.externalName)
 		}
-	}
+	})
 
 
 	// initalization //

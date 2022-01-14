@@ -68,7 +68,7 @@ export function route(baseURL: string='', router: PlexusRouteConfig={}): PlexusR
 		_internalStore._noFetch = true
 	}
 
-	return {
+	return Object.freeze({
 		options: function(options?: RequestInit, overwrite: boolean=false){
 			
 			if(overwrite) {
@@ -142,5 +142,5 @@ export function route(baseURL: string='', router: PlexusRouteConfig={}): PlexusR
 		get config(){
 			return deepClone(_internalStore._options || {})
 		}
-	} as PlexusRoute
+	}) as PlexusRoute
 }

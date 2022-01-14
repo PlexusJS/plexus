@@ -35,10 +35,11 @@ export function _event<PayloadType=any>(instance: () => PlexusInstance){
 		
 	}
 
-	return {
+	const event = Object.freeze({
 		on,
 		emit,
 		disable,
 
-	}
+	})
+	return event
 }
