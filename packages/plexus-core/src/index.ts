@@ -1,17 +1,17 @@
-import { _instance } from './instance'
+import { instance } from './instance'
 import { PlexusPlugin } from './interfaces'
 import { _state } from './state'
 import { _event } from './event'
 import {storage as _storage, StorageOverride} from './storage'
 
 export function state<Value=any>(item: Value) {
-	return _state(() => _instance(), item)
+	return _state(() => instance(), item)
 }
 export function storage(name?: string, override?: StorageOverride){
-	return _storage(() => _instance(), name, override)
+	return _storage(() => instance(), name, override)
 }
 export function event<PayloadType=any>(){
-	return _event<PayloadType>(() => _instance())
+	return _event<PayloadType>(() => instance())
 }
 
 
@@ -23,6 +23,6 @@ export function setCore<CoreObj=Record<string, any>>(coreObj: CoreObj){
 }
 
 export function usePlugin(plugin: PlexusPlugin){
-	plugin.init(() => _instance())
-	_instance()._plugins.set(plugin.name, plugin)
+	plugin.init(() => instance())
+	instance()._plugins.set(plugin.name, plugin)
 }

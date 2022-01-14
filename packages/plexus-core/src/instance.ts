@@ -2,20 +2,60 @@ import { PlexusInstance } from "./interfaces";
 import { _runtime } from "./runtime";
 import { storage } from "./storage";
 
-export const getPlexusInstance = () => globalThis.__plexusInstance__ as PlexusInstance
+interface PlexusInstanceConfig {
+	instanceId: string
+}
+interface PlexusMaster {
+	_ready: false,
+	_instances: Map<string, () => PlexusInstance>,
+}
+/**
+ * Get the master instance
+ * @returns The master of PlexusJS; oversees all instances of PlexusJS
+ */
+export const getPlexusMasterInstance = () => globalThis.__plexusMaster__ as PlexusMaster
 
-export function _instance(): PlexusInstance {
+/**
+ * Get the reference to the instance with a given name, if no name is provided, the master instance is returned
+ * @param name (optional) The name of the instance
+ * @returns If no name, returns the main instance of PlexusJS, otherwise returns the instance with the given name (ex. a plugins instance)
+ */
+export const getPlexusInstance = (name?: string) => globalThis[`__plexusInstance__${name ? name+'__' : ''}`] as PlexusInstance
+
+/**
+ * Generate a new instance of PlexusJS
+ * @param config The configuration for the instance
+ * @returns An instance of PlexusJS
+ */
+export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance {
 	const _internalStore = {
 		_nonce: 0,
+		_id: config.instanceId || ``,
 	}
-	if(globalThis.__plexusInstance__ === undefined){
-		const globalInstance: PlexusInstance = {
+	/**
+	 * Get the correctly formatted instance name
+	 * @returns The formatted name of the instance
+	 */
+	const getInstanceName = () => `__plexusInstance__${_internalStore._id ? _internalStore._id+'__' : ''}`
+
+	// if the master is not created, create it
+	if(globalThis['__plexusMaster__'] === undefined){
+		const plexusMaster: PlexusMaster = {
+			_ready: false,
+			_instances: new Map<string, () => PlexusInstance>(),
+		}
+		globalThis['__plexusMaster__'] = plexusMaster
+	}
+
+	// if the instance is not created, create it
+	if(globalThis[getInstanceName()] === undefined){
+		const newInstance: PlexusInstance = Object.freeze({
 			ready: false,
 			genNonce(){
 				_internalStore._nonce = ++_internalStore._nonce
 				return _internalStore._nonce
 			},
-			_runtime: _runtime(() => _instance()),
+			_runtime: _runtime(() => instance()),
 			_computedStates: new Set(),
 			_states: new Map(),
 			_plugins: new Map(),
@@ -26,20 +66,20 @@ export function _instance(): PlexusInstance {
 			get storage(){
 				return (this as PlexusInstance)._storages.get((this as PlexusInstance).storageEngine)
 			}
-		}
+		})
 		
-		globalThis.__plexusInstance__ = globalInstance as PlexusInstance
-
-		// alias fn for ts
-		
+		globalThis[getInstanceName()] = newInstance
+		// add the instance to the master
+		getPlexusMasterInstance()._instances.set(getInstanceName(), () => getPlexusInstance(getInstanceName()))
 
 		// initail instance configuration, do all pre-init stuff here
-		getPlexusInstance()._storages.set('default', storage(() => _instance()))
-		getPlexusInstance().storageEngine = 'default'
+		getPlexusInstance(getInstanceName())._storages.set('default', storage(() => instance()))
+		getPlexusInstance(getInstanceName()).storageEngine = 'default'
 
 		// instance is done initializing
-		getPlexusInstance().ready = true
+		getPlexusInstance(getInstanceName()).ready = true
 	}
-	return globalThis.__plexusInstance__ as PlexusInstance
+	// return the instance
+	return globalThis[getInstanceName()] as PlexusInstance
 
 }
