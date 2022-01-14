@@ -53,6 +53,8 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 	// if the instance is not created, create it
 	if(globalThis[getInstanceName()] === undefined){
 		const newInstance: PlexusInstance = Object.freeze({
+			get name() { return _internalStore._id || 'default' },
+			get internalName() { return getInstanceName() },
 			get ready(){ return _internalStore._ready },
 			set ready(isReady: boolean){ _internalStore._ready = isReady },
 			get _settings(){ return _internalStore._settings },

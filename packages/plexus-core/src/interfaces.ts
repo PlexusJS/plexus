@@ -9,6 +9,8 @@ export type PlexusPlugin = {
 	
 }
 export interface PlexusInstance {
+	name: string,
+	internalName: string
 	ready: boolean;
 	genNonce(): number | string;
 	_states: Map<string, PxStateInstance>,
