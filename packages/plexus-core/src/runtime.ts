@@ -1,6 +1,7 @@
 import {EventEmitter} from "./helpers";
 import { PlexusInstance, PxStateType } from "./interfaces";
-
+type Fn<Value> = (value: Value) => void
+type SubscriptionTypes = 'stateChange' | 'event' | 'storage' | `plugin_${string}`
 export function _runtime(instance: () => PlexusInstance){
 	const _internalStore = {
 		_conductor: new EventEmitter<{key: string|number, value: any}>(),
@@ -15,13 +16,22 @@ export function _runtime(instance: () => PlexusInstance){
 		_internalStore._conductor.emit(`anyStateChanged`, {key, value})
 	}
 
+	function broadcast<Value=PxStateType>(key: string | number, type: SubscriptionTypes, value: Value){
+		_internalStore._conductor.emit(`${type}_${key}`, {key, value})
+	}
+
 	/**
 	 * 
 	 * @param _key The key of the object being wathced
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
 	 */
-	function subscribe<Value=PxStateType>(_key: string | number, _callback: (value: Value) => void){
+	// function subscribe<Value=PxStateType>(key: string | number, callback: Fn<Value>);
+	function subscribe<Value=PxStateType>(_key: string | number, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>){
+		const type = typeof typeOrCallback === 'string' ? typeOrCallback : 'stateChange'
+		if(typeof typeOrCallback === 'function' && _callback === undefined){
+			_callback = typeOrCallback
+		}
 		function callback(data: {key: string | number, value: Value}){
 			const {key, value} = data
 
@@ -31,7 +41,7 @@ export function _runtime(instance: () => PlexusInstance){
 		} 
 
 		// 
-		const unsub = _internalStore._conductor.on(`stateChange_${_key}`, callback)
+		const unsub = _internalStore._conductor.on(`${type}_${_key}`, callback)
 		// generate watcher key
 		// watcherKey = watcherKey === undefined ? `_plexus_state_watcher_${instance().genNonce()}` : watcherKey
 
@@ -59,9 +69,14 @@ export function _runtime(instance: () => PlexusInstance){
 		if(!key) return _internalStore._conductor.events
 		return _internalStore._conductor.events.get(`stateChange_${key}`)
 	}
+
+	function log(...args: any){
+		console.log('', ...args)
+	}
 	
 	return {
 		stateChange,
+		broadcast,
 		subscribe,
 		unsubscribe,
 		getWatchers,
