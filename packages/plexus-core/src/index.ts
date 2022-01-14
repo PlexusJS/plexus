@@ -1,6 +1,7 @@
 import { _instance } from './instance'
 import { PlexusPlugin } from './interfaces'
 import { _state } from './state'
+import { _event } from './event'
 import {storage as _storage, StorageOverride} from './storage'
 
 export function state<Value=any>(item: Value) {
@@ -8,6 +9,9 @@ export function state<Value=any>(item: Value) {
 }
 export function storage(name?: string, override?: StorageOverride){
 	return _storage(() => _instance(), name, override)
+}
+export function event<PayloadType=any>(){
+	return _event<PayloadType>(() => _instance())
 }
 
 

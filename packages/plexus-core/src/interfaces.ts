@@ -1,3 +1,4 @@
+import { _event } from "./event";
 import { _runtime } from "./runtime";
 
 export type PlexusRuntime = ReturnType<typeof _runtime>
@@ -49,6 +50,8 @@ export type PxState = <PxStateValue=any>(instance: () => PlexusInstance, input: 
 export type PxStateWatcher<V> = (value: V) => void
 
 type DestroyFn = () => void
+
+export type PlexusEvent = ReturnType<typeof _event>
 
 
 
