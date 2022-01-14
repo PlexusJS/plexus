@@ -1,5 +1,4 @@
 import { route, PlexusRoute } from '../src'
-import { _instance } from '../src/instance';
 import { PxState, PxStateInstance } from '../src/interfaces';
 let myRoute: PlexusRoute
 

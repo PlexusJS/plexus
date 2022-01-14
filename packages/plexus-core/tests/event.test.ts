@@ -1,5 +1,5 @@
 import { route, PlexusRoute, PlexusAction, event, state } from '../src'
-import { _instance } from '../src/instance';
+import { instance } from '../src/instance';
 import { PlexusEvent, PxState, PxStateInstance } from '../src/interfaces';
 
 describe('Testing Event Function', () => {

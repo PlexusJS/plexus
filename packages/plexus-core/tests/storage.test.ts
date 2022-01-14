@@ -1,5 +1,5 @@
 import { state } from '../src'
-import { _instance } from '../src/instance';
+import { instance } from '../src/instance';
 import { PxState, PxStateInstance } from '../src/interfaces';
 let booleanState: PxStateInstance<boolean>,
  stringState: PxStateInstance<string>,
@@ -26,8 +26,8 @@ describe('Testing Storage Function', () => {
 	test('Default Storage is created and assigned', () => {
 
 		const value = state(1)
-		expect(_instance().storageEngine).toBe('default')
-		expect(_instance().storage).toBeDefined()
+		expect(instance().storageEngine).toBe('default')
+		expect(instance().storage).toBeDefined()
 	})
 	
 	

@@ -1,5 +1,5 @@
 import { action, PlexusAction } from '../src'
-import { _instance } from '../src/instance';
+import { instance } from '../src/instance';
 import { PxState, PxStateInstance } from '../src/interfaces';
 let myAction: PlexusAction
 
