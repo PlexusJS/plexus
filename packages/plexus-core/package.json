@@ -4,8 +4,9 @@
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
+  "dependancies": {},
   "scripts": {
-    "build": "tsc --build --force",
+    "build": "tsc --build --force --verbose && echo \"Build complete.\"",
     "test": "jest"
   }
 }

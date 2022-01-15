@@ -8,17 +8,17 @@ export function usePlexus<State extends ReturnType<typeof state>>(deps: State | 
 	const [_, set] = useState(null)
 	useEffect(() => {
 		if(Array.isArray(deps)){
-			const depSubIds: Map<string|number, State> = new Map()
+			const depSubIds: Set<() => void> = new Set()
 			for(let dep of deps){
 				
 				const id = dep.watch(set)
-				depSubIds.set(id, dep)
+				// depSubIds.set(id, dep)
 				
 			}
 			return () => {
 				for(let unsub of depSubIds){
-					const [id, value] = unsub
-					value.removeWatcher(id)
+					unsub()
+					depSubIds.delete(unsub)
 				}
 			}
 		}

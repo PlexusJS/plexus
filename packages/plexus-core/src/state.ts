@@ -7,7 +7,8 @@ export type PlexusStateWatcher<V> = (value: V) => void
 export type PlexusStateInstance<Value=any> = {
 	set(item: Value): void;
 	patch(item: Value): void;
-	watch(keyOrCallback: string | number | PlexusStateWatcher<Value>,  callback?: PlexusStateWatcher<Value>): string|number;
+	watch(callback: PlexusStateWatcher<Value>): () => void;
+	watch(keyOrCallback: string | number | PlexusStateWatcher<Value>,  callback?: PlexusStateWatcher<Value>): () => void;
 	removeWatcher(key: string|number): boolean
 	undo(): void;
 	reset(): void;
@@ -92,16 +93,26 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 
 	}
 
-
-	function watch(callback: PlexusStateWatcher<PxStateValue>)
-	function watch(key: string | number, callback: PlexusStateWatcher<PxStateValue>)
+	/**
+	 * Watch for changes on this state
+	 * @param callback 
+	 * @returns 
+	 */
+	function watch(callback: PlexusStateWatcher<PxStateValue>): () => void
 	/**
 	 * Watch for changes on this state
 	 * @param keyOrCallback 
 	 * @param callback 
 	 * @returns 
 	 */
-	function watch(keyOrCallback: string | number | PlexusStateWatcher<PxStateValue>,  callback?: PlexusStateWatcher<PxStateValue>) {
+	function watch(key: string | number, callback: PlexusStateWatcher<PxStateValue>): () => void
+	/**
+	 * Watch for changes on this state
+	 * @param keyOrCallback 
+	 * @param callback 
+	 * @returns 
+	 */
+	function watch(keyOrCallback: string | number | PlexusStateWatcher<PxStateValue>,  callback?: PlexusStateWatcher<PxStateValue>): () => void {
 		if(typeof keyOrCallback === 'function'){
 			callback = keyOrCallback
 			// generate a nonce from global instance
@@ -109,9 +120,13 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 		}
 
 		// add to internal list of named watchers
-		const destroy = instance()._runtime.subscribe(_internalStore._name, callback)
+		const destroy = instance()._runtime.subscribe(_internalStore._name, "stateChange", callback)
 		_internalStore._watchers.set(keyOrCallback, destroy)
-		return keyOrCallback
+		// return keyOrCallback
+		return () => {
+			
+			removeWatcher(keyOrCallback as string | number)
+		}
 	}
 	/**
 	 * Remove a watcher from this state
@@ -120,7 +135,8 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 	 */
 	function removeWatcher(key: string | number){
 		// instance()._runtime.unsubscribe(_internalStore._name, key)
-		const destroy = _internalStore._watchers.get(key)
+		let destroy = _internalStore._watchers.get(key)
+		// if(!destroy) destroy = _internalStore._watchers.get(key.toString())
 		if(destroy) destroy()
 		return _internalStore._watchers.delete(key)
 
