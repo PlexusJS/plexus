@@ -1,6 +1,12 @@
-import { instance } from "./instance";
-import { PlexusInstance, PlexusPlugin } from "./interfaces";
-interface PlexusPluginConfig {
+import { instance, PlexusInstance } from "./instance";
+// import { PlexusInstance } from "./interfaces";
+export type PlexusPlugin = {
+	name: string,
+	version?: string,
+	init: (instance: () => PlexusInstance) => void,
+	
+}
+export interface PlexusPluginConfig {
 	newInstance?: boolean
 	version?: string,
 }
@@ -17,7 +23,6 @@ export function plexusPlugin(name: string, configOrInit?: PlexusPluginConfig | (
 	}
 	configOrInit.newInstance === true ? _internalStore.getInstance = () => instance({instanceId: name}) : _internalStore.getInstance = () => instance()
 
-	// if the init function is defined, call it
-	
+	// call the plugin initializer
 	return init(_internalStore.getInstance)
 }
