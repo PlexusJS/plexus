@@ -1,0 +1,22 @@
+{
+  "name": "@plexusjs/react",
+  "version": "1.0.0-alpha.0",
+  "description": "React Plugin for PlexusJS",
+  "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "peerDependencies": {
+    "@plexusjs/react": "^1.0.0-alpha.0",
+    "react": "^16.8.6"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.49",
+    "@types/react-test-renderer": "^16.9.3",
+    "react-test-renderer": "^16.13.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "jest"
+  }
+}
