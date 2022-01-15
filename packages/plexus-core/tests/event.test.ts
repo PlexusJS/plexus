@@ -1,6 +1,6 @@
 import { route, PlexusRoute, PlexusAction, event, state } from '../src'
-import { instance } from '../src/instance';
-import { PlexusEvent, PxState, PxStateInstance } from '../src/interfaces';
+// import { instance } from '../src/instance';
+// import { PlexusEvent, PxState, PxStateInstance } from '../src/interfaces';
 
 describe('Testing Event Function', () => {
 	test('Emitting a string', async () => {

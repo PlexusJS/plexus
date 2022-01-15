@@ -1,6 +1,6 @@
 import { action, PlexusAction } from '../src'
 import { instance } from '../src/instance';
-import { PxState, PxStateInstance } from '../src/interfaces';
+// import { PxState, PxStateInstance } from '../src/interfaces';
 let myAction: PlexusAction
 
 describe('Testing Action Function', () => {

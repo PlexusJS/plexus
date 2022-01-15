@@ -1,11 +1,11 @@
-import { state } from '../src'
+import { PlexusStateInstance, state } from '../src'
 import { instance } from '../src/instance';
-import { PxState, PxStateInstance } from '../src/interfaces';
-let booleanState: PxStateInstance<boolean>,
- stringState: PxStateInstance<string>,
- objectState: PxStateInstance<{ a?: Partial<{ a: boolean, b: boolean }>, b?: boolean, c?: {b?: boolean}}>,
- arrayState: PxStateInstance<{ item?: string, item2?: {subitem?: string}}[]>,
- nullState: PxStateInstance<null | boolean>
+// import { PxState, PxStateInstance } from '../src/interfaces';
+let booleanState: PlexusStateInstance<boolean>,
+ stringState: PlexusStateInstance<string>,
+ objectState: PlexusStateInstance<{ a?: Partial<{ a: boolean, b: boolean }>, b?: boolean, c?: {b?: boolean}}>,
+ arrayState: PlexusStateInstance<{ item?: string, item2?: {subitem?: string}}[]>,
+ nullState: PlexusStateInstance<null | boolean>
 
 const initialValue = {
 	boolean: true,

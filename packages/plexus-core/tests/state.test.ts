@@ -1,10 +1,10 @@
-import { state } from '../src'
-import { PxState, PxStateInstance } from '../src/interfaces';
-let booleanState: PxStateInstance<boolean>,
- stringState: PxStateInstance<string>,
- objectState: PxStateInstance<{ a?: Partial<{ a: boolean, b: boolean }>, b?: boolean, c?: {b?: boolean}}>,
- arrayState: PxStateInstance<{ item?: string, item2?: {subitem?: string}}[]>,
- nullState: PxStateInstance<null | boolean>
+import { PlexusStateInstance, state } from '../src'
+// import { PlexusState, PlexusStateInstance } from '../src/interfaces';
+let booleanState: PlexusStateInstance<boolean>,
+ stringState: PlexusStateInstance<string>,
+ objectState: PlexusStateInstance<{ a?: Partial<{ a: boolean, b: boolean }>, b?: boolean, c?: {b?: boolean}}>,
+ arrayState: PlexusStateInstance<{ item?: string, item2?: {subitem?: string}}[]>,
+ nullState: PlexusStateInstance<null | boolean>
 
 const initialValue = {
 	boolean: true,
@@ -53,9 +53,11 @@ describe('Testing State Function', () => {
 		expect(objectState.value.a.b).toBe(false)
 		
 
+		console.log(arrayState.value)
 		// check array deep merge
-		arrayState.patch([{ item: 'Hello' }]);
-		expect(arrayState.value[0].item).toBe('Hello')
+		arrayState.patch([{ item: 'Hello2' }]);
+		console.log(arrayState.value)
+		expect(arrayState.value[0].item).toBe('Hello2')
 		expect(arrayState.value[0].item2).toStrictEqual({ subitem: 'World' })
 		expect(arrayState.value[1].item).toBe('Goodbye')
 
@@ -68,12 +70,13 @@ describe('Testing State Function', () => {
 			callbackCalled = !callbackCalled;
 		}
 		// can add watcher
-		const watcherKey = stringState.watch(callback);
+		const watcherDestoryer = stringState.watch(callback);
 		stringState.set('Hello World');
 		expect(callbackCalled).toBe(true);
 		// console.log(_instance()._runtime.getWatchers())
 		// can remove watcher
-		stringState.removeWatcher(watcherKey);
+		// stringState.removeWatcher(watcherKey);
+		watcherDestoryer()
 		// console.log(_instance()._runtime.getWatchers())
 		stringState.set('new value');
 		expect(callbackCalled).toBe(true);
