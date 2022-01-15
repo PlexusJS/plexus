@@ -5,6 +5,7 @@ export type PlexusStateType = Object | Array<unknown> | string | number | boolea
 export type PlexusState = <PxStateValue=any>(instance: () => PlexusInstance, input: PxStateValue) => PlexusStateInstance<PxStateValue>
 export type PlexusStateWatcher<V> = (value: V) => void
 export type PlexusStateInstance<Value=any> = {
+	
 	set(item: Value): void;
 	patch(item: Value): void;
 	watch(callback: PlexusStateWatcher<Value>): () => void;
@@ -18,6 +19,7 @@ export type PlexusStateInstance<Value=any> = {
 	name: string | number;
 	watchers: any
 } 
+// export type PlexusStateInstance<Value=any> = ReturnType<typeof _state>
 
 type DestroyFn = () => void
 
@@ -32,7 +34,7 @@ export interface PlexStateInternalStore<Value> {
 	externalName: string
 }
 
-export function _state<PxStateValue extends PlexusStateType>(instance: () => PlexusInstance, _init: PxStateValue): PlexusStateInstance<PxStateValue> {
+export function _state<PxStateValue extends PlexusStateType>(instance: () => PlexusInstance, _init: PxStateValue) {
 
 	// props // 
 	const _internalStore: PlexStateInternalStore<PxStateValue> = {
@@ -51,7 +53,7 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 	/**
 	 * Set the value of the state
 	 * @param value 
-	 */
+	*/
 	function set(value: PxStateValue) {
 
 		_internalStore._lastValue = _internalStore._value
@@ -180,6 +182,7 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 	
 
 	const state = Object.freeze({
+		
 		set,
 		patch,
 		watch,
@@ -188,7 +191,7 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 		reset,
 		persist,
 		get value() {
-			return deepClone(_internalStore._value)
+			return _internalStore._value
 		},
 		get lastValue(){
 			return deepClone(_internalStore._lastValue)
@@ -210,7 +213,7 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 	// 	state_.name
 	// })
 	instance()._states.set(_internalStore._name+"", state)
-
+	
 
 	return state
 }
