@@ -1,8 +1,11 @@
 import { instance } from './instance'
-import { PlexusPlugin } from './interfaces'
 import { _state } from './state'
 import { _event } from './event'
 import {storage as _storage, StorageOverride} from './storage'
+import { PlexusPlugin } from './plugin'
+
+// export {PlexusStateInstance} from './interfaces'
+export { PlexusStateInstance } from "./state";
 
 export function state<Value=any>(item: Value) {
 	return _state(() => instance(), item)

@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "yarn && turbo run dev --parallel --no-cache",
     "clean-build": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
-    "build": "yarn clean-build && turbo run build",
+    "build": "yarn clean-build && turbo run build --parallel ",
     "prepublish": "lerna run prepublish",
     "publish-canary": "lerna version prerelease --preid canary --force-publish",
     "publish-stable": "lerna version --force-publish",
@@ -29,7 +29,7 @@
     "node-fetch": "2",
     "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
-    "turbo": "^1.0.25",
+    "turbo": "^1.0.28",
     "typescript": "^4.5.4"
   },
   "turbo": {

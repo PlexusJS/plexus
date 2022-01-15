@@ -1,5 +1,9 @@
 import {EventEmitter} from "./helpers";
-import { PlexusInstance, PxStateType } from "./interfaces";
+import { PlexusInstance } from "./instance";
+import { PlexusStateType } from "./state";
+// import { PlexusInstance, PlexusStateType } from "./interfaces";
+
+export type PlexusRuntime = ReturnType<typeof _runtime>
 type Fn<Value> = (value: Value) => void
 type SubscriptionTypes = 'stateChange' | 'event' | 'storage' | `plugin_${string}`
 
@@ -17,12 +21,12 @@ export function _runtime(instance: () => PlexusInstance){
 	const genEventName = (key: string) => `stateChange_${key}`
 
 	// track a change and propigate to all listeneing children in instance
-	function stateChange<Value=PxStateType>(key: string | number, value: Value){	
+	function stateChange<Value=PlexusStateType>(key: string | number, value: Value){	
 		_internalStore._conductor.emit(`stateChange_${key}`, {key, value})
 		_internalStore._conductor.emit(`anyStateChanged`, {key, value})
 	}
 
-	function broadcast<Value=PxStateType>(key: string | number, type: SubscriptionTypes, value: Value){
+	function broadcast<Value=PlexusStateType>(key: string | number, type: SubscriptionTypes, value: Value){
 		_internalStore._conductor.emit(`${type}_${key}`, {key, value})
 	}
 
@@ -32,8 +36,8 @@ export function _runtime(instance: () => PlexusInstance){
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
 	 */
-	// function subscribe<Value=PxStateType>(key: string | number, callback: Fn<Value>);
-	function subscribe<Value=PxStateType>(_key: string | number, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>){
+	// function subscribe<Value=PlexusStateType>(key: string | number, callback: Fn<Value>);
+	function subscribe<Value=PlexusStateType>(_key: string | number, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>){
 		const type = typeof typeOrCallback === 'string' ? typeOrCallback : 'stateChange'
 		if(typeof typeOrCallback === 'function' && _callback === undefined){
 			_callback = typeOrCallback

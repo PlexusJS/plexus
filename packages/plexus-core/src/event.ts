@@ -1,4 +1,6 @@
-import { PlexusInstance } from "./interfaces"
+// import { PlexusInstance } from "./interfaces"
+
+import { PlexusInstance } from "./instance"
 
 type EventHandler = (v: any) => void
 

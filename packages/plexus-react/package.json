@@ -15,8 +15,7 @@
     "react-test-renderer": "^16.13.1"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w",
+    "build": "tsc --build --force",
     "test": "jest"
   }
 }

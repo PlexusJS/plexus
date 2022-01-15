@@ -1,4 +1,3 @@
-import { PxCollectionInstance, PxState, PxStateInstance } from "./interfaces"
 
 export interface PlexusActionHelpers {
 	/**

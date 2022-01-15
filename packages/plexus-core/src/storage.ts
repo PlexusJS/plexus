@@ -1,5 +1,12 @@
 import { deepMerge, isObject } from './helpers';
-import { PlexusInstance, PxStorageInstance } from './interfaces';
+import { PlexusInstance } from './instance';
+// import { PlexusInstance, PxStorageInstance } from './interfaces';
+export interface PlexusStorageInstance {
+	get(key: string): any;
+	set(key: string, value: any): void;
+	remove(key: string): void;
+	patch(key: string, value: any): void;
+}
 
 /**
  * 
@@ -24,7 +31,7 @@ export type StorageOverride = {
 	patch(key: string, value: any): AlmostAnything | Promise<any>,
 }
 // storage func -> called from instance OR by integration -> hooks up to the instance
-export function storage (instance: () => PlexusInstance, name?: string, override?: StorageOverride): PxStorageInstance {
+export function storage (instance: () => PlexusInstance, name?: string, override?: StorageOverride): PlexusStorageInstance {
   
   const getKey = (key: string) => `${_internalStore._prefix}${key}`
   

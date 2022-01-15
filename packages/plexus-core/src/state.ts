@@ -1,7 +1,37 @@
 import { deepClone, deepMerge, isObject } from './helpers'
-import { PlexusInstance, PlexStateInternalStore, PxState, PxStateType, PxStateInstance, PxStateWatcher } from "./interfaces"
+import { PlexusInstance } from './instance'
+// import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusStateWatcher } from "./interfaces"
+export type PlexusStateType = Object | Array<unknown> | string | number | boolean | null | undefined 
+export type PlexusState = <PxStateValue=any>(instance: () => PlexusInstance, input: PxStateValue) => PlexusStateInstance<PxStateValue>
+export type PlexusStateWatcher<V> = (value: V) => void
+export type PlexusStateInstance<Value=any> = {
+	set(item: Value): void;
+	patch(item: Value): void;
+	watch(keyOrCallback: string | number | PlexusStateWatcher<Value>,  callback?: PlexusStateWatcher<Value>): string|number;
+	removeWatcher(key: string|number): boolean
+	undo(): void;
+	reset(): void;
+	persist(name?: string): void;
+	value: Value;
+	lastValue: Value;
+	name: string | number;
+	watchers: any
+} 
 
-export function _state<PxStateValue extends PxStateType>(instance: () => PlexusInstance, _init: PxStateValue): PxStateInstance<PxStateValue> {
+type DestroyFn = () => void
+
+export interface PlexStateInternalStore<Value> {
+	_initialValue: Value
+	_lastValue: Value | null
+	_value: Value
+	_nextValue: Value
+	_watchers: Map<number | string, DestroyFn>
+	_name: string | number
+	_persist: boolean
+	externalName: string
+}
+
+export function _state<PxStateValue extends PlexusStateType>(instance: () => PlexusInstance, _init: PxStateValue): PlexusStateInstance<PxStateValue> {
 
 	// props // 
 	const _internalStore: PlexStateInternalStore<PxStateValue> = {
@@ -17,6 +47,10 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 	}
 	
 	// Methods //
+	/**
+	 * Set the value of the state
+	 * @param value 
+	 */
 	function set(value: PxStateValue) {
 
 		_internalStore._lastValue = _internalStore._value
@@ -37,6 +71,10 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		instance()._runtime.stateChange(_internalStore._name, value)
 		if(_internalStore._persist) instance().storage.set(_internalStore.externalName, _internalStore._value)
 	}
+	/**
+	 * Patch the current value of the state
+	 * @param value 
+	 */
 	function patch(value: PxStateValue) {
 		
 		if(isObject(value) && isObject(_internalStore._value)) {
@@ -54,9 +92,16 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 
 	}
 
-	function watch(callback: PxStateWatcher<PxStateValue>)
-	function watch(key: string | number, callback: PxStateWatcher<PxStateValue>)
-	function watch(keyOrCallback: string | number | PxStateWatcher<PxStateValue>,  callback?: PxStateWatcher<PxStateValue>) {
+
+	function watch(callback: PlexusStateWatcher<PxStateValue>)
+	function watch(key: string | number, callback: PlexusStateWatcher<PxStateValue>)
+	/**
+	 * Watch for changes on this state
+	 * @param keyOrCallback 
+	 * @param callback 
+	 * @returns 
+	 */
+	function watch(keyOrCallback: string | number | PlexusStateWatcher<PxStateValue>,  callback?: PlexusStateWatcher<PxStateValue>) {
 		if(typeof keyOrCallback === 'function'){
 			callback = keyOrCallback
 			// generate a nonce from global instance
@@ -68,6 +113,11 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		_internalStore._watchers.set(keyOrCallback, destroy)
 		return keyOrCallback
 	}
+	/**
+	 * Remove a watcher from this state
+	 * @param key 
+	 * @returns 
+	 */
 	function removeWatcher(key: string | number){
 		// instance()._runtime.unsubscribe(_internalStore._name, key)
 		const destroy = _internalStore._watchers.get(key)
@@ -83,6 +133,10 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		return _internalStore._watchers.clear()
 	}
 
+	/**
+	 * Persist the state to selected storage
+	 * @param name 
+	 */
 	function persist(name?: string ){
 		// if there is a name, change the states internal name 
 		if(name) _internalStore.externalName = `_plexus_state_${name}`
@@ -94,10 +148,16 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 
 	}
 
+	/**
+	 * Reset the state to the previous value
+	 */
 	function undo(){
 		set(_internalStore._lastValue)
 	}
 
+	/**
+	 * Reset the state to the initial value
+	 */
 	function reset(){
 		set(_internalStore._initialValue)
 	}
@@ -112,10 +172,10 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 		reset,
 		persist,
 		get value() {
-			return _internalStore._value
+			return deepClone(_internalStore._value)
 		},
 		get lastValue(){
-			return _internalStore._lastValue
+			return deepClone(_internalStore._lastValue)
 		},
 		get name(){
 			return _internalStore._name
@@ -127,8 +187,8 @@ export function _state<PxStateValue extends PxStateType>(instance: () => PlexusI
 
 
 	// initalization //
-	if (instance()._states.has(this)) {
-		instance()._states.delete(this)
+	if (instance()._states.has(_internalStore._name+"")) {
+		instance()._states.delete(_internalStore._name+"")
 	}
 	// instance()._states.forEach(state_ => {
 	// 	state_.name

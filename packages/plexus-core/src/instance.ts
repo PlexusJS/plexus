@@ -1,6 +1,23 @@
-import { PlexusInstance } from "./interfaces";
-import { _runtime } from "./runtime";
-import { storage } from "./storage";
+import { PlexusStateInstance } from "./state";
+import { PlexusPlugin } from "./plugin";
+import { PlexusRuntime, _runtime } from "./runtime";
+import { PlexusStorageInstance, storage } from "./storage";
+export interface PlexusInstance {
+	name: string,
+	internalName: string
+	ready: boolean;
+	genNonce(): number | string;
+	_states: Map<string, PlexusStateInstance>,
+	_plugins: Map<string, PlexusPlugin>,
+	_runtime: PlexusRuntime,
+	_computedStates: Set<any>,
+	_collections: Map<number | string, any>
+	_settings: {}
+	get storageEngine(): (string | undefined)
+	set storageEngine(name: string)
+	_storages: Map<string, PlexusStorageInstance>
+	get storage(): PlexusStorageInstance;
+}
 
 interface PlexusInstanceConfig {
 	instanceId: string
@@ -33,6 +50,7 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 		_id: config?.instanceId || ``,
 		_selectedStorage: undefined,
 		_settings: {},
+		_runtime: null,
 		_ready: false,
 	}
 	/**
@@ -52,19 +70,19 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 
 	// if the instance is not created, create it
 	if(globalThis[getInstanceName()] === undefined){
-		const newInstance: PlexusInstance = Object.freeze({
-			get name() { return _internalStore._id || 'default' },
-			get internalName() { return getInstanceName() },
-			get ready(){ return _internalStore._ready },
-			set ready(isReady: boolean){ _internalStore._ready = isReady },
-			get _settings(){ return _internalStore._settings },
-			get storageEngine(){ return _internalStore._selectedStorage },
-			set storageEngine(name: string){ _internalStore._selectedStorage = name },
-			get storage(){ return (this as PlexusInstance)._storages.get((this as PlexusInstance).storageEngine) },
-			genNonce(){
-				_internalStore._nonce += 1
-				return _internalStore._nonce
-			},
+		const newInstance: any = Object.freeze({
+			// get name() { return _internalStore._id || 'default' },
+			// get internalName() { return getInstanceName() },
+			// get ready(){ return _internalStore._ready },
+			// set ready(isReady: boolean){ _internalStore._ready = isReady },
+			// get _settings(){ return _internalStore._settings },
+			// get storageEngine(){ return _internalStore._selectedStorage },
+			// set storageEngine(name: string){ _internalStore._selectedStorage = name },
+			// get storage(){ return getPlexusInstance(_internalStore._id)._storages.get(getPlexusInstance(_internalStore._id).storageEngine) },
+			// genNonce(){
+			// 	_internalStore._nonce += 1
+			// 	return _internalStore._nonce
+			// },
 			_runtime: _runtime(() => instance()),
 			_computedStates: new Set(),
 			_states: new Map(),

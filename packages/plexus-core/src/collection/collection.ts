@@ -1,6 +1,13 @@
-import { PlexusInstance, PxCollectionInstance, PxStateType } from '../interfaces';
+// import { PlexusInstance, PxStateType } from '../interfaces';
 
-export function collection<DataType extends PxStateType>(instance: () => PlexusInstance): PxCollectionInstance<DataType> {
+import { PlexusInstance } from "../instance";
+
+export interface PxCollectionInstance<DataType=any> {
+	collect(data: DataType): void;
+}
+
+
+export function collection<DataType extends any>(instance: () => PlexusInstance): PxCollectionInstance<DataType> {
   const collect = (data: DataType) => {
 
   }
