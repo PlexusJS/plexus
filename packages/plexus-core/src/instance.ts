@@ -71,18 +71,18 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 	// if the instance is not created, create it
 	if(globalThis[getInstanceName()] === undefined){
 		const newInstance: any = Object.freeze({
-			// get name() { return _internalStore._id || 'default' },
-			// get internalName() { return getInstanceName() },
-			// get ready(){ return _internalStore._ready },
-			// set ready(isReady: boolean){ _internalStore._ready = isReady },
-			// get _settings(){ return _internalStore._settings },
-			// get storageEngine(){ return _internalStore._selectedStorage },
-			// set storageEngine(name: string){ _internalStore._selectedStorage = name },
-			// get storage(){ return getPlexusInstance(_internalStore._id)._storages.get(getPlexusInstance(_internalStore._id).storageEngine) },
-			// genNonce(){
-			// 	_internalStore._nonce += 1
-			// 	return _internalStore._nonce
-			// },
+			get name() { return _internalStore._id || 'default' },
+			get internalName() { return getInstanceName() },
+			get ready(){ return _internalStore._ready },
+			set ready(isReady: boolean){ _internalStore._ready = isReady },
+			get _settings(){ return _internalStore._settings },
+			get storageEngine(){ return _internalStore._selectedStorage },
+			set storageEngine(name: string){ _internalStore._selectedStorage = name },
+			get storage(){ return getPlexusInstance(_internalStore._id)._storages.get(getPlexusInstance(_internalStore._id).storageEngine) },
+			genNonce(){
+				_internalStore._nonce += 1
+				return _internalStore._nonce
+			},
 			_runtime: _runtime(() => instance()),
 			_computedStates: new Set(),
 			_states: new Map(),
