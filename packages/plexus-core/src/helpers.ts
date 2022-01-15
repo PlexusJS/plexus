@@ -4,9 +4,9 @@ export function isObject (item: any): item is Object {
   return item && typeof item === 'object' && !Array.isArray(item);
 }
 
-export function deepMerge (target: Object, source: Object): any {
+export function deepMerge<Thing extends Object>(target: Thing, source: Thing): Thing {
   let output = Object.assign({}, target);
-  if (isObject(target) && isObject(source)) {
+  if ((isObject(target) && isObject(source)) || (Array.isArray(target) && Array.isArray(source))) {
     for (const key in source) {
       if (isObject(source[key])) {
         if (!(key in target)) {
@@ -19,6 +19,11 @@ export function deepMerge (target: Object, source: Object): any {
       }
     }
   }
+  // if it was originally an array, return an array
+  if(Array.isArray(target) && Array.isArray(source)){ 
+    return Object.values(output) as any as Thing;
+  }
+  
   return output;
 }
 
@@ -42,6 +47,9 @@ export function deepClone<Type = AlmostAnything>(obj: Type): Type {
 
         cloned[key] = deepClone(obj[key]);
       }
+    }
+    if(Array.isArray(obj)){ 
+      return Object.values(cloned) as any as Type;
     }
     return cloned;
   }
