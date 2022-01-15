@@ -47,7 +47,6 @@ export function deepClone<Type = AlmostAnything>(obj: Type): Type {
   }
 }
 
-
 export class EventEmitter<Data=any> {
   events: Map<string|number, Data>
   constructor() {
