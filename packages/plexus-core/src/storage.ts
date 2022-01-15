@@ -68,9 +68,12 @@ export function storage (instance: () => PlexusInstance, name?: string, override
      getLocalStorage().setItem(getKey(key), JSON.stringify(deepMerge(getLocalStorage().getItem(key), value)))
     }
     else if(Array.isArray(value)){
-      getLocalStorage().setItem(getKey(key), JSON.stringify(Object.values<typeof value>(
-        deepMerge(getLocalStorage().getItem(key), value)
-      )))
+      getLocalStorage().setItem(
+        getKey(key), 
+        JSON.stringify(Object.values<typeof value>(
+          deepMerge(JSON.parse(getLocalStorage().getItem(key)), value)
+        ))
+      )
     }
     else{
       getLocalStorage().setItem(getKey(key), String(value))
