@@ -191,7 +191,7 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 		reset,
 		persist,
 		get value() {
-			return _internalStore._value
+			return deepClone(_internalStore._value)
 		},
 		get lastValue(){
 			return deepClone(_internalStore._lastValue)
