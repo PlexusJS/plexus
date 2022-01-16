@@ -53,10 +53,10 @@ describe('Testing State Function', () => {
 		expect(objectState.value.a.b).toBe(false)
 		
 
-		console.log(arrayState.value)
+		// console.log(arrayState.value)
 		// check array deep merge
 		arrayState.patch([{ item: 'Hello2' }]);
-		console.log(arrayState.value)
+		// console.log(arrayState.value)
 		expect(arrayState.value[0].item).toBe('Hello2')
 		expect(arrayState.value[0].item2).toStrictEqual({ subitem: 'World' })
 		expect(arrayState.value[1].item).toBe('Goodbye')
