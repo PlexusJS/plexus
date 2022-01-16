@@ -27,7 +27,7 @@ export function deepMerge<Thing extends Object>(target: Thing, source: Thing): T
   return output;
 }
 
-// a deep clone of an object
+// a deep clone of anything
 export function deepClone<Type = AlmostAnything>(obj: Type): Type {
   if (obj === null || typeof obj !== 'object') {
     return obj;
@@ -39,20 +39,24 @@ export function deepClone<Type = AlmostAnything>(obj: Type): Type {
     return new RegExp(obj) as any as Type;
   }
   // must be an object
-  if(isObject(obj)){
-    
-    const cloned: Type= Object.create(obj as Object);
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
 
-        cloned[key] = deepClone(obj[key]);
-      }
+  
+  const cloned: Type= Object.create(obj as Object);
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+
+      cloned[key] = deepClone(obj[key]);
     }
-    if(Array.isArray(obj)){ 
-      return Object.values(cloned) as any as Type;
-    }
-    return cloned;
   }
+  if(Array.isArray(obj)){ 
+    return Object.values(cloned) as any as Type;
+  }
+  // if it was originally an array, return an array
+  if(Array.isArray(obj)) { return Object.values(cloned) as any as Type }
+  // if it was originally an object, return an object
+  return cloned;
+  
+  
 }
 
 export class EventEmitter<Data=any> {
