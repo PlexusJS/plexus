@@ -15,7 +15,7 @@
     "prepublish": "lerna run prepublish",
     "publish-canary": "lerna version prerelease --preid canary --force-publish",
     "publish-stable": "lerna version --force-publish",
-    "test": "jest"
+    "test": "yarn build && jest"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",

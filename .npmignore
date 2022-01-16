@@ -4,3 +4,4 @@ coverage
 src
 *.tgz
 *.tsbuildinfo
+__snapshots__

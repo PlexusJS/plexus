@@ -3,5 +3,6 @@ coverage
 .turbo
 dist
 packages/*.js
+__snapshots__
 *.tsbuildinfo
 *.tgz
