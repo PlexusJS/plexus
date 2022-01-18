@@ -155,7 +155,7 @@ export function _state<PxStateValue extends PlexusStateType>(instance: () => Ple
 	 * Persist the state to selected storage
 	 * @param name 
 	*/
-	function persist(name?: string ){
+	function persist(name  : string ){
 		// if there is a name, change the states internal name 
 		if(name) _internalStore.externalName = `_plexus_state_${name}`
 
