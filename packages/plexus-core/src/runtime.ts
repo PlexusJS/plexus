@@ -5,7 +5,7 @@ import { PlexusStateType } from "./state";
 
 export type PlexusRuntime = ReturnType<typeof _runtime>
 type Fn<Value> = (value: Value) => void
-type SubscriptionTypes = 'stateChange' | 'event' | 'storage' | `plugin_${string}`
+type SubscriptionTypes = 'stateChange' | ' collection' | 'event' | 'storage' | `plugin_${string}`
 
 /**
  * Create a runtime for an instance NOTE: NOT FOR PUBLIC USE
