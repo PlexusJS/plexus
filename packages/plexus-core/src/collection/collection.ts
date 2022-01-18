@@ -3,7 +3,8 @@
 import { PlexusStateInstance, state } from "..";
 import { PlexusInstance } from "../instance";
 import { _data, PlexusDataInstance } from "./data";
-import { group, PlexusCollectionGroup, PlexusCollectionGroupConfig } from "./group";
+import { _group, PlexusCollectionGroup, PlexusCollectionGroupConfig } from "./group";
+import { PlexusCollectionSelector, _selector } from "./selector";
 
 export interface PlexusCollectionInstance<DataType=any> {
 	collect (data: DataType[], groups?: string[] | string): void
@@ -12,26 +13,34 @@ export interface PlexusCollectionInstance<DataType=any> {
   createSelector (name: string)
   createGroup (name: string)
   getItem(key: string | number): PlexusDataInstance<DataType>
+  getGroup(name: string): PlexusCollectionGroup<DataType>
   getItemValue(key: string | number): DataType
   getGroupsOf(key: string | number): Array<string | number>
+  persist(name?: string ): void
+  update(key: string | number, data: Partial<DataType>, config?: {deep: boolean}): void
   get value(): DataType[]
   get groups(): Record<string, PlexusDataInstance<DataType>[]>
   get groupsValue(): Record<string, DataType[]> 
 }
 export interface PlexusCollectionConfig<DataType>{
   primaryKey?: string,
-  groups?: {
-    [key: string]: PlexusCollectionGroupConfig<DataType>
-  }
+  groups?: Record<string,  PlexusCollectionGroupConfig<DataType>>
 }
 
-export function _collection<DataType extends {[key: string]: any}>(instance: () => PlexusInstance, config: PlexusCollectionConfig<DataType>={primaryKey: 'id'}): PlexusCollectionInstance<DataType> {
+export function _collection<DataType extends {[key: string]: any}>(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType>={primaryKey: 'id'} as const): PlexusCollectionInstance<DataType> {
   const _internalStore = {
     _lookup: new Map<string, string>(),
-    _key: config?.primaryKey || 'id',
+    _key: _config?.primaryKey || 'id',
     _data: new Map<string | number, PlexusDataInstance<DataType>>(),
-    _groups: new Map<string, PlexusCollectionGroup>(),
-  }
+    _groups: new Map<string, PlexusCollectionGroup<DataType>>(),
+    _selectors: new Map<string, PlexusCollectionSelector<DataType>>(),
+    _name: `_plexus_collection_${instance().genNonce()}`,
+    _externalName: '',
+    set externalName(value: string){this._externalName = value},
+    _persist: false,
+
+    set persist(value: boolean){this._persist = value},
+  } as const
   function collect (data: DataType[], groups?: string[] | string)
   function collect (data: DataType, groups?: string[] | string)
   function collect (data: DataType | DataType[], groups?: string[] | string) {
@@ -72,6 +81,26 @@ export function _collection<DataType extends {[key: string]: any}>(instance: () 
       }
     }
   }
+
+  function update(key: string | number, data: Partial<DataType>, config: {deep: boolean}={deep: true}) {
+    if(config.deep){
+      if(_internalStore._data.has(key)){
+        _internalStore._data.get(key).set({...data, [_internalStore._key]: key} as DataType, {mode: 'patch'})
+      }
+      else{
+        console.warn('no data found for key', key)
+      }
+    }
+    else{
+      if(_internalStore._data.has(key)){
+        _internalStore._data.get(key).set(data as DataType, {mode: 'set'})
+      }
+      else{
+        console.warn('no data found for key', key)
+      }
+    }
+    
+  }
   function addToGroups (key: string | number, groups: string[] | string) {
     if(groups){
       if(Array.isArray(groups)){
@@ -88,7 +117,7 @@ export function _collection<DataType extends {[key: string]: any}>(instance: () 
     return _internalStore._data.get(key)
   }
   function getItemValue(key: string | number){
-    return _internalStore._data.get(key).value
+    return getItem(key).value
   }
   function getGroupsOf(key: string | number){
     const inGroups = []
@@ -100,33 +129,50 @@ export function _collection<DataType extends {[key: string]: any}>(instance: () 
     return inGroups
   }
   function createSelector (name: string) {
-
+    _internalStore._selectors.set(name, _selector(() => instance(), _internalStore._name))
   }
   function createGroup (name: string, config?: PlexusCollectionGroupConfig<DataType>) {
-    _internalStore._groups.set(name, group(name, config))
+    _internalStore._groups.set(name, _group(() => instance(), _internalStore._name, name, config))
+  }
+  function persist(name?: string ){
+		// if there is a name, change the states internal name 
+		if(name) _internalStore.externalName = `_plexus_state_${name}`
+
+		if(instance().storage){ 
+			instance().storage.set(_internalStore.externalName, _internalStore._data)
+			_internalStore.persist = true
+		}
+
+	}
+
+  function getGroup(name: keyof typeof _config['groups']) {
+    return _internalStore._groups.get(name)
   }
 
-  if(config){
-    if(config.groups){
-      for(let groupName in config.groups){
-        createGroup(groupName, config.groups[groupName])
+  if(_config){
+    if(_config.groups){
+      for(let groupName in _config.groups){
+        createGroup(groupName, _config.groups[groupName])
       }
     }
   }
 
-  return {
+  const collection =  {
     collect,
     createGroup,
     createSelector,
     getItem,
     getGroupsOf,
+    update,
+    getGroup,
     getItemValue,
+    persist,
     get value(){
       return Array.from(_internalStore._data.values()).map(item => item.value)
     },
     get groups(){
       const groups: Record<string, PlexusDataInstance<DataType>[]> = {}
-      console.warn(_internalStore._groups)
+      // console.warn(_internalStore._groups)
       for(let group of _internalStore._groups.keys()){
         
         if(groups[group] === undefined){
@@ -143,7 +189,7 @@ export function _collection<DataType extends {[key: string]: any}>(instance: () 
     },
     get groupsValue(){
       const groups: Record<string, DataType[]> = {}
-      console.warn(_internalStore._groups)
+      // console.warn(_internalStore._groups)
       for(let group of _internalStore._groups.keys()){
         
         if(groups[group] === undefined){
@@ -159,4 +205,13 @@ export function _collection<DataType extends {[key: string]: any}>(instance: () 
       return groups
     }
   };
+  // initalization //
+	if (instance()._collections.has(_internalStore._name+"")) {
+		instance()._collections.delete(_internalStore._name+"")
+	}
+	// instance()._states.forEach(state_ => {
+	// 	state_.name
+	// })
+	instance()._collections.set(_internalStore._name+"", collection)
+  return collection
 }
