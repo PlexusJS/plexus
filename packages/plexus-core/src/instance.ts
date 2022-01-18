@@ -2,6 +2,7 @@ import { PlexusStateInstance } from "./state";
 import { PlexusPlugin } from "./plugin";
 import { PlexusRuntime, _runtime } from "./runtime";
 import { PlexusStorageInstance, storage } from "./storage";
+import { PlexusCollectionInstance } from ".";
 export interface PlexusInstance {
 	name: string,
 	internalName: string
@@ -11,7 +12,7 @@ export interface PlexusInstance {
 	_plugins: Map<string, PlexusPlugin>,
 	_runtime: PlexusRuntime,
 	_computedStates: Set<any>,
-	_collections: Map<number | string, any>
+	_collections: Map<number | string, PlexusCollectionInstance>
 	_settings: {}
 	get storageEngine(): (string | undefined)
 	set storageEngine(name: string)
