@@ -2,6 +2,8 @@ import { deepClone, deepMerge } from "./helpers"
 import { instance } from "./instance"
 export interface PlexusRouteConfig {
 	options?: RequestInit
+	timeout?: number
+	silentFail?: boolean
 }
 export interface PlexusRouteRes<DataType=any> {
 	status: number,
@@ -21,22 +23,65 @@ export interface PlexusRoute {
 	reset(): PlexusRoute
 	config: RequestInit
 }
-export function route(baseURL: string='', router: PlexusRouteConfig={}): PlexusRoute {
+export function route(baseURL: string='', router: PlexusRouteConfig={options: {headers: {}}, timeout: 20000}): PlexusRoute {
 	const _internalStore = {
-		_options: deepClone(router.options || {headers: {}}),
+		_options: deepClone(router.options || {headers:{}}),
+		_timeout: router.timeout || 20000,
 		_baseURL: baseURL.endsWith('/') ? baseURL.substring(0, baseURL.length-1) : baseURL,
 		_noFetch: false,
 	}
 	async function send<ResponseDataType>(path: string): Promise<PlexusRouteRes<ResponseDataType>>{
+		if(_internalStore._noFetch) return {status: 0, response: {}, rawData: {}, data: null}
+
 		if(_internalStore._options.headers['Content-Type'] === undefined) _internalStore._options.headers['Content-Type'] = 'text/html'
 		if(_internalStore._options.method === undefined) _internalStore._options.method = "GET"
 
 		if(_internalStore._options.method === 'GET' && _internalStore._options.headers['Content-Type'] === undefined) _internalStore._options.headers['Content-Type'] = 'application/json'
-		
+		let timedOut = false
+		let res: Response | undefined
+		try{
+			if(_internalStore._timeout){
+				// res = await 
+				let to: any
+				const timeout = new Promise<void>((resolve, reject) => {
+					to = setTimeout(() => {
+						timedOut = true
+						resolve()
+					}, _internalStore._timeout)
+				})
+				const request = new Promise<Response>((resolve, reject) => {
+					fetch(`${path.match(/^http(s)?/g).length > 0 ? path : `${_internalStore._baseURL}${path.length > 0 ? '/' : ''}${path}`}`, _internalStore._options).then(response => {
+						clearTimeout(to)
+						resolve(response)
+					})
+					.catch(reject)
+				})
+				const raceResult = await Promise.race([ timeout, request ])
+				if(raceResult){
+					res = raceResult
+				}
+				else{
+					// a -1 response status means the programatic timeout was surpassed
+					return {status: -1, response: {}, rawData: {}, data: null}
+				}
 
-		const res = await fetch(`${path.match(/^http(s)?/g).length > 0 ? path : `${_internalStore._baseURL}${path.length > 0 ? '/' : ''}${path}`}`, _internalStore._options)
+			}else{
+				res = await fetch(`${path.match(/^http(s)?/g).length > 0 ? path : `${_internalStore._baseURL}${path.length > 0 ? '/' : ''}${path}`}`, _internalStore._options)
+			}
+		} catch(e){
+
+		}
 		let data: ResponseDataType
 		let rawData: ResponseDataType
+		
+		if(res === undefined) {
+			return {
+				status: res.status,
+				response: res,
+				rawData,
+				data,
+			}
+		}
 
 		if(res.status >= 200 && res.status < 400){
 
