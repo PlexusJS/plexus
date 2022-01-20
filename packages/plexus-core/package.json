@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc --build --force --verbose && echo \"Build complete.\"",
+    "build": "tsc --build --force && echo \"Build complete.\"",
     "test": "jest",
     "prepublish": "yarn build"
   },
