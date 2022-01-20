@@ -1,6 +1,6 @@
 {
   "name": "@plexusjs/core",
-  "version": "1.0.1-canary.0+fceb12f",
+  "version": "1.0.1-canary.8",
   "description": "A library for building modular interconnected applications",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
