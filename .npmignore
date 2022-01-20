@@ -5,3 +5,4 @@ src
 *.tgz
 *.tsbuildinfo
 __snapshots__
+*.log
