@@ -1,6 +1,6 @@
 {
   "name": "@plexusjs/react",
-  "version": "1.0.1-canary.2",
+  "version": "1.0.1-canary.3",
   "description": "React Plugin for PlexusJS",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
