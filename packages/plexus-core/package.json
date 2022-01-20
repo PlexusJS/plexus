@@ -1,6 +1,6 @@
 {
   "name": "@plexusjs/core",
-  "version": "1.0.1-canary.6",
+  "version": "1.0.1-canary.0+9d1e137",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
@@ -8,5 +8,6 @@
     "build": "tsc --build --force --verbose && echo \"Build complete.\"",
     "test": "jest",
     "prepublish": "yarn build"
-  }
+  },
+  "gitHead": "9d1e13742cda171cc14b56fa6f13845189e23a11"
 }
