@@ -9,10 +9,11 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "bootstrap": "lerna bootstrap",
     "dev": "yarn && turbo run dev --parallel --no-cache",
     "clean-build": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
     "build": "yarn clean-build && turbo run build",
-    "prepublish": "lerna run prepublish",
+    "prepublish": "yarn build && lerna run prepublish",
     "publish-canary": "lerna version prerelease --preid canary --force-publish",
     "publish-stable": "lerna version --force-publish",
     "test": "yarn build && jest"
