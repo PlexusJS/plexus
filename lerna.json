@@ -8,7 +8,7 @@
     "publish": {
       "npmClient": "yarn",
       "allowBranch": ["master", "canary"],
-      "registry": "https://registry.npmjs.org/"
+      "registry": "https://github.com/PlexusJS/plexus/"
     }
   },
   "version": "2.1.6"

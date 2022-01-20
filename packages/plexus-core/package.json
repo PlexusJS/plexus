@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc --build --force --verbose && echo \"Build complete.\"",
-    "test": "jest"
+    "test": "jest",
+    "prepublish": "yarn build"
   }
 }
