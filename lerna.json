@@ -9,12 +9,9 @@
     },
     "publish": {
       "npmClient": "yarn",
-      "allowBranch": [
-        "master",
-        "canary"
-      ],
-      "registry": "https://github.com/PlexusJS/plexus/"
+      "allowBranch": ["master", "canary"],
+      "registry": "https://registry.npmjs.org/"
     }
   },
-  "version": "1.0.1-canary.0"
+  "version": "1.0.0"
 }
