@@ -1,8 +1,7 @@
 node_modules
 coverage
 .turbo
-dist
-packages/*.js
-__snapshots__
-*.tsbuildinfo
+src
 *.tgz
+*.tsbuildinfo
+__snapshots__

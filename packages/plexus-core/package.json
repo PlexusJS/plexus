@@ -2,10 +2,10 @@
   "name": "@plexusjs/core",
   "version": "1.0.0-alpha.0",
   "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w",
+    "build": "tsc --build --force --verbose && echo \"Build complete.\"",
     "test": "jest"
   }
 }

@@ -9,13 +9,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev --parallel --no-cache",
+    "dev": "yarn && turbo run dev --parallel --no-cache",
     "clean-build": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
     "build": "yarn clean-build && turbo run build",
     "prepublish": "lerna run prepublish",
     "publish-canary": "lerna version prerelease --preid canary --force-publish",
     "publish-stable": "lerna version --force-publish",
-    "test": "turbo run test"
+    "test": "yarn build && jest"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
@@ -26,11 +26,14 @@
     "babel-jest": "^27.4.6",
     "jest": "^27.4.7",
     "lerna": "^4.0.0",
+    "node-fetch": "2",
+    "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
-    "turbo": "^1.0.25",
+    "turbo": "^1.0.28",
     "typescript": "^4.5.4"
   },
   "turbo": {
+    "baseBranch": "origin/master",
     "pipeline": {
       "build": {
         "dependsOn": [
