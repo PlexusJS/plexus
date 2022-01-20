@@ -1,15 +1,20 @@
 {
   "npmClient": "yarn",
-  "packages": ["packages/*"],
+  "packages": [
+    "packages/*"
+  ],
   "command": {
     "version": {
       "exact": true
     },
     "publish": {
       "npmClient": "yarn",
-      "allowBranch": ["master", "canary"],
+      "allowBranch": [
+        "master",
+        "canary"
+      ],
       "registry": "https://github.com/PlexusJS/plexus/"
     }
   },
-  "version": "2.1.6"
+  "version": "1.0.1-canary.0"
 }
