@@ -8,21 +8,24 @@ export function usePlexus<State extends ReturnType<typeof state>>(deps: State | 
 	const [_, set] = useState(null)
 	useEffect(() => {
 		if(Array.isArray(deps)){
-			const depSubIds: Set<() => void> = new Set()
+			const depUnsubs: Set<() => void> = new Set()
 			for(let dep of deps){
-				
-				const id = dep.watch(set)
-				// depSubIds.set(id, dep)
-				
+				const unsubscribe = dep.watch(set)
+				depUnsubs.add(unsubscribe)
 			}
 			return () => {
-				for(let unsub of depSubIds){
+				for(let unsub of depUnsubs){
 					unsub()
-					depSubIds.delete(unsub)
+					depUnsubs.delete(unsub)
 				}
 			}
 		}
 
 	}, [])
+
+	if(!Array.isArray(deps)){
+		return deps.value
+	}
+	return deps.map(dep => dep.value)
 
 } 
