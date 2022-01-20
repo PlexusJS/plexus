@@ -4,11 +4,12 @@ import { PlexusInstance } from "../instance";
 export interface PlexusCollectionGroupConfig<DataType> {
 	addWhen?: (item: DataType) => boolean
 }
+export type GroupName = string
 export interface PlexusCollectionGroup<DataType> {
 	has( key: string | number ): boolean,
 	add( key: string | number ): PlexusCollectionGroup<DataType>,
 	remove( key: string | number ): PlexusCollectionGroup<DataType>,
-	get includedKeys(): Set<string | number>
+	get index(): Set<string | number>
 	get value(): DataType[]
 
 }
@@ -32,7 +33,7 @@ export function _group<DataType=any>(instance: () => PlexusInstance, collectionI
 			_internalStore._includedKeys.delete(key)
 			return this as PlexusCollectionGroup<DataType>
 		},
-		get includedKeys(){
+		get index(){
 			return _internalStore._includedKeys
 		},
 		get value(){

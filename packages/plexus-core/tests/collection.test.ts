@@ -3,13 +3,7 @@ import { collection, PlexusCollectionInstance } from "../src"
 let myCollection: PlexusCollectionInstance<{thing: string, 'id': number}>
 
 beforeEach(() => {
-	myCollection = collection<{thing: string, 'id': number}>({groups: {
-		group1: {
-			addWhen: (value) => {
-				return true
-			}
-		}
-	}})
+	myCollection = collection<{thing: string, 'id': number}>().createGroup('group1')
 })
 describe('Testing Collection', () => {
 	test('Can create collection', () => {
@@ -39,6 +33,7 @@ describe('Testing Collection', () => {
 		expect(myCollection.getGroupsOf(5)).toBeDefined()
 		// console.log(myCollection.getGroupsOf(5))
 		// console.log(myCollection.groups)
+		myCollection.groups
 		expect(myCollection.groups.group1.length).toBe(1)
 		expect(myCollection.groups.group1[0].value.id).toBe(5)
 		myCollection.groups.group1[0].set({thing: 'lol', 'id': 0})
@@ -49,5 +44,7 @@ describe('Testing Collection', () => {
 		expect(myCollection.getItemValue(5).thing).toBe('idk')
 		expect(myCollection.getGroup('group1')).toBeDefined()
 		expect(myCollection.getGroup('group1').value[0].thing).toBe('idk')
+
+		
 	})
 })
