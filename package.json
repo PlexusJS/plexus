@@ -14,7 +14,7 @@
     "clean-build": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
     "build": "yarn clean-build && turbo run build",
     "prepublish": "yarn build && lerna run prepublish",
-    "publish-canary": "lerna version prerelease --preid canary --force-publish && lerna publish --preid canary --canary --force-publish --no-private --yes",
+    "publish-canary": "lerna publish --preid canary --canary --force-publish --no-private --yes",
     "publish-stable": "lerna version --force-publish",
     "test": "yarn build && jest"
   },
