@@ -1,12 +1,16 @@
 import { PlexusStateInstance, state } from "..";
+import { PlexusInstance } from "../instance";
 
 export interface PlexusDataInstance<TypeValue> {
 	get value(): TypeValue
 	set(value: TypeValue, config?: {mode: 'set' | 'patch'}): void	
 	get state(): PlexusStateInstance<TypeValue>
+	delete(): void
 }
 
-export function _data<Value extends Record<string, any>>(primaryKey: string, value: Value): PlexusDataInstance<Value> | null{
+export type DataKey = string | number;
+
+export function _data<Value extends Record<string, any>>(instance: () => PlexusInstance, primaryKey: string, value: Value): PlexusDataInstance<Value> | null{
 	const _internalStore =  {
 		_key: value[primaryKey],
 		primaryKey,
@@ -34,6 +38,13 @@ export function _data<Value extends Record<string, any>>(primaryKey: string, val
 			},
 			get state(){
 				return _internalStore._state
+			},
+			delete(){
+				
+				instance()._runtime.removeWatchers('state', _internalStore._state.name)
+				instance()._states.delete(_internalStore._state.name)
+				// delete _internalStore._state
+				
 			}
 		}
 	}
