@@ -12,7 +12,7 @@ export interface PlexusInstance {
 	_plugins: Map<string, PlexusPlugin>,
 	_runtime: PlexusRuntime,
 	_computedStates: Set<any>,
-	_collections: Map<number | string, PlexusCollectionInstance>
+	_collections: Map<string, PlexusCollectionInstance>
 	_settings: {}
 	get storageEngine(): (string | undefined)
 	set storageEngine(name: string)

@@ -52,6 +52,6 @@ export function setCore<CoreObj=Record<string, any>>(coreObj: CoreObj){
 }
 
 export function usePlugin(plugin: PlexusPlugin){
-	plugin.init(() => instance())
+	plugin.init((name: string) => instance({instanceId: name}))
 	instance()._plugins.set(plugin.name, plugin)
 }

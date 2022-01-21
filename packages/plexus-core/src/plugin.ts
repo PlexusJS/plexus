@@ -3,7 +3,7 @@ import { instance, PlexusInstance } from "./instance";
 export type PlexusPlugin = {
 	name: string,
 	version?: string,
-	init: (instance: () => PlexusInstance) => void,
+	init: (instance: (name?: string) => PlexusInstance) => void,
 	
 }
 export interface PlexusPluginConfig {
@@ -14,7 +14,7 @@ type PlexusPluginConstructor<T=any> = (instance: () => PlexusInstance) => T;
 export function plexusPlugin(name: string, init: PlexusPluginConstructor);
 export function plexusPlugin(name: string, configOrInit?: PlexusPluginConfig | (PlexusPluginConstructor), init?: PlexusPluginConstructor) {
 	const  _internalStore = {
-		getInstance: null
+		getInstance: () => void 0,
 	}
 	// ensure the init function is defined
 	if(typeof configOrInit === 'function'){
