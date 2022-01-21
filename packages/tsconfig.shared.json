@@ -9,7 +9,7 @@
     "strict": false,
     "composite": true,
     "noImplicitAny": false,
-    "noImplicitThis": false,
+    "noImplicitThis": true,
     "skipLibCheck": true,
     "esModuleInterop": true
   }
