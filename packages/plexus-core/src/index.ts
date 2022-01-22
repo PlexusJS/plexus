@@ -17,7 +17,7 @@ export function state<Value=any>(item: Value) {
 	return _state(() => instance(), item)
 }
 /**
- * 
+ * Create a new Storage Instance
  * @param name The name of the Storage Module
  * @param override The function overrides for the Storage Module, if omitted, defaults to localStorage
  * @returns A storage instance
@@ -26,13 +26,18 @@ export function storage(name?: string, override?: StorageOverride){
 	return _storage(() => instance(), name, override)
 }
 /**
- * 
+ * Create a new event Engine
  * @returns An Event Instance
  */
 export function event<PayloadType=any>(){
 	return _event<PayloadType>(() => instance())
 }
 
+/**
+ * Create a new Collection Instance
+ * @param config The configuration for the collection
+ * @returns A collection Instance
+ */
 export function collection<Type extends {[key: string]: any}>(config?: PlexusCollectionConfig<Type>){
 	return _collection<Type>(() => instance(), config)
 }
@@ -44,10 +49,19 @@ export {
 	PlexusEventInstance,
 	PlexusStateInstance,
 }
-export { route, PlexusRoute, PlexusRouteConfig } from './route' 
-export { action, PlexusAction, PlexusActionHelpers } from './action'
+export { 
+	route, 
+	PlexusRoute, 
+	PlexusRouteConfig 
+} from './route' 
+export { 
+	action, 
+	PlexusAction, 
+	PlexusActionHelpers 
+} from './action'
 
-export function setCore<CoreObj=Record<string, any>>(coreObj: CoreObj){
+// TODO I don't think this is used or needed anywhere
+function setCore<CoreObj=Record<string, any>>(coreObj: CoreObj){
 
 }
 
