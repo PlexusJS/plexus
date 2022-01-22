@@ -1,8 +1,9 @@
 node_modules
-coverage
-.turbo
-src
+coverage/*
+.turbo/*
 *.tgz
 *.tsbuildinfo
 __snapshots__
 *.log
+tests/
+*.test.*
