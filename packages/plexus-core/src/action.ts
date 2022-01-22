@@ -20,7 +20,7 @@ export type PlexusAction = typeof action
 /**
  * Generate a Plexus Action
  * @param fn The Plexus action function to run
- * @returns The intended rteturn value of fn, or null if an error is caught
+ * @returns The intended return value of fn, or null if an error is caught
  */
 export function action<Type extends FunctionType = FunctionType>(fn: Type){
 	const _internalStore = {
