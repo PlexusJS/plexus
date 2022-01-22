@@ -20,29 +20,30 @@ export interface PlexusCollectionConfig<DataType>{
  */
 export interface PlexusCollectionInstance<DataType=any, Groups extends GroupMap<DataType>=GroupMap<DataType>, Selectors extends SelectorMap<DataType>=SelectorMap<DataType> > {
   /**
-   * 
-   * @param data 
-   * @param groups 
+   * Collect An item of data (or many items of data using an array) into the collection. 
+   * @requires: Each data item must have the primary key as a property
+   * @param data Object[] | Object ::                                 
+   * @param groups string | string[] :: The groups to add the items to
    */
 	collect (data: DataType[], groups?: (string)[] | (string)): void
   collect (data: DataType, groups?: (string)[] | (string)): void
   /**
-   * 
+   * GEt the 
    * @param key 
    * @returns 
    */
   getItem(key: DataKey): PlexusDataInstance<DataType>
   /**
-   * 
-   * @param key 
-   * @returns 
+   * Get the value of an item in the collection
+   * @param key The key of the item to get
+   * @returns The value of the item
    */
   getItemValue(key: DataKey): DataType
   /**
-   * 
-   * @param groupName 
+   * Create a group with a name and a configuration
+   * @param groupName The name of the group
    * @param config 
-   * @returns 
+   * @returns The new Collection Instance
    */
   createGroup<Name extends GroupName>(groupName: Name, config?: PlexusCollectionGroupConfig<DataType>): this & PlexusCollectionInstance<DataType, Map<Name, PlexusCollectionGroup<DataType>>, Selectors >
   /**
@@ -53,40 +54,42 @@ export interface PlexusCollectionInstance<DataType=any, Groups extends GroupMap<
   getGroup(name: string): undefined | PlexusCollectionGroup<DataType>
   getGroup(name: KeyOfMap<Groups>): PlexusCollectionGroup<DataType>
   /**
-   * 
-   * @param key 
-   * @param groups 
+   * Add a data item to a group or groups
+   * @param key The key of the item to add
+   * @param groups The group(s) to add the item to
    */
   addToGroups (key: DataKey, groups: GroupName[] | GroupName): void
   /**
-   * 
-   * @param key 
-   * @returns 
+   * Given a key, get all Group names that the key is in 
+   * @param key The data key(s) to use for lookup 
+   * @returns The Group names that the key is in
    */
   getGroupsOf(key: DataKey): Array<KeyOfMap<Groups>>
   /**
-   * 
-   * @param name 
-   * @returns 
+   * Create a Selector instance for a given selector name
+   * @param name The name of the selector
+   * @returns The new Collection Instance
    */
   createSelector<SelectorName extends GroupName>(name: SelectorName): this & PlexusCollectionInstance<DataType, Groups, Map<SelectorName, PlexusCollectionSelector<DataType>> >
   /**
    * Get A Group instance of a given group name
    * @param name The Group Name to search for
-   * @returns Group Instance | undefined
+   * @returns Either a Group Instance or undefined
    */
   getSelector(name: string): undefined | PlexusCollectionSelector<DataType>
   getSelector(name: KeyOfMap<Selectors>): PlexusCollectionSelector<DataType>
   /**
-   * 
-   * @param name 
+   * Persist this collection to the storage
+   * @param key The key to use for storage
    */
-  persist(name?: string ): void
+  persist(key?: string ): void
   /**
-   * 
-   * @param key 
-   * @param data 
-   * @param config 
+   * Update the collection with data; 
+   * This is like collect but will not add new items, and can can be used to patch existing items
+   * @param key The key of the item to update
+   * @param data The data to update the item with 
+   * @param config The configuration to use for the update
+   * @param config.deep Should the update be deep or shallow
    */
   update(key: DataKey, data: Partial<DataType>, config?: {deep: boolean}): void
   /**
@@ -104,9 +107,32 @@ export interface PlexusCollectionInstance<DataType=any, Groups extends GroupMap<
    * Delete all data in the collection
    */
   clear(): void
+  /**
+   * Get all of the collection data values as an array
+   * @returns The collection data values as an array
+   */
   get value(): DataType[]
+  /**
+   * Get all the groups in the collection as an object
+   * @returns The groups in the collection
+   */
   get groups(): Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>> | Record<string, PlexusCollectionGroup<DataType>>
+  /**
+   * Get all the groups and their childrens data values as an object
+   * @returns The groups paired with their childrens data values as an object 
+   */
   get groupsValue(): Record<KeyOfMap<Groups>, DataType[]> 
+  /**
+   * Get all the groups in the collection as an object
+   * @returns The groups in the collection
+   */
+  get selectors(): Record<KeyOfMap<Selectors>, PlexusCollectionSelector<DataType>> | Record<string, PlexusCollectionSelector<DataType>>
+  /**
+   * Get all the groups and their childrens data values as an object
+   * @returns The groups paired with their childrens data values as an object 
+   */
+  get selectorsValue(): Record<KeyOfMap<Selectors>, DataType> 
+  
 }
 
 
@@ -118,7 +144,7 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
     _key: _config?.primaryKey || 'id',
     _data: new Map<DataKey, PlexusDataInstance<DataType>>(),
     _groups: new Map<GroupName, PlexusCollectionGroup<DataType>>() as Groups,
-    _selectors: new Map<string, PlexusCollectionSelector<DataType>>(),
+    _selectors: new Map<SelectorName, PlexusCollectionSelector<DataType>>() as Selectors,
     _name: `_plexus_collection_${instance().genNonce()}`,
     _externalName: '',
     set externalName(value: string){this._externalName = value},
@@ -126,19 +152,20 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
 
     set persist(value: boolean){this._persist = value},
   } 
-  
 
-  // if(_config){
-  //   if(_config.groups){
-  //     for(let groupName in _config.groups){
-  //       createGroup(groupName, _config.groups[groupName])
-  //     }
-  //   }
-  // }
-
+  /**
+   * Helper function; Checks to see if the provided name is a group name
+   * @param name The name to check 
+   * @returns boolean: if the name is a specific name of a group
+   */
   const isCreatedGroup = (name: string): name is KeyOfMap<Groups> => {
     return _internalStore._groups.has(name)
   } 
+  /**
+   * Helper function; Checks to see if the provided name is a selector name
+   * @param name The name to check
+   * @returns boolean: if the name is a specific name of a selector 
+   */
   const isCreatedSelector = (name: string): name is KeyOfMap<Selectors> => {
     return _internalStore._selectors.has(name)
   }
@@ -152,7 +179,6 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
             // if there is already a state for that key, update it
             if(_internalStore._data.has(item[_internalStore._key])){
               _internalStore._data.get(item[_internalStore._key]).set(item)
-              // includeGroups(item[_internalStore._key])
             }
             // if there is no state for that key, create it
             else{
@@ -193,7 +219,7 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
       }
       else{
         if(_internalStore._data.has(key)){
-          _internalStore._data.get(key).set(data as DataType, {mode: 'set'})
+          _internalStore._data.get(key).set(data as DataType, {mode: 'replace'})
         }
         else{
           console.warn('no data found for key', key)
@@ -210,8 +236,9 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
       return this.getItem(key).value
     },
 
-    createSelector (name: string) {
-      _internalStore._selectors.set(name, _selector(() => instance(), _internalStore._name))
+    /// SELECTORS
+    createSelector (selectorName: string) {
+      _internalStore._selectors.set(selectorName, _selector(() => instance(), _internalStore._name, selectorName))
       return this as any
     },
     getSelector(name: KeyOfMap<Selectors> | string) {
@@ -320,7 +347,7 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
     get groups(){
       const groups: Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>> = {} as Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>>
       for( let group of _internalStore._groups.entries()) {
-        groups[group[0]] = group[1]
+        groups[group[0] as KeyOfMap<Groups>] = group[1]
       }
       return groups
       
@@ -331,6 +358,21 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
         groups[group[0] as KeyOfMap<Groups>] = Array.from(group[1].index).map(key => _internalStore._data.get(key).value)
       }
       return groups
+    },
+    get selectors(){
+      const selectors: Record<KeyOfMap<Selectors>, PlexusCollectionSelector<DataType>> = {} as Record<KeyOfMap<Selectors>, PlexusCollectionSelector<DataType>>
+      for( let selector of _internalStore._selectors.entries()) {
+        selectors[selector[0]] = selector[1]
+      }
+      return selectors
+      
+    },
+    get selectorsValue(){
+      const selectors: Record<KeyOfMap<Selectors>, DataType> = {} as Record<KeyOfMap<Selectors>, DataType>
+      for( let selector of _internalStore._selectors.entries()) {
+        selectors[selector[0] as KeyOfMap<Selectors>] = selector[1].value
+      }
+      return selectors
     }
   };
 

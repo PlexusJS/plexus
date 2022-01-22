@@ -7,11 +7,32 @@ export interface PlexusCollectionGroupConfig<DataType> {
 }
 export type GroupName = string
 export interface PlexusCollectionGroup<DataType> {
+	/**
+	 * Check if the group contains the given item
+	 * @param key The key of the item to look for
+	 */
 	has( key: DataKey ): boolean,
+	/**
+	 * Add an item to the group
+	 * @param key The key of the item to look for
+	 */
 	add( key: DataKey ): PlexusCollectionGroup<DataType>,
+	/**
+	 * Remove an item from the group
+	 * @param key The key of the item to look for
+	 */
 	remove( key: DataKey ): PlexusCollectionGroup<DataType>,
+	/**
+	 * Peek at the index of the group (get all of the lookup keys for the group)
+	 */
 	get index(): Set<DataKey>
+	/**
+	 * The data values of the items in the group
+	 */
 	get value(): DataType[]
+	/**
+	 * The data in the group
+	 */
 	get data(): PlexusDataInstance<DataType>[]
 }
 export function _group<DataType=any>(instance: () => PlexusInstance, collectionId: string, name: string, config?: PlexusCollectionGroupConfig<DataType>){

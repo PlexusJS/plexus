@@ -60,9 +60,9 @@ describe('Testing Collection', () => {
 	test('testing selectors', () => {
 		expect(myCollection.value.length).toBe(0)
 		myCollection.collect([{thing: 'lol', 'id': 0},{thing: 'lol3', 'id': 2}, {thing: 'lols', id: 1}])
-
+		console.log(myCollection.getSelector('main').key)
 		myCollection.getSelector('main').select(0)
-
+		expect(myCollection.selectors.main.key).toBe(0)
 		expect(myCollection.getSelector('main').value.id).toBe(0)
 		expect(myCollection.getSelector('main').value.thing).toBe('lol')
 	})
