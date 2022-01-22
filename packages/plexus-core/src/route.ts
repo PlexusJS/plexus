@@ -12,15 +12,53 @@ export interface PlexusRouteRes<DataType=any> {
 	data: DataType
 }
 export interface PlexusRoute {
+	/**
+	 * Set the configurtation options for fetch 
+	 * @param options RequestInit - Same as fetch options
+	 * @param overwrite (optional) If true, will overwrite the current options object
+	 */
 	options(options: RequestInit, overwrite: boolean): PlexusRoute
 	options(options: RequestInit): PlexusRoute
+	/**
+	 * Send a get request
+	 * @param url The url to send the request to
+	 */
 	get<ResponseType=any>(url: string): Promise<PlexusRouteRes<ResponseType>>
-	post<ResponseType=any>(url: string, body: Record<string, string>): Promise<PlexusRouteRes<ResponseType>>
-	put<ResponseType=any>(url: string, body: Record<string, string>): Promise<PlexusRouteRes<ResponseType>>
+	/**
+	 * Send a post request
+	 * @param url The url to send the request to
+	 * @param body The body of the request (can be a string or object)
+	 */
+	post<ResponseType=any>(url: string, body: Record<string, string> | string): Promise<PlexusRouteRes<ResponseType>>
+	/**
+	 * Send a put request
+	 * @param url The url to send the request to
+	 * @param body The body of the request (can be a string or object)
+	 */
+	put<ResponseType=any>(url: string, body: Record<string, string> | string): Promise<PlexusRouteRes<ResponseType>>
+	/**
+	 * Send a delete request
+	 * @param url The url to send the request to
+	 */
 	delete<ResponseType=any>(url: string): Promise<PlexusRouteRes<ResponseType>>
-	patch<ResponseType=any>(url: string, body: Record<string, string>): Promise<PlexusRouteRes<ResponseType>>
+	/**
+	 * Send a patch request 
+	 * @param url The url to send the request to
+	 * @param body The body of the request (can be a string or object) 
+	 */
+	patch<ResponseType=any>(url: string, body: Record<string, string> | string): Promise<PlexusRouteRes<ResponseType>>
+	/**
+	 * Set headers for the request
+	 * @param headers The headers to set for the request
+	 */
 	headers(headers: Record<string, string>): PlexusRoute
+	/**
+	 * Reset this routes configuration
+	 */
 	reset(): PlexusRoute
+	/**
+	 * The configuration of this route
+	 */
 	config: RequestInit
 }
 export function route(baseURL: string='', router: PlexusRouteConfig={options: {headers: {}}, timeout: 20000}): PlexusRoute {
@@ -138,10 +176,12 @@ export function route(baseURL: string='', router: PlexusRouteConfig={options: {h
 			
 			return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
 		},
-		post(path: string, body: Record<string, string>){
+		post(path: string, body: Record<string, string> | string){
 			if(_internalStore._noFetch) return null
 			_internalStore._options.method = "POST"
-			_internalStore._options.body = JSON.stringify(body)
+			if(typeof body !== 'string'){
+				_internalStore._options.body = JSON.stringify(body)
+			}
 			
 			if(_internalStore._options.headers['Content-Type'] === 'application/x-www-form-urlencoded'){
 				const params = new URLSearchParams(body)
@@ -151,10 +191,12 @@ export function route(baseURL: string='', router: PlexusRouteConfig={options: {h
 				send<ResponseType>(path)
 			}
 		},
-		put(path: string, body: Record<string, string>){
+		put(path: string, body: Record<string, string> | string){
 			if(_internalStore._noFetch) return null
 			_internalStore._options.method = "PUT"
-			_internalStore._options.body = JSON.stringify(body)
+			if(typeof body !== 'string'){
+				_internalStore._options.body = JSON.stringify(body)
+			}
 			return send<ResponseType>(path)
 		},
 		delete(path: string){
@@ -162,10 +204,12 @@ export function route(baseURL: string='', router: PlexusRouteConfig={options: {h
 			_internalStore._options.method = "DELETE"			
 			return send<ResponseType>(path)
 		},
-		patch(path: string, body: Record<string, string>){
+		patch(path: string, body: Record<string, string> | string){
 			if(_internalStore._noFetch) return null
 			_internalStore._options.method = "PATCH"
-			_internalStore._options.body = JSON.stringify(body)
+			if(typeof body !== 'string'){
+				_internalStore._options.body = JSON.stringify(body)
+			}
 			return send<ResponseType>(path)
 
 		},
