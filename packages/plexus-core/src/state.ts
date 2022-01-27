@@ -4,10 +4,10 @@ import { PlexusInstance } from './instance'
 export type PlexusStateType = Object | Array<unknown> | string | number | boolean | null | undefined 
 export type PlexusState = <PxStateValue=any>(instance: () => PlexusInstance, input: PxStateValue) => PlexusStateInstance<PxStateValue>
 export type PlexusStateWatcher<V> = (value: V) => void
-export type PlexusStateInstance<Value=any> = {
+export interface PlexusStateInstance<Value=any> {
 	/**
 	 * Set the value of the state
-	 * @param value 
+	 * @param value A value of the state to merge with the current value
 	*/
 	set(item: Value): void;
 	/**
@@ -17,15 +17,15 @@ export type PlexusStateInstance<Value=any> = {
 	patch(item: Value): void;
 	/**
 	 * Watch for changes on this state
-	 * @param keyOrCallback 
-	 * @param callback 
-	 * @returns 
+	 * @param key (optional) The key to use to identify this watcher
+	 * @param callback The callback to run when the state changes
+	 * @returns The remove function to stop watching
 	*/
 	watch(callback: PlexusStateWatcher<Value>): () => void;
 	watch(keyOrCallback: string | number | PlexusStateWatcher<Value>,  callback?: PlexusStateWatcher<Value>): () => void;
 	/**
 	 * Remove a watcher from this state
-	 * @param key 
+	 * @param key The key used to create the watcher
 	 * @returns true if the watcher was removed, false otherwise
 	*/
 	removeWatcher(key: string|number): boolean
@@ -39,12 +39,19 @@ export type PlexusStateInstance<Value=any> = {
 	reset(): void;
 	/**
 	 * Persist the state to selected storage
-	 * @param name 
+	 * @param name The storage prefix to use
 	*/
-	persist(name?: string): void;
+	persist(name: string): void;
 	/**
 	 * The current (reactive) value of the state
 	 */
+	/**
+	 * On a set interval, run a function to update the state
+	 * @param setterFunction The function used to update the state on the interval
+	 * @param ms The interval duration (in milliseconds)
+	 */
+	interval(setterFunction: (value: Value) => Value, ms?: number): this
+	clearInterval(): this
 	value: Value;
 	/**
 	 * The previous (reactive) value of the state
@@ -65,6 +72,7 @@ export interface PlexStateInternalStore<Value> {
 	_watchers: Map<number | string, DestroyFn>
 	_name: string
 	_persist: boolean
+	_interval: NodeJS.Timer | null
 	externalName: string
 }
 
@@ -79,6 +87,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		_watchers: new Map(),
 		_name: `_plexus_state_${instance().genNonce()}`,
 		_persist: false,
+		_interval: null,
 		externalName: '',
 
 	}
@@ -161,7 +170,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		// },
 
 		
-		persist(name  : string ){
+		persist(name: string ){
 			// if there is a name, change the states internal name 
 			if(name) _internalStore.externalName = `_plexus_state_${name}`
 
@@ -180,6 +189,17 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		
 		reset(){
 			this.set(_internalStore._initialValue)
+		},
+		interval(intervalCallback: (value: StateValue) => StateValue, ms?: number){
+			if(_internalStore._interval) clearInterval(_internalStore._interval)
+			_internalStore._interval = setInterval(() => {
+				this.set(intervalCallback(this.value))
+			}, ms ?? 3000)
+			return this
+		},
+		clearInterval(){
+			if(_internalStore._interval) clearInterval(_internalStore._interval)
+			return this
 		},
 		
 		get value() {
