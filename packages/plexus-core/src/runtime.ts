@@ -12,7 +12,8 @@ export interface PlexusRuntime {
 		 * @param _key The key of the object being wathced
 		 * @param _callback The function to call when the value changes
 		 * @returns A function to remove the watcher
-		 */
+		 */ 
+		subscribe<Value=PlexusStateType>(key: string | number, callback: Fn<Value>);
 		subscribe<Value=PlexusStateType>(_key: string, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>): () => void
 		/**
 		 * Either get all watchers on this runtime or get the specific watchers on an event
@@ -20,9 +21,18 @@ export interface PlexusRuntime {
 		 */
 		getWatchers(key: string): { key: string; value: any; }
 		getWatchers(): Map<string, { key: string; value: any; }>
-
+		/**
+		 * remove a watcher from the runtime given a type and a key
+		 * @param type The type of watcher to remove
+		 * @param key The key of the watcher to remove
+		 */
 		removeWatchers(type: SubscriptionTypes, key: string)
-		log
+		/**
+		 * Runtime logger function
+		 * @param type The type of log message
+		 * @param message The message to send
+		 */
+		log(type: 'warn' | 'info' | 'error', message: string)
 }
 type Fn<Value> = (value: Value) => void
 type SubscriptionTypes = 'state' | ' collection' | 'event' | 'storage' | `plugin_${string}`
@@ -40,15 +50,6 @@ export function _runtime(instance: () => PlexusInstance): PlexusRuntime {
 	}
 
 	const genEventName = (type: SubscriptionTypes, key: string) => `${type}_${key}`
-
-	
-	
-
-	
-
-	
-	// function subscribe<Value=PlexusStateType>(key: string | number, callback: Fn<Value>);
-	
 
 	// function unsubscribe(key: string|number, watcherKey: string | number){
 	// 	// if the parent key does not exist, fail silently
@@ -78,12 +79,7 @@ export function _runtime(instance: () => PlexusInstance): PlexusRuntime {
 		broadcast<Value=PlexusStateType>(key: string, type: SubscriptionTypes, value: Value){
 			_internalStore._conductor.emit(genEventName(type, key), {key, value})
 		},
-		/**
-		 * 
-		 * @param _key The key of the object being wathced
-		 * @param _callback The function to call when the value changes
-		 * @returns A function to remove the watcher
-		 */
+		
 		subscribe<Value=PlexusStateType>(_key: string, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>){
 			const type = typeof typeOrCallback === 'string' ? typeOrCallback : 'state'
 			if(typeof typeOrCallback === 'function' && _callback === undefined){
@@ -99,21 +95,11 @@ export function _runtime(instance: () => PlexusInstance): PlexusRuntime {
 
 			// 
 			const unsub = _internalStore._conductor.on(genEventName(type, _key), callback)
-			// generate watcher key
-			// watcherKey = watcherKey === undefined ? `_plexus_state_watcher_${instance().genNonce()}` : watcherKey
-
-
-			// if that watcher list does not already exist, create it
-			// if(!_internalStore._watchers.has(_key)){
-			// 	_internalStore._watchers.set(_key, new Map<string|Number, (v: any) => void>())
-			// }
-			// // add the watcher to the list
-			// _internalStore._watchers.get(_key).set(watcherKey, _callback)
-
+			
 			// return the watcher unsubscribe function
 			return unsub
 		},
-		// unsubscribe,
+		
 		getWatchers(key?: string){
 			if(!key) {
 				return _internalStore._conductor.events
