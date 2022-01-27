@@ -4,7 +4,7 @@ import { PlexusInstance } from "./instance"
 
 type EventHandler = (v: any) => void
 
-export type PlexusEventInstance<PayloadType=any> = {
+export interface PlexusEventInstance<PayloadType=any> {
 	/**
 	 * Listen for an event only once
 	 * @param callback The function to call when the event is fired
