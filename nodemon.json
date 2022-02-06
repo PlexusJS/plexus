@@ -1,0 +1,5 @@
+{
+  "watch": ["packages/**/src"],
+  "ext": ".ts",
+  "exec": "turbo run build --parallel --no-cache"
+}
