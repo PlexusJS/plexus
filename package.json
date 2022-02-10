@@ -10,7 +10,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "dev": "yarn && turbo run dev --parallel --no-cache",
+    "dev": "yarn && nodemon",
     "clean-build": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
     "build": "yarn clean-build && turbo run build",
     "prepublish": "yarn build",
@@ -28,6 +28,7 @@
     "jest": "^27.4.7",
     "lerna": "^4.0.0",
     "node-fetch": "2",
+    "nodemon": "^2.0.15",
     "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
     "turbo": "^1.0.28",
