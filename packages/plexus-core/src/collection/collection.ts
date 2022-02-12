@@ -47,6 +47,12 @@ export interface PlexusCollectionInstance<DataType=any, Groups extends GroupMap<
    */
   createGroup<Name extends GroupName>(groupName: Name, config?: PlexusCollectionGroupConfig<DataType>): this & PlexusCollectionInstance<DataType, Map<Name, PlexusCollectionGroup<DataType>>, Selectors >
   /**
+   * Create multiple groups with a name (no configuration)
+   * @param groupNames The names of the groups to create
+   * @returns The new Collection Instance
+   */
+   createGroups<Name extends GroupName>(groupNames: Name[]): this & PlexusCollectionInstance<DataType, Map<Name, PlexusCollectionGroup<DataType>>, Selectors >
+   /**
    * Get A Group instance of a given group name
    * @param name The Group Name to search for
    * @returns Group Instance | undefined
@@ -71,6 +77,13 @@ export interface PlexusCollectionInstance<DataType=any, Groups extends GroupMap<
    * @returns The new Collection Instance
    */
   createSelector<SelectorName extends GroupName>(name: SelectorName): this & PlexusCollectionInstance<DataType, Groups, Map<SelectorName, PlexusCollectionSelector<DataType>> >
+  /**
+   * Create Selector instances for a given set of selector names
+   * @param names The names of the selectors to create
+   * @returns The new Collection Instance
+   */
+   createSelectors<SelectorName extends GroupName>(names: SelectorName[]): this & PlexusCollectionInstance<DataType, Groups, Map<SelectorName, PlexusCollectionSelector<DataType>> >
+  
   /**
    * Get A Group instance of a given group name
    * @param name The Group Name to search for
@@ -241,6 +254,12 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
       _internalStore._selectors.set(selectorName, _selector(() => instance(), _internalStore._name, selectorName))
       return this as any
     },
+    createSelectors (selectorNames: string[]) {
+      for (const selectorName of selectorNames) {
+        _internalStore._selectors.set(selectorName, _selector(() => instance(), _internalStore._name, selectorName))
+      }
+      return this as any
+    },
     getSelector(name: KeyOfMap<Selectors> | string) {
       if(isCreatedSelector(name)){
         return _internalStore._selectors.get(name)
@@ -252,6 +271,14 @@ export function _collection<DataType extends {[key: string]: any}, Groups extend
     /// GROUPS
     createGroup<Name extends GroupName>(groupName: Name, config?: PlexusCollectionGroupConfig<DataType>) {
       _internalStore._groups.set(groupName, _group(() => instance(), _internalStore._name, groupName, config))
+      // TODO: Fix this type issue
+      // need to return any as it throws a type error with the getGroup function
+      return this as any
+    },
+    createGroups<Name extends GroupName>(groupNames: Name[]) {
+      for (const groupName of groupNames) {
+        _internalStore._groups.set(groupName, _group(() => instance(), _internalStore._name, groupName))
+      }
       // TODO: Fix this type issue
       // need to return any as it throws a type error with the getGroup function
       return this as any
