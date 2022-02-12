@@ -1,76 +1,76 @@
 import { deepClone, deepMerge } from "./helpers"
 import { instance } from "./instance"
-export interface PlexusRouteConfig {
+export interface PlexusApiConfig {
 	options?: RequestInit
 	timeout?: number
 	silentFail?: boolean
 }
-export interface PlexusRouteRes<DataType = any> {
+export interface PlexusApiRes<DataType = any> {
 	status: number
 	response: ResponseInit
 	rawData: any
 	data: DataType
 }
-export interface PlexusRoute {
+export interface PlexusApi {
 	/**
 	 * Set the configurtation options for fetch
 	 * @param options RequestInit - Same as fetch options
 	 * @param overwrite (optional) If true, will overwrite the current options object
 	 */
-	options(options: RequestInit, overwrite: boolean): PlexusRoute
-	options(options: RequestInit): PlexusRoute
+	options(options: RequestInit, overwrite: boolean): PlexusApi
+	options(options: RequestInit): PlexusApi
 	/**
 	 * Send a get request
 	 * @param url The url to send the request to
 	 */
-	get<ResponseType = any>(url: string): Promise<PlexusRouteRes<ResponseType>>
+	get<ResponseType = any>(url: string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a post request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	post<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusRouteRes<ResponseType>>
+	post<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a put request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	put<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusRouteRes<ResponseType>>
+	put<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a delete request
 	 * @param url The url to send the request to
 	 */
-	delete<ResponseType = any>(url: string): Promise<PlexusRouteRes<ResponseType>>
+	delete<ResponseType = any>(url: string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a patch request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	patch<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusRouteRes<ResponseType>>
+	patch<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Set headers for the request
 	 * @param headers The headers to set for the request
 	 */
-	headers(headers: Record<string, string>): PlexusRoute
+	headers(headers: Record<string, string>): PlexusApi
 	/**
 	 * Reset this routes configuration
 	 */
-	reset(): PlexusRoute
+	reset(): PlexusApi
 	/**
 	 * Set the authentication details for the request
 	 * @param token The token to use for authentication
 	 * @param type optional - The type of authentication to use. This determines what prefix to use for the header
 	 */
-	auth(token: string, type?: "bearer" | "basic" | "jwt"): PlexusRoute
+	auth(token: string, type?: "bearer" | "basic" | "jwt"): PlexusApi
 	/**
-	 * The configuration of this route
+	 * The configuration of this api
 	 */
 	config: RequestInit
 }
-export function route(
+export function api(
 	baseURL: string = "",
-	router: PlexusRouteConfig = { options: { headers: {} }, timeout: 20000 }
-): PlexusRoute {
+	router: PlexusApiConfig = { options: { headers: {} }, timeout: 20000 }
+): PlexusApi {
 	const _internalStore = {
 		_options: deepClone(router.options || { headers: {} }),
 		_timeout: router.timeout || 20000,
@@ -78,7 +78,7 @@ export function route(
 		_noFetch: false,
 		_authToken: "",
 	}
-	async function send<ResponseDataType>(path: string): Promise<PlexusRouteRes<ResponseDataType>> {
+	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
 		if (_internalStore._noFetch) return { status: 0, response: {}, rawData: {}, data: null }
 
 		if (_internalStore._options.headers["Content-Type"] === undefined)
@@ -174,7 +174,7 @@ export function route(
 		if (fetch) {
 		}
 	} catch (e) {
-		instance()._runtime.log("warn", "Fetch is not supported in this environment; route will not work.")
+		instance()._runtime.log("warn", "Fetch is not supported in this environment; api will not work.")
 		_internalStore._noFetch = true
 	}
 
@@ -182,14 +182,14 @@ export function route(
 		options: function (options?: RequestInit, overwrite: boolean = false) {
 			if (overwrite) {
 				_internalStore._options = deepClone(options)
-				return this as PlexusRoute
+				return this as PlexusApi
 			}
 
 			// if(!options && !overwrite) return deepClone(_internalStore._options)
 
 			_internalStore._options = deepMerge(_internalStore._options, options)
 			this.headers()
-			return this as PlexusRoute
+			return this as PlexusApi
 			if (_internalStore._noFetch) return this
 		},
 		get(path: string, query?: Record<string, string>) {
@@ -242,7 +242,7 @@ export function route(
 		},
 		headers(headers?: Record<string, string>) {
 			if (!_internalStore._options.headers) _internalStore._options.headers = {} as HeadersInit
-			if (_internalStore._noFetch) return this as PlexusRoute
+			if (_internalStore._noFetch) return this as PlexusApi
 			const temp: Record<string, string> = {}
 			Object.entries(headers || _internalStore._options.headers).map(([key, value]) => {
 				// uppercase the dash separated tokens
@@ -254,15 +254,15 @@ export function route(
 				] = value
 			})
 			_internalStore._options.headers = temp
-			return this as PlexusRoute
+			return this as PlexusApi
 		},
 		reset() {
 			_internalStore._options = deepClone(router.options)
-			return this as PlexusRoute
-			if (_internalStore._noFetch) return this as PlexusRoute
+			return this as PlexusApi
+			if (_internalStore._noFetch) return this as PlexusApi
 		},
 		get config() {
 			return deepClone(_internalStore._options || {})
 		},
-	}) as PlexusRoute
+	}) as PlexusApi
 }

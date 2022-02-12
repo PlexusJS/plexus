@@ -50,10 +50,11 @@ export {
 	PlexusStateInstance,
 }
 export { 
-	route, 
-	PlexusRoute, 
-	PlexusRouteConfig 
-} from './route' 
+	api,
+	PlexusApi,
+	PlexusApiConfig,
+	PlexusApiRes
+} from './api' 
 export { 
 	action, 
 	PlexusAction, 

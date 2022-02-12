@@ -1,4 +1,4 @@
-import { route, PlexusRoute, PlexusAction, event, state } from '../src'
+import { api, PlexusApi, PlexusAction, event, state } from '../src'
 // import { instance } from '../src/instance';
 // import { PlexusEvent, PxState, PxStateInstance } from '../src/interfaces';
 
@@ -12,7 +12,7 @@ describe('Testing Event Function', () => {
 		})
 
 		myEvent.emit('test')
-		// console.log(myRoute.config)
+		// console.log(myApi.config)
 		destroy()
 		
 	})
@@ -30,7 +30,7 @@ describe('Testing Event Function', () => {
 		setTimeout(() => {
 		}, 100)
 		destroy()
-		// console.log(myRoute.config)
+		// console.log(myApi.config)
 		
 		
 	})
