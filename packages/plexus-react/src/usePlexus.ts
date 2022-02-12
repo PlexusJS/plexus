@@ -1,20 +1,22 @@
-import { PlexusStateInstance, state } from '@plexusjs/core'
+import { PlexusCollectionGroup, PlexusStateInstance } from '@plexusjs/core'
 // import {  } from '@plexusjs/core/dist/interfaces';
 import { useEffect, useState } from 'react';
 
+// export type PlexusValue<T> = T extends PlexusStateInstance<infer U> ? U : T extends PlexusCollectionGroup<infer U> ? U : never;
+// export type PlexusValueArray<T> = { [ K in keyof T ]: T[K] extends PlexusStateInstance<infer U> ? U : T[K] extends PlexusCollectionGroup<infer U> ? U : never };
 export type PlexusValue<T> = T extends PlexusStateInstance<infer U> ? U : never;
 export type PlexusValueArray<T> = { [ K in keyof T ]: T[ K ] extends PlexusStateInstance<infer U> ? U : never };
 
 
-const normalizeDeps = (deps: PlexusStateInstance | PlexusStateInstance[]) => Array.isArray(deps) ? deps : [ deps ];
+const normalizeDeps = (deps: PlexusCollectionGroup | PlexusCollectionGroup[] | PlexusStateInstance | PlexusStateInstance[]) => Array.isArray(deps) ? deps : [ deps ];
 
 export function usePlexus<Value extends PlexusStateInstance<any>>(deps: Value): PlexusValue<Value>
 
 export function usePlexus<Value extends PlexusStateInstance<any>[]>(deps: Value): PlexusValueArray<Value>
 
-export function usePlexus<Value extends PlexusStateInstance<any>[]>(deps: Value | [] | PlexusStateInstance): PlexusValue<Value> | PlexusValueArray<Value> {
-	const depsArr = normalizeDeps(deps) as PlexusValueArray<Value>
-	const [ _, set ] = useState(null)
+export function usePlexus<Value extends PlexusStateInstance<any>[] | PlexusCollectionGroup<any>[]>(deps: Value | [] | PlexusStateInstance | PlexusCollectionGroup): PlexusValue<Value> | PlexusValueArray<Value> {
+	const depsArr = normalizeDeps(deps) as any[] // PlexusValueArray<Value>
+	const [_, set] = useState(null)
 	useEffect(() => {
 		if (Array.isArray(depsArr)) {
 			const depUnsubs: Set<() => void> = new Set()

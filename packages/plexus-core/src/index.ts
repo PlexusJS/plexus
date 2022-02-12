@@ -4,6 +4,7 @@ import { _event, PlexusEventInstance } from "./event"
 import { storage as _storage, StorageOverride } from "./storage"
 import { PlexusPlugin, PlexusPluginConfig } from "./plugin"
 import { _collection } from "./collection/collection"
+import { PlexusCollectionGroup } from './collection/group';
 
 import { PlexusCollectionConfig, PlexusCollectionInstance } from "./collection/collection"
 
@@ -47,6 +48,7 @@ export {
 	PlexusCollectionInstance,
 	PlexusEventInstance,
 	PlexusStateInstance,
+	PlexusCollectionGroup
 }
 export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
 export { action, PlexusAction, PlexusActionHelpers } from "./action"
