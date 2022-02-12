@@ -7,7 +7,7 @@ export interface PlexusCollectionGroupConfig<DataType> {
 	addWhen?: (item: DataType) => boolean
 }
 export type GroupName = string
-export interface PlexusCollectionGroup<DataType> {
+export interface PlexusCollectionGroup<DataType=any> {
 	/**
 	 * Check if the group contains the given item
 	 * @param key The key of the item to look for
