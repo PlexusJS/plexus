@@ -1,5 +1,6 @@
-import { PlexusStateInstance, state } from "..";
-import { PlexusInstance } from "../instance";
+import { PlexusStateInstance, state } from ".."
+import { PlexusInstance } from "../instance"
+import { PlexusStateWatcher } from "../state"
 
 export interface PlexusDataInstance<TypeValue> {
 	/**
@@ -12,7 +13,7 @@ export interface PlexusDataInstance<TypeValue> {
 	 * @param config The config to use when setting the value
 	 * @param config.mode should we 'patch' or 'replace' the value
 	 */
-	set(value: TypeValue, config?: {mode: 'replace' | 'patch'}): void	
+	set(value: TypeValue, config?: { mode: "replace" | "patch" }): void
 	/**
 	 * The state that powers this data instance
 	 */
@@ -21,46 +22,57 @@ export interface PlexusDataInstance<TypeValue> {
 	 * Delete the data instance
 	 */
 	delete(): void
+	/**
+	 * Watch for changes on this data instance
+	 * @param callback The callback to run when the state changes
+	 * @returns The remove function to stop watching
+	 */
+	watch(callback: PlexusStateWatcher<TypeValue>): () => void
 }
 
-export type DataKey = string | number;
+export type DataKey = string | number
 
-export function _data<Value extends Record<string, any>>(instance: () => PlexusInstance, primaryKey: string, value: Value): PlexusDataInstance<Value> | null{
-	const _internalStore =  {
+export function _data<Value extends Record<string, any>>(
+	instance: () => PlexusInstance,
+	primaryKey: string,
+	value: Value
+): PlexusDataInstance<Value> | null {
+	const _internalStore = {
 		_key: value[primaryKey],
 		primaryKey,
-		_state: state<Value>(value)
+		_state: state<Value>(value),
 	}
 
-	if(value[primaryKey] !== undefined && value[primaryKey] !== null){	
+	if (value[primaryKey] !== undefined && value[primaryKey] !== null) {
 		return {
-			get value(){
+			get value() {
 				return _internalStore._state.value
 			},
-			set: (value: Partial<Value>, config: {mode: 'replace' | 'patch'}={mode: 'replace'}) => {
-				const checkIfHasKey = () => value[_internalStore.primaryKey] !== undefined && value[_internalStore.primaryKey] === _internalStore._key
-				if(config.mode === 'replace'){
-					if(checkIfHasKey()){
+			set: (value: Partial<Value>, config: { mode: "replace" | "patch" } = { mode: "replace" }) => {
+				const checkIfHasKey = () =>
+					value[_internalStore.primaryKey] !== undefined &&
+					value[_internalStore.primaryKey] === _internalStore._key
+				if (config.mode === "replace") {
+					if (checkIfHasKey()) {
 						_internalStore._state.set(value as Value)
 					}
-				}
-				else{
-					if(value[_internalStore.primaryKey] === _internalStore._key){
+				} else {
+					if (value[_internalStore.primaryKey] === _internalStore._key) {
 						_internalStore._state.patch(value as Value)
 					}
 				}
-				
 			},
-			get state(){
+			get state() {
 				return _internalStore._state
 			},
-			delete(){
-				
-				instance()._runtime.removeWatchers('state', _internalStore._state.name)
+			delete() {
+				instance()._runtime.removeWatchers("state", _internalStore._state.name)
 				instance()._states.delete(_internalStore._state.name)
 				// delete _internalStore._state
-				
-			}
+			},
+			watch(callback?: PlexusStateWatcher<Value>) {
+				return _internalStore._state.watch(callback)
+			},
 		}
 	}
 	return null
