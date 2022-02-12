@@ -55,9 +55,9 @@ export interface PlexusCollectionInstance<DataType = any, Groups extends GroupMa
   /**
   * Get A Group instance of a given group name
   * @param name The Group Name to search for
-  * @returns Group Instance | undefined
+  * @returns Group Instance
   */
-  getGroup(name: string): undefined | PlexusCollectionGroup<DataType>
+  getGroup(name: string): PlexusCollectionGroup<DataType>
   getGroup(name: KeyOfMap<Groups>): PlexusCollectionGroup<DataType>
   /**
    * Add a data item to a group or groups
@@ -287,7 +287,9 @@ export function _collection<DataType extends { [ key: string ]: any }, Groups ex
       if (isCreatedGroup(name)) {
         return _internalStore._groups.get(name)
       } else {
-        return undefined
+        const g =  _group(() => instance(), _internalStore._name, name)
+        _internalStore._groups.set(name as GroupName, g);
+        return g;
       }
     },
     getGroupsOf(key: DataKey) {
@@ -304,11 +306,21 @@ export function _collection<DataType extends { [ key: string ]: any }, Groups ex
       if (groups) {
         if (Array.isArray(groups)) {
           for (let group in groups) {
-            _internalStore._groups.get(group as GroupName).add(key)
+            let g = _internalStore._groups.get(group as GroupName);
+            if (!g) {
+              g = _group(() => instance(), _internalStore._name, group)
+              _internalStore._groups.set(group as GroupName, g);
+            }
+            g.add(key);
           }
         }
         else {
-          _internalStore._groups.get(groups).add(key)
+          let g = _internalStore._groups.get(groups as GroupName);
+          if (!g) {
+            g = _group(() => instance(), _internalStore._name, groups)
+            _internalStore._groups.set(groups as GroupName, g);
+          }
+          g.add(key);
         }
       }
     },
