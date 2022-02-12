@@ -48,7 +48,7 @@ export {
 	PlexusEventInstance,
 	PlexusStateInstance,
 }
-export { api, PlexusAPI, PlexusAPIConfig } from "./api"
+export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
 export { action, PlexusAction, PlexusActionHelpers } from "./action"
 
 // TODO I don't think this is used or needed anywhere

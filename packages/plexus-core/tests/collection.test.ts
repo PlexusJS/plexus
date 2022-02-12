@@ -1,6 +1,6 @@
 import { collection, PlexusCollectionInstance } from "../src"
 
-let myCollection = collection<{thing: string, 'id': number}>().createGroup('group1').createSelector('main')
+let myCollection = collection<{thing: string, 'id': number}>().createGroups(['group1']).createSelectors(['main'])
 
 beforeEach(() => {
 	myCollection.clear()
