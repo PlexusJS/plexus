@@ -60,7 +60,7 @@ export interface PlexusStateInstance<Value = any> {
 	 * Persist the state to selected storage
 	 * @param name The storage prefix to use
 	 */
-	persist(name: string): void
+	persist(name: string): this
 	/**
 	 * The current (reactive) value of the state
 	 */
@@ -188,6 +188,8 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 				instance().storage.set(_internalStore.externalName, _internalStore._value)
 				_internalStore._persist = true
 			}
+
+			return this;
 		},
 
 		undo() {
