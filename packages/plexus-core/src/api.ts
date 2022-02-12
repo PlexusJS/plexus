@@ -137,7 +137,7 @@ export function api(
 
 		if (res === undefined) {
 			return {
-				status: res.status,
+				status: 500,
 				response: res,
 				rawData,
 				data,

@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "@plexusjs/core": "^1.0.0-alpha.0",
+    "@plexusjs/core": "~1.0.0",
     "react": "^16.8.6"
   },
   "devDependencies": {
