@@ -61,6 +61,21 @@ export function _group<DataType = any>(
 			callback(instance()._collections.get(_internalStore._collectionId).groupsValue[_internalStore._name])
 		})
 	}
+	const rebuildWatchers = () => {
+		_internalStore._watcherDestroyers.forEach((destroyer) => destroyer())
+		_internalStore._watcherDestroyers.clear()
+
+		Array.from(_internalStore._includedKeys).forEach((key) =>
+			_internalStore._watcherDestroyers.add(
+				instance()
+					._collections.get(_internalStore._collectionId)
+					.getItem(key)
+					.watch(() => {
+						runWatchers()
+					})
+			)
+		)
+	}
 
 	return Object.freeze({
 		has(key: DataKey) {
@@ -68,20 +83,12 @@ export function _group<DataType = any>(
 		},
 		add(key: DataKey) {
 			_internalStore._includedKeys.add(key)
-			_internalStore._watcherDestroyers.forEach((destroyer) => destroyer())
-			_internalStore._watcherDestroyers.clear()
-
-			this.data.forEach((data) =>
-				_internalStore._watcherDestroyers.add(
-					data.watch(() => {
-						runWatchers()
-					})
-				)
-			)
+			rebuildWatchers()
 			return this as PlexusCollectionGroup<DataType>
 		},
 		remove(key: DataKey) {
 			_internalStore._includedKeys.delete(key)
+			rebuildWatchers()
 			return this as PlexusCollectionGroup<DataType>
 		},
 		get index() {
