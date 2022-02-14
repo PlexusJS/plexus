@@ -4,10 +4,10 @@ import * as renderer from "react-test-renderer"
 import { collection, PlexusStateInstance, state } from "@plexusjs/core"
 
 let myState: PlexusStateInstance
-const myCollection = collection<{ text: string }>().createGroup("group1")
+const myCollection = collection<{ id: string, a: number }>().createGroup("test")
 beforeEach(() => {
 	myState = state("yes")
-	myCollection.collect({ text: "hello" }, "group1")
+	myCollection.collect({ id: "poggers", a: 2 }, "test")
 })
 
 describe("Test react integration", () => {
@@ -27,9 +27,9 @@ describe("Test react integration", () => {
 	})
 	test("usePlexus hook w/collection group", () => {
 		function RandomComponent() {
-			const col = collection().createGroup("test")
-			col.collect({ id: "pog", a: 1 }, "test")
-			const groupValue = usePlexus(col.groups.test)
+			
+			myCollection.collect({ id: "pog", a: 1 }, "test")
+			const groupValue = usePlexus(myCollection.groups.test)
 			return (
 				<div>
 					<p>{JSON.stringify(groupValue)}</p>
