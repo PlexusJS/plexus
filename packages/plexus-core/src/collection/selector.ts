@@ -2,7 +2,7 @@ import { PlexusInstance } from "../instance"
 import { PlexusStateWatcher } from "../state"
 import { DataKey, PlexusDataInstance } from "./data"
 export type SelectorName = string
-export interface PlexusCollectionSelector<ValueType extends { [key: string]: any }> {
+export interface PlexusCollectionSelector<ValueType extends { [key: string]: any } = { [key: string]: any }> {
 	/**
 	 * The key of a data item assigned to this selecor
 	 */
@@ -28,7 +28,7 @@ export interface PlexusCollectionSelector<ValueType extends { [key: string]: any
 	get data(): PlexusDataInstance<ValueType> | null
 }
 
-export function _selector<ValueType extends { [key: string]: any }>(
+export function _selector<ValueType extends { [key: string]: any } = { [key: string]: any }>(
 	instance: () => PlexusInstance,
 	collectionId: string,
 	name: string
