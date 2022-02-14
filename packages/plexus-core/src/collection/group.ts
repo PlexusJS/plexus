@@ -7,7 +7,7 @@ export interface PlexusCollectionGroupConfig<DataType> {
 	addWhen?: (item: DataType) => boolean
 }
 export type GroupName = string
-export interface PlexusCollectionGroup<DataType=any> {
+export interface PlexusCollectionGroup<DataType = any> {
 	/**
 	 * Check if the group contains the given item
 	 * @param key The key of the item to look for
@@ -28,7 +28,7 @@ export interface PlexusCollectionGroup<DataType=any> {
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusStateWatcher<DataType>): () => void
+	watch(callback: PlexusStateWatcher<DataType[]>): () => void
 	/**
 	 * Peek at the index of the group (get all of the lookup keys for the group)
 	 */
@@ -53,6 +53,28 @@ export function _group<DataType = any>(
 		_name: name,
 		_collectionId: collectionId,
 		_includedKeys: new Set<string | number>(),
+		_watcherDestroyers: new Set<() => void>(),
+		_watchers: new Set<PlexusStateWatcher<DataType[]>>(),
+	}
+	const runWatchers = () => {
+		_internalStore._watchers.forEach((callback) => {
+			callback(instance()._collections.get(_internalStore._collectionId).groupsValue[_internalStore._name])
+		})
+	}
+	const rebuildWatchers = () => {
+		_internalStore._watcherDestroyers.forEach((destroyer) => destroyer())
+		_internalStore._watcherDestroyers.clear()
+
+		Array.from(_internalStore._includedKeys).forEach((key) =>
+			_internalStore._watcherDestroyers.add(
+				instance()
+					._collections.get(_internalStore._collectionId)
+					.getItem(key)
+					.watch(() => {
+						runWatchers()
+					})
+			)
+		)
 	}
 
 	return Object.freeze({
@@ -61,10 +83,12 @@ export function _group<DataType = any>(
 		},
 		add(key: DataKey) {
 			_internalStore._includedKeys.add(key)
+			rebuildWatchers()
 			return this as PlexusCollectionGroup<DataType>
 		},
 		remove(key: DataKey) {
 			_internalStore._includedKeys.delete(key)
+			rebuildWatchers()
 			return this as PlexusCollectionGroup<DataType>
 		},
 		get index() {
@@ -78,10 +102,12 @@ export function _group<DataType = any>(
 				instance()._collections.get(_internalStore._collectionId).getItem(key)
 			)
 		},
-		watch(callback?: PlexusStateWatcher<DataType>) {
-			const destroyers = this.data.map((data) => data.watch(callback))
+		watch(callback?: PlexusStateWatcher<DataType[]>) {
+			// const destroyers = this.data.map((data) => data.watch(callback))
+			_internalStore._watchers.add(callback)
 			const destroyer = () => {
-				destroyers.forEach((destroyer) => destroyer())
+				// destroyers.forEach((destroyer) => destroyer())
+				_internalStore._watchers.delete(callback)
 			}
 			return destroyer
 		},

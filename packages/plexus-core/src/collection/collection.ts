@@ -3,6 +3,7 @@
 import { group } from "console"
 import { PlexusStateInstance, state } from ".."
 import { PlexusInstance } from "../instance"
+import { PlexusStateWatcher } from "../state"
 import { _data, PlexusDataInstance, DataKey } from "./data"
 import { _group, PlexusCollectionGroup, PlexusCollectionGroupConfig, GroupName } from "./group"
 import { PlexusCollectionSelector, SelectorName, _selector } from "./selector"
@@ -80,8 +81,8 @@ export interface PlexusCollectionInstance<
 	 * @returns The Group names that the key is in
 	 */
 	getGroupsOf(key: DataKey): Array<KeyOfMap<Groups>>
-	watchGroup(name: string, callback: () => void): void | (() => void)
-	watchGroup(name: KeyOfMap<Groups>, callback: () => void): () => void
+	watchGroup(name: string, callback: PlexusStateWatcher<DataType[]>): void | (() => void)
+	watchGroup(name: KeyOfMap<Groups>, callback: PlexusStateWatcher<DataType[]>): () => void
 	/**
 	 * Create a Selector instance for a given selector name
 	 * @param name The name of the selector
@@ -355,7 +356,7 @@ export function _collection<
 				}
 			}
 		},
-		watchGroup(name: KeyOfMap<Groups> | string, callback: () => void) {
+		watchGroup(name: KeyOfMap<Groups> | string, callback: PlexusStateWatcher<DataType[]>) {
 			if (isCreatedGroup(name)) {
 				return _internalStore._groups.get(name).watch(callback)
 			} else {
