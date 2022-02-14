@@ -3,10 +3,7 @@ import { _state, PlexusStateInstance } from "./state"
 import { _event, PlexusEventInstance } from "./event"
 import { storage as _storage, StorageOverride } from "./storage"
 import { PlexusPlugin, PlexusPluginConfig } from "./plugin"
-import { _collection } from "./collection/collection"
-import { PlexusCollectionGroup } from './collection/group';
-
-import { PlexusCollectionConfig, PlexusCollectionInstance } from "./collection/collection"
+import { _collection, PlexusCollectionConfig, PlexusCollectionInstance, PlexusCollectionSelector, PlexusCollectionGroup } from "./collection/collection"
 
 /**
  * Generate a Plexus State
@@ -48,7 +45,8 @@ export {
 	PlexusCollectionInstance,
 	PlexusEventInstance,
 	PlexusStateInstance,
-	PlexusCollectionGroup
+	PlexusCollectionGroup,
+	PlexusCollectionSelector,
 }
 export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
 export { action, PlexusAction, PlexusActionHelpers } from "./action"

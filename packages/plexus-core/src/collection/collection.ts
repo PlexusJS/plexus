@@ -12,6 +12,7 @@ type GroupMap<DataType> = Map<GroupName, PlexusCollectionGroup<DataType>>
 type SelectorMap<DataType> = Map<SelectorName, PlexusCollectionSelector<DataType>>
 type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<infer K, unknown> ? K : never
 
+export { PlexusCollectionGroup, PlexusCollectionSelector }
 export interface PlexusCollectionConfig<DataType> {
 	primaryKey?: string
 }
@@ -111,7 +112,7 @@ export interface PlexusCollectionInstance<
 	 * Persist this collection to the storage
 	 * @param key The key to use for storage
 	 */
-	persist(key?: string): void
+	persist(key: string): void
 	/**
 	 * Update the collection with data;
 	 * This is like collect but will not add new items, and can can be used to patch existing items
@@ -364,9 +365,9 @@ export function _collection<
 			}
 		},
 
-		persist(name?: string) {
+		persist(key: string) {
 			// if there is a name, change the states internal name
-			if (name) _internalStore.externalName = `_plexus_state_${name}`
+			if (key) _internalStore.externalName = `_plexus_collection_${key}`
 
 			if (instance().storage) {
 				instance().storage.set(_internalStore.externalName, _internalStore._data)
