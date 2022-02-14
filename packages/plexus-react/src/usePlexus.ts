@@ -1,6 +1,4 @@
 import { PlexusCollectionGroup, PlexusStateInstance, state, PlexusCollectionSelector } from "@plexusjs/core"
-import { PlexusStateWatcher } from "@plexusjs/core/dist/state"
-// import {  } from '@plexusjs/core/dist/interfaces';
 import { useEffect, useState } from "react"
 
 export type PlexusValue<T> = T extends PlexusStateInstance<infer U>

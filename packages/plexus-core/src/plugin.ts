@@ -3,9 +3,9 @@ import { instance, PlexusInstance } from "./instance";
 export type PlexusPlugin = {
 	name: string,
 	version?: string,
-	init: (instance: (name?: string) => PlexusInstance) => void,
-	
+	init: (instance: (name?: string) => PlexusInstance) => void,	
 }
+
 export interface PlexusPluginConfig {
 	newInstance?: boolean
 	version?: string,
