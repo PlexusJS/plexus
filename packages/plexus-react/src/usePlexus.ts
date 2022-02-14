@@ -1,4 +1,4 @@
-import { PlexusCollectionGroup, PlexusStateInstance, state } from "@plexusjs/core"
+import { PlexusCollectionGroup, PlexusStateInstance, state, PlexusCollectionSelector } from "@plexusjs/core"
 import { PlexusStateWatcher } from "@plexusjs/core/dist/state"
 // import {  } from '@plexusjs/core/dist/interfaces';
 import { useEffect, useState } from "react"
@@ -11,25 +11,35 @@ export type PlexusValue<T> = T extends PlexusStateInstance<infer U>
 export type PlexusValueArray<T> = {
 	[K in keyof T]: T[K] extends PlexusCollectionGroup<infer U>
 		? Array<U>
+		: T[K] extends PlexusCollectionSelector<infer U>
+		? U
 		: T[K] extends PlexusStateInstance<infer U>
 		? U
 		: never
 }
 
 const normalizeDeps = (
-	deps: PlexusStateInstance | PlexusStateInstance[] | PlexusCollectionGroup | PlexusCollectionGroup[]
+	deps:
+		| PlexusStateInstance
+		| PlexusStateInstance[]
+		| PlexusCollectionGroup
+		| PlexusCollectionGroup[]
+		| PlexusCollectionSelector
+		| PlexusCollectionSelector[]
 ) => (Array.isArray(deps) ? deps : [deps])
 
-export function usePlexus<Value extends PlexusStateInstance<any> | PlexusCollectionGroup<any>>(
-	deps: Value
-): PlexusValue<Value>
+export function usePlexus<
+	Value extends PlexusStateInstance<any> | PlexusCollectionGroup<any> | PlexusCollectionSelector<any>
+>(deps: Value): PlexusValue<Value>
 
-export function usePlexus<Value extends PlexusStateInstance<any>[] | PlexusCollectionGroup<any>[]>(
-	deps: Value
-): PlexusValueArray<Value>
+export function usePlexus<
+	Value extends PlexusStateInstance<any>[] | PlexusCollectionGroup<any>[] | PlexusCollectionSelector<any>[]
+>(deps: Value): PlexusValueArray<Value>
 
-export function usePlexus<Value extends PlexusStateInstance<any>[] | PlexusCollectionGroup<any>[]>(
-	deps: Value | [] | PlexusStateInstance | PlexusCollectionGroup
+export function usePlexus<
+	Value extends PlexusStateInstance<any>[] | PlexusCollectionGroup<any>[] | PlexusCollectionSelector<any>[]
+>(
+	deps: Value | [] | PlexusStateInstance | PlexusCollectionGroup | PlexusCollectionSelector
 ): PlexusValue<Value> | PlexusValueArray<Value> {
 	const depsArr = normalizeDeps(deps)
 	const [_, set] = useState(null)
