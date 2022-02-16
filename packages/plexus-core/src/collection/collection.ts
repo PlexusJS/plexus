@@ -108,11 +108,7 @@ export interface PlexusCollectionInstance<
 	 */
 	getSelector(name: string): undefined | PlexusCollectionSelector<DataType>
 	getSelector(name: KeyOfMap<Selectors>): PlexusCollectionSelector<DataType>
-	/**
-	 * Persist this collection to the storage
-	 * @param key The key to use for storage
-	 */
-	persist(key: string): void
+
 	/**
 	 * Update the collection with data;
 	 * This is like collect but will not add new items, and can can be used to patch existing items
@@ -362,16 +358,6 @@ export function _collection<
 				return _internalStore._groups.get(name).watch(callback)
 			} else {
 				console.warn("no group found for name", name)
-			}
-		},
-
-		persist(key: string) {
-			// if there is a name, change the states internal name
-			if (key) _internalStore.externalName = `_plexus_collection_${key}`
-
-			if (instance().storage) {
-				instance().storage.set(_internalStore.externalName, _internalStore._data)
-				_internalStore.persist = true
 			}
 		},
 
