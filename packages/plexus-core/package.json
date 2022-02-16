@@ -13,5 +13,8 @@
     "test": "jest",
     "prepublish": "yarn build"
   },
-  "gitHead": "5484a0484fbc0e866a9043dfb925f7b84473a2fd"
+  "gitHead": "5484a0484fbc0e866a9043dfb925f7b84473a2fd",
+  "devDependencies": {
+    "isomorphic-fetch": "^3.0.0"
+  }
 }

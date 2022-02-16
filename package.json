@@ -9,6 +9,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "core": "yarn workspace @plexusjs/core",
+    "react": "yarn workspace @plexusjs/react",
+    "next": "yarn workspace @plexusjs/next",
     "bootstrap": "lerna bootstrap",
     "dev": "yarn && nodemon",
     "clean-build": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
