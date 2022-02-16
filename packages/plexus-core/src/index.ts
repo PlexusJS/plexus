@@ -4,6 +4,7 @@ import { _event, PlexusEventInstance } from "./event"
 import { storage as _storage, StorageOverride } from "./storage"
 import { PlexusPlugin, PlexusPluginConfig } from "./plugin"
 import { _collection, PlexusCollectionConfig, PlexusCollectionInstance, PlexusCollectionSelector, PlexusCollectionGroup } from "./collection/collection"
+import { PlexusInstance } from './instance';
 
 /**
  * Generate a Plexus State
@@ -47,6 +48,7 @@ export {
 	PlexusStateInstance,
 	PlexusCollectionGroup,
 	PlexusCollectionSelector,
+	PlexusInstance
 }
 export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
 export { action, PlexusAction, PlexusActionHelpers } from "./action"
@@ -58,3 +60,5 @@ export function usePlugin(plugin: PlexusPlugin) {
 	plugin.init((name: string) => instance({ instanceId: name }))
 	instance()._plugins.set(plugin.name, plugin)
 }
+
+export { instance };

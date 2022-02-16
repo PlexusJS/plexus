@@ -12,7 +12,7 @@
     "bootstrap": "lerna bootstrap",
     "dev": "yarn && nodemon",
     "clean-build": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
-    "build": "yarn clean-build && lerna run build --scope @plexusjs/core && lerna run build",
+    "build": "yarn clean-build && lerna run build --scope @plexusjs/core && lerna run build --scope @plexusjs/react && lerna run build",
     "prepublish": "yarn build",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
