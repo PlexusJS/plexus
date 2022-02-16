@@ -1,0 +1,27 @@
+{
+  "name": "@plexusjs/next",
+  "version": "1.0.1-canary.0+79a6457",
+  "description": "Next Plugin for PlexusJS",
+  "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "@plexusjs/core": "~1.0.0",
+    "@plexusjs/react": "~1.0.0",
+    "react": "^16.8.6"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.49",
+    "@types/react-test-renderer": "^16.9.3",
+    "react": "^17.0.2",
+    "react-test-renderer": "^16.13.1"
+  },
+  "scripts": {
+    "build": "tsc --build --force",
+    "test": "jest",
+    "prepublish": "yarn build"
+  }
+}

@@ -17,6 +17,10 @@ export interface PlexusStateInstance<Value = any> {
 	 */
 	lastValue: Value
 	/**
+	 * The initial (default) value of the state
+	 */
+	initialValue: Value
+	/**
 	 * The next value to apply to the state
 	 * This is normally managed internally, but you can use it to "prepare" the state before applying the value.
 	 * @example state.nextValue = { foo: "bar" };
@@ -226,6 +230,9 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		},
 		get nextValue() {
 			return _internalStore._nextValue
+		},
+		get initialValue () {
+			return _internalStore._initialValue
 		},
 		set nextValue(value: StateValue) {
 			_internalStore._nextValue = value

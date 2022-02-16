@@ -14,7 +14,7 @@ type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<i
 
 export { PlexusCollectionGroup, PlexusCollectionSelector }
 export interface PlexusCollectionConfig<DataType> {
-	primaryKey?: string
+	primaryKey?: string;
 }
 
 /**
@@ -162,6 +162,14 @@ export interface PlexusCollectionInstance<
 	 * @returns The groups paired with their childrens data values as an object
 	 */
 	get selectorsValue(): Record<KeyOfMap<Selectors>, DataType>
+	/**
+	 * Get the name (generated or custom) of the collection store
+	 */
+	get name (): string;
+	/**
+	 * Get the config
+	 */
+	get config (): PlexusCollectionConfig<DataType>;
 }
 
 export function _collection<
@@ -438,6 +446,12 @@ export function _collection<
 			}
 			return selectors
 		},
+		get name () {
+			return _internalStore._name;
+		},
+		get config () {
+			return _config;
+		}
 	}
 
 	// initalization //
