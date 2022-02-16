@@ -25,6 +25,14 @@ describe('Testing Api Function', () => {
 		const res = await myApi.get('https://google.com');
 		expect(res?.status).toBeGreaterThan(0)
 	})
+
+	describe('Test the API\'s baseURL capabilities', () => {
+		const myApi2 = api('https://google.com');
+		test('Can make a request to a sub-path', async () => {
+			const res = await myApi2.get('maps');
+			expect(res?.status).toBeGreaterThan(0)
+		})
+	})
 	
 	
 })
