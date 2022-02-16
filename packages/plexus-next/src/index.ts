@@ -1,4 +1,4 @@
-import { instance, PlexusCollectionSelector, PlexusInstance } from '@plexusjs/core';
+import { instance, PlexusCollectionSelector, PlexusInstance, PlexusPlugin, usePlugin } from '@plexusjs/core';
 
 interface PlexusNextData {
   state: {
@@ -90,9 +90,11 @@ export function isServer() {
 
 export * from '@plexusjs/react';
 
-instance()._plugins.set('nextjs', {
+const PlexusNext: PlexusPlugin = {
   name: 'NextJS',
   init: (inst) => {
     loadServerState()
   }
-})
+}
+
+export default PlexusNext;
