@@ -45,7 +45,7 @@ export function preserveServerState (nextData: {
       }
     }
   
-    nextData.props.PLEXUS_DATA = data;
+    nextData.props.PLEXUS_DATA = JSON.parse(JSON.stringify(data));
   } catch (e) {
     console.warn(e);
   }
