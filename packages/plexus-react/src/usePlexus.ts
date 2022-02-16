@@ -5,6 +5,8 @@ export type PlexusValue<T> = T extends PlexusStateInstance<infer U>
 	? U
 	: T extends PlexusCollectionGroup<infer U>
 	? U[]
+	: T extends PlexusCollectionSelector<infer U>
+	? U
 	: never
 export type PlexusValueArray<T> = {
 	[K in keyof T]: T[K] extends PlexusCollectionGroup<infer U>
@@ -12,6 +14,8 @@ export type PlexusValueArray<T> = {
 		: T[K] extends PlexusCollectionSelector<infer U>
 		? U
 		: T[K] extends PlexusStateInstance<infer U>
+		? U
+		: T[K] extends PlexusCollectionSelector<infer U>
 		? U
 		: never
 }
