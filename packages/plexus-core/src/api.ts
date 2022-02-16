@@ -29,13 +29,13 @@ export interface PlexusApi {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	post<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusApiRes<ResponseType>>
+	post<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a put request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	put<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusApiRes<ResponseType>>
+	put<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a delete request
 	 * @param url The url to send the request to
@@ -46,12 +46,12 @@ export interface PlexusApi {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	patch<ResponseType = any>(url: string, body: Record<string, string> | string): Promise<PlexusApiRes<ResponseType>>
+	patch<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Set headers for the request
 	 * @param headers The headers to set for the request
 	 */
-	headers(headers: Record<string, string>): PlexusApi
+	headers(headers: Record<string, any>): PlexusApi
 	/**
 	 * Reset this routes configuration
 	 */
@@ -192,14 +192,14 @@ export function api(
 			return this as PlexusApi
 			if (_internalStore._noFetch) return this
 		},
-		get(path: string, query?: Record<string, string>) {
+		get(path: string, query?: Record<string, any>) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "GET"
 			const params = new URLSearchParams(query)
 
 			return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
 		},
-		post(path: string, body: Record<string, string> | string) {
+		post(path: string, body: Record<string, any> | string) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "POST"
 			if (typeof body !== "string") {
@@ -213,7 +213,7 @@ export function api(
 				send<ResponseType>(path)
 			}
 		},
-		put(path: string, body: Record<string, string> | string) {
+		put(path: string, body: Record<string, any> | string) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "PUT"
 			if (typeof body !== "string") {
@@ -226,7 +226,7 @@ export function api(
 			_internalStore._options.method = "DELETE"
 			return send<ResponseType>(path)
 		},
-		patch(path: string, body: Record<string, string> | string) {
+		patch(path: string, body: Record<string, any> | string) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "PATCH"
 			if (typeof body !== "string") {
@@ -240,10 +240,10 @@ export function api(
 			_internalStore._options.headers["Authorization"] = `${prefix}${token}`
 			return this
 		},
-		headers(headers?: Record<string, string>) {
+		headers(headers?: Record<string, any>) {
 			if (!_internalStore._options.headers) _internalStore._options.headers = {} as HeadersInit
 			if (_internalStore._noFetch) return this as PlexusApi
-			const temp: Record<string, string> = {}
+			const temp: Record<string, any> = {}
 			Object.entries(headers || _internalStore._options.headers).map(([key, value]) => {
 				// uppercase the dash separated tokens
 				temp[
