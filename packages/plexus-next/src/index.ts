@@ -46,7 +46,9 @@ export function preserveServerState (nextData: {
     }
   
     nextData.props.PLEXUS_DATA = data;
-  } catch (e) {}
+  } catch (e) {
+    console.warn(e);
+  }
 
   return nextData;
 }
@@ -87,7 +89,9 @@ export function loadServerState (plexus?: PlexusInstance, data: PlexusNextData =
         }
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.warn(e);
+  }
 }
 
 export function isServer() {
