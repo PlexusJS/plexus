@@ -81,6 +81,10 @@ export function api(
 	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
 		if (_internalStore._noFetch) return { status: 0, response: {}, rawData: {}, data: null }
 
+		if (_internalStore._baseURL.length > 0) {
+			path = `${baseURL}${path.startsWith('/') ? path : `/${path}`}`;
+		}
+
 		if (_internalStore._options.headers["Content-Type"] === undefined)
 			_internalStore._options.headers["Content-Type"] = "text/html"
 		if (_internalStore._options.method === undefined) _internalStore._options.method = "GET"
