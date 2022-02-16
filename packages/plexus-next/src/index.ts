@@ -6,7 +6,7 @@ interface PlexusNextData {
   }
   collections: Array<{
     name: string;
-    data: any;
+    data: Array<Object>;
     groups: {
       [key: string]: Array<string>;
     };
@@ -18,7 +18,7 @@ interface PlexusNextData {
 
 export function preserveServerState (nextData: {
   [key: string]: any;
-}) {
+} = {}) {
   try {
     const collections = instance()._collections;
     const states = instance()._states;

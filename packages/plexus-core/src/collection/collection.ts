@@ -15,6 +15,7 @@ type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<i
 export { PlexusCollectionGroup, PlexusCollectionSelector }
 export interface PlexusCollectionConfig<DataType> {
 	primaryKey?: string;
+	name?: string;
 }
 
 /**
@@ -183,7 +184,7 @@ export function _collection<
 		_data: new Map<DataKey, PlexusDataInstance<DataType>>(),
 		_groups: new Map<GroupName, PlexusCollectionGroup<DataType>>() as Groups,
 		_selectors: new Map<SelectorName, PlexusCollectionSelector<DataType>>() as Selectors,
-		_name: `_plexus_collection_${instance().genNonce()}`,
+		_name: _config?.name || `_plexus_collection_${instance().genNonce()}`,
 		_externalName: "",
 		set externalName(value: string) {
 			this._externalName = value
