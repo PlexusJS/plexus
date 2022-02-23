@@ -40,7 +40,7 @@ export function _data<Value extends Record<string, any>>(
 	const _internalStore = {
 		_key: value[primaryKey],
 		primaryKey,
-		_state: state<Value>(value),
+		_state: state<Value>(value).key(`collection_data_${value[primaryKey]}`),
 	}
 
 	if (value[primaryKey] !== undefined && value[primaryKey] !== null) {

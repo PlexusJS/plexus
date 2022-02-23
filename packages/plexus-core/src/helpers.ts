@@ -94,3 +94,24 @@ export class EventEmitter<Data = any> {
 		})
 	}
 }
+
+export const convertToString = (input: any) =>
+	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)
+export const hash = function (input: string) {
+	/* Simple hash function. */
+	let a = 1,
+		c = 0,
+		h,
+		o
+	if (input) {
+		a = 0
+		/*jshint plusplus:false bitwise:false*/
+		for (h = input.length - 1; h >= 0; h--) {
+			o = input.charCodeAt(h)
+			a = ((a << 6) & 268435455) + o + (o << 14)
+			c = a & 266338304
+			a = c !== 0 ? a ^ (c >> 21) : a
+		}
+	}
+	return String(a)
+}

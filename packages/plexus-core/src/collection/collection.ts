@@ -2,6 +2,7 @@
 
 import { group } from "console"
 import { PlexusStateInstance, state } from ".."
+import { convertToString, hash } from "../helpers"
 import { PlexusInstance } from "../instance"
 import { PlexusStateWatcher } from "../state"
 import { _data, PlexusDataInstance, DataKey } from "./data"
@@ -14,8 +15,8 @@ type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<i
 
 export { PlexusCollectionGroup, PlexusCollectionSelector }
 export interface PlexusCollectionConfig<DataType> {
-	primaryKey?: string;
-	name?: string;
+	primaryKey?: string
+	name?: string
 }
 
 /**
@@ -135,6 +136,10 @@ export interface PlexusCollectionInstance<
 	 */
 	clear(): void
 	/**
+	 * Set the key of the collection for internal tracking
+	 */
+	key(key: string): this
+	/**
 	 * Get all of the collection data values as an array
 	 * @returns The collection data values as an array
 	 */
@@ -166,11 +171,11 @@ export interface PlexusCollectionInstance<
 	/**
 	 * Get the name (generated or custom) of the collection store
 	 */
-	get name (): string;
+	get name(): string
 	/**
 	 * Get the config
 	 */
-	get config (): PlexusCollectionConfig<DataType>;
+	get config(): PlexusCollectionConfig<DataType>
 }
 
 export function _collection<
@@ -184,7 +189,7 @@ export function _collection<
 		_data: new Map<DataKey, PlexusDataInstance<DataType>>(),
 		_groups: new Map<GroupName, PlexusCollectionGroup<DataType>>() as Groups,
 		_selectors: new Map<SelectorName, PlexusCollectionSelector<DataType>>() as Selectors,
-		_name: _config?.name || `_plexus_collection_${instance().genNonce()}`,
+		_name: _config?.name || "",
 		_externalName: "",
 		set externalName(value: string) {
 			this._externalName = value
@@ -194,6 +199,20 @@ export function _collection<
 		set persist(value: boolean) {
 			this._persist = value
 		},
+	}
+
+	/**
+	 * Helper Function; Mounts the collection to the instance
+	 */
+	const mount = () => {
+		if (_internalStore._name === "") {
+			instance()._runtime.log("warn", "State is not keyed, it will not be mounted to the instance")
+		}
+		if (instance()._collections.has(_internalStore._name + "")) {
+			instance()._collections.delete(_internalStore._name + "")
+		}
+
+		instance()._collections.set(_internalStore._name + "", collection)
 	}
 
 	/**
@@ -280,7 +299,11 @@ export function _collection<
 		createSelector(selectorName: string) {
 			_internalStore._selectors.set(
 				selectorName,
-				_selector(() => instance(), _internalStore._name, selectorName)
+				_selector(
+					() => instance(),
+					() => this,
+					selectorName
+				)
 			)
 			return this as any
 		},
@@ -288,7 +311,11 @@ export function _collection<
 			for (const selectorName of selectorNames) {
 				_internalStore._selectors.set(
 					selectorName,
-					_selector(() => instance(), _internalStore._name, selectorName)
+					_selector(
+						() => instance(),
+						() => this,
+						selectorName
+					)
 				)
 			}
 			return this as any
@@ -305,7 +332,12 @@ export function _collection<
 		createGroup<Name extends GroupName>(groupName: Name, config?: PlexusCollectionGroupConfig<DataType>) {
 			_internalStore._groups.set(
 				groupName,
-				_group(() => instance(), _internalStore._name, groupName, config)
+				_group(
+					() => instance(),
+					() => this,
+					groupName,
+					config
+				)
 			)
 			// TODO: Fix this type issue
 			// need to return any as it throws a type error with the getGroup function
@@ -315,7 +347,11 @@ export function _collection<
 			for (const groupName of groupNames) {
 				_internalStore._groups.set(
 					groupName,
-					_group(() => instance(), _internalStore._name, groupName)
+					_group(
+						() => instance(),
+						() => this,
+						groupName
+					)
 				)
 			}
 			// TODO: Fix this type issue
@@ -326,7 +362,11 @@ export function _collection<
 			if (isCreatedGroup(name)) {
 				return _internalStore._groups.get(name)
 			} else {
-				const g = _group(() => instance(), _internalStore._name, name)
+				const g = _group(
+					() => instance(),
+					() => this,
+					name
+				)
 				_internalStore._groups.set(name as GroupName, g)
 				return g
 			}
@@ -347,7 +387,11 @@ export function _collection<
 					for (let group in groups) {
 						let g = _internalStore._groups.get(group as GroupName)
 						if (!g) {
-							g = _group(() => instance(), _internalStore._name, group)
+							g = _group(
+								() => instance(),
+								() => this,
+								group
+							)
 							_internalStore._groups.set(group as GroupName, g)
 						}
 						g.add(key)
@@ -355,7 +399,11 @@ export function _collection<
 				} else {
 					let g = _internalStore._groups.get(groups as GroupName)
 					if (!g) {
-						g = _group(() => instance(), _internalStore._name, groups)
+						g = _group(
+							() => instance(),
+							() => this,
+							groups
+						)
 						_internalStore._groups.set(groups as GroupName, g)
 					}
 					g.add(key)
@@ -408,6 +456,15 @@ export function _collection<
 		clear() {
 			this.delete(Array.from(_internalStore._data.keys()))
 		},
+
+		key(key: string) {
+			if (instance()._collections.has(_internalStore._name + "")) {
+				instance()._collections.delete(_internalStore._name + "")
+			}
+			_internalStore._name = key
+			mount()
+			return this
+		},
 		get value() {
 			return Array.from(_internalStore._data.values()).map((item) => item.value)
 		},
@@ -447,19 +504,19 @@ export function _collection<
 			}
 			return selectors
 		},
-		get name () {
-			return _internalStore._name;
+		get name() {
+			return _internalStore._name
 		},
-		get config () {
-			return _config;
-		}
+		get config() {
+			return _config
+		},
 	}
 
 	// initalization //
-	if (instance()._collections.has(_internalStore._name + "")) {
-		instance()._collections.delete(_internalStore._name + "")
-	}
+	// if (instance()._collections.has(_internalStore._name + "")) {
+	// 	instance()._collections.delete(_internalStore._name + "")
+	// }
 
-	instance()._collections.set(_internalStore._name + "", collection)
+	// instance()._collections.set(_internalStore._name + "", collection)
 	return collection
 }

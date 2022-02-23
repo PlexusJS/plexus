@@ -8,6 +8,7 @@ export interface PlexusInstance {
 	internalName: string
 	ready: boolean;
 	genNonce(): number | string;
+	genNonce(): number | string;
 	_states: Map<string, PlexusStateInstance>,
 	_plugins: Map<string, PlexusPlugin>,
 	_runtime: PlexusRuntime,
@@ -84,6 +85,7 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 				_internalStore._nonce += 1
 				return _internalStore._nonce
 			},
+
 			_runtime: _runtime(() => instance()),
 			_computedStates: new Set(),
 			_states: new Map(),

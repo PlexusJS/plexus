@@ -44,21 +44,21 @@ export interface PlexusCollectionGroup<DataType = any> {
 }
 export function _group<DataType = any>(
 	instance: () => PlexusInstance,
-	collectionId: string,
+	collection: () => PlexusCollectionInstance<DataType>,
 	name: string,
 	config?: PlexusCollectionGroupConfig<DataType>
 ) {
 	const _internalStore = {
 		addWhen: config?.addWhen || (() => false),
 		_name: name,
-		_collectionId: collectionId,
+		_collectionId: collection().name,
 		_includedKeys: new Set<string | number>(),
 		_watcherDestroyers: new Set<() => void>(),
 		_watchers: new Set<PlexusStateWatcher<DataType[]>>(),
 	}
 	const runWatchers = () => {
 		_internalStore._watchers.forEach((callback) => {
-			callback(instance()._collections.get(_internalStore._collectionId).groupsValue[_internalStore._name])
+			callback(collection().groupsValue[_internalStore._name])
 		})
 	}
 	const rebuildWatchers = () => {
@@ -67,8 +67,7 @@ export function _group<DataType = any>(
 
 		Array.from(_internalStore._includedKeys).forEach((key) =>
 			_internalStore._watcherDestroyers.add(
-				instance()
-					._collections.get(_internalStore._collectionId)
+				collection()
 					.getItem(key)
 					.watch(() => {
 						runWatchers()
@@ -95,12 +94,10 @@ export function _group<DataType = any>(
 			return _internalStore._includedKeys
 		},
 		get value() {
-			return instance()._collections.get(_internalStore._collectionId).groupsValue[_internalStore._name]
+			return collection().groupsValue[_internalStore._name]
 		},
 		get data() {
-			return Array.from(_internalStore._includedKeys).map((key) =>
-				instance()._collections.get(_internalStore._collectionId).getItem(key)
-			)
+			return Array.from(_internalStore._includedKeys).map((key) => collection().getItem(key))
 		},
 		watch(callback?: PlexusStateWatcher<DataType[]>) {
 			// const destroyers = this.data.map((data) => data.watch(callback))

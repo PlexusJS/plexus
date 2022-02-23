@@ -1,3 +1,4 @@
+import { PlexusCollectionInstance } from ".."
 import { PlexusInstance } from "../instance"
 import { PlexusStateWatcher } from "../state"
 import { DataKey, PlexusDataInstance } from "./data"
@@ -30,13 +31,13 @@ export interface PlexusCollectionSelector<ValueType extends { [key: string]: any
 
 export function _selector<ValueType extends { [key: string]: any } = { [key: string]: any }>(
 	instance: () => PlexusInstance,
-	collectionId: string,
+	collection: () => PlexusCollectionInstance<ValueType>,
 	name: string
 ): PlexusCollectionSelector<ValueType> {
 	const _internalStore = {
 		_name: name,
 		_key: null,
-		_collectionId: collectionId,
+		_collectionId: collection().name,
 	}
 
 	return {
@@ -50,13 +51,13 @@ export function _selector<ValueType extends { [key: string]: any } = { [key: str
 			if (_internalStore._key === null) {
 				return null
 			}
-			return instance()._collections.get(_internalStore._collectionId).getItemValue(_internalStore._key)
+			return collection().getItemValue(_internalStore._key)
 		},
 		get data() {
 			if (_internalStore._key === null) {
 				return null
 			}
-			return instance()._collections.get(_internalStore._collectionId).getItem(_internalStore._key)
+			return collection().getItem(_internalStore._key)
 		},
 		watch(callback: PlexusStateWatcher<ValueType>) {
 			return this.data.watch(callback)

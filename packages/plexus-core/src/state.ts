@@ -1,4 +1,4 @@
-import { deepClone, deepMerge, isObject } from "./helpers"
+import { convertToString, deepClone, deepMerge, hash, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusStateWatcher } from "./interfaces"
 export type PlexusStateType = Object | Array<unknown> | string | number | boolean | null | undefined
@@ -61,6 +61,10 @@ export interface PlexusStateInstance<Value = any> {
 	 */
 	reset(): void
 	/**
+	 * Set the key of the state for internal tracking
+	 */
+	key(key: string): this
+	/**
 	 * Persist the state to selected storage
 	 * @param name The storage prefix to use
 	 */
@@ -104,14 +108,25 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		_initialValue: _init,
 		_lastValue: _init,
 		_watchers: new Map(),
-		_name: `_plexus_state_${instance().genNonce()}`,
+		_name: "",
 		_persist: false,
 		_interval: null,
 		externalName: "",
 	}
 
 	// Methods //
+	const mount = () => {
+		if (_internalStore._name === "") {
+			instance()._runtime.log("warn", "State is not keyed, it will not be mounted to the instance")
+		}
+		if (instance()._states.has(_internalStore._name + "")) {
+			instance()._states.delete(_internalStore._name + "")
+		}
 
+		instance()._states.set(_internalStore._name + "", state)
+	}
+
+	// Returned Object //
 	const state: PlexusStateInstance<StateValue> = Object.freeze({
 		set(value?: StateValue) {
 			_internalStore._lastValue = _internalStore._value
@@ -157,7 +172,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			if (typeof keyOrCallback === "function") {
 				callback = keyOrCallback
 				// generate a nonce from global instance
-				keyOrCallback = `_plexus_state_watcher_${instance().genNonce()}`
+				keyOrCallback = `_plexus_state_watcher_${hash(convertToString(callback))}`
 			}
 
 			// add to internal list of named watchers
@@ -193,7 +208,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 				_internalStore._persist = true
 			}
 
-			return this;
+			return this
 		},
 
 		undo() {
@@ -214,7 +229,11 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			if (_internalStore._interval) clearInterval(_internalStore._interval)
 			return this
 		},
-
+		key(key: string) {
+			_internalStore._name = `_plexus_state_${key}`
+			mount()
+			return this
+		},
 		get value() {
 			return deepClone(_internalStore._value)
 		},
@@ -231,22 +250,13 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		get nextValue() {
 			return _internalStore._nextValue
 		},
-		get initialValue () {
+		get initialValue() {
 			return _internalStore._initialValue
 		},
 		set nextValue(value: StateValue) {
 			_internalStore._nextValue = value
 		},
 	})
-
-	// initalization //
-	if (instance()._states.has(_internalStore._name + "")) {
-		instance()._states.delete(_internalStore._name + "")
-	}
-	// instance()._states.forEach(state_ => {
-	// 	state_.name
-	// })
-	instance()._states.set(_internalStore._name + "", state)
 
 	return state
 }
