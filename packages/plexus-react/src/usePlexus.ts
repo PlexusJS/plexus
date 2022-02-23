@@ -53,7 +53,7 @@ export function usePlexus<
 				// if not a watchable, then we can't watch it, skip to next iteration
 				if (!isWatchable(dep)) continue
 				const unsubscribe = dep.watch(() =>
-					set(Math.random().toString(32).substring(4) + Math.random().toString(32).substring(4))
+					set(Math.random().toString(36).substring(6) + Math.random().toString(36).substring(6))
 				)
 				depUnsubs.add(unsubscribe)
 			}
