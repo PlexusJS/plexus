@@ -122,6 +122,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 	const mount = () => {
 		if (_internalStore._name === "") {
 			instance()._runtime.log("warn", "State is not keyed, it will not be mounted to the instance")
+			return
 		}
 		if (instance()._states.has(`${_internalStore._name}`)) {
 			instance()._states.delete(`${_internalStore._name}`)
@@ -132,8 +133,8 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 	const removeWatcher = (key: string | number) => {
 		// instance()._runtime.unsubscribe(_internalStore._name, key)
 		let destroy = _internalStore._watchers.get(key)
-		// if(!destroy) destroy = _internalStore._watchers.get(key.toString())
-		if (destroy) destroy()
+		// if (!destroy) destroy = _internalStore._watchers.get(key.toString())
+		destroy?.()
 		return _internalStore._watchers.delete(key)
 	}
 	// Returned Object //
@@ -191,6 +192,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			// return keyOrCallback
 			return () => {
 				removeWatcher(keyOrCallback as string | number)
+				// this.watcherRemovers.value
 			}
 		},
 
@@ -210,7 +212,8 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 				instance().storage.set(_internalStore.externalName, _internalStore._value)
 				_internalStore._persist = true
 			}
-
+			// this should only run on initial load of the state when this function is called
+			this.set(instance().storage.get(_internalStore.externalName))
 			return this
 		},
 

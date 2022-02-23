@@ -108,14 +108,18 @@ export function _runtime(instance: () => PlexusInstance): PlexusRuntime {
 			const unsub = _internalStore._conductor.on(genEventName(type, _key), callback)
 
 			// return the watcher unsubscribe function
-			return unsub
+			return () => {
+				unsub()
+				// we also need to remove the watcher from the conductor
+				// _internalStore._watchers.get(type).delete(_key)
+			}
 		},
 
 		getWatchers(key?: string) {
-			if (!key) {
-				return _internalStore._conductor.events
+			if (key && _internalStore._conductor.events.has(`${key}`)) {
+				return _internalStore._conductor.events.get(`${key}`).value
 			} else {
-				return _internalStore._conductor.events.get(`${key}`)
+				return _internalStore._conductor.events
 			}
 		},
 		removeWatchers(type: SubscriptionTypes, key: string) {

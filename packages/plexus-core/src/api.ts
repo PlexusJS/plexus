@@ -69,11 +69,11 @@ export interface PlexusApi {
 }
 export function api(
 	baseURL: string = "",
-	router: PlexusApiConfig = { options: { headers: {} }, timeout: 20000 }
+	config: PlexusApiConfig = { options: { headers: {} }, timeout: 20000 }
 ): PlexusApi {
 	const _internalStore = {
-		_options: deepClone(router.options || { headers: {} }),
-		_timeout: router.timeout || 20000,
+		_options: deepClone(config.options || { headers: {} }),
+		_timeout: config.timeout || 20000,
 		_baseURL: baseURL.endsWith("/") ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 		_noFetch: false,
 		_authToken: "",
@@ -82,7 +82,7 @@ export function api(
 		if (_internalStore._noFetch) return { status: 0, response: {}, rawData: {}, data: null }
 
 		if (_internalStore._baseURL.length > 0) {
-			path = `${baseURL}${path.startsWith('/') ? path : `/${path}`}`;
+			path = `${baseURL}${path.startsWith("/") ? path : `/${path}`}`
 		}
 
 		if (_internalStore._options.headers["Content-Type"] === undefined)
@@ -261,7 +261,7 @@ export function api(
 			return this as PlexusApi
 		},
 		reset() {
-			_internalStore._options = deepClone(router.options)
+			_internalStore._options = deepClone(config.options)
 			return this as PlexusApi
 			if (_internalStore._noFetch) return this as PlexusApi
 		},

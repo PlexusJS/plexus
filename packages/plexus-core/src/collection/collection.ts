@@ -211,7 +211,8 @@ export function _collection<
 	 */
 	const mount = () => {
 		if (_internalStore._name === "") {
-			instance()._runtime.log("warn", "State is not keyed, it will not be mounted to the instance")
+			instance()._runtime.log("warn", "Collection is not keyed, it will not be mounted to the instance")
+			return
 		}
 		if (instance()._collections.has(_internalStore._name + "")) {
 			instance()._collections.delete(_internalStore._name + "")
