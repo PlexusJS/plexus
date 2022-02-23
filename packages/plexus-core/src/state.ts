@@ -1,12 +1,13 @@
 import { convertToString, deepClone, deepMerge, hash, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
-// import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusStateWatcher } from "./interfaces"
+import { PlexusWatcher } from "./interfaces"
+// import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
 export type PlexusStateType = Object | Array<unknown> | string | number | boolean | null | undefined
 export type PlexusState = <PxStateValue = any>(
 	instance: () => PlexusInstance,
 	input: PxStateValue
 ) => PlexusStateInstance<PxStateValue>
-export type PlexusStateWatcher<V> = (value: V) => void
+
 export interface PlexusStateInstance<Value = any> {
 	/**
 	 * The value of the state
@@ -27,6 +28,9 @@ export interface PlexusStateInstance<Value = any> {
 	 * state.set(); // The state will be { foo: "bar" }
 	 */
 	nextValue: Value
+	/**
+	 * The name of the state (NOTE: set with the `.key()` function)
+	 */
 	name: string
 	/**
 	 * Set the value of the state
@@ -44,14 +48,14 @@ export interface PlexusStateInstance<Value = any> {
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusStateWatcher<Value>): () => void
-	watch(keyOrCallback: string | number | PlexusStateWatcher<Value>, callback?: PlexusStateWatcher<Value>): () => void
-	/**
-	 * Remove a watcher from this state
-	 * @param key The key used to create the watcher
-	 * @returns true if the watcher was removed, false otherwise
-	 */
-	removeWatcher(key: string | number): boolean
+	watch(callback: PlexusWatcher<Value>): () => void
+	watch(keyOrCallback: string | number | PlexusWatcher<Value>, callback?: PlexusWatcher<Value>): () => void
+	// /**
+	//  * Remove a watcher from this state
+	//  * @param key The key used to create the watcher
+	//  * @returns true if the watcher was removed, false otherwise
+	//  */
+	// removeWatcher(key: string | number): boolean
 	/**
 	 * Reset the state to the previous value
 	 */
@@ -69,9 +73,7 @@ export interface PlexusStateInstance<Value = any> {
 	 * @param name The storage prefix to use
 	 */
 	persist(name: string): this
-	/**
-	 * The current (reactive) value of the state
-	 */
+
 	/**
 	 * On a set interval, run a function to update the state
 	 * @param setterFunction The function used to update the state on the interval; returns the new value
@@ -97,12 +99,14 @@ export interface PlexStateInternalStore<Value> {
 	_name: string
 	_persist: boolean
 	_interval: NodeJS.Timer | null
+	_internalId: string
 	externalName: string
 }
 
 export function _state<StateValue extends PlexusStateType>(instance: () => PlexusInstance, _init: StateValue) {
 	// props //
 	const _internalStore: PlexStateInternalStore<StateValue> = {
+		_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
 		_nextValue: null,
 		_value: _init,
 		_initialValue: _init,
@@ -119,13 +123,19 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		if (_internalStore._name === "") {
 			instance()._runtime.log("warn", "State is not keyed, it will not be mounted to the instance")
 		}
-		if (instance()._states.has(_internalStore._name + "")) {
-			instance()._states.delete(_internalStore._name + "")
+		if (instance()._states.has(`${_internalStore._name}`)) {
+			instance()._states.delete(`${_internalStore._name}`)
 		}
 
-		instance()._states.set(_internalStore._name + "", state)
+		instance()._states.set(`${_internalStore._name}`, state)
 	}
-
+	const removeWatcher = (key: string | number) => {
+		// instance()._runtime.unsubscribe(_internalStore._name, key)
+		let destroy = _internalStore._watchers.get(key)
+		// if(!destroy) destroy = _internalStore._watchers.get(key.toString())
+		if (destroy) destroy()
+		return _internalStore._watchers.delete(key)
+	}
 	// Returned Object //
 	const state: PlexusStateInstance<StateValue> = Object.freeze({
 		set(value?: StateValue) {
@@ -147,7 +157,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			_internalStore._nextValue = deepClone(_internalStore._value)
 
 			// update the runtime conductor
-			instance()._runtime.stateChange(_internalStore._name, value)
+			instance()._runtime.broadcast(_internalStore._internalId, "state", value)
 			if (_internalStore._persist) instance().storage.set(_internalStore.externalName, _internalStore._value)
 		},
 
@@ -155,7 +165,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			if (isObject(value) && isObject(_internalStore._value)) {
 				this.set(deepMerge(_internalStore._value, value))
 			}
-			// if the deep merge is on an array type, we need to convert the merged objecct back to an array
+			// if the deep merge is on an array type, we need to convert the merged object back to an array
 			else if (Array.isArray(value) && Array.isArray(_internalStore._value)) {
 				const obj = deepMerge(_internalStore._value, value)
 				this.set(Object.values(obj) as StateValue)
@@ -166,8 +176,8 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		},
 
 		watch(
-			keyOrCallback: string | number | PlexusStateWatcher<StateValue>,
-			callback?: PlexusStateWatcher<StateValue>
+			keyOrCallback: string | number | PlexusWatcher<StateValue>,
+			callback?: PlexusWatcher<StateValue>
 		): () => void {
 			if (typeof keyOrCallback === "function") {
 				callback = keyOrCallback
@@ -176,21 +186,14 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			}
 
 			// add to internal list of named watchers
-			const destroy = instance()._runtime.subscribe(_internalStore._name, "state", callback)
+			const destroy = instance()._runtime.subscribe(_internalStore._internalId, "state", callback)
 			_internalStore._watchers.set(keyOrCallback, destroy)
 			// return keyOrCallback
 			return () => {
-				this.removeWatcher(keyOrCallback as string | number)
+				removeWatcher(keyOrCallback as string | number)
 			}
 		},
 
-		removeWatcher(key: string | number) {
-			// instance()._runtime.unsubscribe(_internalStore._name, key)
-			let destroy = _internalStore._watchers.get(key)
-			// if(!destroy) destroy = _internalStore._watchers.get(key.toString())
-			if (destroy) destroy()
-			return _internalStore._watchers.delete(key)
-		},
 		// removeAllWatchers(){
 		// 	// instance()._runtime.unsubscribe(_internalStore._name, key)
 		// 	_internalStore._watchers.forEach(destroy => {
@@ -230,7 +233,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			return this
 		},
 		key(key: string) {
-			_internalStore._name = `_plexus_state_${key}`
+			_internalStore._name = key
 			mount()
 			return this
 		},
@@ -245,7 +248,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			return _internalStore._name
 		},
 		get watcherRemovers() {
-			return instance()._runtime.getWatchers(_internalStore._name)
+			return instance()._runtime.getWatchers(_internalStore._internalId)
 		},
 		get nextValue() {
 			return _internalStore._nextValue

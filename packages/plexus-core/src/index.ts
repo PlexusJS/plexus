@@ -3,8 +3,16 @@ import { _state, PlexusStateInstance } from "./state"
 import { _event, PlexusEventInstance } from "./event"
 import { storage as _storage, StorageOverride } from "./storage"
 import { PlexusPlugin, PlexusPluginConfig } from "./plugin"
-import { _collection, PlexusCollectionConfig, PlexusCollectionInstance, PlexusCollectionSelector, PlexusCollectionGroup } from "./collection/collection"
-import { PlexusInstance } from './instance';
+import {
+	_collection,
+	PlexusCollectionConfig,
+	PlexusCollectionInstance,
+	PlexusCollectionSelector,
+	PlexusCollectionGroup,
+} from "./collection/collection"
+import { PlexusInstance } from "./instance"
+import { _computed, PlexusComputedStateInstance } from "./computed"
+import { Watchable } from "./interfaces"
 
 /**
  * Generate a Plexus State
@@ -13,6 +21,17 @@ import { PlexusInstance } from './instance';
  */
 export function state<Value = any>(item: Value) {
 	return _state(() => instance(), item)
+}
+/**
+ * Generate a Plexus State
+ * @param item The default value to use when we generate the state
+ * @returns A Plexus State Instance
+ */
+export function computed<Value = any>(item: (value?: Value) => Value, dependencies: Array<Watchable> | Watchable) {
+	if (!Array.isArray(dependencies)) {
+		return _computed(() => instance(), item, [dependencies])
+	}
+	return _computed(() => instance(), item, dependencies)
 }
 /**
  * Create a new Storage Instance
@@ -48,12 +67,13 @@ export {
 	PlexusStateInstance,
 	PlexusCollectionGroup,
 	PlexusCollectionSelector,
-	PlexusInstance
+	PlexusComputedStateInstance,
+	PlexusInstance,
 }
 export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
 export { action, PlexusAction, PlexusActionHelpers } from "./action"
 
-// TODO I don't think this is used or needed anywhere
+// TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
 function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
 
 export function usePlugin(plugin: PlexusPlugin) {
@@ -61,4 +81,4 @@ export function usePlugin(plugin: PlexusPlugin) {
 	instance()._plugins.set(plugin.name, plugin)
 }
 
-export { instance };
+export { instance }

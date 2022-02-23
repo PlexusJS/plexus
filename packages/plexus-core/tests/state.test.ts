@@ -1,4 +1,4 @@
-import { PlexusStateInstance, state } from "../src"
+import { instance, PlexusStateInstance, state } from "../src"
 // import { PlexusState, PlexusStateInstance } from '../src/interfaces';
 let booleanState: PlexusStateInstance<boolean>,
 	stringState: PlexusStateInstance<string>,
@@ -8,7 +8,7 @@ let booleanState: PlexusStateInstance<boolean>,
 
 const initialValue = {
 	boolean: true,
-	string: "Hello Pulse!",
+	string: "Hello Plexus!",
 	object: { a: { a: true, b: true }, b: true },
 	array: [
 		{ item: "Hello", item2: { subitem: "World" } },
@@ -72,7 +72,7 @@ describe("Testing State Function", () => {
 		const watcherDestoryer = stringState.watch(callback)
 		stringState.set("Hello World")
 		expect(callbackCalled).toBe(true)
-		// console.log(_instance()._runtime.getWatchers())
+		console.log(instance()._runtime.getWatchers())
 		// can remove watcher
 		// stringState.removeWatcher(watcherKey);
 		watcherDestoryer()

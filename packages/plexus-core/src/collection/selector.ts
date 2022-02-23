@@ -1,6 +1,7 @@
 import { PlexusCollectionInstance } from ".."
 import { PlexusInstance } from "../instance"
-import { PlexusStateWatcher } from "../state"
+import { PlexusWatcher } from "../interfaces"
+
 import { DataKey, PlexusDataInstance } from "./data"
 export type SelectorName = string
 export interface PlexusCollectionSelector<ValueType extends { [key: string]: any } = { [key: string]: any }> {
@@ -18,7 +19,7 @@ export interface PlexusCollectionSelector<ValueType extends { [key: string]: any
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusStateWatcher<ValueType>): () => void
+	watch(callback: PlexusWatcher<ValueType>): () => void
 	/**
 	 * Return the data value of the selected item
 	 */
@@ -59,7 +60,7 @@ export function _selector<ValueType extends { [key: string]: any } = { [key: str
 			}
 			return collection().getItem(_internalStore._key)
 		},
-		watch(callback: PlexusStateWatcher<ValueType>) {
+		watch(callback: PlexusWatcher<ValueType>) {
 			return this.data.watch(callback)
 		},
 	}

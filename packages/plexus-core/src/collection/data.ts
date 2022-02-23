@@ -1,6 +1,6 @@
 import { PlexusStateInstance, state } from ".."
 import { PlexusInstance } from "../instance"
-import { PlexusStateWatcher } from "../state"
+import { PlexusWatcher } from "../interfaces"
 
 export interface PlexusDataInstance<TypeValue> {
 	/**
@@ -27,7 +27,7 @@ export interface PlexusDataInstance<TypeValue> {
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusStateWatcher<TypeValue>): () => void
+	watch(callback: PlexusWatcher<TypeValue>): () => void
 }
 
 export type DataKey = string | number
@@ -70,7 +70,7 @@ export function _data<Value extends Record<string, any>>(
 				instance()._states.delete(_internalStore._state.name)
 				// delete _internalStore._state
 			},
-			watch(callback?: PlexusStateWatcher<Value>) {
+			watch(callback?: PlexusWatcher<Value>) {
 				return _internalStore._state.watch(callback)
 			},
 		}

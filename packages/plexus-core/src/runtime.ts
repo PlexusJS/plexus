@@ -4,7 +4,9 @@ import { PlexusStateType } from "./state"
 // import { PlexusInstance, PlexusStateType } from "./interfaces";
 
 export interface PlexusRuntime {
-	// track a change and propigate to all listeneing children in instance
+	/**
+	 * track a change and propagate to all listening children in instance
+	 *  */
 	stateChange<Value = PlexusStateType>(key: string, value: Value)
 	broadcast<Value = PlexusStateType>(key: string, type: SubscriptionTypes, value: Value): void
 	/**
@@ -39,7 +41,7 @@ export interface PlexusRuntime {
 	log(type: "warn" | "info" | "error", message: string)
 }
 type Fn<Value> = (value: Value) => void
-type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin_${string}`
+type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin_${string}` | "*"
 
 /**
  * Create a runtime for an instance NOTE: NOT FOR PUBLIC USE
@@ -76,10 +78,10 @@ export function _runtime(instance: () => PlexusInstance): PlexusRuntime {
 	}
 
 	return {
-		// track a change and propigate to all listeneing children in instance
+		// track a change and propagate to all listening children in instance
 		stateChange<Value = PlexusStateType>(key: string, value: Value) {
-			_internalStore._conductor.emit(`state_${key}`, { key, value })
-			_internalStore._conductor.emit(`*`, { key, value })
+			this.broadcast(key, "state", { key, value })
+			this.broadcast(key, "*", { key, value })
 		},
 		broadcast<Value = PlexusStateType>(key: string, type: SubscriptionTypes, value: Value) {
 			_internalStore._conductor.emit(genEventName(type, key), { key, value })

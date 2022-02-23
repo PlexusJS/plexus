@@ -1,10 +1,9 @@
 // import { PlexusInstance, PxStateType } from '../interfaces';
-
-import { group } from "console"
 import { PlexusStateInstance, state } from ".."
 import { convertToString, hash } from "../helpers"
 import { PlexusInstance } from "../instance"
-import { PlexusStateWatcher } from "../state"
+import { PlexusWatcher } from "../interfaces"
+
 import { _data, PlexusDataInstance, DataKey } from "./data"
 import { _group, PlexusCollectionGroup, PlexusCollectionGroupConfig, GroupName } from "./group"
 import { PlexusCollectionSelector, SelectorName, _selector } from "./selector"
@@ -15,7 +14,13 @@ type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<i
 
 export { PlexusCollectionGroup, PlexusCollectionSelector }
 export interface PlexusCollectionConfig<DataType> {
+	/**
+	 * The primary key of of the data items in the collection
+	 */
 	primaryKey?: string
+	/**
+	 * The name (or key) of the collection
+	 */
 	name?: string
 }
 
@@ -84,8 +89,8 @@ export interface PlexusCollectionInstance<
 	 * @returns The Group names that the key is in
 	 */
 	getGroupsOf(key: DataKey): Array<KeyOfMap<Groups>>
-	watchGroup(name: string, callback: PlexusStateWatcher<DataType[]>): void | (() => void)
-	watchGroup(name: KeyOfMap<Groups>, callback: PlexusStateWatcher<DataType[]>): () => void
+	watchGroup(name: string, callback: PlexusWatcher<DataType[]>): void | (() => void)
+	watchGroup(name: KeyOfMap<Groups>, callback: PlexusWatcher<DataType[]>): () => void
 	/**
 	 * Create a Selector instance for a given selector name
 	 * @param name The name of the selector
@@ -410,7 +415,7 @@ export function _collection<
 				}
 			}
 		},
-		watchGroup(name: KeyOfMap<Groups> | string, callback: PlexusStateWatcher<DataType[]>) {
+		watchGroup(name: KeyOfMap<Groups> | string, callback: PlexusWatcher<DataType[]>) {
 			if (isCreatedGroup(name)) {
 				return _internalStore._groups.get(name).watch(callback)
 			} else {

@@ -1,11 +1,19 @@
-import { _event } from "./event";
-import { _runtime } from "./runtime";
+import { _event } from "./event"
+import { _runtime } from "./runtime"
 
 export type PlexusRuntime = ReturnType<typeof _runtime>
 export type PlexusEvent = ReturnType<typeof _event>
+export type PlexusWatcher<V> = (value: V) => void
 
+export type Watchable = { [key: string | number]: any } & {
+	watch<V>(callback: PlexusWatcher<V>): () => void
+	name?: string
+	key?: string | ((key: string) => unknown)
+}
 
-
+export const isWatchable = (value: any): value is Watchable => {
+	return value && typeof value.watch === "function"
+}
 // export type PlexusStateInstance<Value=any> = {
 // 	set(item: Value): void;
 // 	patch(item: Value): void;
@@ -18,7 +26,7 @@ export type PlexusEvent = ReturnType<typeof _event>
 // 	lastValue: Value;
 // 	name: string | number;
 // 	watchers: any
-// } 
+// }
 // export interface PlexStateInternalStore<Value> {
 // 	_initialValue: Value
 // 	_lastValue: Value | null
@@ -29,15 +37,11 @@ export type PlexusEvent = ReturnType<typeof _event>
 // 	_persist: boolean
 // 	externalName: string
 // }
-// export type PxStateType = Object | Array<unknown> | string | number | boolean | null | undefined 
+// export type PxStateType = Object | Array<unknown> | string | number | boolean | null | undefined
 // export type PxState = <PxStateValue=any>(instance: () => PlexusInstance, input: PxStateValue) => PlexusStateInstance<PxStateValue>
 // export type PxStateWatcher<V> = (value: V) => void
 
 // type DestroyFn = () => void
-
-
-
-
 
 // export interface PxCollectionInstance<DataType=any> {
 // 	collect(data: DataType): void;

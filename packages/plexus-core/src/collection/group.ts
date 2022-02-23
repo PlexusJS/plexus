@@ -1,6 +1,7 @@
 import { PlexusCollectionInstance } from ".."
 import { PlexusInstance } from "../instance"
-import { PlexusStateWatcher } from "../state"
+import { PlexusWatcher } from "../interfaces"
+
 import { DataKey, PlexusDataInstance } from "./data"
 
 export interface PlexusCollectionGroupConfig<DataType> {
@@ -28,7 +29,7 @@ export interface PlexusCollectionGroup<DataType = any> {
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusStateWatcher<DataType[]>): () => void
+	watch(callback: PlexusWatcher<DataType[]>): () => void
 	/**
 	 * Peek at the index of the group (get all of the lookup keys for the group)
 	 */
@@ -54,7 +55,7 @@ export function _group<DataType = any>(
 		_collectionId: collection().name,
 		_includedKeys: new Set<string | number>(),
 		_watcherDestroyers: new Set<() => void>(),
-		_watchers: new Set<PlexusStateWatcher<DataType[]>>(),
+		_watchers: new Set<PlexusWatcher<DataType[]>>(),
 	}
 	const runWatchers = () => {
 		_internalStore._watchers.forEach((callback) => {
@@ -99,7 +100,7 @@ export function _group<DataType = any>(
 		get data() {
 			return Array.from(_internalStore._includedKeys).map((key) => collection().getItem(key))
 		},
-		watch(callback?: PlexusStateWatcher<DataType[]>) {
+		watch(callback?: PlexusWatcher<DataType[]>) {
 			// const destroyers = this.data.map((data) => data.watch(callback))
 			_internalStore._watchers.add(callback)
 			const destroyer = () => {
