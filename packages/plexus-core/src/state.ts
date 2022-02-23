@@ -206,11 +206,11 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 
 		persist(name: string) {
 			// if there is a name, change the states internal name
-			if (name) _internalStore.externalName = `_plexus_state_${name}`
+			if (name) _internalStore.externalName = `state_${name}`
 
 			if (instance().storage) {
 				// this should only run on initial load of the state when this function is called
-				this.set(instance().storage.get(_internalStore.externalName) ?? _internalStore._value)
+				this.set(instance().storage.get(_internalStore.externalName) )
 
 				_internalStore._persist = true
 			}
