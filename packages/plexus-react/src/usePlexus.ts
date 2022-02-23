@@ -50,8 +50,8 @@ export function usePlexus<
 		if (Array.isArray(depsArr)) {
 			const depUnsubs: Set<() => void> = new Set()
 			for (let dep of depsArr) {
-				// @warning this is kind of wrong, but works for now
-				if (isWatchable(dep)) continue
+				// if not a watchable, then we can't watch it, skip to next iteration
+				if (!isWatchable(dep)) continue
 				const unsubscribe = dep.watch(() =>
 					set(Math.random().toString(64).substring(4) + Math.random().toString(64).substring(4))
 				)

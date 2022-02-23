@@ -210,7 +210,9 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 
 			if (instance().storage) {
 				// this should only run on initial load of the state when this function is called
-				this.set(instance().storage.get(_internalStore.externalName) )
+				const storedValue = instance().storage.get(_internalStore.externalName)
+
+				storedValue && storedValue !== {} && this.set(storedValue)
 
 				_internalStore._persist = true
 			}
