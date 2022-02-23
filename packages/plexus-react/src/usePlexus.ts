@@ -1,4 +1,5 @@
 import { PlexusCollectionGroup, PlexusStateInstance, state, PlexusCollectionSelector } from "@plexusjs/core"
+import { isWatchable } from "@plexusjs/core/dist/interfaces"
 import { useEffect, useState } from "react"
 
 export type PlexusValue<T> = T extends PlexusStateInstance<infer U>
@@ -50,8 +51,10 @@ export function usePlexus<
 			const depUnsubs: Set<() => void> = new Set()
 			for (let dep of depsArr) {
 				// @warning this is kind of wrong, but works for now
-				if (!dep?.watch) continue
-				const unsubscribe = dep.watch(set)
+				if (isWatchable(dep)) continue
+				const unsubscribe = dep.watch(() =>
+					set(Math.random().toString(64).substring(4) + Math.random().toString(64).substring(4))
+				)
 				depUnsubs.add(unsubscribe)
 			}
 			return () => {

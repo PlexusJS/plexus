@@ -16,6 +16,7 @@ describe("Test react integration", () => {
 			const stateValue = usePlexus(myState)
 			const g1 = usePlexus(myCollection.getGroup("test"))
 
+
 			return (
 				<div>
 					<p>{stateValue}</p>
@@ -23,6 +24,8 @@ describe("Test react integration", () => {
 			)
 		}
 		const tree = renderer.create(<RandomComponent />).toJSON()
+		myState.set("no")
+		expect(tree)
 		expect(tree).toMatchSnapshot()
 	})
 	test("usePlexus hook w/collection group", () => {
