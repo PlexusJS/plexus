@@ -88,7 +88,7 @@ export function api(
 		if (_internalStore._noFetch) return { status: 0, response: {}, rawData: {}, data: null }
 
 		if (_internalStore._baseURL.length > 0) {
-			path = `${baseURL}${path.startsWith("/") ? path : `/${path}`}`
+			path = `${baseURL}${path.length > 0 ? path.startsWith("/") ? path : `/${path}` : ""}`
 		}
 
 		if (_internalStore._options.headers["Content-Type"] === undefined)
@@ -100,6 +100,8 @@ export function api(
 		let timedOut = false
 		let res: Response | undefined
 		try {
+			const uri = path.match(/^http(s)?/g)?.length > 0 ? path
+				: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`;
 			if (_internalStore._timeout) {
 				// res = await
 				let to: any
@@ -110,14 +112,7 @@ export function api(
 					}, _internalStore._timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
-					fetch(
-						`${
-							path.match(/^http(s)?/g).length > 0
-								? path
-								: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`
-						}`,
-						_internalStore._options
-					)
+					fetch(uri, _internalStore._options)
 						.then((response) => {
 							clearTimeout(to)
 							resolve(response)
@@ -132,14 +127,7 @@ export function api(
 					return { status: -1, response: {}, rawData: {}, data: null }
 				}
 			} else {
-				res = await fetch(
-					`${
-						path.match(/^http(s)?/g).length > 0
-							? path
-							: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`
-					}`,
-					_internalStore._options
-				)
+				res = await fetch(uri, _internalStore._options);
 			}
 		} catch (e) {}
 		let data: ResponseDataType
