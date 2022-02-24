@@ -48,6 +48,12 @@ export interface PlexusApi {
 	 */
 	patch<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
+	 * Send a graphql request
+	 * @param query The gql query to send
+	 * @param variables Variables
+	 */
+	gql<ResponseType = any>(query: string, variables?: Record<string, any>): Promise<PlexusApiRes<ResponseType>>
+	/**
 	 * Set headers for the request
 	 * @param headers The headers to set for the request
 	 */
