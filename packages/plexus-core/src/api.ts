@@ -214,7 +214,7 @@ export function api(
 				const params = new URLSearchParams(body)
 				return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
 			} else {
-				send<ResponseType>(path)
+				return send<ResponseType>(path)
 			}
 		},
 		put(path: string, body: Record<string, any> | string) {
@@ -237,6 +237,17 @@ export function api(
 				_internalStore._options.body = JSON.stringify(body)
 			}
 			return send<ResponseType>(path)
+		},
+		gql(query: string, variables?: Record<string, any>) {
+			if (_internalStore._noFetch) return null
+			_internalStore._options.method = "POST"
+			_internalStore._options.body = JSON.stringify({
+				query, variables
+			})
+
+			_internalStore._options.headers["Content-Type"] = "application/json"
+
+			return send<ResponseType>('')
 		},
 		auth(token: string, type: "bearer" | "basic" | "jwt" = "bearer") {
 			_internalStore._authToken = token
