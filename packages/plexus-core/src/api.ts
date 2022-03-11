@@ -29,13 +29,13 @@ export interface PlexusApi {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	post<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
+	post<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a put request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	put<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
+	put<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a delete request
 	 * @param url The url to send the request to
@@ -46,7 +46,7 @@ export interface PlexusApi {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	patch<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
+	patch<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a graphql request
 	 * @param query The gql query to send
@@ -194,7 +194,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 
 			return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
 		},
-		post(path: string, body: Record<string, any> | string) {
+		post(path: string, body: Record<string, any> | string = {}) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "POST"
 			if (typeof body !== "string") {
@@ -208,7 +208,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 				return send<ResponseType>(path)
 			}
 		},
-		put(path: string, body: Record<string, any> | string) {
+		put(path: string, body: Record<string, any> | string = {}) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "PUT"
 			if (typeof body !== "string") {
@@ -221,7 +221,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			_internalStore._options.method = "DELETE"
 			return send<ResponseType>(path)
 		},
-		patch(path: string, body: Record<string, any> | string) {
+		patch(path: string, body: Record<string, any> | string = {}) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "PATCH"
 			if (typeof body !== "string") {
