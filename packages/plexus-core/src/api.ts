@@ -121,7 +121,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 					res = raceResult
 				} else {
 					// a -1 response status means the programmatic timeout was surpassed
-					return { status: -1, response: {}, rawData: {}, data: null }
+					return { status: 504, response: {}, rawData: {}, data: null }
 				}
 			} else {
 				res = await fetch(`${path.match(/^http(s)?/g)?.length > 0 ? path : finalUrl}`, _internalStore._options)
