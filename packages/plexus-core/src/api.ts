@@ -99,7 +99,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		let timedOut = false
 		let res: Response | undefined
 		try {
-			if (_internalStore._timeout) {
+			if (_internalStore._timeout && _internalStore._timeout > 0) {
 				// res = await
 				let to: any
 				const timeout = new Promise<void>((resolve, reject) => {
