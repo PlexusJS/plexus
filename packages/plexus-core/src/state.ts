@@ -100,6 +100,7 @@ export interface PlexStateInternalStore<Value> {
 	_persist: boolean
 	_interval: NodeJS.Timer | null
 	_internalId: string
+	_ready: boolean
 	externalName: string
 }
 
@@ -116,6 +117,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		_persist: false,
 		_interval: null,
 		externalName: "",
+		_ready: false,
 	}
 
 	// Methods //
@@ -210,9 +212,23 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 
 			if (instance().storage) {
 				// this should only run on initial load of the state when this function is called
-				const storedValue = instance().storage.get(_internalStore.externalName)
+				let storedValue = instance().storage.get(_internalStore.externalName)
+				if (!storedValue) {
+					instance().storage.set(_internalStore.externalName, this.value)
+					storedValue = this.value
+				}
 
-				storedValue && storedValue !== {} && this.set(storedValue)
+				// throw new Error(
+				// 	`TODO: setting persisted value ${_internalStore.externalName} ${instance().storage.get(
+				// 		_internalStore.externalName
+				// 	)} ${storedValue}`
+				// )
+				// console.log(`Trying to apply persisted value ${storedValue}`)
+
+				if (storedValue !== undefined && storedValue !== null) {
+					// console.log("apply persisted value")
+					this.set(storedValue)
+				}
 
 				_internalStore._persist = true
 			}
