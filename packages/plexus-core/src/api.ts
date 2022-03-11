@@ -67,7 +67,7 @@ export interface PlexusApi {
 	 * @param token The token to use for authentication
 	 * @param type optional - The type of authentication to use. This determines what prefix to use for the header
 	 */
-	auth(token: string, type?: "bearer" | "basic" | "jwt"): PlexusApi
+	auth(token: string | undefined, type?: "bearer" | "basic" | "jwt"): PlexusApi
 	/**
 	 * The configuration of this api
 	 */
@@ -126,8 +126,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			} else {
 				res = await fetch(`${path.match(/^http(s)?/g)?.length > 0 ? path : finalUrl}`, _internalStore._options)
 			}
-		} catch (e) {
-		}
+		} catch (e) {}
 		let data: ResponseDataType
 		let rawData: ResponseDataType
 
@@ -242,7 +241,8 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 
 			return send<ResponseType>("")
 		},
-		auth(token: string, type: "bearer" | "basic" | "jwt" = "bearer") {
+		auth(token: string | undefined, type: "bearer" | "basic" | "jwt" = "bearer") {
+			if (!token) return this
 			_internalStore._authToken = token
 			const prefix = type === "jwt" ? "JWT " : type === "bearer" ? "Bearer " : ""
 			_internalStore._options.headers["Authorization"] = `${prefix}${token}`
