@@ -73,13 +73,10 @@ export interface PlexusApi {
 	 */
 	config: RequestInit
 }
-export function api(
-	baseURL: string = "",
-	config: PlexusApiConfig = { options: { headers: {} }, timeout: 20000 }
-): PlexusApi {
+export function api(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }): PlexusApi {
 	const _internalStore = {
 		_options: deepClone(config.options || { headers: {} }),
-		_timeout: config.timeout || 20000,
+		_timeout: config.timeout || undefined,
 		_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 		_noFetch: false,
 		_authToken: "",
@@ -112,7 +109,7 @@ export function api(
 					}, _internalStore._timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
-					fetch(`${path.match(/^http(s)?/g).length > 0 ? path : finalUrl}`, _internalStore._options)
+					fetch(`${path.match(/^http(s)?/g)?.length > 0 ? path : finalUrl}`, _internalStore._options)
 						.then((response) => {
 							clearTimeout(to)
 							resolve(response)
@@ -123,13 +120,14 @@ export function api(
 				if (raceResult) {
 					res = raceResult
 				} else {
-					// a -1 response status means the programatic timeout was surpassed
+					// a -1 response status means the programmatic timeout was surpassed
 					return { status: -1, response: {}, rawData: {}, data: null }
 				}
 			} else {
-				res = await fetch(`${path.match(/^http(s)?/g).length > 0 ? path : finalUrl}`, _internalStore._options)
+				res = await fetch(`${path.match(/^http(s)?/g)?.length > 0 ? path : finalUrl}`, _internalStore._options)
 			}
-		} catch (e) {}
+		} catch (e) {
+		}
 		let data: ResponseDataType
 		let rawData: ResponseDataType
 
@@ -236,12 +234,13 @@ export function api(
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "POST"
 			_internalStore._options.body = JSON.stringify({
-				query, variables
+				query,
+				variables,
 			})
 
 			_internalStore._options.headers["Content-Type"] = "application/json"
 
-			return send<ResponseType>('')
+			return send<ResponseType>("")
 		},
 		auth(token: string, type: "bearer" | "basic" | "jwt" = "bearer") {
 			_internalStore._authToken = token
