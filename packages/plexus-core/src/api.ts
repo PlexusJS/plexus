@@ -74,15 +74,17 @@ export function api(
 	const _internalStore = {
 		_options: deepClone(config.options || { headers: {} }),
 		_timeout: config.timeout || 20000,
-		_baseURL: baseURL.endsWith("/") ? baseURL.substring(0, baseURL.length - 1) : baseURL,
+		_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 		_noFetch: false,
 		_authToken: "",
 	}
 	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
+		// default url to baseurl
+		let finalUrl = `${path}`
 		if (_internalStore._noFetch) return { status: 0, response: {}, rawData: {}, data: null }
 
 		if (_internalStore._baseURL.length > 0) {
-			path = `${baseURL}${path.startsWith("/") ? path : `/${path}`}`
+			finalUrl = `${_internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
 		}
 
 		if (_internalStore._options.headers["Content-Type"] === undefined)
@@ -104,14 +106,7 @@ export function api(
 					}, _internalStore._timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
-					fetch(
-						`${
-							path.match(/^http(s)?/g).length > 0
-								? path
-								: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`
-						}`,
-						_internalStore._options
-					)
+					fetch(`${path.match(/^http(s)?/g).length > 0 ? path : finalUrl}`, _internalStore._options)
 						.then((response) => {
 							clearTimeout(to)
 							resolve(response)
@@ -126,14 +121,7 @@ export function api(
 					return { status: -1, response: {}, rawData: {}, data: null }
 				}
 			} else {
-				res = await fetch(
-					`${
-						path.match(/^http(s)?/g).length > 0
-							? path
-							: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`
-					}`,
-					_internalStore._options
-				)
+				res = await fetch(`${path.match(/^http(s)?/g).length > 0 ? path : finalUrl}`, _internalStore._options)
 			}
 		} catch (e) {}
 		let data: ResponseDataType
