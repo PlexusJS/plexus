@@ -275,7 +275,6 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		reset() {
 			_internalStore._options = deepClone(config.options)
 			return this as PlexusApi
-			if (_internalStore._noFetch) return this as PlexusApi
 		},
 		get config() {
 			return deepClone(_internalStore._options || {})
