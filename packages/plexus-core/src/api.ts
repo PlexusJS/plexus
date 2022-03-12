@@ -247,6 +247,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		},
 		auth(token: string | undefined, type: "bearer" | "basic" | "jwt" = "bearer") {
 			if (!token) return this
+			token = token.replace("Bearer ", "").replace("Basic ", "").replace("JWT ", "")
 			_internalStore._authToken = token
 			const prefix = type === "jwt" ? "JWT " : type === "bearer" ? "Bearer " : ""
 			_internalStore._options.headers["Authorization"] = `${prefix}${token}`
