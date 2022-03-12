@@ -89,13 +89,21 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		if (_internalStore._baseURL.length > 0) {
 			finalUrl = `${_internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
 		}
+		if (_internalStore._options.method === undefined) {
+			_internalStore._options.method = "GET"
+		}
+		if (_internalStore._options.headers["Content-Type"] === undefined) {
+			if (
+				_internalStore._options.method === "POST" ||
+				_internalStore._options.method === "PUT" ||
+				_internalStore._options.method === "PATCH"
+			) {
+				_internalStore._options.headers["Content-Type"] = "application/json"
+			} else {
+				_internalStore._options.headers["Content-Type"] = "text/html"
+			}
+		}
 
-		if (_internalStore._options.headers["Content-Type"] === undefined)
-			_internalStore._options.headers["Content-Type"] = "text/html"
-		if (_internalStore._options.method === undefined) _internalStore._options.method = "GET"
-
-		if (_internalStore._options.method === "GET" && _internalStore._options.headers["Content-Type"] === undefined)
-			_internalStore._options.headers["Content-Type"] = "application/json"
 		let timedOut = false
 		let res: Response | undefined
 		try {
@@ -198,9 +206,9 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "POST"
 			if (typeof body !== "string") {
-				_internalStore._options.body = JSON.stringify(body)
+				body = JSON.stringify(body)
 			}
-
+			_internalStore._options.body = body
 			if (_internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded") {
 				const params = new URLSearchParams(body)
 				return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
