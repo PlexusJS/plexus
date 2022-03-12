@@ -20,6 +20,7 @@ describe("Testing Api Function", () => {
 		expect(myApi.config).toBeDefined()
 		expect(myApi.config.headers).toBeDefined()
 		expect(myApi.config.headers["custom"]).toBe("header")
+
 		const res = await myApi.get("https://google.com")
 		expect(res?.status).toBeGreaterThan(0)
 	})
@@ -27,7 +28,9 @@ describe("Testing Api Function", () => {
 describe("Test the API's baseURL capabilities", () => {
 	const myApi2 = api("https://google.com")
 	test("Can make a request to a sub-path", async () => {
-		const res = await myApi2.get("maps")
+		const res = await myApi2.post("maps")
+
+		expect(myApi2.config.headers["Content-Type"]).toBe("application/json")
 		// console.log(JSON.stringify(res, null, 2))
 		expect(res?.status).toBeGreaterThan(0)
 	})

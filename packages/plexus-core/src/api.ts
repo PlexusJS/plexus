@@ -75,7 +75,7 @@ export interface PlexusApi {
 }
 export function api(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }): PlexusApi {
 	const _internalStore = {
-		_options: deepClone(config.options || { headers: {} }),
+		_options: deepClone(config.options),
 		_timeout: config.timeout || undefined,
 		_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 		_noFetch: false,
@@ -93,17 +93,13 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			_internalStore._options.method = "GET"
 		}
 		if (_internalStore._options.headers["Content-Type"] === undefined) {
-			if (
-				_internalStore._options.method === "POST" ||
-				_internalStore._options.method === "PUT" ||
-				_internalStore._options.method === "PATCH"
-			) {
+			if (_internalStore._options.body !== undefined) {
 				_internalStore._options.headers["Content-Type"] = "application/json"
 			} else {
 				_internalStore._options.headers["Content-Type"] = "text/html"
 			}
 		}
-
+		console.log(_internalStore._options.headers, _internalStore._options.method)
 		let timedOut = false
 		let res: Response | undefined
 		try {
@@ -129,7 +125,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 					res = raceResult
 				} else {
 					// a -1 response status means the programmatic timeout was surpassed
-					return { status: 504, response: {}, rawData: {}, data: null }
+					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: {}, data: null }
 				}
 			} else {
 				res = await fetch(`${path.match(/^http(s)?/g)?.length > 0 ? path : finalUrl}`, _internalStore._options)
