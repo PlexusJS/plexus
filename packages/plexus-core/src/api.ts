@@ -84,7 +84,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
 		// default url to baseurl
 		let finalUrl = `${path}`
-		if (_internalStore._noFetch) return { status: 0, response: {}, rawData: {}, data: null }
+		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: {}, data: null }
 
 		if (_internalStore._baseURL.length > 0) {
 			finalUrl = `${_internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
@@ -132,7 +132,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 
 		if (res === undefined) {
 			return {
-				status: 0,
+				status: 500,
 				response: {},
 				rawData: null,
 				data,
