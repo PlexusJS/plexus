@@ -45,16 +45,16 @@ export function usePlexus<
 	deps: Value | [] | PlexusStateInstance | PlexusCollectionGroup | PlexusCollectionSelector
 ): PlexusValue<Value> | PlexusValueArray<Value> {
 	const depsArr = normalizeDeps(deps)
-	const [_, set] = useState(null)
+	const [_, set] = useState({})
 	useEffect(() => {
 		if (Array.isArray(depsArr)) {
 			const depUnsubs: Set<() => void> = new Set()
 			for (let dep of depsArr) {
 				// if not a watchable, then we can't watch it, skip to next iteration
 				if (!isWatchable(dep)) continue
-				const unsubscribe = dep.watch(() =>
-					set(Math.random().toString(36).substring(6) + Math.random().toString(36).substring(6))
-				)
+				const unsubscribe = dep.watch(function () {
+					set({})
+				})
 				depUnsubs.add(unsubscribe)
 			}
 			return () => {

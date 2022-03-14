@@ -29,13 +29,13 @@ export interface PlexusApi {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	post<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
+	post<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a put request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	put<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
+	put<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a delete request
 	 * @param url The url to send the request to
@@ -46,7 +46,7 @@ export interface PlexusApi {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	patch<ResponseType = any>(url: string, body: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
+	patch<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
 	/**
 	 * Send a graphql request
 	 * @param query The gql query to send
@@ -67,36 +67,39 @@ export interface PlexusApi {
 	 * @param token The token to use for authentication
 	 * @param type optional - The type of authentication to use. This determines what prefix to use for the header
 	 */
-	auth(token: string, type?: "bearer" | "basic" | "jwt"): PlexusApi
+	auth(token: string | undefined, type?: "bearer" | "basic" | "jwt"): PlexusApi
 	/**
 	 * The configuration of this api
 	 */
 	config: RequestInit
 }
-export function api(
-	baseURL: string = "",
-	config: PlexusApiConfig = { options: { headers: {} }, timeout: 20000 }
-): PlexusApi {
+export function api(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }): PlexusApi {
 	const _internalStore = {
-		_options: deepClone(config.options || { headers: {} }),
-		_timeout: config.timeout || 20000,
-		_baseURL: baseURL.endsWith("/") ? baseURL.substring(0, baseURL.length - 1) : baseURL,
+		_options: deepClone(config.options),
+		_timeout: config.timeout || undefined,
+		_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 		_noFetch: false,
 		_authToken: "",
 	}
 	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
-		if (_internalStore._noFetch) return { status: 0, response: {}, rawData: {}, data: null }
+		// default url to baseurl
+		let finalUrl = `${path}`
+		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: {}, data: null }
 
 		if (_internalStore._baseURL.length > 0) {
 			path = `${baseURL}${path.length > 0 ? path.startsWith("/") ? path : `/${path}` : ""}`
 		}
-
-		if (_internalStore._options.headers["Content-Type"] === undefined)
-			_internalStore._options.headers["Content-Type"] = "text/html"
-		if (_internalStore._options.method === undefined) _internalStore._options.method = "GET"
-
-		if (_internalStore._options.method === "GET" && _internalStore._options.headers["Content-Type"] === undefined)
-			_internalStore._options.headers["Content-Type"] = "application/json"
+		if (_internalStore._options.method === undefined) {
+			_internalStore._options.method = "GET"
+		}
+		if (_internalStore._options.headers["Content-Type"] === undefined) {
+			if (_internalStore._options.body !== undefined) {
+				_internalStore._options.headers["Content-Type"] = "application/json"
+			} else {
+				_internalStore._options.headers["Content-Type"] = "text/html"
+			}
+		}
+		console.log(_internalStore._options.headers, _internalStore._options.method)
 		let timedOut = false
 		let res: Response | undefined
 		try {
@@ -123,8 +126,8 @@ export function api(
 				if (raceResult) {
 					res = raceResult
 				} else {
-					// a -1 response status means the programatic timeout was surpassed
-					return { status: -1, response: {}, rawData: {}, data: null }
+					// a -1 response status means the programmatic timeout was surpassed
+					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: {}, data: null }
 				}
 			} else {
 				res = await fetch(uri, _internalStore._options);
@@ -135,7 +138,7 @@ export function api(
 
 		if (res === undefined) {
 			return {
-				status: 0,
+				status: 500,
 				response: {},
 				rawData: null,
 				data,
@@ -197,13 +200,13 @@ export function api(
 
 			return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
 		},
-		post(path: string, body: Record<string, any> | string) {
+		post(path: string, body: Record<string, any> | string = {}) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "POST"
 			if (typeof body !== "string") {
-				_internalStore._options.body = JSON.stringify(body)
+				body = JSON.stringify(body)
 			}
-
+			_internalStore._options.body = body
 			if (_internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded") {
 				const params = new URLSearchParams(body)
 				return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
@@ -211,7 +214,7 @@ export function api(
 				return send<ResponseType>(path)
 			}
 		},
-		put(path: string, body: Record<string, any> | string) {
+		put(path: string, body: Record<string, any> | string = {}) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "PUT"
 			if (typeof body !== "string") {
@@ -224,7 +227,7 @@ export function api(
 			_internalStore._options.method = "DELETE"
 			return send<ResponseType>(path)
 		},
-		patch(path: string, body: Record<string, any> | string) {
+		patch(path: string, body: Record<string, any> | string = {}) {
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "PATCH"
 			if (typeof body !== "string") {
@@ -236,14 +239,17 @@ export function api(
 			if (_internalStore._noFetch) return null
 			_internalStore._options.method = "POST"
 			_internalStore._options.body = JSON.stringify({
-				query, variables
+				query,
+				variables,
 			})
 
 			_internalStore._options.headers["Content-Type"] = "application/json"
 
-			return send<ResponseType>('')
+			return send<ResponseType>("")
 		},
-		auth(token: string, type: "bearer" | "basic" | "jwt" = "bearer") {
+		auth(token: string | undefined, type: "bearer" | "basic" | "jwt" = "bearer") {
+			if (!token) return this
+			token = token.replace("Bearer ", "").replace("Basic ", "").replace("JWT ", "")
 			_internalStore._authToken = token
 			const prefix = type === "jwt" ? "JWT " : type === "bearer" ? "Bearer " : ""
 			_internalStore._options.headers["Authorization"] = `${prefix}${token}`
@@ -268,7 +274,6 @@ export function api(
 		reset() {
 			_internalStore._options = deepClone(config.options)
 			return this as PlexusApi
-			if (_internalStore._noFetch) return this as PlexusApi
 		},
 		get config() {
 			return deepClone(_internalStore._options || {})
