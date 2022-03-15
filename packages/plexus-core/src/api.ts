@@ -87,7 +87,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: {}, data: null }
 
 		if (_internalStore._baseURL.length > 0) {
-			finalUrl = `${_internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
+			path = `${baseURL}${path.length > 0 ? path.startsWith("/") ? path : `/${path}` : ""}`
 		}
 		if (_internalStore._options.method === undefined) {
 			_internalStore._options.method = "GET"
@@ -103,7 +103,9 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		let timedOut = false
 		let res: Response | undefined
 		try {
-			if (_internalStore._timeout && _internalStore._timeout > 0) {
+			const uri = path.match(/^http(s)?/g)?.length > 0 ? path
+				: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`;
+			if (_internalStore._timeout) {
 				// res = await
 				let to: any
 				const timeout = new Promise<void>((resolve, reject) => {
@@ -113,7 +115,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 					}, _internalStore._timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
-					fetch(`${path.match(/^http(s)?/g)?.length > 0 ? path : finalUrl}`, _internalStore._options)
+					fetch(uri, _internalStore._options)
 						.then((response) => {
 							clearTimeout(to)
 							resolve(response)
@@ -128,7 +130,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: {}, data: null }
 				}
 			} else {
-				res = await fetch(`${path.match(/^http(s)?/g)?.length > 0 ? path : finalUrl}`, _internalStore._options)
+				res = await fetch(uri, _internalStore._options);
 			}
 		} catch (e) {}
 		let data: ResponseDataType
