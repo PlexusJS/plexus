@@ -1,4 +1,10 @@
-import { PlexusCollectionGroup, PlexusStateInstance, state, PlexusCollectionSelector } from "@plexusjs/core"
+import {
+	PlexusCollectionGroup,
+	PlexusStateInstance,
+	state,
+	PlexusCollectionSelector,
+	PlexusComputedStateInstance,
+} from "@plexusjs/core/dist"
 import { isWatchable } from "@plexusjs/core/dist/interfaces"
 import { useEffect, useState } from "react"
 
@@ -25,6 +31,8 @@ const normalizeDeps = (
 	deps:
 		| PlexusStateInstance
 		| PlexusStateInstance[]
+		| PlexusComputedStateInstance
+		| PlexusComputedStateInstance[]
 		| PlexusCollectionGroup
 		| PlexusCollectionGroup[]
 		| PlexusCollectionSelector
@@ -32,15 +40,27 @@ const normalizeDeps = (
 ) => (Array.isArray(deps) ? deps : [deps])
 
 export function usePlexus<
-	Value extends PlexusStateInstance<any> | PlexusCollectionGroup<any> | PlexusCollectionSelector<any>
+	Value extends
+		| PlexusStateInstance<any>
+		| PlexusComputedStateInstance<any>
+		| PlexusCollectionGroup<any>
+		| PlexusCollectionSelector<any>
 >(deps: Value): PlexusValue<Value>
 
 export function usePlexus<
-	Value extends PlexusStateInstance<any>[] | PlexusCollectionGroup<any>[] | PlexusCollectionSelector<any>[]
+	Value extends
+		| PlexusStateInstance<any>[]
+		| PlexusComputedStateInstance<any>[]
+		| PlexusCollectionGroup<any>[]
+		| PlexusCollectionSelector<any>[]
 >(deps: Value): PlexusValueArray<Value>
 
 export function usePlexus<
-	Value extends PlexusStateInstance<any>[] | PlexusCollectionGroup<any>[] | PlexusCollectionSelector<any>[]
+	Value extends
+		| PlexusStateInstance<any>[]
+		| PlexusComputedStateInstance<any>[]
+		| PlexusCollectionGroup<any>[]
+		| PlexusCollectionSelector<any>[]
 >(
 	deps: Value | [] | PlexusStateInstance | PlexusCollectionGroup | PlexusCollectionSelector
 ): PlexusValue<Value> | PlexusValueArray<Value> {

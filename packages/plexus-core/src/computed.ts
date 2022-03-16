@@ -3,7 +3,7 @@ import { deepClone } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { isWatchable, Watchable } from "./interfaces"
 import { PlexusStateType, _state, PlexusStateInstance } from "./state"
-export interface PlexusComputedStateInstance<ValueType extends PlexusStateType> {
+export interface PlexusComputedStateInstance<ValueType extends PlexusStateType = any> {
 	/**
 	 * The value (reactive) of the state
 	 */
