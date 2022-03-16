@@ -242,13 +242,13 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		reset() {
 			this.set(_internalStore._initialValue)
 		},
-		interval(intervalCallback: (value: StateValue) => StateValue | Promise<StateValue>, ms?: number) {
+		interval(intervalCallback: (value: StateValue) => StateValue | Promise<StateValue> | void, ms?: number) {
 			if (_internalStore._interval) clearInterval(_internalStore._interval)
 			_internalStore._interval = setInterval(() => {
 				const res = intervalCallback(this.value)
 				if (res instanceof Promise) {
 					res.then((value) => this.set(value)).catch((err) => console.error(err))
-				} else {
+				} else if (res) {
 					this.set(res)
 				}
 			}, ms ?? 3000)
