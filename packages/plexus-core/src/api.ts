@@ -87,7 +87,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: {}, data: null }
 
 		if (_internalStore._baseURL.length > 0) {
-			path = `${baseURL}${path.length > 0 ? path.startsWith("/") ? path : `/${path}` : ""}`
+			path = `${baseURL}${path.length > 0 ? (path.startsWith("/") ? path : `/${path}`) : ""}`
 		}
 		if (_internalStore._options.method === undefined) {
 			_internalStore._options.method = "GET"
@@ -99,12 +99,14 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 				_internalStore._options.headers["Content-Type"] = "text/html"
 			}
 		}
-		console.log(_internalStore._options.headers, _internalStore._options.method)
+		// console.log(_internalStore._options.headers, _internalStore._options.method)
 		let timedOut = false
 		let res: Response | undefined
 		try {
-			const uri = path.match(/^http(s)?/g)?.length > 0 ? path
-				: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`;
+			const uri =
+				path.match(/^http(s)?/g)?.length > 0
+					? path
+					: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`
 			if (_internalStore._timeout) {
 				// res = await
 				let to: any
@@ -130,7 +132,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: {}, data: null }
 				}
 			} else {
-				res = await fetch(uri, _internalStore._options);
+				res = await fetch(uri, _internalStore._options)
 			}
 		} catch (e) {}
 		let data: ResponseDataType
@@ -249,7 +251,10 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		},
 		auth(token: string | undefined, type: "bearer" | "basic" | "jwt" = "bearer") {
 			if (!token) return this
-			token = token.replace(/^(B|b)earer /, "").replace(/^(B|b)asic /, "").replace(/^(JWT|jwt) /, "")
+			token = token
+				.replace(/^(B|b)earer /, "")
+				.replace(/^(B|b)asic /, "")
+				.replace(/^(JWT|jwt) /, "")
 			_internalStore._authToken = token
 			const prefix = type === "jwt" ? "JWT " : type === "bearer" ? "Bearer " : ""
 			_internalStore._options.headers["Authorization"] = `${prefix}${token}`

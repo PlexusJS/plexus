@@ -64,10 +64,10 @@ export function _computed<StateValue extends PlexusStateType>(
 		Array.from(_internalStore._deps.values()).forEach((dep, i) => {
 			const destroyers = dep.watch(() => {
 				const value = computeFn(_internalStore._state.value)
-				console.log(
-					`${dep.name} changed; updating computed state to "${value}"; current value is "${_internalStore._state.value}"`,
-					JSON.stringify(Array.from(_internalStore._deps.values()), null, 2)
-				)
+				// console.log(
+				// 	`${dep.name} changed; updating computed state to "${value}"; current value is "${_internalStore._state.value}"`,
+				// 	JSON.stringify(Array.from(_internalStore._deps.values()), null, 2)
+				// )
 				_internalStore._state.set(value)
 			})
 			_internalStore._depsDestroyers.set(dep.name || (typeof dep.key === "string" ? dep.key : `${i}`), destroyers)
