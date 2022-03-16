@@ -79,7 +79,7 @@ export interface PlexusStateInstance<Value = any> {
 	 * @param setterFunction The function used to update the state on the interval; returns the new value
 	 * @param ms The interval duration (in milliseconds)
 	 */
-	interval(setterFunction: (value: Value) => Value, ms?: number): this
+	interval(setterFunction: (value: Value) => Value | Promise<Value>, ms?: number): this
 	/**
 	 * Stop the state interval
 	 */
@@ -242,10 +242,15 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		reset() {
 			this.set(_internalStore._initialValue)
 		},
-		interval(intervalCallback: (value: StateValue) => StateValue, ms?: number) {
+		interval(intervalCallback: (value: StateValue) => StateValue | Promise<StateValue>, ms?: number) {
 			if (_internalStore._interval) clearInterval(_internalStore._interval)
 			_internalStore._interval = setInterval(() => {
-				this.set(intervalCallback(this.value))
+				const res = intervalCallback(this.value)
+				if (res instanceof Promise) {
+					res.then((value) => this.set(value)).catch((err) => console.error(err))
+				} else {
+					this.set(res)
+				}
 			}, ms ?? 3000)
 			return this
 		},
