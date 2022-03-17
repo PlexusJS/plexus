@@ -12,7 +12,7 @@ import {
 } from "./collection/collection"
 import { PlexusInstance } from "./instance"
 import { _computed, PlexusComputedStateInstance } from "./computed"
-import { Watchable } from "./interfaces"
+import { Watchable, WatchableValue } from "./interfaces"
 
 /**
  * Generate a Plexus State
@@ -58,7 +58,21 @@ export function event<PayloadType = any>() {
 export function collection<Type extends { [key: string]: any }>(config?: PlexusCollectionConfig<Type>) {
 	return _collection<Type>(() => instance(), config)
 }
+
+
+// TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
+function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
+
+export function usePlugin(plugin: PlexusPlugin) {
+	plugin.init((name: string) => instance({ instanceId: name }))
+	instance()._plugins.set(plugin.name, plugin)
+}
+
+export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
+export { action, PlexusAction, PlexusActionHelpers } from "./action"
+export { gql } from "./gql"
 export {
+	instance,
 	PlexusPlugin,
 	PlexusPluginConfig,
 	PlexusCollectionConfig,
@@ -69,17 +83,5 @@ export {
 	PlexusCollectionSelector,
 	PlexusComputedStateInstance,
 	PlexusInstance,
+	WatchableValue,
 }
-export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
-export { action, PlexusAction, PlexusActionHelpers } from "./action"
-export { gql } from './gql';
-
-// TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
-function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
-
-export function usePlugin(plugin: PlexusPlugin) {
-	plugin.init((name: string) => instance({ instanceId: name }))
-	instance()._plugins.set(plugin.name, plugin)
-}
-
-export { instance }

@@ -1,72 +1,25 @@
-import {
-	PlexusCollectionGroup,
-	PlexusStateInstance,
-	state,
-	PlexusCollectionSelector,
-	PlexusComputedStateInstance,
-} from "@plexusjs/core/dist"
-import { isWatchable } from "@plexusjs/core/dist/interfaces"
+import { PlexusCollectionGroup, PlexusStateInstance, state, PlexusCollectionSelector, PlexusComputedStateInstance } from "@plexusjs/core/dist"
+import { isWatchable, WatchableValue } from "@plexusjs/core/dist/interfaces"
 import { useEffect, useState } from "react"
 
-export type PlexusValue<T> = T extends PlexusStateInstance<infer U>
-	? U
-	: T extends PlexusCollectionGroup<infer U>
-	? U[]
-	: T extends PlexusCollectionSelector<infer U>
-	? U
-	: never
+const normalizeDeps = (deps: WatchableValue | WatchableValue[]) => (Array.isArray(deps) ? (deps as WatchableValue[]) : [deps as WatchableValue])
+
+export type PlexusValue<T> = T extends WatchableValue<infer U> ? U : T extends PlexusCollectionGroup<infer U> ? U[] : never
 export type PlexusValueArray<T> = {
-	[K in keyof T]: T[K] extends PlexusCollectionGroup<infer U>
-		? Array<U>
-		: T[K] extends PlexusCollectionSelector<infer U>
-		? U
-		: T[K] extends PlexusStateInstance<infer U>
-		? U
-		: T[K] extends PlexusComputedStateInstance<infer U>
-		? U
-		: T[K] extends PlexusCollectionSelector<infer U>
-		? U
-		: never
+	[K in keyof T]: T[K] extends PlexusCollectionGroup<infer U> ? U[] : T[K] extends WatchableValue<infer U> ? U : never
 }
 
-const normalizeDeps = (
-	deps:
-		| PlexusStateInstance
-		| PlexusStateInstance[]
-		| PlexusComputedStateInstance
-		| PlexusComputedStateInstance[]
-		| PlexusCollectionGroup
-		| PlexusCollectionGroup[]
-		| PlexusCollectionSelector
-		| PlexusCollectionSelector[]
-) => (Array.isArray(deps) ? deps : [deps])
-
-export function usePlexus<
-	Value extends
-		| PlexusStateInstance<any>
-		| PlexusComputedStateInstance<any>
-		| PlexusCollectionGroup<any>
-		| PlexusCollectionSelector<any>
->(deps: Value): PlexusValue<Value>
-
-export function usePlexus<
-	Value extends
-		| PlexusStateInstance<any>[]
-		| PlexusComputedStateInstance<any>[]
-		| PlexusCollectionGroup<any>[]
-		| PlexusCollectionSelector<any>[]
->(deps: Value): PlexusValueArray<Value>
-
-export function usePlexus<
-	Value extends
-		| PlexusStateInstance<any>[]
-		| PlexusComputedStateInstance<any>[]
-		| PlexusCollectionGroup<any>[]
-		| PlexusCollectionSelector<any>[]
->(
-	deps: Value | [] | PlexusStateInstance | PlexusCollectionGroup | PlexusCollectionSelector
-): PlexusValue<Value> | PlexusValueArray<Value> {
-	const depsArr = normalizeDeps(deps)
+// Singleton argument
+export function usePlexus<V extends WatchableValue<any>>(deps: V): PlexusValue<V>
+// array argument
+export function usePlexus<V extends WatchableValue<any>[]>(deps: V | []): PlexusValueArray<V>
+/**
+ * A react hook to extract the values from plexus objects and reactively update the component and value when the values change
+ * @param deps A list of plexus watchable objects (ex. State, Group, Selector, Computed)
+ * @returns
+ */
+export function usePlexus<V extends WatchableValue<any>[]>(deps: V | [] | WatchableValue): PlexusValue<V> | PlexusValueArray<V> {
+	const depsArr = normalizeDeps(deps) as PlexusValueArray<V>
 	const [_, set] = useState({})
 	useEffect(() => {
 		if (Array.isArray(depsArr)) {
@@ -79,6 +32,7 @@ export function usePlexus<
 				})
 				depUnsubs.add(unsubscribe)
 			}
+			// unsubscribe on component destroy
 			return () => {
 				for (let unsub of depUnsubs) {
 					unsub()
@@ -89,9 +43,9 @@ export function usePlexus<
 	}, [])
 
 	if (!Array.isArray(deps) && depsArr.length === 1) {
-		return deps.value as PlexusValue<Value>
+		return depsArr[0].value
 	}
 
 	// TODO: dependency array is not returning the correct types per index; This must be fixed before release
-	return depsArr.map<Value>((dep) => dep.value) as PlexusValueArray<Value>
+	return depsArr.map((dep) => dep.value) as PlexusValueArray<V>
 }
