@@ -11,6 +11,8 @@ export type Watchable = { [key: string | number]: any } & {
 	key?: string | ((key: string) => unknown)
 }
 
+export type WatchableValue<V> = Watchable & {value: V}
+
 export const isWatchable = (value: any): value is Watchable => {
 	return value && typeof value.watch === "function"
 }
