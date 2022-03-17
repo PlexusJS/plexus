@@ -104,7 +104,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		let res: Response | undefined
 		try {
 			const uri =
-				path.match(/^http(s)?/g)?.length > 0
+				path.match(/^http(s)?/g)?.length === 0
 					? path
 					: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`
 			if (_internalStore._timeout) {
