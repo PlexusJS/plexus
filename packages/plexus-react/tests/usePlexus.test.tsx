@@ -16,7 +16,6 @@ describe("Test react integration", () => {
 			const stateValue = usePlexus(myState)
 			const g1 = usePlexus(myCollection.getGroup("test"))
 
-
 			return (
 				<div>
 					<p>{stateValue}</p>
@@ -31,7 +30,7 @@ describe("Test react integration", () => {
 	test("usePlexus hook w/collection group", () => {
 		function RandomComponent() {
 			myCollection.collect({ id: "pog", a: 1 }, "test")
-			const [groupValue] = usePlexus([myCollection.getGroup("test")])
+			const [groupValue, stateItem] = usePlexus([myCollection.getGroup("test"), myState])
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>

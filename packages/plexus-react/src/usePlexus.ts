@@ -22,6 +22,8 @@ export type PlexusValueArray<T> = {
 		? U
 		: T[K] extends PlexusStateInstance<infer U>
 		? U
+		: T[K] extends PlexusComputedStateInstance<infer U>
+		? U
 		: T[K] extends PlexusCollectionSelector<infer U>
 		? U
 		: never
@@ -90,5 +92,6 @@ export function usePlexus<
 		return deps.value as PlexusValue<Value>
 	}
 
+	// TODO: dependency array is not returning the correct types per index; This must be fixed before release
 	return depsArr.map<Value>((dep) => dep.value) as PlexusValueArray<Value>
 }
