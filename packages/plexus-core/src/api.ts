@@ -82,13 +82,11 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		_authToken: "",
 	}
 	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
-		// default url to baseurl
-		let finalUrl = `${path}`
 		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: {}, data: null }
 
-		if (_internalStore._baseURL.length > 0) {
-			path = `${baseURL}${path.length > 0 ? (path.startsWith("/") ? path : `/${path}`) : ""}`
-		}
+		// if (_internalStore._baseURL.length > 0) {
+		// 	path = `${baseURL}${path.length > 0 ? (path.startsWith("/") ? path : `/${path}`) : ""}`
+		// }
 		if (_internalStore._options.method === undefined) {
 			_internalStore._options.method = "GET"
 		}
@@ -103,10 +101,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		let timedOut = false
 		let res: Response | undefined
 		try {
-			const uri =
-				path.match(/^http(s)?/g)?.length === 0
-					? path
-					: `${_internalStore._baseURL}${path.length > 0 ? "/" : ""}${path}`
+			const uri = path.match(/^http(s)?/g)?.length > 0 ? path : `${_internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
 			if (_internalStore._timeout) {
 				// res = await
 				let to: any
@@ -148,10 +143,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		}
 
 		if (res.status >= 200 && res.status < 400) {
-			if (
-				_internalStore._options.headers["Content-Type"] === "application/json" ||
-				_internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded"
-			) {
+			if (_internalStore._options.headers["Content-Type"] === "application/json" || _internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded") {
 				data = (await res.json()) as ResponseDataType
 			} else {
 				rawData = (await res.text()) as any as ResponseDataType
