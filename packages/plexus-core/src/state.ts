@@ -3,10 +3,7 @@ import { PlexusInstance } from "./instance"
 import { PlexusWatcher } from "./interfaces"
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
 export type PlexusStateType = Object | Array<unknown> | string | number | boolean | null | undefined
-export type PlexusState = <PxStateValue = any>(
-	instance: () => PlexusInstance,
-	input: PxStateValue
-) => PlexusStateInstance<PxStateValue>
+export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, input: PxStateValue) => PlexusStateInstance<PxStateValue>
 
 export interface PlexusStateInstance<Value = any> {
 	/**
@@ -101,7 +98,6 @@ export interface PlexStateInternalStore<Value> {
 	_interval: NodeJS.Timer | null
 	_internalId: string
 	_ready: boolean
-	externalName: string
 }
 
 export function _state<StateValue extends PlexusStateType>(instance: () => PlexusInstance, _init: StateValue) {
@@ -116,21 +112,18 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		_name: "",
 		_persist: false,
 		_interval: null,
-		externalName: "",
 		_ready: false,
 	}
 
 	// Methods //
 	const mount = () => {
-		if (_internalStore._name === "") {
-			instance()._runtime.log("warn", "State is not keyed, it will not be mounted to the instance")
-			return
+		// if (_internalStore._name === "") {
+		// 	return
+		// }
+		if (!instance()._states.has(state)) {
+			instance()._runtime.log("info", "Hoisting state to instance")
+			instance()._states.add(state)
 		}
-		if (instance()._states.has(`${_internalStore._name}`)) {
-			instance()._states.delete(`${_internalStore._name}`)
-		}
-
-		instance()._states.set(`${_internalStore._name}`, state)
 	}
 	const removeWatcher = (key: string | number) => {
 		// instance()._runtime.unsubscribe(_internalStore._name, key)
@@ -139,6 +132,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		destroy?.()
 		return _internalStore._watchers.delete(key)
 	}
+
 	// Returned Object //
 	const state: PlexusStateInstance<StateValue> = Object.freeze({
 		set(value?: StateValue) {
@@ -161,7 +155,8 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 
 			// update the runtime conductor
 			instance()._runtime.broadcast(_internalStore._internalId, "state", value)
-			if (_internalStore._persist) instance().storage.set(_internalStore.externalName, _internalStore._value)
+			if (_internalStore._persist) instance().storage.set(_internalStore._name, _internalStore._value)
+			mount()
 		},
 
 		patch(value: StateValue) {
@@ -175,13 +170,10 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			} else {
 				this.set(value)
 			}
-			if (_internalStore._persist) instance().storage.set(_internalStore.externalName, _internalStore._value)
+			if (_internalStore._persist) instance().storage.set(_internalStore._name, _internalStore._value)
 		},
 
-		watch(
-			keyOrCallback: string | number | PlexusWatcher<StateValue>,
-			callback?: PlexusWatcher<StateValue>
-		): () => void {
+		watch(keyOrCallback: string | number | PlexusWatcher<StateValue>, callback?: PlexusWatcher<StateValue>): () => void {
 			if (typeof keyOrCallback === "function") {
 				callback = keyOrCallback
 				// generate a nonce from global instance
@@ -208,28 +200,17 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 
 		persist(name: string) {
 			// if there is a name, change the states internal name
-			if (name) _internalStore.externalName = `state_${name}`
+			if (name) _internalStore._name = `state_${name}`
 
 			if (instance().storage) {
 				// this should only run on initial load of the state when this function is called
-				let storedValue = instance().storage.get(_internalStore.externalName)
-				if (!storedValue) {
-					instance().storage.set(_internalStore.externalName, this.value)
-					storedValue = this.value
-				}
+				instance()._runtime.log("info", `Persisting ${_internalStore._name}`)
 
-				// throw new Error(
-				// 	`TODO: setting persisted value ${_internalStore.externalName} ${instance().storage.get(
-				// 		_internalStore.externalName
-				// 	)} ${storedValue}`
-				// )
-				// console.log(`Trying to apply persisted value ${storedValue}`)
-
-				if (storedValue !== undefined && storedValue !== null) {
-					// console.log("apply persisted value")
-					this.set(storedValue)
-				}
-
+				// if (storedValue !== undefined && storedValue !== null) {
+				// 	instance()._runtime.log("info", "apply persisted value")
+				// 	this.set(storedValue)
+				// }
+				instance().storage.monitor(_internalStore._name, this)
 				_internalStore._persist = true
 			}
 			return this
@@ -259,11 +240,17 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			return this
 		},
 		key(key: string) {
-			_internalStore._name = key
-			mount()
+			_internalStore._name = `state_${key}`
 			return this
 		},
 		get value() {
+			instance()._runtime.log("info", `getting value; persist ${_internalStore._persist ? "enabled" : "disabled"}`)
+			mount()
+			// if (_internalStore._persist) {
+			// 	let storedValue = instance().storage.get(_internalStore.externalName)
+			// 	this.set(storedValue)
+			// }
+
 			return deepClone(_internalStore._value)
 		},
 

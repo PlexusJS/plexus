@@ -1,8 +1,10 @@
 import { EventEmitter } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { PlexusStateType } from "./state"
-// import { PlexusInstance, PlexusStateType } from "./interfaces";
 
+interface RuntimeConfig {
+	logLevel: "debug" | "warn" | "error" | "silent"
+}
 export interface PlexusRuntime {
 	/**
 	 * track a change and propagate to all listening children in instance
@@ -16,11 +18,7 @@ export interface PlexusRuntime {
 	 * @returns A function to remove the watcher
 	 */
 	subscribe<Value = PlexusStateType>(key: string | number, callback: Fn<Value>)
-	subscribe<Value = PlexusStateType>(
-		_key: string,
-		typeOrCallback: SubscriptionTypes | Fn<Value>,
-		_callback?: Fn<Value>
-	): () => void
+	subscribe<Value = PlexusStateType>(_key: string, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>): () => void
 	/**
 	 * Either get all watchers on this runtime or get the specific watchers on an event
 	 * @param key (optional) The event key
@@ -38,7 +36,7 @@ export interface PlexusRuntime {
 	 * @param type The type of log message
 	 * @param message The message to send
 	 */
-	log(type: "warn" | "info" | "error", message: string)
+	log(type: Exclude<RuntimeConfig["logLevel"], "silent"> | "info", ...message: string[])
 }
 type Fn<Value> = (value: Value) => void
 type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin_${string}` | "*"
@@ -47,8 +45,9 @@ type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin
  * Create a runtime for an instance NOTE: NOT FOR PUBLIC USE
  * @param instance the instance the runtime is running on
  * @returns
+ * @private
  */
-export function _runtime(instance: () => PlexusInstance): PlexusRuntime {
+export function _runtime(instance: () => PlexusInstance, config?: Partial<RuntimeConfig>): PlexusRuntime {
 	const _internalStore = {
 		_conductor: new EventEmitter<{ key: string | number; value: any }>(),
 		_watchers: new Map<string | number, Map<string | Number, (v: any) => void>>(),
@@ -64,17 +63,40 @@ export function _runtime(instance: () => PlexusInstance): PlexusRuntime {
 	// 	// _internalStore._watchers.get(key).delete(watcherKey)
 	// }
 
-	function log(type: "warn" | "info" | "error", message: string) {
+	function log(type: "warn" | "info" | "error", ...message: string[]) {
 		const typeColors = {
 			info: "#4281A4",
 			warn: "#E9D985",
 			error: "#CE2D4F",
 		}
-		console[type](
-			`%cPlexus(${instance().name}) ${type.toUpperCase()}:%c ${message}`,
-			`color: ${typeColors[type] || "#4281A4"};`,
-			"color: unset;"
-		)
+		const callLog = () =>
+			console[type](
+				`%cPlexus(%c${instance().name}%c) ${type.toUpperCase()}:%c`,
+				`color: ${typeColors[type] || "#4281A4"};`,
+				"color: #D8DC6A;",
+				`color: ${typeColors[type] || "#4281A4"};`,
+				"color: unset;",
+				...message
+			)
+		// TODO Logging must only occur when the config parameter is set
+		if (config?.logLevel) {
+			switch (config?.logLevel) {
+				case "warn": {
+					if (type === "error" || type === "warn") callLog()
+				}
+				case "error": {
+					type === "error" && callLog()
+				}
+				case "silent": {
+					return
+				}
+				case "debug": {
+					callLog()
+				}
+			}
+			return
+		}
+		callLog()
 	}
 
 	return {
@@ -87,11 +109,7 @@ export function _runtime(instance: () => PlexusInstance): PlexusRuntime {
 			_internalStore._conductor.emit(genEventName(type, key), { key, value })
 		},
 
-		subscribe<Value = PlexusStateType>(
-			_key: string,
-			typeOrCallback: SubscriptionTypes | Fn<Value>,
-			_callback?: Fn<Value>
-		) {
+		subscribe<Value = PlexusStateType>(_key: string, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>) {
 			const type = typeof typeOrCallback === "string" ? typeOrCallback : "state"
 			if (typeof typeOrCallback === "function" && _callback === undefined) {
 				_callback = typeOrCallback

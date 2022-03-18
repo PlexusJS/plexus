@@ -67,7 +67,7 @@ export function _data<Value extends Record<string, any>>(
 			},
 			delete() {
 				instance()._runtime.removeWatchers("state", _internalStore._state.name)
-				instance()._states.delete(_internalStore._state.name)
+				instance()._states.delete(_internalStore._state)
 				// delete _internalStore._state
 			},
 			watch(callback?: PlexusWatcher<Value>) {

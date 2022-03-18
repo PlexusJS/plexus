@@ -1,4 +1,4 @@
-import { PlexusCollectionGroup, PlexusStateInstance, state, PlexusCollectionSelector, PlexusComputedStateInstance } from "@plexusjs/core/dist"
+import { PlexusCollectionGroup, PlexusStateInstance, state, PlexusCollectionSelector, PlexusComputedStateInstance, instance } from "@plexusjs/core/dist"
 import { isWatchable, WatchableValue } from "@plexusjs/core/dist/interfaces"
 import { useEffect, useState } from "react"
 
@@ -19,6 +19,8 @@ export function usePlexus<V extends WatchableValue<any>[]>(deps: V | []): Plexus
  * @returns
  */
 export function usePlexus<V extends WatchableValue<any>[]>(deps: V | [] | WatchableValue): PlexusValue<V> | PlexusValueArray<V> {
+	instance().storage.sync()
+
 	const depsArr = normalizeDeps(deps) as PlexusValueArray<V>
 	const [_, set] = useState({})
 	useEffect(() => {

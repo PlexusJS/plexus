@@ -95,8 +95,7 @@ export class EventEmitter<Data = any> {
 	}
 }
 
-export const convertToString = (input: any) =>
-	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)
+export const convertToString = (input: any) => (typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input))
 export const hash = function (input: string) {
 	/* Simple hash function. */
 	let a = 1,
@@ -114,4 +113,28 @@ export const hash = function (input: string) {
 		}
 	}
 	return String(a)
+}
+
+export const convertStringToType = (inp: string) => {
+	try {
+		// try to parse it as JSON (array or object)
+		return JSON.parse(inp)
+	} catch (e) {
+		// if that fails, try...
+
+		// ...as a number
+		const num = Number(inp)
+		if (!isNaN(num)) {
+			return num
+		}
+		// ...as a boolean
+		if (inp === "true") {
+			return true
+		}
+		if (inp === "false") {
+			return false
+		}
+		// ...as a string
+		return inp
+	}
 }

@@ -1,22 +1,26 @@
-import { deepMerge, isObject } from "./helpers"
+import { convertStringToType, deepMerge, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
+import { WatchableValue } from "./interfaces"
+import { PlexusStateInstance } from "./state"
 // import { PlexusInstance, PxStorageInstance } from './interfaces';
 export interface PlexusStorageInstance {
 	get(key: string): any
 	set(key: string, value: any): void
 	remove(key: string): void
 	patch(key: string, value: any): void
+	watching: unknown & (WatchableValue | PlexusStateInstance)[]
+	monitor(key: string, object: WatchableValue | PlexusStateInstance)
+	sync()
 }
 
 /**
  *
- * @returns returns the localstorage if available, otherwise returns false
+ * @returns returns the localstorage if available, otherwise returns null
  */
 const getLocalStorage = () => {
 	try {
 		const ls = window?.localStorage ? window.localStorage : localStorage
-		if (typeof ls.getItem !== "function") return null
-		return ls
+		return typeof ls.getItem !== "function" ? null : ls
 	} catch (e) {
 		return null
 	}
@@ -31,17 +35,14 @@ export type StorageOverride = {
 	patch(key: string, value: any): AlmostAnything | Promise<any>
 }
 // storage func -> called from instance OR by integration -> hooks up to the instance
-export function storage(
-	instance: () => PlexusInstance,
-	name?: string,
-	override?: StorageOverride
-): PlexusStorageInstance {
+export function storage(instance: () => PlexusInstance, name?: string, override?: StorageOverride): PlexusStorageInstance {
 	const getKey = (key: string) => `${_internalStore._prefix}${key}`
 
 	const _internalStore = {
 		_name: name || "localStorage",
 		_storage: getLocalStorage(),
 		_prefix: override?.prefix || "plexus-",
+		tracking: new Set<WatchableValue>(),
 	}
 
 	const get = (key: string): any => {
@@ -50,7 +51,9 @@ export function storage(
 			instance()._runtime.log("warn", "No localstorage available, cannot get persisted value")
 			return
 		}
-		return getLocalStorage().getItem(getKey(key))
+		instance()._runtime.log("info", `Retrieving value for key ${getKey(key)}`)
+		const val = convertStringToType(getLocalStorage().getItem(getKey(key)))
+		return val
 	}
 
 	const set = (key: string, value: any): void => {
@@ -59,6 +62,7 @@ export function storage(
 			instance()._runtime.log("warn", "No localstorage available, cannot persist in storage")
 			return
 		}
+
 		if (isObject(value)) {
 			getLocalStorage().setItem(getKey(key), JSON.stringify(value))
 		} else if (Array.isArray(value)) {
@@ -77,12 +81,7 @@ export function storage(
 		if (isObject(value)) {
 			getLocalStorage().setItem(getKey(key), JSON.stringify(deepMerge(getLocalStorage().getItem(key), value)))
 		} else if (Array.isArray(value)) {
-			getLocalStorage().setItem(
-				getKey(key),
-				JSON.stringify(
-					Object.values<typeof value>(deepMerge(JSON.parse(getLocalStorage().getItem(key)), value))
-				)
-			)
+			getLocalStorage().setItem(getKey(key), JSON.stringify(Object.values<typeof value>(deepMerge(JSON.parse(getLocalStorage().getItem(key)), value))))
 		} else {
 			getLocalStorage().setItem(getKey(key), String(value))
 		}
@@ -101,6 +100,52 @@ export function storage(
 		set: override?.set || set,
 		remove: override?.remove || remove,
 		patch: override?.patch || patch,
+		get watching() {
+			return Array.from(_internalStore.tracking)
+		},
+		monitor(key: string, object: WatchableValue) {
+			if (key === "" || key === undefined) {
+				instance()._runtime.log("warn", `Can't monitor an object with no key`)
+				return
+			}
+
+			_internalStore.tracking.add(object)
+			let storedValue = this.get(key)
+			instance()._runtime.log("info", `Persisting new key ${key}`, JSON.stringify(this.watching))
+			if (!storedValue) {
+				instance().storage.set(key, object.value)
+			}
+
+			// instance()._runtime.log("info", `Trying to apply persisted value ${storedValue}`)
+
+			// if (storedValue !== undefined && storedValue !== null) {
+			// 	instance()._runtime.log("info", "Applying persisted value")
+			// 	object.set(storedValue)
+			// }
+		},
+		sync() {
+			instance()._runtime.log("info", "Syncing storage storage...")
+			_internalStore.tracking.forEach((object) => {
+				let key: string
+				if (typeof object.key === "string") {
+					key = object.key
+				} else if (typeof object.name === "string") {
+					key = object.name
+				}
+
+				if (key === "" || key === undefined) {
+					instance()._runtime.log("warn", `Can't sync an object with no key`)
+					return
+				}
+
+				// instance().storage.monitor(key, object)
+				let storedValue = this.get(key)
+				if (storedValue) {
+					instance()._runtime.log("info", `Syncing "${key}" with storage value "${storedValue}"`)
+					object.set(storedValue)
+				}
+			})
+		},
 	})
 	instance()._storages.set(name, store)
 	return store
