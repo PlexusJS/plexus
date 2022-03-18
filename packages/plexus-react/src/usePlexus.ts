@@ -4,15 +4,15 @@ import { useEffect, useState } from "react"
 
 const normalizeDeps = (deps: WatchableValue | WatchableValue[]) => (Array.isArray(deps) ? (deps as WatchableValue[]) : [deps as WatchableValue])
 
-export type PlexusValue<T> = T extends WatchableValue<infer U> ? U : T extends PlexusCollectionGroup<infer U> ? U[] : never
+export type PlexusValue<T> = T extends PlexusCollectionGroup<infer U> ? U[] : T extends WatchableValue<infer U> ? U : never
 export type PlexusValueArray<T> = {
 	[K in keyof T]: T[K] extends PlexusCollectionGroup<infer U> ? U[] : T[K] extends WatchableValue<infer U> ? U : never
 }
 
 // Singleton argument
-export function usePlexus<V extends WatchableValue<any>>(deps: V): PlexusValue<V>
+export function usePlexus<V extends WatchableValue<any> | PlexusCollectionGroup<any>>(deps: V): PlexusValue<V>
 // array argument
-export function usePlexus<V extends WatchableValue<any>[]>(deps: V | []): PlexusValueArray<V>
+export function usePlexus<V extends (WatchableValue<any> | PlexusCollectionGroup<any>)[]>(deps: V | []): PlexusValueArray<V>
 /**
  * A react hook to extract the values from plexus objects and reactively update the component and value when the values change
  * @param deps A list of plexus watchable objects (ex. State, Group, Selector, Computed)

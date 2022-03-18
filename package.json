@@ -22,7 +22,7 @@
 		"publish-canary": "lerna publish --canary prerelease --preid canary --force-publish --yes",
 		"publish-stable": "lerna version --force-publish",
 		"postinstall": "husky install",
-		"test": "yarn build && jest"
+		"test": "yarn build && jest -u"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.16.7",

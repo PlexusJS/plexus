@@ -30,15 +30,30 @@ describe("Test react integration", () => {
 			)
 		}
 		const tree = renderer.create(<RandomComponent />).toJSON()
-		myState.set("no")
-		expect(tree)
 		expect(tree).toMatchSnapshot()
+		// myState.set("no")
 	})
 	test("usePlexus hook w/collection group", () => {
 		function RandomComponent() {
 			myCollection.collect({ id: "pog", a: 1 }, "test")
 			const g1 = usePlexus(myCollection.getGroup("test"))
-			const [groupValue, stateItem] = usePlexus([myState, myState2])
+			const [groupValue, stateItem] = usePlexus([myCollection.getGroup("test"), myState2])
+			// const [groupValue] = usePlexus([myCollection.groups.test])
+			return (
+				<div>
+					<p>{JSON.stringify(groupValue)}</p>
+				</div>
+			)
+		}
+		const tree = renderer.create(<RandomComponent />).toJSON()
+		expect(tree).toMatchSnapshot()
+	})
+	test("usePlexus hook w/collection selector", () => {
+		function RandomComponent() {
+			myCollection.collect({ id: "pog", a: 1 }, "test")
+			
+			const g1 = usePlexus(myCollection.getSelector('main'))
+			const [groupValue, stateItem] = usePlexus([myCollection.getSelector("main"), myState2])
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
