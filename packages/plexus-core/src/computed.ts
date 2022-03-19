@@ -39,18 +39,12 @@ export interface PlexusComputedStateInstance<ValueType extends PlexusStateType =
 	 */
 	key(key: string): this
 }
-export function _computed<StateValue extends PlexusStateType>(
-	instance: () => PlexusInstance,
-	computeFn: (value?: StateValue) => StateValue,
-	deps: Watchable[]
-) {
+export function _computed<StateValue extends PlexusStateType>(instance: () => PlexusInstance, computeFn: (value?: StateValue) => StateValue, deps: Watchable[]) {
 	const _internalStore = {
 		_state: _state(() => instance(), computeFn()),
 		// utilizing maps because it allows us to preform a lookup in O(1)
 		_depsDestroyers: new Map<string, ReturnType<Watchable["watch"]>>(),
-		_deps: new Map<string, Watchable>(
-			deps.map((dep, i) => [dep.name || (typeof dep.key === "string" ? dep.key : `${i}`), dep])
-		),
+		_deps: new Map<string, Watchable>(deps.map((dep, i) => [dep.name || (typeof dep.key === "string" ? dep.key : `${i}`), dep])),
 	}
 
 	/**
@@ -62,7 +56,7 @@ export function _computed<StateValue extends PlexusStateType>(
 		_internalStore._depsDestroyers.clear()
 
 		Array.from(_internalStore._deps.values()).forEach((dep, i) => {
-			const destroyers = dep.watch(() => {
+			const destroyer = dep.watch(() => {
 				const value = computeFn(_internalStore._state.value)
 				// console.log(
 				// 	`${dep.name} changed; updating computed state to "${value}"; current value is "${_internalStore._state.value}"`,
@@ -70,7 +64,7 @@ export function _computed<StateValue extends PlexusStateType>(
 				// )
 				_internalStore._state.set(value)
 			})
-			_internalStore._depsDestroyers.set(dep.name || (typeof dep.key === "string" ? dep.key : `${i}`), destroyers)
+			_internalStore._depsDestroyers.set(dep.name || (typeof dep.key === "string" ? dep.key : `${i}`), destroyer)
 		})
 	}
 
@@ -82,12 +76,7 @@ export function _computed<StateValue extends PlexusStateType>(
 	 */
 	const checkSearchKey = (searchKey: string): boolean => {
 		if (searchKey === "") {
-			instance()._runtime.log(
-				"warn",
-				`Computed state ${
-					_internalStore._state.name || "<NULL>"
-				} can't add a dependency with a key of "${searchKey}"`
-			)
+			instance()._runtime.log("warn", `Computed state`, _internalStore._state.name || "<NULL>", `can't add a dependency with a key of "${searchKey}"`)
 			return false
 		}
 		return true

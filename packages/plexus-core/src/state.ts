@@ -53,6 +53,7 @@ export interface PlexusStateInstance<Value = any> {
 	//  * @returns true if the watcher was removed, false otherwise
 	//  */
 	// removeWatcher(key: string | number): boolean
+
 	/**
 	 * Reset the state to the previous value
 	 */
@@ -244,7 +245,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			return this
 		},
 		get value() {
-			instance()._runtime.log("info", `getting value; persist ${_internalStore._persist ? "enabled" : "disabled"}`)
+			// instance()._runtime.log("info", `getting value; persist ${_internalStore._persist ? "enabled" : "disabled"}`)
 			mount()
 			// if (_internalStore._persist) {
 			// 	let storedValue = instance().storage.get(_internalStore.externalName)

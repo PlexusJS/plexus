@@ -14,7 +14,7 @@ export interface PlexusInstance {
 	_runtime: PlexusRuntime
 	_computedStates: Set<any>
 	_collections: Map<string, PlexusCollectionInstance>
-	_settings: {}
+	settings: Partial<PlexusInstanceConfig>
 	get storageEngine(): string | undefined
 	set storageEngine(name: string)
 	_storages: Map<string, PlexusStorageInstance>
@@ -48,18 +48,11 @@ export const getPlexusInstance = (name?: string) => globalThis[`__plexusInstance
  * @returns An instance of PlexusJS
  */
 export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance {
-	const _internalStore = {
-		_nonce: 0,
-		_id: config?.instanceId || ``,
-		_selectedStorage: undefined,
-		_settings: { ...config },
-		_ready: false,
-	}
 	/**
 	 * Get the correctly formatted instance name
 	 * @returns The formatted name of the instance
 	 */
-	const getInstanceName = () => `__plexusInstance__${_internalStore._id ? _internalStore._id + "__" : ""}`
+	const getInstanceName = (name?: string) => `__plexusInstance__${name ? name + "__" : ""}`
 
 	// if the master is not created, create it
 	if (globalThis["__plexusMaster__"] === undefined) {
@@ -72,6 +65,13 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 
 	// if the instance is not created, create it
 	if (globalThis[getInstanceName()] === undefined) {
+		const _internalStore = {
+			_nonce: 0,
+			_id: config?.instanceId || ``,
+			_selectedStorage: undefined,
+			_settings: { ...config },
+			_ready: false,
+		}
 		const newInstance: PlexusInstance = Object.freeze({
 			get name() {
 				return _internalStore._id || "default"
@@ -85,8 +85,11 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 			set ready(isReady: boolean) {
 				_internalStore._ready = isReady
 			},
-			get _settings() {
+			get settings() {
 				return _internalStore._settings
+			},
+			set settings(settings: Partial<PlexusInstanceConfig>) {
+				_internalStore._settings = { ..._internalStore._settings, ...settings }
 			},
 			get storageEngine() {
 				return _internalStore._selectedStorage
@@ -127,5 +130,5 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 		getPlexusInstance(_internalStore._id)._runtime.log("info", "Instance initialized")
 	}
 	// return the instance
-	return globalThis[getInstanceName()] as PlexusInstance
+	return getPlexusInstance(config?.instanceId || "") as PlexusInstance
 }
