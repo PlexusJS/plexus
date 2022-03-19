@@ -57,45 +57,10 @@ export function deepClone<Type = AlmostAnything>(obj: Type): Type {
 	return cloned
 }
 
-export class EventEmitter<Data = any> {
-	events: Map<string | number, Data>
-	constructor() {
-		this.events = new Map()
-	}
-	on(event: string | number, listener: (...args: any[]) => void) {
-		if (!(event in this.events)) {
-			this.events[event] = []
-		}
-		this.events[event].push(listener)
-		return () => this.removeListener(event, listener)
-	}
-	removeListener(event: string | number, listener: (...args: any[]) => void) {
-		if (!(event in this.events)) {
-			return
-		}
-		const idx = this.events[event].indexOf(listener)
-		if (idx > -1) {
-			this.events[event].splice(idx, 1)
-		}
-		if (this.events[event].length === 0) {
-			delete this.events[event]
-		}
-	}
-	emit(event: string | number, ...args: any) {
-		if (!(event in this.events)) {
-			return
-		}
-		this.events[event].forEach((listener) => listener(...args))
-	}
-	once(event: string | number, listener: (...args: any[]) => void) {
-		const remove = this.on(event, (...args) => {
-			remove()
-			listener(...args)
-		})
-	}
-}
 
-export const convertToString = (input: any) => (typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input))
+
+export const convertToString = (input: any) =>
+	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)
 export const hash = function (input: string) {
 	/* Simple hash function. */
 	let a = 1,

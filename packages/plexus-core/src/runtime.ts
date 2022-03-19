@@ -1,4 +1,4 @@
-import { EventEmitter } from "./helpers"
+import { EventEngine } from "./engine"
 import { PlexusInstance } from "./instance"
 import { PlexusStateType } from "./state"
 
@@ -37,6 +37,10 @@ export interface PlexusRuntime {
 	 * @param message The message to send
 	 */
 	log(type: Exclude<RuntimeConfig["logLevel"], "silent"> | "info", ...message: string[])
+	/**
+	 * Runtime Conductor Engine
+	 */
+	engine: EventEngine
 }
 type Fn<Value> = (value: Value) => void
 type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin_${string}` | "*"
@@ -49,8 +53,7 @@ type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin
  */
 export function _runtime(instance: () => PlexusInstance, config?: Partial<RuntimeConfig>): PlexusRuntime {
 	const _internalStore = {
-		_conductor: new EventEmitter<{ key: string | number; value: any }>(),
-		_watchers: new Map<string | number, Map<string | Number, (v: any) => void>>(),
+		_conductor: new EventEngine(),
 	}
 
 	const genEventName = (type: SubscriptionTypes, key: string) => `${type}_${key}`
@@ -80,7 +83,7 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 			)
 		// TODO Logging must only occur when the config parameter is set
 		if (config?.logLevel) {
-			switch (config?.logLevel) {
+			switch (instance().settings.logLevel) {
 				case "warn": {
 					if (type === "error" || type === "warn") callLog()
 				}
@@ -106,6 +109,7 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 			this.broadcast(key, "*", { key, value })
 		},
 		broadcast<Value = PlexusStateType>(key: string, type: SubscriptionTypes, value: Value) {
+			this.log("info", `Broadcasting ${type} change for ${key}`)
 			_internalStore._conductor.emit(genEventName(type, key), { key, value })
 		},
 
@@ -114,6 +118,7 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 			if (typeof typeOrCallback === "function" && _callback === undefined) {
 				_callback = typeOrCallback
 			}
+			this.log("info", `Subscribing ${type} change for ${_key}`)
 			function callback(data: { key: string; value: Value }) {
 				const { key, value } = data
 
@@ -134,15 +139,19 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 		},
 
 		getWatchers(key?: string) {
-			if (key && _internalStore._conductor.events.has(`${key}`)) {
-				return _internalStore._conductor.events.get(`${key}`).value
-			} else {
-				return _internalStore._conductor.events
-			}
+			// if (key && _internalStore._conductor.events.has(`${key}`)) {
+			// 	return _internalStore._conductor.events.get(`${key}`).value
+			// } else {
+			// 	return _internalStore._conductor.events
+			// }
+			return key && _internalStore._conductor.events.has(`${key}`) ? _internalStore._conductor.events : {}
 		},
 		removeWatchers(type: SubscriptionTypes, key: string) {
 			_internalStore._conductor.events.get(genEventName(type, key))
 		},
 		log,
+		get engine() {
+			return _internalStore._conductor
+		},
 	} as PlexusRuntime
 }
