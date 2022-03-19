@@ -1,10 +1,10 @@
 import { PlexusCollectionInstance } from ".."
 import { PlexusInstance } from "../instance"
-import { PlexusWatcher } from "../interfaces"
+import { PlexusWatcher, WatchableValue } from "../interfaces"
 
 import { DataKey, PlexusDataInstance } from "./data"
 export type SelectorName = string
-export interface PlexusCollectionSelector<ValueType extends { [key: string]: any } = { [key: string]: any }> {
+export interface PlexusCollectionSelector<ValueType extends Record<string, any> = Record<string, any>> {
 	/**
 	 * The key of a data item assigned to this selecor
 	 */
@@ -14,6 +14,13 @@ export interface PlexusCollectionSelector<ValueType extends { [key: string]: any
 	 * @param key The key to select
 	 */
 	select(key: DataKey)
+	/**
+	 * Set the value of the selected data instance
+	 * @param value The value to set
+	 * @param config The config to use when setting the value
+	 * @param config.mode should we 'patch' or 'replace' the value
+	 */
+	set(value: ValueType, config?: { mode: "replace" | "patch" }): void
 	/**
 	 * Watch for changes on this group
 	 * @param callback The callback to run when the state changes
@@ -30,7 +37,7 @@ export interface PlexusCollectionSelector<ValueType extends { [key: string]: any
 	get data(): PlexusDataInstance<ValueType> | null
 }
 
-export function _selector<ValueType extends { [key: string]: any } = { [key: string]: any }>(
+export function _selector<ValueType extends Record<string, any> = Record<string, any>>(
 	instance: () => PlexusInstance,
 	collection: () => PlexusCollectionInstance<ValueType>,
 	name: string
@@ -47,6 +54,9 @@ export function _selector<ValueType extends { [key: string]: any } = { [key: str
 		},
 		select(key: DataKey) {
 			_internalStore._key = key
+		},
+		set(value: ValueType, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
+			this.data.set(value, config)
 		},
 		get value() {
 			if (_internalStore._key === null) {
