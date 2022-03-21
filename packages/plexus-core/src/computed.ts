@@ -39,7 +39,7 @@ export interface PlexusComputedStateInstance<ValueType extends PlexusStateType =
 	 */
 	key(key: string): this
 }
-export function _computed<StateValue extends PlexusStateType>(instance: () => PlexusInstance, computeFn: (value?: StateValue) => StateValue, deps: Watchable[]) {
+export function _computed<StateValue extends PlexusStateType>(instance: () => PlexusInstance, computeFn: () => StateValue, deps: Watchable[]) {
 	const _internalStore = {
 		_state: _state(() => instance(), computeFn()),
 		// utilizing maps because it allows us to preform a lookup in O(1)
@@ -57,7 +57,7 @@ export function _computed<StateValue extends PlexusStateType>(instance: () => Pl
 
 		Array.from(_internalStore._deps.values()).forEach((dep, i) => {
 			const destroyer = dep.watch(() => {
-				const value = computeFn(_internalStore._state.value)
+				const value = computeFn()
 				// console.log(
 				// 	`${dep.name} changed; updating computed state to "${value}"; current value is "${_internalStore._state.value}"`,
 				// 	JSON.stringify(Array.from(_internalStore._deps.values()), null, 2)
@@ -76,7 +76,12 @@ export function _computed<StateValue extends PlexusStateType>(instance: () => Pl
 	 */
 	const checkSearchKey = (searchKey: string): boolean => {
 		if (searchKey === "") {
-			instance()._runtime.log("warn", `Computed state`, _internalStore._state.name || "<NULL>", `can't add a dependency with a key of "${searchKey}"`)
+			instance()._runtime.log(
+				"warn",
+				`Computed state`,
+				_internalStore._state.name || "<NULL>",
+				`can't add a dependency with a key of "${searchKey}"`
+			)
 			return false
 		}
 		return true
