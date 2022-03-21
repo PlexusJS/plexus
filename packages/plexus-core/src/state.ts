@@ -118,12 +118,10 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 
 	// Methods //
 	const mount = () => {
-		// if (_internalStore._name === "") {
-		// 	return
-		// }
 		if (!instance()._states.has(state)) {
-			instance()._runtime.log("info", "Hoisting state to instance")
+			instance()._runtime.log("info", `Hoisting state ${_internalStore._internalId} with value ${_internalStore._value} to instance`)
 			instance()._states.add(state)
+			instance().storage.sync()
 		}
 	}
 	const removeWatcher = (key: string | number) => {
@@ -155,9 +153,9 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			_internalStore._nextValue = deepClone(_internalStore._value)
 
 			// update the runtime conductor
-			instance()._runtime.broadcast(_internalStore._internalId, "state", value)
 			if (_internalStore._persist) instance().storage.set(_internalStore._name, _internalStore._value)
 			mount()
+			instance()._runtime.broadcast(_internalStore._internalId, "state", value)
 		},
 
 		patch(value: StateValue) {

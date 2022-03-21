@@ -1,4 +1,11 @@
-import { PlexusCollectionGroup, PlexusStateInstance, state, PlexusCollectionSelector, PlexusComputedStateInstance, instance } from "@plexusjs/core/dist"
+import {
+	PlexusCollectionGroup,
+	PlexusStateInstance,
+	state,
+	PlexusCollectionSelector,
+	PlexusComputedStateInstance,
+	instance,
+} from "@plexusjs/core/dist"
 import { isWatchable, WatchableValue } from "@plexusjs/core/dist/interfaces"
 import { useEffect, useState } from "react"
 
@@ -19,10 +26,10 @@ export function usePlexus<V extends (WatchableValue<any> | PlexusCollectionGroup
  * @returns
  */
 export function usePlexus<V extends WatchableValue<any>[]>(deps: V | [] | WatchableValue): PlexusValue<V> | PlexusValueArray<V> {
-	instance().storage.sync()
+	const [_, set] = useState({})
 
 	const depsArr = normalizeDeps(deps) as PlexusValueArray<V>
-	const [_, set] = useState({})
+
 	useEffect(() => {
 		if (Array.isArray(depsArr)) {
 			const depUnsubs: Set<() => void> = new Set()
@@ -45,7 +52,7 @@ export function usePlexus<V extends WatchableValue<any>[]>(deps: V | [] | Watcha
 	}, [])
 
 	if (!Array.isArray(deps) && depsArr.length === 1) {
-		return depsArr[0].value
+		return depsArr[0].value as PlexusValue<V>
 	}
 
 	// TODO: dependency array is not returning the correct types per index; This must be fixed before release

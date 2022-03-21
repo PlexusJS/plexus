@@ -1,4 +1,4 @@
-import { convertStringToType, deepMerge, isObject } from "./helpers"
+import { convertStringToType, deepMerge, isEqual, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { WatchableValue } from "./interfaces"
 import { PlexusStateInstance } from "./state"
@@ -81,7 +81,10 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 		if (isObject(value)) {
 			getLocalStorage().setItem(getKey(key), JSON.stringify(deepMerge(getLocalStorage().getItem(key), value)))
 		} else if (Array.isArray(value)) {
-			getLocalStorage().setItem(getKey(key), JSON.stringify(Object.values<typeof value>(deepMerge(JSON.parse(getLocalStorage().getItem(key)), value))))
+			getLocalStorage().setItem(
+				getKey(key),
+				JSON.stringify(Object.values<typeof value>(deepMerge(JSON.parse(getLocalStorage().getItem(key)), value)))
+			)
 		} else {
 			getLocalStorage().setItem(getKey(key), String(value))
 		}
@@ -141,8 +144,13 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 				// instance().storage.monitor(key, object)
 				let storedValue = this.get(key)
 				if (storedValue) {
-					instance()._runtime.log("info", `Syncing "${key}" with storage value "${storedValue}"`)
-					object.set(storedValue)
+					const val = object.value
+					if (val && (val !== storedValue || !isEqual(val, storedValue))) {
+						instance()._runtime.log("info", `Syncing "${key}" with storage value "${storedValue}"`)
+						object.set(storedValue)
+					} else {
+						instance()._runtime.log("info", `Skipping the storage sync of item "${key}"; Values are already equal.`)
+					}
 				}
 			})
 		},
