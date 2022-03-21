@@ -19,7 +19,7 @@ export class EventEngine {
 			this.events.set(eventId, [])
 		}
 
-		this.events.get(eventId).push()
+		this.events.get(eventId).push(eventWatcher)
 		return () => this.removeListener(eventId, eventWatcher)
 	}
 	removeListener(eventId: string | number, eventWatcher: EngineEventReceiver) {
