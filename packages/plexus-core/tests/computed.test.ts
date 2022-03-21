@@ -45,8 +45,10 @@ describe("Testing Computed State Function", () => {
 		expect(computedState.value).toBe(13)
 	})
 	test("Can update a computed state value", () => {
+		console.log(`Looking at ${stringState.value}`)
 		stringState.set("daasw")
-		expect(numberState.value).toBe(5)
+		expect(stringState.value).toBe("daasw")
+
 		expect(computedState.value).toBe(5)
 		stringState.set("")
 		expect(numberState.value).toBe(0)
