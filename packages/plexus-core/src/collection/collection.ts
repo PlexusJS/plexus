@@ -153,9 +153,7 @@ export interface PlexusCollectionInstance<
 	 * Get all the groups in the collection as an object
 	 * @returns The groups in the collection
 	 */
-	get groups():
-		| Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>>
-		| Record<string, PlexusCollectionGroup<DataType>>
+	get groups(): Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>> | Record<string, PlexusCollectionGroup<DataType>>
 	/**
 	 * Get all the groups and their childrens data values as an object
 	 * @returns The groups paired with their childrens data values as an object
@@ -165,9 +163,7 @@ export interface PlexusCollectionInstance<
 	 * Get all the groups in the collection as an object
 	 * @returns The groups in the collection
 	 */
-	get selectors():
-		| Record<KeyOfMap<Selectors>, PlexusCollectionSelector<DataType>>
-		| Record<string, PlexusCollectionSelector<DataType>>
+	get selectors(): Record<KeyOfMap<Selectors>, PlexusCollectionSelector<DataType>> | Record<string, PlexusCollectionSelector<DataType>>
 	/**
 	 * Get all the groups and their childrens data values as an object
 	 * @returns The groups paired with their childrens data values as an object
@@ -189,6 +185,7 @@ export function _collection<
 	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 >(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType> = { primaryKey: "id" } as const) {
 	const _internalStore = {
+		_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
 		_lookup: new Map<string, string>(),
 		_key: _config?.primaryKey || "id",
 		_data: new Map<DataKey, PlexusDataInstance<DataType>>(),
@@ -210,15 +207,21 @@ export function _collection<
 	 * Helper Function; Mounts the collection to the instance
 	 */
 	const mount = () => {
-		if (_internalStore._name === "") {
-			instance()._runtime.log("warn", "Collection is not keyed, it will not be mounted to the instance")
-			return
-		}
-		if (instance()._collections.has(_internalStore._name + "")) {
-			instance()._collections.delete(_internalStore._name + "")
-		}
+		// if (_internalStore._name === "") {
+		// 	instance()._runtime.log("warn", "Collection is not keyed, it will not be mounted to the instance")
+		// 	return
+		// }
+		// if (instance()._collections.has(_internalStore._name + "")) {
+		// 	instance()._collections.delete(_internalStore._name + "")
+		// }
 
-		instance()._collections.set(_internalStore._name + "", collection)
+		// instance()._collections.set(_internalStore._name + "", collection)
+		// instance().storage.sync()
+		if (!instance()._collections.has(collection)) {
+			instance()._runtime.log("info", `Hoisting collection ${_internalStore._internalId} to instance`)
+			instance()._collections.add(collection)
+			instance().storage.sync()
+		}
 	}
 
 	/**
@@ -278,9 +281,7 @@ export function _collection<
 		update(key: DataKey, data: Partial<DataType>, config: { deep: boolean } = { deep: true }) {
 			if (config.deep) {
 				if (_internalStore._data.has(key)) {
-					_internalStore._data
-						.get(key)
-						.set({ ...data, [_internalStore._key]: key } as DataType, { mode: "patch" })
+					_internalStore._data.get(key).set({ ...data, [_internalStore._key]: key } as DataType, { mode: "patch" })
 				} else {
 					console.warn("no data found for key", key)
 				}
@@ -464,9 +465,6 @@ export function _collection<
 		},
 
 		key(key: string) {
-			if (instance()._collections.has(_internalStore._name + "")) {
-				instance()._collections.delete(_internalStore._name + "")
-			}
 			_internalStore._name = key
 			mount()
 			return this
@@ -475,10 +473,7 @@ export function _collection<
 			return Array.from(_internalStore._data.values()).map((item) => item.value)
 		},
 		get groups() {
-			const groups: Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>> = {} as Record<
-				KeyOfMap<Groups>,
-				PlexusCollectionGroup<DataType>
-			>
+			const groups: Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>> = {} as Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>>
 			for (let group of _internalStore._groups.entries()) {
 				groups[group[0] as KeyOfMap<Groups>] = group[1]
 			}
@@ -487,9 +482,7 @@ export function _collection<
 		get groupsValue() {
 			const groups: Record<KeyOfMap<Groups>, DataType[]> = {} as Record<KeyOfMap<Groups>, DataType[]>
 			for (let group of _internalStore._groups.entries()) {
-				groups[group[0] as KeyOfMap<Groups>] = Array.from(group[1].index).map(
-					(key) => _internalStore._data.get(key).value
-				)
+				groups[group[0] as KeyOfMap<Groups>] = Array.from(group[1].index).map((key) => _internalStore._data.get(key).value)
 			}
 			return groups
 		},

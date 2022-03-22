@@ -28,15 +28,12 @@ beforeEach(() => {
 	arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(initialValue.array)
 	nullState = state(initialValue.null)
 	numberState = state(initialValue.number)
-	computedState = computed(
-		(value) => {
-			console.log(`Looking at ${stringState.value}`)
-			numberState.set(stringState.value.length)
-			console.log(`computed to: ${booleanState.value}`)
-			return stringState.value.length
-		},
-		[stringState]
-	)
+	computedState = computed(() => {
+		console.log(`Looking at ${stringState.value}`)
+		numberState.set(stringState.value.length)
+		console.log(`computed to: ${booleanState.value}`)
+		return stringState.value.length
+	}, [stringState])
 })
 describe("Testing Computed State Function", () => {
 	test("Can initialize a computed state value", () => {
