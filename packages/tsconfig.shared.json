@@ -6,7 +6,7 @@
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
-		"strict": false,
+		"strict": true,
 		"composite": true,
 		"noImplicitAny": false,
 		"noImplicitThis": true,
