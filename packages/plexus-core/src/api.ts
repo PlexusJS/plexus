@@ -9,7 +9,7 @@ export interface PlexusApiRes<DataType = any> {
 	status: number
 	response: ResponseInit
 	rawData: string
-	data: DataType | null
+	data: DataType
 }
 export interface PlexusApi {
 	/**
@@ -88,7 +88,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		_internalStore._options.headers = {}
 	}
 	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
-		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: "", data: null }
+		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: "", data: {} as ResponseDataType }
 
 		if (_internalStore._options.method === undefined) {
 			_internalStore._options.method = "GET"
@@ -131,7 +131,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 					res = raceResult
 				} else {
 					// a -1 response status means the programmatic timeout was surpassed
-					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: "", data: null }
+					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: "", data: {} as ResponseDataType }
 				}
 			} else {
 				res = await fetch(uri, _internalStore._options)
