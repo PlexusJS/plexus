@@ -81,6 +81,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 		_noFetch: false,
 		_authToken: "",
+		_silentFail: config.silentFail || false,
 	}
 
 	if (_internalStore._options.headers === undefined) {
@@ -135,7 +136,11 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			} else {
 				res = await fetch(uri, _internalStore._options)
 			}
-		} catch (e) {}
+		} catch (e) {
+			if (!_internalStore._silentFail) {
+				throw e
+			}
+		}
 		let data: ResponseDataType
 		let rawData: string
 
@@ -144,7 +149,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 				status: 500,
 				response: {},
 				rawData: "",
-				data: null,
+				data: {} as ResponseDataType,
 			}
 		}
 
@@ -172,7 +177,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 				status: res.status,
 				response: res,
 				rawData: "",
-				data: null,
+				data: {} as ResponseDataType,
 			}
 		}
 	}
