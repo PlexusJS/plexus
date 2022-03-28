@@ -8,7 +8,7 @@ export interface PlexusApiConfig {
 export interface PlexusApiRes<DataType = any> {
 	status: number
 	response: ResponseInit
-	rawData: any
+	rawData: string
 	data: DataType | null
 }
 export interface PlexusApi {
@@ -87,11 +87,8 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		_internalStore._options.headers = {}
 	}
 	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
-		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: {}, data: null }
+		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: "", data: null }
 
-		// if (_internalStore._baseURL.length > 0) {
-		// 	path = `${baseURL}${path.length > 0 ? (path.startsWith("/") ? path : `/${path}`) : ""}`
-		// }
 		if (_internalStore._options.method === undefined) {
 			_internalStore._options.method = "GET"
 		}
@@ -133,20 +130,20 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 					res = raceResult
 				} else {
 					// a -1 response status means the programmatic timeout was surpassed
-					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: {}, data: null }
+					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: "", data: null }
 				}
 			} else {
 				res = await fetch(uri, _internalStore._options)
 			}
 		} catch (e) {}
 		let data: ResponseDataType
-		let rawData: ResponseDataType
+		let rawData: string
 
 		if (res === undefined) {
 			return {
 				status: 500,
 				response: {},
-				rawData: null,
+				rawData: "",
 				data: null,
 			}
 		}
@@ -157,10 +154,10 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 				_internalStore._options.headers["Content-Type"] === "application/json" ||
 				_internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded"
 			) {
-				data = (await res.json()) as ResponseDataType
-				rawData = text as any as ResponseDataType
+				data = JSON.parse(text) as ResponseDataType
+				rawData = text
 			} else {
-				rawData = text as any as ResponseDataType
+				rawData = text
 				data = text as any as ResponseDataType
 			}
 
@@ -174,7 +171,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			return {
 				status: res.status,
 				response: res,
-				rawData: null,
+				rawData: "",
 				data: null,
 			}
 		}
