@@ -1,3 +1,4 @@
+"use strict"
 import { PlexusCollectionGroup } from "@plexusjs/core"
 import { AlmostAnything } from "@plexusjs/core/dist/helpers"
 import { isWatchable, WatchableValue } from "@plexusjs/core/dist/interfaces"
@@ -11,18 +12,18 @@ export type PlexusValueArray<T> = {
 }
 
 // Singleton argument
-export function usePlexus<V extends WatchableValue<any> | PlexusCollectionGroup<any>>(deps: V): PlexusValue<V>
+export function usePlexus<V extends WatchableValue | PlexusCollectionGroup>(deps: V): PlexusValue<V>
 // array argument
-export function usePlexus<V extends (WatchableValue<any> | PlexusCollectionGroup<any>)[]>(deps: V | []): PlexusValueArray<V>
+export function usePlexus<V extends (WatchableValue | PlexusCollectionGroup)[]>(deps: V | []): PlexusValueArray<V>
 /**
  * A react hook to extract the values from plexus objects and reactively update the component and value when the values change
  * @param deps A list of plexus watchable objects (ex. State, Group, Selector, Computed)
  * @returns
  */
-export function usePlexus<V extends WatchableValue<any>[]>(deps: V | [] | WatchableValue): PlexusValue<V> | PlexusValueArray<V> {
+export function usePlexus<V extends WatchableValue[]>(deps: V | [] | WatchableValue): PlexusValue<V> | PlexusValueArray<V> {
 	const [_, set] = useState({})
 
-	const depsArr = normalizeDeps(deps) as PlexusValueArray<V>
+	const depsArr = normalizeDeps(deps)
 
 	useEffect(() => {
 		if (Array.isArray(depsArr)) {
