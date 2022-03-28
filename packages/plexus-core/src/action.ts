@@ -3,15 +3,13 @@ export interface PlexusActionHelpers {
 	 * Add a new error handler to this action. This will catch any errors that occur during the execution of this action and prevent a crash.
 	 * @param handler? A function that will be called when an error occurs, omit to fail silently.
 	 */
-	onCatch(handler?: (error: any) => void): void
+	onCatch(handler?: (error: any) => unknown): void
 }
 
 type FunctionType = (helpers: PlexusActionHelpers, ...args: any) => any
-type InnerFunction<ReturnData extends FunctionType> = ReturnData extends (
-	helpers: PlexusActionHelpers,
-	...args: infer Params
-) => ReturnType<ReturnData>
-	? (...args: Params) => ReturnType<ReturnData>
+
+type InnerFunction<ResultFn extends FunctionType> = ResultFn extends (helpers: PlexusActionHelpers, ...args: infer Params) => ReturnType<ResultFn>
+	? (...args: Params) => ReturnType<ResultFn>
 	: never
 
 // export type PlexusAction = <ReturnData=FunctionType>(fn: FunctionType) => (...args: any) => ReturnData | Promise<ReturnData>
@@ -23,13 +21,13 @@ export type PlexusAction = typeof action
  * @param fn The Plexus action function to run
  * @returns The intended return value of fn, or null if an error is caught
  */
-export function action<Type extends FunctionType = FunctionType>(fn: Type) {
+export function action<Fn extends FunctionType = FunctionType>(fn: Fn) {
 	const _internalStore = {
-		_errorHandlers: new Set<(error: any) => void>(),
+		_errorHandlers: new Set<(error: any) => unknown>(),
 	}
 
 	const helpers: PlexusActionHelpers = Object.freeze({
-		onCatch: (handler: (error: any) => void = () => {}) => {
+		onCatch: (handler: (error: any) => unknown = () => {}) => {
 			_internalStore._errorHandlers.add(handler)
 		},
 	})
@@ -47,7 +45,7 @@ export function action<Type extends FunctionType = FunctionType>(fn: Type) {
 				return null
 			}
 		}
-		return newAction as InnerFunction<Type>
+		return newAction as InnerFunction<Fn>
 	} else if (fn.constructor.name === "AsyncFunction") {
 		const newAction = async (...args) => {
 			try {
@@ -61,9 +59,9 @@ export function action<Type extends FunctionType = FunctionType>(fn: Type) {
 				return null
 			}
 		}
-		return newAction as InnerFunction<Type>
+		return newAction as InnerFunction<Fn>
 	} else {
 		console.warn("%cPlexus WARN:%c An action must be of type Function.", "color: #f00;", "color: #FFF;")
-		return () => {}
+		throw new Error("An action must be of type Function.")
 	}
 }
