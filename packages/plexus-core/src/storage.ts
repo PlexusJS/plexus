@@ -52,50 +52,57 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 			return
 		}
 		instance()._runtime.log("info", `Retrieving value for key ${getKey(key)}`)
-		const val = convertStringToType(getLocalStorage().getItem(getKey(key)))
-		return val
+		const val = getLocalStorage()?.getItem(getKey(key))
+		if (typeof val === "string" && convertStringToType(val)) {
+			return convertStringToType(val)
+		} else return null
 	}
 
 	const set = (key: string, value: any): void => {
 		// try to run with localstorage
-		if (getLocalStorage() === null) {
+		const ls = getLocalStorage()
+		if (ls === null) {
 			instance()._runtime.log("warn", "No localstorage available, cannot persist in storage")
 			return
 		}
 
 		if (isObject(value)) {
-			getLocalStorage().setItem(getKey(key), JSON.stringify(value))
+			ls.setItem(getKey(key), JSON.stringify(value))
 		} else if (Array.isArray(value)) {
-			getLocalStorage().setItem(getKey(key), JSON.stringify(Object.values<typeof value>(value)))
+			ls.setItem(getKey(key), JSON.stringify(Object.values<typeof value>(value)))
 		} else {
-			getLocalStorage().setItem(getKey(key), String(value))
+			ls.setItem(getKey(key), String(value))
 		}
 	}
 
 	const patch = (key: string, value: any): void => {
 		// try to run with localstorage
-		if (getLocalStorage() === null) {
+		const ls = getLocalStorage()
+		if (ls === null) {
 			instance()._runtime.log("warn", "No localstorage available, cannot set value to storage")
 			return
 		}
+		const item = ls.getItem(key)
+		if (!item) {
+			instance()._runtime.log("warn", "Item in storage does not exist, cannot patch")
+			return
+		}
 		if (isObject(value)) {
-			getLocalStorage().setItem(getKey(key), JSON.stringify(deepMerge(getLocalStorage().getItem(key), value)))
+			ls.setItem(getKey(key), JSON.stringify(deepMerge(ls.getItem(key), value)))
 		} else if (Array.isArray(value)) {
-			getLocalStorage().setItem(
-				getKey(key),
-				JSON.stringify(Object.values<typeof value>(deepMerge(JSON.parse(getLocalStorage().getItem(key)), value)))
-			)
+			ls.setItem(getKey(key), JSON.stringify(Object.values<typeof value>(deepMerge(JSON.parse(item), value))))
 		} else {
-			getLocalStorage().setItem(getKey(key), String(value))
+			ls.setItem(getKey(key), String(value))
 		}
 	}
 	const remove = (key: string): void => {
 		// try to run with localstorage
-		if (getLocalStorage() === null) {
+		const ls = getLocalStorage()
+		if (ls === null) {
 			instance()._runtime.log("warn", "No localstorage available, cannot remove value from storage")
 			return
 		}
-		getLocalStorage().removeItem(getKey(key))
+		ls.removeItem(getKey(key))
 	}
 
 	const store = Object.freeze({
@@ -116,7 +123,7 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 			let storedValue = this.get(key)
 			instance()._runtime.log("info", `Persisting new key ${key}`, JSON.stringify(this.watching))
 			if (!storedValue) {
-				instance().storage.set(key, object.value)
+				instance().storage?.set(key, object.value)
 			}
 
 			// instance()._runtime.log("info", `Trying to apply persisted value ${storedValue}`)
@@ -129,14 +136,14 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 		sync() {
 			instance()._runtime.log("info", "Syncing storage storage...")
 			_internalStore.tracking.forEach((object) => {
-				let key: string
+				let key: string | null = null
 				if (typeof object.key === "string") {
 					key = object.key
 				} else if (typeof object.name === "string") {
 					key = object.name
 				}
 
-				if (key === "" || key === undefined) {
+				if (key === "" || key === undefined || key === null) {
 					instance()._runtime.log("warn", `Can't sync an object with no key`)
 					return
 				}
@@ -155,6 +162,6 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 			})
 		},
 	})
-	instance()._storages.set(name, store)
+	instance()._storages.set(_internalStore._name, store)
 	return store
 }

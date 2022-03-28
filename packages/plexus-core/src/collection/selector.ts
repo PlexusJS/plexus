@@ -1,14 +1,14 @@
 import { PlexusCollectionInstance } from ".."
 import { PlexusInstance } from "../instance"
-import { PlexusWatcher, WatchableValue } from "../interfaces"
+import { PlexusWatcher } from "../interfaces"
 
 import { DataKey, PlexusDataInstance } from "./data"
 export type SelectorName = string
 export interface PlexusCollectionSelector<ValueType extends Record<string, any> = Record<string, any>> {
 	/**
-	 * The key of a data item assigned to this selecor
+	 * The key of a data item assigned to this selector
 	 */
-	get key(): DataKey
+	get key(): DataKey | null
 	/**
 	 * Select an item in the collection
 	 * @param key The key to select
@@ -44,7 +44,7 @@ export function _selector<ValueType extends Record<string, any> = Record<string,
 ): PlexusCollectionSelector<ValueType> {
 	const _internalStore = {
 		_name: name,
-		_key: null,
+		_key: null as DataKey | null,
 		_collectionId: collection().name,
 	}
 
@@ -56,22 +56,23 @@ export function _selector<ValueType extends Record<string, any> = Record<string,
 			_internalStore._key = key
 		},
 		set(value: ValueType, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
-			this.data.set(value, config)
+			// TODO add a warning here if the key is not set
+			this.data?.set(value, config)
 		},
 		get value() {
 			if (_internalStore._key === null) {
 				return null
 			}
-			return collection().getItemValue(_internalStore._key)
+			return collection().getItemValue(_internalStore._key) || null
 		},
 		get data() {
 			if (_internalStore._key === null) {
 				return null
 			}
-			return collection().getItem(_internalStore._key)
+			return collection().getItem(_internalStore._key) || null
 		},
 		watch(callback: PlexusWatcher<ValueType>) {
-			return this.data.watch(callback)
+			return this.data?.watch(callback) || (() => {})
 		},
 	}
 }

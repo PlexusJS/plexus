@@ -1,11 +1,5 @@
-import {
-	PlexusCollectionGroup,
-	PlexusStateInstance,
-	state,
-	PlexusCollectionSelector,
-	PlexusComputedStateInstance,
-	instance,
-} from "@plexusjs/core/dist"
+import { PlexusCollectionGroup } from "@plexusjs/core"
+import { AlmostAnything } from "@plexusjs/core/dist/helpers"
 import { isWatchable, WatchableValue } from "@plexusjs/core/dist/interfaces"
 import { useEffect, useState } from "react"
 
@@ -43,18 +37,17 @@ export function usePlexus<V extends WatchableValue<any>[]>(deps: V | [] | Watcha
 			}
 			// unsubscribe on component destroy
 			return () => {
-				for (let unsub of depUnsubs) {
+				for (let unsub of Array.from(depUnsubs.values())) {
 					unsub()
 					depUnsubs.delete(unsub)
 				}
 			}
 		}
 	}, [])
-
+	// The "!" at the end of the values here tell the tsc that these values will never be "undefined"
 	if (!Array.isArray(deps) && depsArr.length === 1) {
-		return depsArr[0].value as PlexusValue<V>
+		return depsArr[0].value!
 	}
 
-	// TODO: dependency array is not returning the correct types per index; This must be fixed before release
-	return depsArr.map((dep) => dep.value) as PlexusValueArray<V>
+	return depsArr.map((dep) => dep.value!) as PlexusValueArray<V>
 }

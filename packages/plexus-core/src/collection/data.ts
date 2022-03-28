@@ -32,7 +32,11 @@ export interface PlexusDataInstance<TypeValue> {
 
 export type DataKey = string | number
 
-export function _data<Value extends Record<string, any>>(instance: () => PlexusInstance, primaryKey: string, value: Value): PlexusDataInstance<Value> | null {
+export function _data<Value extends Record<string, any>>(
+	instance: () => PlexusInstance,
+	primaryKey: string,
+	value: Value
+): PlexusDataInstance<Value> | null {
 	const _internalStore = {
 		_key: value[primaryKey],
 		primaryKey,
@@ -64,7 +68,7 @@ export function _data<Value extends Record<string, any>>(instance: () => PlexusI
 				instance()._states.delete(_internalStore._state)
 				// delete _internalStore._state
 			},
-			watch(callback?: PlexusWatcher<Value>) {
+			watch(callback: PlexusWatcher<Value>) {
 				return _internalStore._state.watch(callback)
 			},
 		}

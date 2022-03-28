@@ -19,18 +19,19 @@ export class EventEngine {
 			this.events.set(eventId, [])
 		}
 
-		this.events.get(eventId).push(eventWatcher)
+		this.events.get(eventId)?.push(eventWatcher)
 		return () => this.removeListener(eventId, eventWatcher)
 	}
 	removeListener(eventId: string | number, eventWatcher: EngineEventReceiver) {
 		if (!this.events.has(eventId)) {
 			return
 		}
-		const idx = this.events.get(eventId).indexOf(eventWatcher)
-		if (idx > -1) {
-			this.events.set(eventId, [...this.events.get(eventId).splice(0, idx - 1), ...this.events.get(eventId).splice(idx + 1)])
+		const idx = this.events.get(eventId)?.indexOf(eventWatcher)
+		const eventWatchers = this.events.get(eventId)
+		if (eventWatchers && idx && idx > -1) {
+			this.events.set(eventId, [...eventWatchers.splice(0, idx - 1), ...eventWatchers.splice(idx + 1)])
 		}
-		if (this.events.get(eventId).length === 0) {
+		if (this.events.get(eventId)?.length === 0) {
 			this.events.delete(eventId)
 		}
 	}
@@ -38,7 +39,7 @@ export class EventEngine {
 		if (!this.events.has(eventId)) {
 			return
 		}
-		this.events.get(eventId).forEach((callbackObj) => callbackObj.listener(args))
+		this.events.get(eventId)?.forEach((callbackObj) => callbackObj.listener(args))
 	}
 	once(eventId: string | number, eventWatcher: EngineEventReceiver) {
 		const remove = this.on(eventId, (...args) => {

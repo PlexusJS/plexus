@@ -1,8 +1,6 @@
-import { classPrivateMethod } from "@babel/types"
-import { deepClone } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { isWatchable, Watchable } from "./interfaces"
-import { PlexusStateType, _state, PlexusStateInstance } from "./state"
+import { PlexusStateType, _state } from "./state"
 export interface PlexusComputedStateInstance<ValueType extends PlexusStateType = any> {
 	/**
 	 * The value (reactive) of the state

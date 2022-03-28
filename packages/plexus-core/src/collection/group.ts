@@ -48,7 +48,7 @@ export function _group<DataType = any>(
 	collection: () => PlexusCollectionInstance<DataType>,
 	name: string,
 	config?: PlexusCollectionGroupConfig<DataType>
-) {
+): PlexusCollectionGroup<DataType> {
 	const _internalStore = {
 		addWhen: config?.addWhen || (() => false),
 		_name: name,
@@ -66,15 +66,14 @@ export function _group<DataType = any>(
 		_internalStore._watcherDestroyers.forEach((destroyer) => destroyer())
 		_internalStore._watcherDestroyers.clear()
 
-		Array.from(_internalStore._includedKeys).forEach((key) =>
-			_internalStore._watcherDestroyers.add(
-				collection()
-					.getItem(key)
-					.watch(() => {
-						runWatchers()
-					})
-			)
-		)
+		Array.from(_internalStore._includedKeys).forEach((key) => {
+			const destroyer = collection()
+				.getItem(key)
+				?.watch(() => {
+					runWatchers()
+				})
+			if (destroyer) _internalStore._watcherDestroyers.add(destroyer)
+		})
 	}
 
 	return Object.freeze({
@@ -100,7 +99,7 @@ export function _group<DataType = any>(
 		get data() {
 			return Array.from(_internalStore._includedKeys).map((key) => collection().getItem(key))
 		},
-		watch(callback?: PlexusWatcher<DataType[]>) {
+		watch(callback: PlexusWatcher<DataType[]>) {
 			// const destroyers = this.data.map((data) => data.watch(callback))
 			_internalStore._watchers.add(callback)
 			const destroyer = () => {
@@ -109,5 +108,5 @@ export function _group<DataType = any>(
 			}
 			return destroyer
 		},
-	})
+	} as PlexusCollectionGroup<DataType>)
 }

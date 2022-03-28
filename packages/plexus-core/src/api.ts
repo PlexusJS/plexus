@@ -9,7 +9,7 @@ export interface PlexusApiRes<DataType = any> {
 	status: number
 	response: ResponseInit
 	rawData: any
-	data: DataType
+	data: DataType | null
 }
 export interface PlexusApi {
 	/**
@@ -75,11 +75,16 @@ export interface PlexusApi {
 }
 export function api(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }): PlexusApi {
 	const _internalStore = {
-		_options: deepClone(config.options),
+		_options: { headers: {}, ...config.options } as RequestInit & { headers: Record<string, string> },
+		_optionsInit: { headers: {}, ...config.options } as RequestInit & { headers: Record<string, string> },
 		_timeout: config.timeout || undefined,
 		_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 		_noFetch: false,
 		_authToken: "",
+	}
+
+	if (_internalStore._options.headers === undefined) {
+		_internalStore._options.headers = {}
 	}
 	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
 		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: {}, data: null }
@@ -89,6 +94,9 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		// }
 		if (_internalStore._options.method === undefined) {
 			_internalStore._options.method = "GET"
+		}
+		if (_internalStore._options.headers === undefined) {
+			_internalStore._options.headers = {}
 		}
 		if (_internalStore._options.headers["Content-Type"] === undefined) {
 			if (_internalStore._options.body !== undefined) {
@@ -101,7 +109,8 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		let timedOut = false
 		let res: Response | undefined
 		try {
-			const uri = path.match(/^http(s)?/g)?.length > 0 ? path : `${_internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
+			const matches = path.match(/^http(s)?/g)
+			const uri = matches && matches?.length > 0 ? path : `${_internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
 			if (_internalStore._timeout) {
 				// res = await
 				let to: any
@@ -138,15 +147,21 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 				status: 500,
 				response: {},
 				rawData: null,
-				data,
+				data: null,
 			}
 		}
 
-		if (res.status >= 200 && res.status < 400) {
-			if (_internalStore._options.headers["Content-Type"] === "application/json" || _internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded") {
+		if (res.status >= 200 && res.status < 600) {
+			const text = await res.text()
+			if (
+				_internalStore._options.headers["Content-Type"] === "application/json" ||
+				_internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded"
+			) {
 				data = (await res.json()) as ResponseDataType
+				rawData = text as any as ResponseDataType
 			} else {
-				rawData = (await res.text()) as any as ResponseDataType
+				rawData = text as any as ResponseDataType
+				data = text as any as ResponseDataType
 			}
 
 			return {
@@ -159,30 +174,27 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			return {
 				status: res.status,
 				response: res,
-				rawData,
-				data,
+				rawData: null,
+				data: null,
 			}
 		}
 	}
 
 	try {
-		if (fetch) {
-		}
+		fetch
 	} catch (e) {
 		instance()._runtime.log("warn", "Fetch is not supported in this environment; api will not work.")
 		_internalStore._noFetch = true
 	}
 
 	return Object.freeze({
-		options: function (options?: RequestInit, overwrite: boolean = false) {
+		options: function (options: RequestInit, overwrite: boolean = false) {
 			if (overwrite) {
-				_internalStore._options = deepClone(options)
+				_internalStore._options = deepClone(options) as RequestInit & { headers: Record<string, string> }
 				return this as PlexusApi
 			}
 
-			// if(!options && !overwrite) return deepClone(_internalStore._options)
-
-			_internalStore._options = deepMerge(_internalStore._options, options)
+			_internalStore._options = deepMerge(_internalStore._options, options) as RequestInit & { headers: Record<string, string> }
 			this.headers()
 			return this as PlexusApi
 			if (_internalStore._noFetch) return this
@@ -201,7 +213,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 				body = JSON.stringify(body)
 			}
 			_internalStore._options.body = body
-			if (_internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded") {
+			if (_internalStore._options.headers && _internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded") {
 				const params = new URLSearchParams(body)
 				return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
 			} else {
@@ -253,7 +265,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			return this
 		},
 		headers(headers?: Record<string, any>) {
-			if (!_internalStore._options.headers) _internalStore._options.headers = {} as HeadersInit
+			if (!_internalStore._options.headers) _internalStore._options.headers = {}
 			if (_internalStore._noFetch) return this as PlexusApi
 			const temp: Record<string, any> = {}
 			Object.entries(headers || _internalStore._options.headers).map(([key, value]) => {
@@ -269,11 +281,11 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 			return this as PlexusApi
 		},
 		reset() {
-			_internalStore._options = deepClone(config.options)
+			_internalStore._options = deepClone(_internalStore._optionsInit) || {}
 			return this as PlexusApi
 		},
 		get config() {
-			return deepClone(_internalStore._options || {})
+			return deepClone(_internalStore._options || { headers: {} })
 		},
 	}) as PlexusApi
 }

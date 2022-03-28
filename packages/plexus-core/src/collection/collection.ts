@@ -1,6 +1,3 @@
-// import { PlexusInstance, PxStateType } from '../interfaces';
-import { PlexusStateInstance, state } from ".."
-import { convertToString, hash } from "../helpers"
 import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
 
@@ -45,13 +42,13 @@ export interface PlexusCollectionInstance<
 	 * @param key
 	 * @returns
 	 */
-	getItem(key: DataKey): PlexusDataInstance<DataType>
+	getItem(key: DataKey): PlexusDataInstance<DataType> | undefined
 	/**
 	 * Get the value of an item in the collection
 	 * @param key The key of the item to get
 	 * @returns The value of the item
 	 */
-	getItemValue(key: DataKey): DataType
+	getItemValue(key: DataKey): DataType | undefined
 	/**
 	 * Create a group with a name and a configuration
 	 * @param groupName The name of the group
@@ -113,7 +110,7 @@ export interface PlexusCollectionInstance<
 	 * @param name The Group Name to search for
 	 * @returns Either a Group Instance or undefined
 	 */
-	getSelector(name: string): undefined | PlexusCollectionSelector<DataType>
+	getSelector(name: string): PlexusCollectionSelector<DataType>
 	getSelector(name: KeyOfMap<Selectors>): PlexusCollectionSelector<DataType>
 
 	/**
@@ -207,20 +204,10 @@ export function _collection<
 	 * Helper Function; Mounts the collection to the instance
 	 */
 	const mount = () => {
-		// if (_internalStore._name === "") {
-		// 	instance()._runtime.log("warn", "Collection is not keyed, it will not be mounted to the instance")
-		// 	return
-		// }
-		// if (instance()._collections.has(_internalStore._name + "")) {
-		// 	instance()._collections.delete(_internalStore._name + "")
-		// }
-
-		// instance()._collections.set(_internalStore._name + "", collection)
-		// instance().storage.sync()
 		if (!instance()._collections.has(collection)) {
 			instance()._runtime.log("info", `Hoisting collection ${_internalStore._internalId} to instance`)
 			instance()._collections.add(collection)
-			instance().storage.sync()
+			instance().storage?.sync()
 		}
 	}
 
@@ -248,7 +235,7 @@ export function _collection<
 					if (item[_internalStore._key] !== undefined && item[_internalStore._key] !== null) {
 						// if there is already a state for that key, update it
 						if (_internalStore._data.has(item[_internalStore._key])) {
-							_internalStore._data.get(item[_internalStore._key]).set(item)
+							_internalStore._data.get(item[_internalStore._key])?.set(item)
 						}
 						// if there is no state for that key, create it
 						else {
@@ -257,14 +244,14 @@ export function _collection<
 								_internalStore._data.set(item[_internalStore._key], datainstance)
 							}
 						}
-						this.addToGroups(item[_internalStore._key], groups)
+						if (groups) this.addToGroups(item[_internalStore._key], groups)
 					}
 				}
 			} else {
 				if (data[_internalStore._key] !== undefined && data[_internalStore._key] !== null) {
 					// if there is already a state for that key, update it
 					if (_internalStore._data.has(data[_internalStore._key])) {
-						_internalStore._data.get(data[_internalStore._key]).set(data)
+						_internalStore._data.get(data[_internalStore._key])?.set(data)
 					}
 					// if there is no state for that key, create it
 					else {
@@ -273,7 +260,7 @@ export function _collection<
 							_internalStore._data.set(data[_internalStore._key], datainstance)
 						}
 					}
-					this.addToGroups(data[_internalStore._key], groups)
+					if (groups) this.addToGroups(data[_internalStore._key], groups)
 				}
 			}
 		},
@@ -281,13 +268,13 @@ export function _collection<
 		update(key: DataKey, data: Partial<DataType>, config: { deep: boolean } = { deep: true }) {
 			if (config.deep) {
 				if (_internalStore._data.has(key)) {
-					_internalStore._data.get(key).set({ ...data, [_internalStore._key]: key } as DataType, { mode: "patch" })
+					_internalStore._data.get(key)?.set({ ...data, [_internalStore._key]: key } as DataType, { mode: "patch" })
 				} else {
 					console.warn("no data found for key", key)
 				}
 			} else {
 				if (_internalStore._data.has(key)) {
-					_internalStore._data.get(key).set(data as DataType, { mode: "replace" })
+					_internalStore._data.get(key)?.set(data as DataType, { mode: "replace" })
 				} else {
 					console.warn("no data found for key", key)
 				}
@@ -299,7 +286,7 @@ export function _collection<
 		},
 
 		getItemValue(key: DataKey) {
-			return this.getItem(key).value
+			return this.getItem(key)?.value
 		},
 
 		/// SELECTORS
@@ -328,10 +315,17 @@ export function _collection<
 			return this as any
 		},
 		getSelector(name: KeyOfMap<Selectors> | string) {
-			if (isCreatedSelector(name)) {
-				return _internalStore._selectors.get(name)
+			const selector = _internalStore._selectors.get(name)
+			if (isCreatedSelector(name) && selector) {
+				return selector
 			} else {
-				return undefined
+				const s = _selector(
+					() => instance(),
+					() => this,
+					name
+				)
+				_internalStore._selectors.set(name as GroupName, s)
+				return s
 			}
 		},
 
@@ -367,7 +361,9 @@ export function _collection<
 		},
 		getGroup(name: KeyOfMap<Groups> | string) {
 			if (isCreatedGroup(name)) {
-				return _internalStore._groups.get(name)
+				const group = _internalStore._groups.get(name) as PlexusCollectionGroup<DataType>
+
+				return group
 			} else {
 				const g = _group(
 					() => instance(),
@@ -418,19 +414,22 @@ export function _collection<
 			}
 		},
 		watchGroup(name: KeyOfMap<Groups> | string, callback: PlexusWatcher<DataType[]>) {
-			if (isCreatedGroup(name)) {
-				return _internalStore._groups.get(name).watch(callback)
+			const group = this.getGroup(name)
+			if (isCreatedGroup(name) && group) {
+				return group.watch(callback)
 			} else {
+				// TODO Replace with runtime log
 				console.warn("no group found for name", name)
+				return () => {}
 			}
 		},
 
 		delete(keys: DataKey | DataKey[]) {
 			const rm = (key) => {
-				_internalStore._data.get(key).delete()
+				_internalStore._data.get(key)?.delete()
 
 				for (let groupName of this.getGroupsOf(key)) {
-					_internalStore._groups.get(groupName).remove(key)
+					_internalStore._groups.get(groupName)?.remove(key)
 				}
 				_internalStore._data.delete(key)
 			}
@@ -445,7 +444,7 @@ export function _collection<
 			const rm = (key) => {
 				if (Array.isArray(groups)) {
 					for (let groupName of this.getGroupsOf(key)) {
-						_internalStore._groups.get(groupName).remove(key)
+						_internalStore._groups.get(groupName)?.remove(key)
 					}
 				}
 			}
@@ -482,7 +481,14 @@ export function _collection<
 		get groupsValue() {
 			const groups: Record<KeyOfMap<Groups>, DataType[]> = {} as Record<KeyOfMap<Groups>, DataType[]>
 			for (let group of _internalStore._groups.entries()) {
-				groups[group[0] as KeyOfMap<Groups>] = Array.from(group[1].index).map((key) => _internalStore._data.get(key).value)
+				const keys = Array.from(group[1].index)
+				for (let key in keys) {
+					const data = _internalStore._data.get(key)
+					if (!groups[group[0] as KeyOfMap<Groups>]) groups[group[0] as KeyOfMap<Groups>] = []
+					if (data) {
+						groups[group[0] as KeyOfMap<Groups>].push(data.value)
+					}
+				}
 			}
 			return groups
 		},
@@ -499,7 +505,7 @@ export function _collection<
 		get selectorsValue() {
 			const selectors: Record<KeyOfMap<Selectors>, DataType> = {} as Record<KeyOfMap<Selectors>, DataType>
 			for (let selector of _internalStore._selectors.entries()) {
-				selectors[selector[0] as KeyOfMap<Selectors>] = selector[1].value
+				if (selector[1].value) selectors[selector[0] as KeyOfMap<Selectors>] = selector[1].value
 			}
 			return selectors
 		},

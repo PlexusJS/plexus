@@ -118,12 +118,16 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 			if (typeof typeOrCallback === "function" && _callback === undefined) {
 				_callback = typeOrCallback
 			}
+			if (_callback === undefined && typeof typeOrCallback === "string") {
+				this.log("warn", `Missing a subscription function; skipping assignment`)
+				return
+			}
 			this.log("info", `Subscribing ${type} change for ${_key}`)
 			function callback(data: { key: string; value: Value }) {
 				const { key, value } = data
 
 				if (_key === key) {
-					_callback(value)
+					_callback?.(value)
 				}
 			}
 

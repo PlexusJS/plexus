@@ -16,9 +16,9 @@ export interface PlexusInstance {
 	_collections: Set<PlexusCollectionInstance>
 	settings: Partial<PlexusInstanceConfig>
 	get storageEngine(): string | undefined
-	set storageEngine(name: string)
+	set storageEngine(name: string | undefined)
 	_storages: Map<string, PlexusStorageInstance>
-	get storage(): PlexusStorageInstance
+	get storage(): PlexusStorageInstance | undefined
 }
 
 interface PlexusInstanceConfig {
@@ -68,7 +68,7 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 		const _internalStore = {
 			_nonce: 0,
 			_id: config?.instanceId || ``,
-			_selectedStorage: undefined,
+			_selectedStorage: undefined as string | undefined,
 			_settings: { ...config },
 			_ready: false,
 		}
@@ -94,11 +94,14 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 			get storageEngine() {
 				return _internalStore._selectedStorage
 			},
-			set storageEngine(name: string) {
-				_internalStore._selectedStorage = name
+			set storageEngine(name: string | undefined) {
+				if (name) {
+					_internalStore._selectedStorage = name
+				}
 			},
 			get storage() {
-				return getPlexusInstance(_internalStore._id)._storages.get(getPlexusInstance(_internalStore._id).storageEngine)
+				const storageName = getPlexusInstance(_internalStore._id).storageEngine
+				if (storageName) return getPlexusInstance(_internalStore._id)._storages.get(storageName)
 			},
 			genNonce() {
 				_internalStore._nonce += 1

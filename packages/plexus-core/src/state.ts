@@ -1,11 +1,11 @@
-import { convertToString, deepClone, deepMerge, hash, isObject } from "./helpers"
+import { AlmostAnything, convertToString, deepClone, deepMerge, hash, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { PlexusWatcher } from "./interfaces"
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
-export type PlexusStateType = Object | Array<unknown> | string | number | boolean | null | undefined
+export type PlexusStateType = AlmostAnything | null
 export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, input: PxStateValue) => PlexusStateInstance<PxStateValue>
 
-export interface PlexusStateInstance<Value = any> {
+export interface PlexusStateInstance<Value extends PlexusStateType = any> {
 	/**
 	 * The value of the state
 	 */
@@ -90,7 +90,7 @@ type DestroyFn = () => void
 
 export interface PlexStateInternalStore<Value> {
 	_initialValue: Value
-	_lastValue: Value | null
+	_lastValue: Value
 	_value: Value
 	_nextValue: Value
 	_watchers: Map<number | string, DestroyFn>
@@ -105,7 +105,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 	// props //
 	const _internalStore: PlexStateInternalStore<StateValue> = {
 		_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-		_nextValue: null,
+		_nextValue: _init,
 		_value: _init,
 		_initialValue: _init,
 		_lastValue: _init,
@@ -121,7 +121,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 		if (!instance()._states.has(state)) {
 			instance()._runtime.log("info", `Hoisting state ${_internalStore._internalId} with value ${_internalStore._value} to instance`)
 			instance()._states.add(state)
-			instance().storage.sync()
+			instance().storage?.sync()
 		}
 	}
 	const removeWatcher = (key: string | number) => {
@@ -153,7 +153,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			_internalStore._nextValue = deepClone(_internalStore._value)
 
 			// update the runtime conductor
-			if (_internalStore._persist) instance().storage.set(_internalStore._name, _internalStore._value)
+			if (_internalStore._persist) instance().storage?.set(_internalStore._name, _internalStore._value)
 			mount()
 			instance()._runtime.broadcast(_internalStore._internalId, "state", value)
 		},
@@ -169,7 +169,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 			} else {
 				this.set(value)
 			}
-			if (_internalStore._persist) instance().storage.set(_internalStore._name, _internalStore._value)
+			if (_internalStore._persist) instance().storage?.set(_internalStore._name, _internalStore._value)
 		},
 
 		watch(keyOrCallback: string | number | PlexusWatcher<StateValue>, callback?: PlexusWatcher<StateValue>): () => void {
@@ -209,7 +209,7 @@ export function _state<StateValue extends PlexusStateType>(instance: () => Plexu
 				// 	instance()._runtime.log("info", "apply persisted value")
 				// 	this.set(storedValue)
 				// }
-				instance().storage.monitor(_internalStore._name, this)
+				instance().storage?.monitor(_internalStore._name, this)
 				_internalStore._persist = true
 			}
 			return this

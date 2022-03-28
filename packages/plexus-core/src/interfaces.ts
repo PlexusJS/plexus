@@ -5,7 +5,7 @@ export type PlexusRuntime = ReturnType<typeof _runtime>
 export type PlexusEvent = ReturnType<typeof _event>
 export type PlexusWatcher<V extends any = any> = (value: V) => void
 
-export type Watchable = { [key: string | number]: any } & {
+export type Watchable<V extends any=any> = { [key: string | number]: any } & {
 	watch<V extends any = any>(callback: PlexusWatcher<V>): () => void
 	name?: string
 	key?: string | number | ((key: string) => unknown)

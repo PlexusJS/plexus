@@ -28,33 +28,32 @@ export function deepMerge<Thing extends Object>(target: Thing, source: Thing): T
 }
 
 // a deep clone of anything
-export function deepClone<Type = AlmostAnything>(obj: Type): Type {
-	if (obj === null || typeof obj !== "object") {
-		return obj
+export function deepClone<Type = AlmostAnything>(thing: Type): Type {
+	if (thing instanceof Date) {
+		return new Date(thing.getTime()) as any as Type
 	}
-	if (obj instanceof Date) {
-		return new Date(obj.getTime()) as any as Type
-	}
-	if (obj instanceof RegExp) {
-		return new RegExp(obj) as any as Type
+	if (thing instanceof RegExp) {
+		return new RegExp(thing) as any as Type
 	}
 	// must be an object
-
-	const cloned: Type = Object.create(obj as Object)
-	for (const key in obj) {
-		if (obj.hasOwnProperty(key)) {
-			cloned[key] = deepClone(obj[key])
+	if (typeof thing === "object") {
+		const cloned: Type = Object.create(thing as Object)
+		for (const key in thing) {
+			if ((thing as Object).hasOwnProperty(key)) {
+				cloned[key] = deepClone(thing[key])
+			}
 		}
+		if (Array.isArray(thing)) {
+			return Object.values(cloned) as any as Type
+		}
+		// if it was originally an array, return an array
+		if (Array.isArray(thing)) {
+			return Object.values(cloned) as any as Type
+		}
+		// if it was originally an object, return an object
+		return cloned
 	}
-	if (Array.isArray(obj)) {
-		return Object.values(cloned) as any as Type
-	}
-	// if it was originally an array, return an array
-	if (Array.isArray(obj)) {
-		return Object.values(cloned) as any as Type
-	}
-	// if it was originally an object, return an object
-	return cloned
+	return thing
 }
 
 export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
@@ -93,7 +92,6 @@ export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
 	}
 	return false
 }
-
 
 export const convertToString = (input: any) =>
 	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)

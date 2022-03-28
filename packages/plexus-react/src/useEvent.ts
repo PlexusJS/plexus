@@ -1,6 +1,5 @@
-import { PlexusEventInstance, event } from "@plexusjs/core"
-// import {  } from '@plexusjs/core/dist/interfaces';
-import { useEffect, useState } from "react"
+import { PlexusEventInstance } from "@plexusjs/core"
+import { useEffect } from "react"
 
 export type PlexusValue<T> = T extends PlexusEventInstance<infer U> ? U : never
 export type PlexusValueArray<T> = { [K in keyof T]: T[K] extends PlexusEventInstance<infer U> ? U : never }

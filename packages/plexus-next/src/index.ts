@@ -55,10 +55,7 @@ export function preserveServerState(
 	return nextData
 }
 
-export function loadServerState(
-	plexus?: PlexusInstance,
-	data: PlexusNextData = globalThis?.__NEXT_DATA__?.props?.pageProps?.PLEXUS_DATA
-) {
+export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = globalThis?.__NEXT_DATA__?.props?.pageProps?.PLEXUS_DATA) {
 	try {
 		if (!isServer()) return
 
@@ -82,9 +79,8 @@ export function loadServerState(
 							if (gKeys?.length > 0) {
 								const groups = collection.getGroup(gName)
 								for (const gk of gKeys) groups.add(gk)
-								const toCol = fromSSR.data.filter((d) =>
-									gKeys.includes(d[collection.config.primaryKey])
-								)
+								// TODO THIS IS A LAZY FIX, MUST BE PROPERLY FIXED
+								const toCol = fromSSR.data.filter((d) => gKeys.includes(d[collection.config.primaryKey || ""]))
 								for (const data of toCol) collection.collect(data, gName)
 							}
 						}
@@ -92,9 +88,11 @@ export function loadServerState(
 
 					if (fromSSR.data?.length > 0) collection.collect(fromSSR.data)
 
-					for (const key in fromSSR.selectors)
-						if (collection.selectors[key].key)
-							collection.selectors[key].select((fromSSR.selectors[key] as PlexusCollectionSelector).key)
+					for (const name in fromSSR.selectors) {
+						const selector = collection.selectors[name]
+						const SSRSelector = fromSSR.selectors[name] as PlexusCollectionSelector
+						if (selector.key && SSRSelector && SSRSelector.key) selector.select(SSRSelector.key)
+					}
 				}
 			}
 		}
