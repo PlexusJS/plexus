@@ -159,7 +159,11 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 				_internalStore._options.headers["Content-Type"] === "application/json" ||
 				_internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded"
 			) {
-				data = JSON.parse(text) as ResponseDataType
+				let parsed: ResponseDataType = {} as ResponseDataType
+				try {
+					parsed = JSON.parse(text) as ResponseDataType
+				} catch (e) {}
+				data = parsed ?? ({} as ResponseDataType)
 				rawData = text
 			} else {
 				rawData = text
