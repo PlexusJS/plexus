@@ -2,9 +2,9 @@
 	"name": "plexus",
 	"version": "1.0.0",
 	"repository": "git@github.com:plexusjs/plexus",
-	"author": "Nicolas Theck <contact@itsrems.com>",
+	"author": "Philippe Clesca <hello@philippec.me>",
 	"contributors": [
-		"Philippe Clesca <hello@philippec.me>"
+		"Nicolas Theck <contact@itsrems.com>"
 	],
 	"license": "MIT",
 	"private": true,
