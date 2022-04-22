@@ -1,5 +1,5 @@
-import { PlexusStateInstance, state } from '../src'
-import { instance } from '../src/instance';
+import { PlexusStateInstance, state } from "@plexusjs/core"
+import { instance } from "@plexusjs/core/src/instance"
 // import { PxState, PxStateInstance } from '../src/interfaces';
 let booleanState: PlexusStateInstance<boolean>,
  stringState: PlexusStateInstance<string>,

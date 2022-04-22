@@ -1,6 +1,6 @@
 import { collection, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core"
 import * as React from "react"
-import { usePlexus } from "../dist"
+import { usePlexus } from "../packages/plexus-react/dist"
 import * as renderer from "react-test-renderer"
 
 let myState: PlexusStateInstance<string>

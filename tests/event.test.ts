@@ -1,4 +1,4 @@
-import { api, PlexusApi, PlexusAction, event, state } from "../src"
+import { api, PlexusApi, PlexusAction, event, state } from "@plexusjs/core"
 // import { instance } from '../src/instance';
 // import { PlexusEvent, PxState, PxStateInstance } from '../src/interfaces';
 

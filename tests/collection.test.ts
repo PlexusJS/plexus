@@ -1,4 +1,4 @@
-import { collection, PlexusCollectionInstance } from "../src"
+import { collection, PlexusCollectionInstance } from "@plexusjs/core"
 
 let myCollection = collection<{ thing: string; id: number }>().createGroups(["group1"]).createSelectors(["main"])
 
@@ -18,9 +18,9 @@ describe("Testing Collection", () => {
 		expect(myCollection.value[2].thing).toBe("lols")
 
 		// can properly retrieve data values
-		expect(myCollection.getItemValue(0).thing).toBe("lol")
-		expect(myCollection.getItemValue(2).thing).toBe("lol3")
-		expect(myCollection.getItemValue(1).thing).toBe("lols")
+		expect(myCollection.getItemValue(0)?.thing).toBe("lol")
+		expect(myCollection.getItemValue(2)?.thing).toBe("lol3")
+		expect(myCollection.getItemValue(1)?.thing).toBe("lols")
 	})
 	test("Do Groups Work?", () => {
 		expect(myCollection.value.length).toBe(0)
@@ -53,14 +53,14 @@ describe("Testing Collection", () => {
 		expect(myCollection.groups.group1.value[0].id).toBe(5)
 
 		// if we try to change the key of an item, it should do nothing and fail silently
-		myCollection.groups.group1.data[0].set({ thing: "lol", id: 0 })
+		myCollection.groups.group1.data[0]?.set({ thing: "lol", id: 0 })
 		expect(myCollection.groups.group1.value[0].id).toBe(5)
 		// console.log(myCollection.getGroup('group1').value)
 
 		// we should be able to update a data item and see it in all places we can get the item (in the collection, in the groups, etc)
 		myCollection.update(5, { thing: "idk" })
 		// console.log(myCollection.getGroup('group1').value)
-		expect(myCollection.getItemValue(5).thing).toBe("idk")
+		expect(myCollection.getItemValue(5)?.thing).toBe("idk")
 		expect(myCollection.getGroup("group1")).toBeDefined()
 		expect(myCollection.getGroup("group1").value[0].thing).toBe("idk")
 	})
@@ -75,8 +75,8 @@ describe("Testing Collection", () => {
 		myCollection.getSelector("main").select(0)
 		console.log(myCollection.getSelector("main").key)
 		expect(myCollection.selectors.main.key).toBe(0)
-		expect(myCollection.getSelector("main").value.id).toBe(0)
-		expect(myCollection.getSelector("main").value.thing).toBe("lol")
+		expect(myCollection.getSelector("main").value?.id).toBe(0)
+		expect(myCollection.getSelector("main").value?.thing).toBe("lol")
 	})
 	test("Watching Groups", () => {
 		myCollection.collect([

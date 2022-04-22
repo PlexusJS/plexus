@@ -1,8 +1,10 @@
-import { instance, PlexusStateInstance, state } from "../src"
+"use strict"
+import { instance, PlexusStateInstance, state } from "@plexusjs/core"
 // import { PlexusState, PlexusStateInstance } from '../src/interfaces';
+type ObjectStateExample = Partial<{ a: { a?: boolean; b?: boolean }; b: boolean; c: { b?: boolean } }>
 let booleanState: PlexusStateInstance<boolean>,
 	stringState: PlexusStateInstance<string>,
-	objectState: PlexusStateInstance<Partial<{ a: { a?: boolean; b?: boolean }; b: boolean; c: { b?: boolean } }>>,
+	objectState: PlexusStateInstance<ObjectStateExample>,
 	arrayState: PlexusStateInstance<{ item?: string; item2?: { subitem?: string } }[]>,
 	nullState: PlexusStateInstance<null | boolean>
 
@@ -20,7 +22,7 @@ const initialValue = {
 beforeEach(() => {
 	booleanState = state(initialValue.boolean)
 	stringState = state(initialValue.string)
-	objectState = state<{ a?: { a?: boolean; b?: boolean }; b?: boolean; c?: { b?: boolean } }>(initialValue.object)
+	objectState = state<ObjectStateExample>(initialValue.object)
 	arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(initialValue.array)
 	nullState = state(initialValue.null)
 })
@@ -41,17 +43,17 @@ describe("Testing State Function", () => {
 		// check .set(value: object)
 		objectState.set({ a: { b: false } })
 		// check if the object is actually merged and children props do get overwritten
-		expect(objectState.value.a.b).toBe(false)
+		expect(objectState.value.a?.b).toBe(false)
 	})
 
 	test("Checking state().patch()", () => {
 		// can the object deep merge?
 		objectState.patch({ a: { b: false } })
-		expect(objectState.value.a.a).toBe(true)
+		expect(objectState.value.a?.a).toBe(true)
 		// check that other value is still there
 		expect(objectState.value.b).toBe(true)
 		// changed intended value
-		expect(objectState.value.a.b).toBe(false)
+		expect(objectState.value.a?.b).toBe(false)
 
 		// console.log(arrayState.value)
 		// check array deep merge
@@ -87,9 +89,9 @@ describe("Testing State Function", () => {
 		objectState.nextValue = { a: { b: true } }
 
 		// check if the object is actually merged and children props do get overwritten
-		expect(objectState.value.a.b).toBe(false)
+		expect(objectState.value.a?.b).toBe(false)
 		objectState.set()
-		expect(objectState.value.a.b).toBe(true)
+		expect(objectState.value.a?.b).toBe(true)
 		console.log(objectState.value, objectState.nextValue)
 		expect(objectState.nextValue).toStrictEqual(objectState.value)
 	})
