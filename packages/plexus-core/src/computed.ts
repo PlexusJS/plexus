@@ -1,155 +1,114 @@
 import { PlexusInstance } from "./instance"
-import { isWatchable, Watchable } from "./interfaces"
-import { PlexusStateType, _state } from "./state"
-export interface PlexusComputedStateInstance<ValueType extends PlexusStateType = any> {
-	/**
-	 * The value (reactive) of the state
-	 */
-	get value(): ValueType
-	/**
-	 * The previous value of the state
-	 */
-	get lastValue(): ValueType
-	/**
-	 * The name of the state (NOTE: set with the `.key()` function)
-	 */
-	get name(): string
-	get deps(): unknown[]
-	addDep(dep: Watchable | string): void
-	removeDep(dep: Watchable | string): void
-	/**
-	 * Persist the state to selected storage
-	 * @param name The storage prefix to use
-	 */
+import { PlexusStateType, StateInstance, _state } from "./state"
+import { WatchableValue } from "./watchable"
 
-	persist(name: string): void
+export type PlexusComputedStateInstance<ValueType extends PlexusStateType = any> = ComputedStateInstance<ValueType>
 
-	/**
-	 * Reset the state to the previous value
-	 */
-	undo(): void
-	/**
-	 * Reset the state to the initial value
-	 */
-	reset(): void
-	/**
-	 * Set the key of the state for internal tracking
-	 */
-	key(key: string): this
-}
-export function _computed<StateValue extends PlexusStateType>(instance: () => PlexusInstance, computeFn: () => StateValue, deps: Watchable[]) {
-	const _internalStore = {
-		_state: _state(() => instance(), computeFn()),
+export class ComputedStateInstance<ValueType extends PlexusStateType = any> {
+	private _internalStore: {
+		_state: StateInstance<ValueType>
 		// utilizing maps because it allows us to preform a lookup in O(1)
-		_depsDestroyers: new Map<string, ReturnType<Watchable["watch"]>>(),
-		_deps: new Map<string, Watchable>(deps.map((dep, i) => [dep.name || (typeof dep.key === "string" ? dep.key : `${i}`), dep])),
+		_depsDestroyers: Map<Dependency, ReturnType<WatchableValue<any>["watch"]>>
+		_deps: Set<WatchableValue<any>>
+	}
+	private instance: () => PlexusInstance
+	private computeFn: () => ValueType
+
+	constructor(instance: () => PlexusInstance, computeFn: () => ValueType, deps: WatchableValue<any>[]) {
+		this.instance = instance
+		this.computeFn = computeFn
+
+		this._internalStore = {
+			_state: _state(() => instance(), computeFn()),
+			// utilizing maps because it allows us to preform a lookup in O(1)
+			_depsDestroyers: new Map<Dependency, ReturnType<WatchableValue["watch"]>>(),
+			_deps: new Set(deps),
+		}
+		this.refreshDeps()
 	}
 
 	/**
 	 *  Internal Helper Function; for each dependency, add a watcher to the state that will update the computed state when a dependency changes
 	 * @internal
 	 * */
-	const refreshDeps = () => {
-		_internalStore._depsDestroyers.forEach((destroyer) => destroyer())
-		_internalStore._depsDestroyers.clear()
+	private refreshDeps() {
+		this._internalStore._depsDestroyers.forEach((destroyer) => destroyer())
+		this._internalStore._depsDestroyers.clear()
 
-		Array.from(_internalStore._deps.values()).forEach((dep, i) => {
+		Array.from(this._internalStore._deps.values()).forEach((dep, i) => {
 			const destroyer = dep.watch(() => {
-				const value = computeFn()
+				const value = this.computeFn()
 				// console.log(
 				// 	`${dep.name} changed; updating computed state to "${value}"; current value is "${_internalStore._state.value}"`,
 				// 	JSON.stringify(Array.from(_internalStore._deps.values()), null, 2)
 				// )
-				_internalStore._state.set(value)
+				this._internalStore._state.set(value)
 			})
-			_internalStore._depsDestroyers.set(dep.name || (typeof dep.key === "string" ? dep.key : `${i}`), destroyer)
+			this._internalStore._depsDestroyers.set(dep, destroyer)
 		})
 	}
 
 	/**
-	 * Internal Helper Function; get the value of the state
-	 * @internal
-	 * @param searchKey
-	 * @returns
+	 * The value (reactive) of the state
 	 */
-	const checkSearchKey = (searchKey: string): boolean => {
-		if (searchKey === "") {
-			instance()._runtime.log(
-				"warn",
-				`Computed state`,
-				_internalStore._state.name || "<NULL>",
-				`can't add a dependency with a key of "${searchKey}"`
-			)
-			return false
-		}
-		return true
+	get value(): ValueType {
+		return this._internalStore._state.value
+	}
+	/**
+	 * The previous value of the state
+	 */
+	get lastValue(): ValueType {
+		return this._internalStore._state.lastValue
+	}
+	/**
+	 * The name of the state (NOTE: set with the `.key()` function)
+	 */
+	get name(): string {
+		return this._internalStore._state.name
+	}
+	get deps() {
+		return Array.from(this._internalStore._deps.values())
+	}
+	addDep(dep: WatchableValue<any>): void {
+		this._internalStore._deps.add(dep)
+		this.refreshDeps()
+	}
+	removeDep(dep: WatchableValue<any>) {
+		this._internalStore._deps.delete(dep)
+		this.refreshDeps()
+	}
+	/**
+	 * Persist the state to selected storage
+	 * @param name The storage prefix to use
+	 */
+
+	persist(name: string) {
+		this._internalStore._state.persist(name)
 	}
 
-	const computed: PlexusComputedStateInstance<StateValue> = Object.freeze({
-		persist(name: string) {
-			_internalStore._state.persist(name)
-		},
-		undo() {
-			_internalStore._state.undo()
-		},
-		reset() {
-			_internalStore._state.reset()
-		},
-		get value() {
-			return _internalStore._state.value
-		},
-		get lastValue() {
-			return _internalStore._state.lastValue
-		},
-		get name() {
-			return _internalStore._state.name
-		},
-		key(key: string) {
-			_internalStore._state.key(key)
-			return this
-		},
-		get deps() {
-			return Array.from(_internalStore._deps.values())
-		},
-		addDep(dep: Watchable | string) {
-			let searchKey = ""
-			// TODO - add a warning the dep is already added
-			// TODO - add a warning the dep is not a watchable
-			if (isWatchable(dep)) {
-				searchKey = dep.name || (typeof dep.key === "string" ? dep.key : "")
-				if (checkSearchKey(searchKey)) {
-					return
-				}
-				_internalStore._deps.set(searchKey, dep)
-				refreshDeps()
-			} else if (typeof dep === "string") {
-				searchKey = dep
-			}
-
-			if (isWatchable(dep)) {
-			}
-		},
-		removeDep(dep: Watchable | string) {
-			let searchKey = ""
-			if (isWatchable(dep)) {
-				searchKey = dep.name || (typeof dep.key === "string" ? dep.key : "")
-			} else if (typeof dep === "string") {
-				searchKey = dep
-			}
-			if (checkSearchKey(searchKey)) {
-				return
-			}
-			if (_internalStore._deps.has(searchKey)) {
-				_internalStore._deps.delete(searchKey)
-				return
-			}
-			if (_internalStore._depsDestroyers.has(searchKey)) {
-				_internalStore._depsDestroyers.delete(searchKey)
-				return
-			}
-			refreshDeps()
-		},
-	})
-	refreshDeps()
-	return computed
+	/**
+	 * Reset the state to the previous value
+	 */
+	undo(): void {
+		this._internalStore._state.undo()
+	}
+	/**
+	 * Reset the state to the initial value
+	 */
+	reset(): void {
+		this._internalStore._state.reset()
+	}
+	/**
+	 * Set the key of the state for internal tracking
+	 */
+	key(key: string) {
+		this._internalStore._state.key(key)
+		return this
+	}
+}
+interface Dependency extends WatchableValue<any> {
+	[key: string]: any
+}
+export function _computed<StateValue extends PlexusStateType>(instance: () => PlexusInstance, computeFn: () => StateValue, deps: Dependency[]) {
+	return new ComputedStateInstance<StateValue>(instance, computeFn, deps)
 }
