@@ -10,15 +10,14 @@ export interface PlexusRuntime {
 	 * track a change and propagate to all listening children in instance
 	 *  */
 	stateChange<Value = PlexusStateType>(key: string, value: Value)
-	broadcast<Value = PlexusStateType>(key: string, type: SubscriptionTypes, value: Value): void
+	broadcast<Value = PlexusStateType>(key: string, value: Value, options?: { type?: SubscriptionTypes }): void
 	/**
 	 *
 	 * @param _key The key of the object being wathced
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
 	 */
-	subscribe<Value = PlexusStateType>(key: string | number, callback: Fn<Value>)
-	subscribe<Value = PlexusStateType>(_key: string, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>): () => void
+	subscribe<Value = PlexusStateType>(_key: string | number, _callback: Fn<Value>, options?: { type?: SubscriptionTypes }): () => void
 	/**
 	 * Either get all watchers on this runtime or get the specific watchers on an event
 	 * @param key (optional) The event key
@@ -57,14 +56,6 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 	}
 
 	const genEventName = (type: SubscriptionTypes, key: string) => `${type}_${key}`
-
-	// function unsubscribe(key: string|number, watcherKey: string | number){
-	// 	// if the parent key does not exist, fail silently
-	// 	// if(!_internalStore._watchers.has(key)){return}
-	// 	// const callback = _internalStore._watchers.get(key).get(watcherKey)
-	// 	// _internalStore._conductor.removeListener('stateChange', callback)
-	// 	// _internalStore._watchers.get(key).delete(watcherKey)
-	// }
 
 	function log(type: "warn" | "info" | "error", ...message: string[]) {
 		const typeColors = {
@@ -105,24 +96,27 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 	return {
 		// track a change and propagate to all listening children in instance
 		stateChange<Value = PlexusStateType>(key: string, value: Value) {
-			this.broadcast(key, "state", { key, value })
-			this.broadcast(key, "*", { key, value })
+			// this.broadcast(key, "state", { key, value })
+			this.broadcast(key, { key, value }, { type: "state" })
+			this.broadcast(key, { key, value }, { type: "*" })
 		},
-		broadcast<Value = PlexusStateType>(key: string, type: SubscriptionTypes, value: Value) {
-			this.log("info", `Broadcasting ${type} change for ${key}`)
-			_internalStore._conductor.emit(genEventName(type, key), { key, value })
+		broadcast<Value = PlexusStateType>(key: string, value: Value, options?: { type?: SubscriptionTypes }) {
+			this.log("info", `Broadcasting a change to ${key}`)
+			// _internalStore._conductor.emit(genEventName(type, key), { key, value })
+			_internalStore._conductor.emit(key, { key, value })
 		},
 
-		subscribe<Value = PlexusStateType>(_key: string, typeOrCallback: SubscriptionTypes | Fn<Value>, _callback?: Fn<Value>) {
-			const type = typeof typeOrCallback === "string" ? typeOrCallback : "state"
-			if (typeof typeOrCallback === "function" && _callback === undefined) {
-				_callback = typeOrCallback
-			}
-			if (_callback === undefined && typeof typeOrCallback === "string") {
-				this.log("warn", `Missing a subscription function; skipping assignment`)
-				return
-			}
-			this.log("info", `Subscribing ${type} change for ${_key}`)
+		subscribe<Value = PlexusStateType>(_key: string, _callback: Fn<Value>, options?: { type?: SubscriptionTypes }) {
+			// const type = typeof typeOrCallback === "string" ? typeOrCallback : "state"
+			// if (typeof typeOrCallback === "function" && _callback === undefined) {
+			// 	_callback = typeOrCallback
+			// }
+			// if (_callback === undefined && typeof typeOrCallback === "string") {
+			// 	this.log("warn", `Missing a subscription function; skipping assignment`)
+			// 	return
+			// }
+
+			this.log("info", `Subscribing to changes of ${_key}`)
 			function callback(data: { key: string; value: Value }) {
 				const { key, value } = data
 
@@ -132,7 +126,8 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 			}
 
 			//
-			const unsub = _internalStore._conductor.on(genEventName(type, _key), callback)
+			// const unsub = _internalStore._conductor.on(genEventName(type, _key), callback)
+			const unsub = _internalStore._conductor.on(_key, callback)
 
 			// return the watcher unsubscribe function
 			return () => {
@@ -151,7 +146,7 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 			return key && _internalStore._conductor.events.has(`${key}`) ? _internalStore._conductor.events : {}
 		},
 		removeWatchers(type: SubscriptionTypes, key: string) {
-			_internalStore._conductor.events.get(genEventName(type, key))
+			_internalStore._conductor.events.get(key)
 		},
 		log,
 		get engine() {
