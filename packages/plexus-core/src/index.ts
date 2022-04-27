@@ -12,7 +12,8 @@ import {
 } from "./collection/collection"
 import { PlexusInstance } from "./instance"
 import { _computed, PlexusComputedStateInstance } from "./computed"
-import { Watchable, WatchableValue } from "./interfaces"
+import { Watchable } from "./interfaces"
+import { WatchableValue } from "./watchable"
 
 /**
  * Generate a Plexus State
@@ -27,7 +28,7 @@ export function state<Value = any>(item: Value) {
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function computed<Value = any>(item: (value?: Value) => Value, dependencies: Array<Watchable> | Watchable) {
+export function computed<Value = any>(item: (value?: Value) => Value, dependencies: Array<WatchableValue<any>> | WatchableValue<any>) {
 	if (!Array.isArray(dependencies)) {
 		return _computed(() => instance(), item, [dependencies])
 	}

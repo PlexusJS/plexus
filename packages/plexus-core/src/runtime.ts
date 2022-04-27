@@ -35,7 +35,7 @@ export interface PlexusRuntime {
 	 * @param type The type of log message
 	 * @param message The message to send
 	 */
-	log(type: Exclude<RuntimeConfig["logLevel"], "silent"> | "info", ...message: string[])
+	log(type: Exclude<RuntimeConfig["logLevel"], "silent"> | "info", ...message: any[])
 	/**
 	 * Runtime Conductor Engine
 	 */
@@ -57,7 +57,7 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 
 	const genEventName = (type: SubscriptionTypes, key: string) => `${type}_${key}`
 
-	function log(type: "warn" | "info" | "error", ...message: string[]) {
+	function log(type: "warn" | "info" | "error", ...message: any[]) {
 		const typeColors = {
 			info: "#4281A4",
 			warn: "#E9D985",
@@ -90,7 +90,8 @@ export function _runtime(instance: () => PlexusInstance, config?: Partial<Runtim
 			}
 			return
 		}
-		callLog()
+		// commanet or uncomment to allow or disallow dev logging (always on)
+		// callLog()
 	}
 
 	return {

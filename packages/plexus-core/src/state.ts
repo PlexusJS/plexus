@@ -6,45 +6,6 @@ import { WatchableValue } from "./watchable"
 export type PlexusStateType = AlmostAnything | null
 export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, input: PxStateValue) => PlexusStateInstance<PxStateValue>
 
-// export interface PlexusStateInstance<Value extends PlexusStateType = any> {
-// 	value: Value
-
-// 	lastValue: Value
-
-// 	initialValue: Value
-
-// 	nextValue: Value
-
-// 	name: string
-
-// 	set(value?: Value): void
-
-// 	patch(value: Value): void
-
-// 	watch(callback: PlexusWatcher<Value>): () => void
-// 	watch(keyOrCallback: string | number | PlexusWatcher<Value>, callback?: PlexusWatcher<Value>): () => void
-// 	// /**
-// 	//  * Remove a watcher from this state
-// 	//  * @param key The key used to create the watcher
-// 	//  * @returns true if the watcher was removed, false otherwise
-// 	//  */
-// 	// removeWatcher(key: string | number): boolean
-
-// 	undo(): void
-
-// 	reset(): void
-
-// 	key(key: string): this
-
-// 	persist(name: string): this
-
-// 	interval(setterFunction: (value: Value) => Value | Promise<Value>, ms?: number): this
-
-// 	clearInterval(): this
-// 	watcherRemovers: any
-// }
-// export type PlexusStateInstance<Value=any> = ReturnType<typeof _state>
-
 type DestroyFn = () => void
 
 export interface StateStore<Value> {
@@ -279,36 +240,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 }
 
 export function _state<StateValue extends PlexusStateType>(instance: () => PlexusInstance, _init: StateValue) {
-	// props //
-	// const _internalStore: PlexStateInternalStore<StateValue> = {
-	// 	_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-	// 	_nextValue: _init,
-	// 	_value: _init,
-	// 	_initialValue: _init,
-	// 	_lastValue: _init,
-	// 	_watchers: new Map(),
-	// 	_name: "",
-	// 	_persist: false,
-	// 	_interval: null,
-	// 	_ready: false,
-	// }
-
-	// Methods //
-	// const mount = () => {
-	// 	if (!instance()._states.has(state)) {
-	// 		instance().runtime.log("info", `Hoisting state ${_internalStore._internalId} with value ${_internalStore._value} to instance`)
-	// 		instance()._states.add(state)
-	// 		instance().storage?.sync()
-	// 	}
-	// }
-	// const removeWatcher = (key: string | number) => {
-	// 	// instance().runtime.unsubscribe(_internalStore._name, key)
-	// 	let destroy = _internalStore._watchers.get(key)
-	// 	// if (!destroy) destroy = _internalStore._watchers.get(key.toString())
-	// 	destroy?.()
-	// 	return _internalStore._watchers.delete(key)
-	// }
-
 	// Returned Object //
 
 	return new StateInstance<StateValue>(instance, _init)

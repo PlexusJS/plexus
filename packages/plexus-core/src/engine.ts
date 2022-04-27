@@ -1,7 +1,6 @@
 import { PlexusWatcher } from "./interfaces"
 export interface EngineEventReceiver {
 	from: string
-
 	listener: PlexusWatcher
 }
 export class EventEngine {
