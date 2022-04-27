@@ -12,7 +12,7 @@ interface WatchableStore<Value = AlmostAnything> {
 	_internalId: string
 }
 export class WatchableValue<ValueType = AlmostAnything> {
-	private _watchableStore: WatchableStore<ValueType>
+	protected _watchableStore: WatchableStore<ValueType>
 	private _instance: () => PlexusInstance
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		this._instance = instance
