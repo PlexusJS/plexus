@@ -1,11 +1,11 @@
-import { computed, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core"
+import { computed, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core/src"
 // import { PlexusState, PlexusStateInstance } from '../src/interfaces';
 let booleanState: PlexusStateInstance<boolean>,
 	stringState: PlexusStateInstance<string>,
 	numberState: PlexusStateInstance<number>,
 	objectState: PlexusStateInstance<Partial<{ a: { a?: boolean; b?: boolean }; b: boolean; c: { b?: boolean } }>>,
 	arrayState: PlexusStateInstance<{ item?: string; item2?: { subitem?: string } }[]>,
-	nullState: PlexusStateInstance<null | boolean>,
+	nullState: PlexusStateInstance<null>,
 	computedState: PlexusComputedStateInstance<number>
 
 const initialValue = {
