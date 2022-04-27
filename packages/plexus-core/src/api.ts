@@ -25,68 +25,8 @@ export interface PlexusAPIReq {
 	signal?: RequestInit["signal"]
 	window?: RequestInit["window"]
 }
-export interface PlexusApi {
-	/**
-	 * Set the configurtation options for fetch
-	 * @param options RequestInit - Same as fetch options
-	 * @param overwrite (optional) If true, will overwrite the current options object
-	 */
-	options(options: PlexusAPIReq, overwrite: boolean): PlexusApi
-	options(options: PlexusAPIReq): PlexusApi
-	/**
-	 * Send a get request
-	 * @param url The url to send the request to
-	 */
-	get<ResponseType = any>(url: string): Promise<PlexusApiRes<ResponseType>>
-	/**
-	 * Send a post request
-	 * @param url The url to send the request to
-	 * @param body The body of the request (can be a string or object)
-	 */
-	post<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
-	/**
-	 * Send a put request
-	 * @param url The url to send the request to
-	 * @param body The body of the request (can be a string or object)
-	 */
-	put<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
-	/**
-	 * Send a delete request
-	 * @param url The url to send the request to
-	 */
-	delete<ResponseType = any>(url: string): Promise<PlexusApiRes<ResponseType>>
-	/**
-	 * Send a patch request
-	 * @param url The url to send the request to
-	 * @param body The body of the request (can be a string or object)
-	 */
-	patch<ResponseType = any>(url: string, body?: Record<string, any> | string): Promise<PlexusApiRes<ResponseType>>
-	/**
-	 * Send a graphql request
-	 * @param query The gql query to send
-	 * @param variables Variables
-	 */
-	gql<ResponseType = any>(query: string, variables?: Record<string, any>): Promise<PlexusApiRes<ResponseType>>
-	/**
-	 * Set headers for the request
-	 * @param headers The headers to set for the request
-	 */
-	headers(headers: Record<string, any>): PlexusApi
-	/**
-	 * Reset this routes configuration
-	 */
-	reset(): PlexusApi
-	/**
-	 * Set the authentication details for the request
-	 * @param token The token to use for authentication
-	 * @param type optional - The type of authentication to use. This determines what prefix to use for the header
-	 */
-	auth(token: string | undefined, type?: "bearer" | "basic" | "jwt"): PlexusApi
-	/**
-	 * The configuration of this api
-	 */
-	config: PlexusAPIReq & { headers: Record<string, string> }
-}
+
+export type PlexusApi = ApiInstance
 interface ApiStore {
 	_options: RequestInit
 	_optionsInit: RequestInit
@@ -97,7 +37,7 @@ interface ApiStore {
 	_silentFail: boolean
 }
 export class ApiInstance {
-	private
+	// private
 	private _internalStore: ApiStore
 	private _headers: Map<string, string> = new Map()
 	constructor(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }) {
@@ -390,6 +330,5 @@ export class ApiInstance {
 }
 
 export function api(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }) {
-	
 	return new ApiInstance(baseURL, config)
 }

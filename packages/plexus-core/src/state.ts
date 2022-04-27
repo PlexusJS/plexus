@@ -4,7 +4,7 @@ import { PlexusWatcher } from "./interfaces"
 import { WatchableValue } from "./watchable"
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
 export type PlexusStateType = AlmostAnything | null
-export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, input: PxStateValue) => PlexusStateInstance<PxStateValue>
+export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, input: PxStateValue) => StateInstance<PxStateValue>
 
 type DestroyFn = () => void
 
@@ -31,7 +31,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
-			_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+			_internalId:
+				this._watchableStore._internalId || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
 			_nextValue: init,
 			_value: init,
 			_initialValue: init,

@@ -12,7 +12,7 @@ import {
 } from "./collection/collection"
 import { PlexusInstance } from "./instance"
 import { _computed, PlexusComputedStateInstance } from "./computed"
-import { Watchable } from "./interfaces"
+
 import { WatchableValue } from "./watchable"
 
 /**

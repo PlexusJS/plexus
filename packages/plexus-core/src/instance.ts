@@ -1,26 +1,10 @@
-import { PlexusStateInstance, StateInstance } from "./state"
+import { StateInstance } from "./state"
 import { PlexusPlugin } from "./plugin"
 import { PlexusRuntime, _runtime } from "./runtime"
 import { PlexusStorageInstance, storage } from "./storage"
 import { PlexusCollectionInstance } from "."
 import { CollectionInstance } from "./collection/collection"
-// export interface PlexusInstance {
-// 	name: string
-// 	internalName: string
-// 	ready: boolean
-// 	genNonce(): number | string
-// 	genNonce(): number | string
-// 	_states: Set<PlexusStateInstance>
-// 	_plugins: Map
-// 	_runtime: PlexusRuntime
-// 	_computedStates: Set
-// 	_collections: Set<PlexusCollectionInstance>
-// 	settings: Partial<PlexusInstanceConfig>
-// 	get storageEngine(): string | undefined
-// 	set storageEngine(name: string | undefined)
-// 	_storages: Map
-// 	get storage(): PlexusStorageInstance | undefined
-// }
+
 const getInstanceName = (name: string = "default") => `__plexusInstance__${name.length > 0 ? name : "default"}__`
 interface PlexusInstanceStore {
 	_nonce: number
