@@ -11,14 +11,28 @@ export interface PlexusApiRes<DataType = any> {
 	rawData: string
 	data: DataType
 }
+export interface PlexusAPIReq {
+	headers: Record<string, string>
+	body?: RequestInit["body"]
+	cache?: RequestInit["cache"]
+	method?: RequestInit["method"]
+	credentials?: RequestInit["credentials"]
+	integrity?: RequestInit["integrity"]
+	keepalive?: RequestInit["keepalive"]
+	mode?: RequestInit["mode"]
+	redirect?: RequestInit["redirect"]
+	referrer?: RequestInit["referrer"]
+	signal?: RequestInit["signal"]
+	window?: RequestInit["window"]
+}
 export interface PlexusApi {
 	/**
 	 * Set the configurtation options for fetch
 	 * @param options RequestInit - Same as fetch options
 	 * @param overwrite (optional) If true, will overwrite the current options object
 	 */
-	options(options: RequestInit, overwrite: boolean): PlexusApi
-	options(options: RequestInit): PlexusApi
+	options(options: PlexusAPIReq, overwrite: boolean): PlexusApi
+	options(options: PlexusAPIReq): PlexusApi
 	/**
 	 * Send a get request
 	 * @param url The url to send the request to
@@ -71,36 +85,52 @@ export interface PlexusApi {
 	/**
 	 * The configuration of this api
 	 */
-	config: RequestInit
+	config: PlexusAPIReq & { headers: Record<string, string> }
 }
-export function api(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }): PlexusApi {
-	const _internalStore = {
-		_options: { headers: {}, ...config.options } as RequestInit & { headers: Record<string, string> },
-		_optionsInit: { headers: {}, ...config.options } as RequestInit & { headers: Record<string, string> },
-		_timeout: config.timeout || undefined,
-		_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
-		_noFetch: false,
-		_authToken: "",
-		_silentFail: config.silentFail || false,
-	}
-
-	if (_internalStore._options.headers === undefined) {
-		_internalStore._options.headers = {}
-	}
-	async function send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
-		if (_internalStore._noFetch) return { status: 408, response: {}, rawData: "", data: {} as ResponseDataType }
-
-		if (_internalStore._options.method === undefined) {
-			_internalStore._options.method = "GET"
+interface ApiStore {
+	_options: RequestInit
+	_optionsInit: RequestInit
+	_timeout: number | undefined
+	_baseURL: string
+	_noFetch: boolean
+	_authToken: string
+	_silentFail: boolean
+}
+export class ApiInstance {
+	private
+	private _internalStore: ApiStore
+	private _headers: Map<string, string> = new Map()
+	constructor(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }) {
+		this._internalStore = {
+			_options: config.options ?? {},
+			_optionsInit: { ...config.options },
+			_timeout: config.timeout || undefined,
+			_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
+			_noFetch: false,
+			_authToken: "",
+			_silentFail: config.silentFail || false,
 		}
-		if (_internalStore._options.headers === undefined) {
-			_internalStore._options.headers = {}
+		try {
+			fetch
+		} catch (e) {
+			instance().runtime.log("warn", "Fetch is not supported in this environment; api will not work.")
+			this._internalStore._noFetch = true
 		}
-		if (_internalStore._options.headers["Content-Type"] === undefined) {
-			if (_internalStore._options.body !== undefined) {
-				_internalStore._options.headers["Content-Type"] = "application/json"
+	}
+	private async send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
+		if (this._internalStore._noFetch) return { status: 408, response: {}, rawData: "", data: {} as ResponseDataType }
+
+		if (this._internalStore._options.method === undefined) {
+			this._internalStore._options.method = "GET"
+		}
+		if (this._internalStore._options.headers === undefined) {
+			this._internalStore._options.headers = {}
+		}
+		if (!this._headers.has("Content-Type")) {
+			if (this._internalStore._options.body !== undefined) {
+				this._headers.set("Content-Type", "application/json")
 			} else {
-				_internalStore._options.headers["Content-Type"] = "text/html"
+				this._headers.set("Content-Type", "text/html")
 			}
 		}
 		// console.log(_internalStore._options.headers, _internalStore._options.method)
@@ -108,18 +138,18 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		let res: Response | undefined
 		try {
 			const matches = path.match(/^http(s)?/g)
-			const uri = matches && matches?.length > 0 ? path : `${_internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
-			if (_internalStore._timeout) {
+			const uri = matches && matches?.length > 0 ? path : `${this._internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
+			if (this._internalStore._timeout) {
 				// res = await
 				let to: any
 				const timeout = new Promise<void>((resolve, reject) => {
 					to = setTimeout(() => {
 						timedOut = true
 						resolve()
-					}, _internalStore._timeout)
+					}, this._internalStore._timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
-					fetch(uri, _internalStore._options)
+					fetch(uri, { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers) })
 						.then((response) => {
 							clearTimeout(to)
 							resolve(response)
@@ -134,10 +164,10 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: "", data: {} as ResponseDataType }
 				}
 			} else {
-				res = await fetch(uri, _internalStore._options)
+				res = await fetch(uri, { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers) })
 			}
 		} catch (e) {
-			if (!_internalStore._silentFail) {
+			if (!this._internalStore._silentFail) {
 				throw e
 			}
 		}
@@ -156,8 +186,8 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		if (res.status >= 200 && res.status < 600) {
 			const text = await res.text()
 			if (
-				_internalStore._options.headers["Content-Type"] === "application/json" ||
-				_internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded"
+				this._headers.get("Content-Type") === "application/json" ||
+				this._headers.get("Content-Type") === "application/x-www-form-urlencoded"
 			) {
 				let parsed: ResponseDataType = {} as ResponseDataType
 				try {
@@ -186,112 +216,180 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 		}
 	}
 
-	try {
-		fetch
-	} catch (e) {
-		instance().runtime.log("warn", "Fetch is not supported in this environment; api will not work.")
-		_internalStore._noFetch = true
+	private static parseHeaders = (_headers: Map<string, string>) => {
+		const headers: Record<string, string> = {}
+		_headers.forEach((value, key) => {
+			headers[key] = value
+		})
+		return headers
 	}
-
-	return Object.freeze({
-		options: function (options: RequestInit, overwrite: boolean = false) {
-			if (overwrite) {
-				_internalStore._options = deepClone(options) as RequestInit & { headers: Record<string, string> }
-				return this as PlexusApi
-			}
-
-			_internalStore._options = deepMerge(_internalStore._options, options) as RequestInit & { headers: Record<string, string> }
-			this.headers()
-			return this as PlexusApi
-			if (_internalStore._noFetch) return this
-		},
-		get(path: string, query?: Record<string, any>) {
-			if (_internalStore._noFetch) return null
-			_internalStore._options.method = "GET"
-			const params = new URLSearchParams(query)
-
-			return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
-		},
-		post(path: string, body: Record<string, any> | string = {}) {
-			if (_internalStore._noFetch) return null
-			_internalStore._options.method = "POST"
-			if (typeof body !== "string") {
-				body = JSON.stringify(body)
-			}
-			_internalStore._options.body = body
-			if (_internalStore._options.headers && _internalStore._options.headers["Content-Type"] === "application/x-www-form-urlencoded") {
-				const params = new URLSearchParams(body)
-				return send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
-			} else {
-				return send<ResponseType>(path)
-			}
-		},
-		put(path: string, body: Record<string, any> | string = {}) {
-			if (_internalStore._noFetch) return null
-			_internalStore._options.method = "PUT"
-			if (typeof body !== "string") {
-				_internalStore._options.body = JSON.stringify(body)
-			}
-			return send<ResponseType>(path)
-		},
-		delete(path: string) {
-			if (_internalStore._noFetch) return null
-			_internalStore._options.method = "DELETE"
-			return send<ResponseType>(path)
-		},
-		patch(path: string, body: Record<string, any> | string = {}) {
-			if (_internalStore._noFetch) return null
-			_internalStore._options.method = "PATCH"
-			if (typeof body !== "string") {
-				_internalStore._options.body = JSON.stringify(body)
-			}
-			return send<ResponseType>(path)
-		},
-		gql(query: string, variables?: Record<string, any>) {
-			if (_internalStore._noFetch) return null
-			_internalStore._options.method = "POST"
-			_internalStore._options.body = JSON.stringify({
-				query,
-				variables,
-			})
-
-			_internalStore._options.headers["Content-Type"] = "application/json"
-
-			return send<ResponseType>("")
-		},
-		auth(token: string | undefined, type: "bearer" | "basic" | "jwt" = "bearer") {
-			if (!token) return this
-			token = token
-				.replace(/^(B|b)earer /, "")
-				.replace(/^(B|b)asic /, "")
-				.replace(/^(JWT|jwt) /, "")
-			_internalStore._authToken = token
-			const prefix = type === "jwt" ? "JWT " : type === "bearer" ? "Bearer " : ""
-			_internalStore._options.headers["Authorization"] = `${prefix}${token}`
+	/**
+	 * Set the configuration options for fetch
+	 * @param options RequestInit - Same as fetch options
+	 * @param overwrite (optional) If true, will overwrite the current options object
+	 */
+	options(options: PlexusAPIReq, overwrite: boolean)
+	options(options: PlexusAPIReq)
+	options(options: RequestInit, overwrite: boolean = false) {
+		if (overwrite) {
+			this._internalStore._options = deepClone(options) as RequestInit & { headers: Record<string, string> }
 			return this
-		},
-		headers(headers?: Record<string, any>) {
-			if (!_internalStore._options.headers) _internalStore._options.headers = {}
-			if (_internalStore._noFetch) return this as PlexusApi
-			const temp: Record<string, any> = {}
-			Object.entries(headers || _internalStore._options.headers).map(([key, value]) => {
-				// uppercase the dash separated tokens
-				temp[
-					key
-						.split("-")
-						.map((v) => `${v.at(0)}${v.substring(1)}`)
-						.join("-")
-				] = value
-			})
-			_internalStore._options.headers = temp
-			return this as PlexusApi
-		},
-		reset() {
-			_internalStore._options = deepClone(_internalStore._optionsInit) || {}
-			return this as PlexusApi
-		},
-		get config() {
-			return deepClone(_internalStore._options || { headers: {} })
-		},
-	}) as PlexusApi
+		}
+
+		this._internalStore._options = deepMerge(this._internalStore._options, options) as RequestInit & { headers: Record<string, string> }
+
+		this.headers(options.headers)
+		return this
+		if (this._internalStore._noFetch) return this
+	}
+	/**
+	 * Send a get request
+	 * @param url The url to send the request to
+	 */
+	get(path: string, query?: Record<string, any>) {
+		if (this._internalStore._noFetch) return null
+		this._internalStore._options.method = "GET"
+		const params = new URLSearchParams(query)
+
+		return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
+	}
+	/**
+	 * Send a post request
+	 * @param url The url to send the request to
+	 * @param body The body of the request (can be a string or object)
+	 */
+	post(path: string, body: Record<string, any> | string = {}) {
+		if (this._internalStore._noFetch) return null
+		this._internalStore._options.method = "POST"
+		if (typeof body !== "string") {
+			body = JSON.stringify(body)
+		}
+		this._internalStore._options.body = body
+		if (this._headers && this._headers.get("Content-Type") === "application/x-www-form-urlencoded") {
+			const params = new URLSearchParams(body)
+			return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
+		} else {
+			return this.send<ResponseType>(path)
+		}
+	}
+	/**
+	 * Send a put request
+	 * @param url The url to send the request to
+	 * @param body The body of the request (can be a string or object)
+	 */
+	put(path: string, body: Record<string, any> | string = {}) {
+		if (this._internalStore._noFetch) return null
+		this._internalStore._options.method = "PUT"
+		if (typeof body !== "string") {
+			this._internalStore._options.body = JSON.stringify(body)
+		}
+		return this.send<ResponseType>(path)
+	}
+	/**
+	 * Send a delete request
+	 * @param url The url to send the request to
+	 */
+	delete(path: string) {
+		if (this._internalStore._noFetch) return null
+		this._internalStore._options.method = "DELETE"
+		return this.send<ResponseType>(path)
+	}
+	/**
+	 * Send a patch request
+	 * @param url The url to send the request to
+	 * @param body The body of the request (can be a string or object)
+	 */
+	patch(path: string, body: Record<string, any> | string = {}) {
+		if (this._internalStore._noFetch) return null
+		this._internalStore._options.method = "PATCH"
+		if (typeof body !== "string") {
+			this._internalStore._options.body = JSON.stringify(body)
+		}
+		return this.send<ResponseType>(path)
+	}
+	/**
+	 * Send a graphql request
+	 * @param query The gql query to send
+	 * @param variables Variables
+	 */
+	gql(query: string, variables?: Record<string, any>) {
+		if (this._internalStore._noFetch) return null
+		this._internalStore._options.method = "POST"
+		this._internalStore._options.body = JSON.stringify({
+			query,
+			variables,
+		})
+
+		this._headers.set("Content-Type", "application/json")
+
+		return this.send<ResponseType>("")
+	}
+	/**
+	 * Set the authentication details for the request
+	 * @param token The token to use for authentication
+	 * @param type optional - The type of authentication to use. This determines what prefix to use for the header
+	 */
+	auth(token: string | undefined, type: "bearer" | "basic" | "jwt" = "bearer") {
+		if (!token) return this
+		token = token
+			.replace(/^(B|b)earer /, "")
+			.replace(/^(B|b)asic /, "")
+			.replace(/^(JWT|jwt) /, "")
+		this._internalStore._authToken = token
+		const prefix = type === "jwt" ? "JWT " : type === "bearer" ? "Bearer " : ""
+		this._headers.set("Authorization", `${prefix}${token}`)
+		return this
+	}
+	/**
+	 * Set headers for the request
+	 * @param headers The headers to set for the request
+	 */
+	headers(headers?: Record<string, any>) {
+		// if (!_headers) _internalStore._options.headers = {}
+		if (this._internalStore._noFetch) return this
+		const temp: Record<string, any> = {}
+		Array.from(this._headers.entries()).map(([key, value]) => {
+			// uppercase the dash separated tokens
+			temp[
+				key
+					.split("-")
+					.map((v) => `${v.at(0)}${v.substring(1)}`)
+					.join("-")
+			] = value
+		})
+		Object.entries(headers || {}).map(([key, value]) => {
+			// uppercase the dash separated tokens
+			temp[
+				key
+					.split("-")
+					.map((v) => `${v.at(0)}${v.substring(1)}`)
+					.join("-")
+			] = value
+		})
+		this._headers.clear()
+		Object.entries(temp).forEach((kvPair) => {
+			this._headers.set(kvPair[0], kvPair[1])
+		})
+		return this
+	}
+	/**
+	 * Reset this routes configuration
+	 */
+	reset() {
+		this._internalStore._options = deepClone(this._internalStore._optionsInit) || {}
+		return this
+	}
+	/**
+	 * The configuration of this api
+	 */
+	get config() {
+		return Object.freeze(deepClone({ ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers) })) as {
+			headers: Record<string, string>
+		} & RequestInit
+	}
+}
+
+export function api(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }) {
+	
+	return new ApiInstance(baseURL, config)
 }
