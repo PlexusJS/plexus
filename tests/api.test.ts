@@ -1,4 +1,4 @@
-import { api, PlexusApi } from "@plexusjs/core"
+import { api,PlexusApi } from "@plexusjs/core"
 import "isomorphic-fetch"
 
 // if(globalThis.fetch === undefined) globalThis.fetch = fetch as any as (input: RequestInfo, init?: RequestInit) => Promise<Response>;

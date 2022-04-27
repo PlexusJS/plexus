@@ -1,16 +1,15 @@
-import { collection, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core/src"
+import { collection, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core"
 import * as React from "react"
-import { usePlexus } from "../packages/plexus-react/dist"
+import { usePlexus } from "../packages/plexus-react/src"
 import * as renderer from "react-test-renderer"
 
-let myState: PlexusStateInstance<string>
+let myState = state("yes")
 let myState2: PlexusStateInstance<number>
 let myState3: PlexusStateInstance<Partial<{ name: string }>>
 let myState4: PlexusComputedStateInstance<number>
 
 const myCollection = collection<{ id: string; a: number }>().createGroup("test").createSelector("main")
 beforeEach(() => {
-	myState = state("yes")
 	myState2 = state(1)
 	myState3 = state<Partial<{ name: string }>>({ name: "test" })
 	myCollection.collect({ id: "poggers", a: 2 }, "test")
