@@ -3,7 +3,7 @@ import { deepClone, deepMerge, isObject } from "./helpers"
 import { AlmostAnything } from "./interfaces"
 export type PlexusWatcher<V extends any = any> = (value: V) => void
 type DestroyFn = () => void
-interface WatchableStore<Value = AlmostAnything> {
+interface WatchableStore<Value = any> {
 	_initialValue: Value
 	_lastValue: Value
 	_value: Value
@@ -11,7 +11,7 @@ interface WatchableStore<Value = AlmostAnything> {
 	_watchers: Set<PlexusWatcher<Value>>
 	_internalId: string
 }
-export class WatchableValue<ValueType = AlmostAnything> {
+export class WatchableValue<ValueType = any> {
 	protected _watchableStore: WatchableStore<ValueType>
 	private _instance: () => PlexusInstance
 	constructor(instance: () => PlexusInstance, init: ValueType) {
