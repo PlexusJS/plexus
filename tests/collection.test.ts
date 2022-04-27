@@ -1,4 +1,4 @@
-import { collection, PlexusCollectionInstance } from "@plexusjs/core"
+import { collection, PlexusCollectionInstance } from "@plexusjs/core/src"
 
 let myCollection = collection<{ thing: string; id: number }>().createGroups(["group1"]).createSelectors(["main"])
 
@@ -37,6 +37,7 @@ describe("Testing Collection", () => {
 		])
 
 		expect(myCollection.value.length).toBe(3)
+		console.warn(myCollection.value)
 		expect(myCollection.value[0].thing).toBe("lol")
 		expect(myCollection.value[1].thing).toBe("lol3")
 		expect(myCollection.value[2].thing).toBe("lols")
@@ -50,6 +51,7 @@ describe("Testing Collection", () => {
 		// console.log(myCollection.groups.group1.index)
 
 		expect(myCollection.groups.group1.index.size).toBe(1)
+		console.warn(myCollection.groups, myCollection.groups.group1.value)
 		expect(myCollection.groups.group1.value[0].id).toBe(5)
 
 		// if we try to change the key of an item, it should do nothing and fail silently

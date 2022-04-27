@@ -1,4 +1,4 @@
-import { collection, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core"
+import { collection, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core/src"
 import * as React from "react"
 import { usePlexus } from "../packages/plexus-react/dist"
 import * as renderer from "react-test-renderer"
@@ -12,7 +12,7 @@ const myCollection = collection<{ id: string; a: number }>().createGroup("test")
 beforeEach(() => {
 	myState = state("yes")
 	myState2 = state(1)
-	myState3 = state({ name: "test" })
+	myState3 = state<Partial<{ name: string }>>({ name: "test" })
 	myCollection.collect({ id: "poggers", a: 2 }, "test")
 })
 

@@ -68,17 +68,17 @@ describe("Testing State Function", () => {
 		let callbackCalled = false
 
 		// can add watcher
-		const watcherDestoryer = stringState.watch((value) => {
+		const watcherDestroyer = stringState.watch((value) => {
 			console.log("callback called", value)
-			callbackCalled = !callbackCalled
+			callbackCalled = true
 		})
-		console.log(instance()._runtime.getWatchers())
+		console.log(instance().runtime.getWatchers())
 		stringState.set("Hello World")
 		expect(callbackCalled).toBe(true)
 		// can remove watcher
 		// stringState.removeWatcher(watcherKey);
-		watcherDestoryer()
-		// console.log(_instance()._runtime.getWatchers())
+		watcherDestroyer()
+		// console.log(_instance().runtime.getWatchers())
 		stringState.set("new value")
 		expect(callbackCalled).toBe(true)
 	})
