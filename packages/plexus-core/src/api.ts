@@ -189,7 +189,7 @@ export function api(baseURL: string = "", config: PlexusApiConfig = { options: {
 	try {
 		fetch
 	} catch (e) {
-		instance()._runtime.log("warn", "Fetch is not supported in this environment; api will not work.")
+		instance().runtime.log("warn", "Fetch is not supported in this environment; api will not work.")
 		_internalStore._noFetch = true
 	}
 

@@ -48,10 +48,10 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 	const get = (key: string): any => {
 		// try to run with localstorage
 		if (getLocalStorage() === null) {
-			instance()._runtime.log("warn", "No localstorage available, cannot get persisted value")
+			instance().runtime.log("warn", "No localstorage available, cannot get persisted value")
 			return
 		}
-		instance()._runtime.log("info", `Retrieving value for key ${getKey(key)}`)
+		instance().runtime.log("info", `Retrieving value for key ${getKey(key)}`)
 		const val = getLocalStorage()?.getItem(getKey(key))
 		if (typeof val === "string" && convertStringToType(val)) {
 			return convertStringToType(val)
@@ -62,7 +62,7 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 		// try to run with localstorage
 		const ls = getLocalStorage()
 		if (ls === null) {
-			instance()._runtime.log("warn", "No localstorage available, cannot persist in storage")
+			instance().runtime.log("warn", "No localstorage available, cannot persist in storage")
 			return
 		}
 
@@ -79,12 +79,12 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 		// try to run with localstorage
 		const ls = getLocalStorage()
 		if (ls === null) {
-			instance()._runtime.log("warn", "No localstorage available, cannot set value to storage")
+			instance().runtime.log("warn", "No localstorage available, cannot set value to storage")
 			return
 		}
 		const item = ls.getItem(key)
 		if (!item) {
-			instance()._runtime.log("warn", "Item in storage does not exist, cannot patch")
+			instance().runtime.log("warn", "Item in storage does not exist, cannot patch")
 			return
 		}
 		if (isObject(value)) {
@@ -99,7 +99,7 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 		// try to run with localstorage
 		const ls = getLocalStorage()
 		if (ls === null) {
-			instance()._runtime.log("warn", "No localstorage available, cannot remove value from storage")
+			instance().runtime.log("warn", "No localstorage available, cannot remove value from storage")
 			return
 		}
 		ls.removeItem(getKey(key))
@@ -115,26 +115,26 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 		},
 		monitor(key: string, object: WatchableValue) {
 			if (key === "" || key === undefined) {
-				instance()._runtime.log("warn", `Can't monitor an object with no key`)
+				instance().runtime.log("warn", `Can't monitor an object with no key`)
 				return
 			}
 
 			_internalStore.tracking.add(object)
 			let storedValue = this.get(key)
-			instance()._runtime.log("info", `Persisting new key ${key}`, JSON.stringify(this.watching))
+			instance().runtime.log("info", `Persisting new key ${key}`, JSON.stringify(this.watching))
 			if (!storedValue) {
 				instance().storage?.set(key, object.value)
 			}
 
-			// instance()._runtime.log("info", `Trying to apply persisted value ${storedValue}`)
+			// instance().runtime.log("info", `Trying to apply persisted value ${storedValue}`)
 
 			// if (storedValue !== undefined && storedValue !== null) {
-			// 	instance()._runtime.log("info", "Applying persisted value")
+			// 	instance().runtime.log("info", "Applying persisted value")
 			// 	object.set(storedValue)
 			// }
 		},
 		sync() {
-			instance()._runtime.log("info", "Syncing storage storage...")
+			instance().runtime.log("info", "Syncing storage storage...")
 			_internalStore.tracking.forEach((object) => {
 				let key: string | null = null
 				if (typeof object.key === "string") {
@@ -144,7 +144,7 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 				}
 
 				if (key === "" || key === undefined || key === null) {
-					instance()._runtime.log("warn", `Can't sync an object with no key`)
+					instance().runtime.log("warn", `Can't sync an object with no key`)
 					return
 				}
 
@@ -153,10 +153,10 @@ export function storage(instance: () => PlexusInstance, name?: string, override?
 				if (storedValue) {
 					const val = object.value
 					if (val && (val !== storedValue || !isEqual(val, storedValue))) {
-						instance()._runtime.log("info", `Syncing "${key}" with storage value "${storedValue}"`)
+						instance().runtime.log("info", `Syncing "${key}" with storage value "${storedValue}"`)
 						object.set(storedValue)
 					} else {
-						instance()._runtime.log("info", `Skipping the storage sync of item "${key}"; Values are already equal.`)
+						instance().runtime.log("info", `Skipping the storage sync of item "${key}"; Values are already equal.`)
 					}
 				}
 			})

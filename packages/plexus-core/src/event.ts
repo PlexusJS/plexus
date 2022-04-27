@@ -45,7 +45,7 @@ export function _event<PayloadType = any>(instance: () => PlexusInstance): Plexu
 				return
 			}
 			// subscribe to the event on the runtime
-			const cleanup = instance()._runtime.subscribe(`${_internalStore._name}`, "event", callback)
+			const cleanup = instance().runtime.subscribe(`${_internalStore._name}`, callback, { type: "event" })
 			_internalStore._once_destroyers.set(_internalStore._name, cleanup)
 			return () => cleanup()
 		},
@@ -55,7 +55,7 @@ export function _event<PayloadType = any>(instance: () => PlexusInstance): Plexu
 				return
 			}
 			// subscribe to the event on the runtime
-			const cleanup = instance()._runtime.subscribe(`${_internalStore._name}`, "event", callback)
+			const cleanup = instance().runtime.subscribe(`${_internalStore._name}`, callback, { type: "event" })
 			_internalStore._destroyers.set(callback.toString(), cleanup)
 			return () => cleanup()
 		},
@@ -67,7 +67,7 @@ export function _event<PayloadType = any>(instance: () => PlexusInstance): Plexu
 			// increase internal use count
 			_internalStore._uses += 1
 			// broadcast the event
-			instance()._runtime.broadcast(`${_internalStore._name}`, "event", payload)
+			instance().runtime.broadcast(`${_internalStore._name}`, payload, { type: "event" })
 			// if there are dwestoryers for the once event, remove them
 			if (_internalStore._once_destroyers.size > 0) {
 				_internalStore._once_destroyers.forEach((cleanup) => cleanup())
