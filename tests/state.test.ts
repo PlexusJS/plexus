@@ -6,7 +6,7 @@ let booleanState: PlexusStateInstance<boolean>,
 	stringState: PlexusStateInstance<string>,
 	objectState: PlexusStateInstance<ObjectStateExample>,
 	arrayState: PlexusStateInstance<{ item?: string; item2?: { subitem?: string } }[]>,
-	nullState: PlexusStateInstance<null | boolean>
+	nullState: PlexusStateInstance<null>
 
 const initialValue = {
 	boolean: true,

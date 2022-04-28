@@ -29,9 +29,9 @@ beforeEach(() => {
 	nullState = state(initialValue.null)
 	numberState = state(initialValue.number)
 	computedState = computed(() => {
-		console.log(`Looking at ${stringState.value}`)
+		// console.log(`Looking at ${stringState.value}`)
 		numberState.set(stringState.value.length)
-		console.log(`computed to: ${booleanState.value}`)
+		// console.log(`computed to: ${booleanState.value}`)
 		return stringState.value.length
 	}, [stringState])
 })
@@ -42,7 +42,7 @@ describe("Testing Computed State Function", () => {
 		expect(computedState.value).toBe(13)
 	})
 	test("Can update a computed state value", () => {
-		console.log(`Looking at ${stringState.value}`)
+		// console.log(`Looking at ${stringState.value}`)
 		stringState.set("daasw")
 		expect(stringState.value).toBe("daasw")
 
