@@ -9,6 +9,8 @@ type GroupMap<DataType> = Map<GroupName, PlexusCollectionGroup<DataType>>
 type SelectorMap<DataType> = Map<SelectorName, PlexusCollectionSelector<DataType>>
 type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<infer K, unknown> ? K : never
 
+// type valuesOfArray =
+
 export { PlexusCollectionGroup, PlexusCollectionSelector }
 export interface PlexusCollectionConfig<DataType> {
 	/**
@@ -196,7 +198,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param name The name of the selector
 	 * @returns The new Collection Instance
 	 */
-	createSelector<Name extends SelectorName>(selectorName: SelectorName) {
+	createSelector<Name extends SelectorName>(selectorName: Name) {
 		this._internalStore._selectors.set(
 			selectorName,
 			_selector(
@@ -205,25 +207,26 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				selectorName
 			)
 		)
-		return this as CollectionInstance<DataType, Groups, Selectors & Name>
+		return this as CollectionInstance<DataType, Groups, Selectors & Map<Name, PlexusCollectionSelector<DataType>>>
 	}
 	/**
 	 * Create Selector instances for a given set of selector names
 	 * @param names The names of the selectors to create
 	 * @returns The new Collection Instance
 	 */
-	createSelectors<Names extends ReadonlyArray<SelectorName>>(selectorNames: Names) {
+	createSelectors<Names extends SelectorName>(selectorNames: [Names, ...Names[]]) {
 		for (const selectorName of selectorNames) {
-			this._internalStore._selectors.set(
-				selectorName,
-				_selector(
-					() => this.instance(),
-					() => this,
-					selectorName
-				)
-			)
+			// this._internalStore._selectors.set(
+			// 	selectorName,
+			// 	_selector(
+			// 		() => this.instance(),
+			// 		() => this,
+			// 		selectorName
+			// 	)
+			// )
+			this.createSelector(selectorName)
 		}
-		return this as CollectionInstance<DataType, Groups, Selectors & Names>
+		return this as CollectionInstance<DataType, Groups, Selectors & Map<typeof selectorNames[number], PlexusCollectionSelector<DataType>>>
 	}
 	/**
 	 * Get A Group instance of a given group name
@@ -242,7 +245,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				() => this,
 				name
 			)
-			this._internalStore._selectors.set(name as GroupName, s)
+			this._internalStore._selectors.set(name as SelectorName, s)
 			return s
 		}
 	}
@@ -264,9 +267,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				config
 			)
 		)
-		// TODO: Fix this type issue
-		// need to return any as it throws a type error with the getGroup function
-		return this as CollectionInstance<DataType, Groups & Name, Selectors>
+
+		return this as CollectionInstance<DataType, Groups & Map<Name, PlexusCollectionGroup<DataType>>, Selectors>
 	}
 
 	/**
@@ -274,20 +276,26 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param groupNames The names of the groups to create
 	 * @returns The new Collection Instance
 	 */
-	createGroups<Names extends ReadonlyArray<GroupName>>(groupNames: Names) {
+	createGroups<Names extends GroupName>(groupNames: [Names, ...Names[]]) {
+		let ret: CollectionInstance<DataType, Groups, Selectors> = this
 		for (const groupName of groupNames) {
-			this._internalStore._groups.set(
-				groupName,
-				_group(
-					() => this.instance(),
-					() => this,
-					groupName
-				)
-			)
+			// this._internalStore._groups.set(
+			// 	groupName,
+			// 	_group(
+			// 		() => this.instance(),
+			// 		() => this,
+			// 		groupName
+			// 	)
+			// )
+			this.createGroup(groupName)
 		}
+		// for (const groupName of groupNames) {
+		// 	ret = this.createGroup(groupName)
+		// }
+
 		// TODO: Fix this type issue
 		// need to return any as it throws a type error with the getGroup function
-		return this as CollectionInstance<DataType, Groups & Names, Selectors>
+		return this as CollectionInstance<DataType, Groups & Map<typeof groupNames[number], PlexusCollectionGroup<DataType>>, Selectors>
 	}
 	/**
 	 * Get A Group instance of a given group name
