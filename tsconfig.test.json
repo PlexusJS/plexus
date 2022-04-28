@@ -1,0 +1,10 @@
+{
+	"extends": "./packages/tsconfig.shared.json",
+	"compilerOptions": {
+		"jsx": "react",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"sourceMap": true
+	},
+	"include": ["./test"]
+}

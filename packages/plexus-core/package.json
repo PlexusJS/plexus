@@ -1,0 +1,20 @@
+{
+  "name": "@plexusjs/core",
+  "version": "1.0.1-canary.0+79a6457",
+  "description": "A library for building modular interconnected applications",
+  "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc --build --force && echo \"Build complete.\"",
+    "test": "jest",
+    "prepublish": "yarn build"
+  },
+  "gitHead": "5484a0484fbc0e866a9043dfb925f7b84473a2fd",
+  "devDependencies": {
+    "isomorphic-fetch": "^3.0.0"
+  }
+}
