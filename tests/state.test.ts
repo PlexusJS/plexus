@@ -72,13 +72,13 @@ describe("Testing State Function", () => {
 			console.log("callback called", value)
 			callbackCalled = true
 		})
-		console.log(instance().runtime.getWatchers())
+		console.log(instance().runtime.engine.events.entries())
 		stringState.set("Hello World")
 		expect(callbackCalled).toBe(true)
 		// can remove watcher
 		// stringState.removeWatcher(watcherKey);
 		watcherDestroyer()
-		// console.log(_instance().runtime.getWatchers())
+		// console.log(watcherDestroyer.toString(), instance().runtime.engine.events.entries())
 		stringState.set("new value")
 		expect(callbackCalled).toBe(true)
 	})

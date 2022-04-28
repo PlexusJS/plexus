@@ -116,6 +116,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this._internalStore._watchers.add(destroyer)
 		// return keyOrCallback
 		return () => {
+			destroyer()
 			this._internalStore._watchers.delete(destroyer)
 			// this.watcherRemovers.value
 		}
