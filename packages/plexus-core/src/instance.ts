@@ -1,6 +1,6 @@
 import { StateInstance } from "./state"
 import { PlexusPlugin } from "./plugin"
-import { PlexusRuntime, _runtime } from "./runtime"
+import { PlexusRuntime, RuntimeInstance, _runtime } from "./runtime"
 import { PlexusStorageInstance, storage } from "./storage"
 import { PlexusCollectionInstance } from "."
 import { CollectionInstance } from "./collection/collection"
@@ -15,7 +15,7 @@ interface PlexusInstanceStore {
 }
 export class PlexusInstance {
 	private _internalStore: PlexusInstanceStore
-	runtime: PlexusRuntime
+	runtime: RuntimeInstance
 
 	_computedStates = new Set<any>()
 	_states = new Set<StateInstance<any>>()

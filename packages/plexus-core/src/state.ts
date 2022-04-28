@@ -104,6 +104,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<StateValue>): () => void {
+		// TODO: This grows infinitely, need to investigate why
 		// if (typeof keyOrCallback === "function") {
 		// 	callback = keyOrCallback
 		// 	// generate a nonce from global instance
