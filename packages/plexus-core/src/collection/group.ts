@@ -20,7 +20,7 @@ interface CollectionGroupStore<DataType = any> {
 	_watcherDestroyers: Set<() => void>
 	_watchers: Set<PlexusWatcher<DataType[]>>
 }
-class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> {
+export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> {
 	private _internalStore: CollectionGroupStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>
 	private instance: () => PlexusInstance

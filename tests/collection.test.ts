@@ -1,6 +1,6 @@
 import { collection, PlexusCollectionInstance } from "@plexusjs/core/src"
 
-let myCollection = collection<{ thing: string; id: number }>().createGroups(["group1"]).createSelectors(["main"])
+let myCollection = collection<{ thing: string; id: number }>().createGroups(["group1", "group2"]).createSelector("main")
 
 beforeEach(() => {
 	myCollection.clear()
@@ -9,6 +9,8 @@ describe("Testing Collection", () => {
 	test("Can create collection", () => {
 		// can properly collect data
 		myCollection.collect({ thing: "lol", id: 0 })
+		// myCollection.getSelector("")
+		// myCollection.getGroup("group1")
 		myCollection.collect([
 			{ thing: "lol3", id: 2 },
 			{ thing: "lols", id: 1 },
