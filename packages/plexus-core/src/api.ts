@@ -186,7 +186,7 @@ export class ApiInstance {
 	 * Send a get request
 	 * @param url The url to send the request to
 	 */
-	get(path: string, query?: Record<string, any>) {
+	get<ResponseType = any>(path: string, query?: Record<string, any>) {
 		if (this._internalStore._noFetch) return null
 		this._internalStore._options.method = "GET"
 		const params = new URLSearchParams(query)
@@ -198,7 +198,7 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	post <ResponseType = any> (path: string, body: Record<string, any> | string = {}) {
+	post<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
 		if (this._internalStore._noFetch) return null
 		this._internalStore._options.method = "POST"
 		if (typeof body !== "string") {
@@ -217,7 +217,7 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	put(path: string, body: Record<string, any> | string = {}) {
+	put<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
 		if (this._internalStore._noFetch) return null
 		this._internalStore._options.method = "PUT"
 		if (typeof body !== "string") {
@@ -229,7 +229,7 @@ export class ApiInstance {
 	 * Send a delete request
 	 * @param url The url to send the request to
 	 */
-	delete(path: string) {
+	delete<ResponseType = any>(path: string) {
 		if (this._internalStore._noFetch) return null
 		this._internalStore._options.method = "DELETE"
 		return this.send<ResponseType>(path)
@@ -239,7 +239,7 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	patch(path: string, body: Record<string, any> | string = {}) {
+	patch<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
 		if (this._internalStore._noFetch) return null
 		this._internalStore._options.method = "PATCH"
 		if (typeof body !== "string") {
@@ -252,7 +252,7 @@ export class ApiInstance {
 	 * @param query The gql query to send
 	 * @param variables Variables
 	 */
-	gql(query: string, variables?: Record<string, any>) {
+	gql<ResponseType = any>(query: string, variables?: Record<string, any>) {
 		if (this._internalStore._noFetch) return null
 		this._internalStore._options.method = "POST"
 		this._internalStore._options.body = JSON.stringify({
