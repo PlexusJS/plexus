@@ -198,7 +198,7 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	post(path: string, body: Record<string, any> | string = {}) {
+	post <ResponseType = any> (path: string, body: Record<string, any> | string = {}) {
 		if (this._internalStore._noFetch) return null
 		this._internalStore._options.method = "POST"
 		if (typeof body !== "string") {
