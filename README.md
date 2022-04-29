@@ -1,6 +1,7 @@
 # PlexusJS - A state management (& more) framework suite for reactive applications
 
 [![npm version](https://badge.fury.io/js/@plexusjs%2Fcore.svg)](https://badge.fury.io/js/@plexusjs%2Fcore)
+[![Node.js Package](https://github.com/PlexusJS/plexus/actions/workflows/npm-publish-github-packages.yml/badge.svg)](https://github.com/PlexusJS/plexus/actions/workflows/npm-publish-github-packages.yml)
 
 <a aria-label="Powered By Vercel" href="https://vercel.com?utm_source=plexusjs&utm_campaign=oss">
   <img src="https://www.datocms-assets.com/31049/1618983297-powered-by-vercel.svg">
