@@ -4,6 +4,7 @@ import { PlexusRuntime, RuntimeInstance, _runtime } from "./runtime"
 import { PlexusStorageInstance, storage } from "./storage"
 import { PlexusCollectionInstance } from "."
 import { CollectionInstance } from "./collection/collection"
+import { isEqual } from "./helpers"
 
 const getInstanceName = (name: string = "default") => `__plexusInstance__${name.length > 0 ? name : "default"}__`
 interface PlexusInstanceStore {
@@ -138,6 +139,9 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 		getPlexusInstance(newInstance.name).ready = true
 
 		getPlexusInstance(newInstance.name).runtime.log("info", "Instance initialized")
+	} else if (config && !isEqual(config, getPlexusInstance(config?.instanceId || "").settings)) {
+		getPlexusInstance(config?.instanceId || "").settings = config
+		getPlexusInstance(config?.instanceId || "").runtime
 	}
 	// return the instance
 	return getPlexusInstance(config?.instanceId || "") as PlexusInstance
