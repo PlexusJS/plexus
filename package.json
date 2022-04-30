@@ -20,7 +20,7 @@
 		"prepublishOnly": "pinst --disable",
 		"postpublish": "pinst --enable",
 		"publish-canary": "lerna publish --canary prerelease --preid canary --force-publish --yes",
-		"publish-stable": "lerna version --force-publish",
+		"publish-stable": "lerna publish --yes --force-publish",
 		"postinstall": "husky install",
 		"test": "yarn build && jest -u"
 	},
