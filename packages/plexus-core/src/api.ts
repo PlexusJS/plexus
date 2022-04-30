@@ -125,20 +125,12 @@ export class ApiInstance {
 
 		if (res.status >= 200 && res.status < 600) {
 			const text = await res.text()
-			if (
-				this._headers.get("Content-Type") === "application/json" ||
-				this._headers.get("Content-Type") === "application/x-www-form-urlencoded"
-			) {
-				let parsed: ResponseDataType = {} as ResponseDataType
-				try {
-					parsed = JSON.parse(text) as ResponseDataType
-				} catch (e) {}
-				data = parsed ?? ({} as ResponseDataType)
-				rawData = text
-			} else {
-				rawData = text
-				data = text as any as ResponseDataType
-			}
+			let parsed: ResponseDataType = undefined as any;
+			try {
+				parsed = JSON.parse(text) as ResponseDataType
+			} catch (e) {}
+			data = parsed ?? text as any as ResponseDataType
+			rawData = text
 
 			return {
 				status: res.status,
