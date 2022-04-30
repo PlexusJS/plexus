@@ -150,6 +150,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			// 	if (groups) this.addToGroups(data[this._internalStore._key], groups)
 			// }
 		}
+		this.mount()
 	}
 	/**
 	 * Update the collection with data;
@@ -174,6 +175,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				console.warn("no data found for key", key)
 			}
 		}
+		this.mount()
 	}
 	/**
 	 * Get the
@@ -440,6 +442,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The collection data values as an array
 	 */
 	get value() {
+		this.mount()
 		return Array.from(this._internalStore._data.values()).map((item) => item.value)
 	}
 	/**
@@ -458,10 +461,16 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The groups paired with their childrens data values as an object
 	 */
 	get groupsValue() {
+		// holder for groups values
 		const groups: Record<KeyOfMap<Groups>, DataType[]> = {} as Record<KeyOfMap<Groups>, DataType[]>
+
+		// iterate through the groups
 		for (let group of this._internalStore._groups.entries()) {
-			const keys = Array.from(group[1].index)
+			// get the primaryKeys in the current group
+			const keys = Array.from(group[1].index.values())
+			// iterate through all of the keys
 			for (let key in keys) {
+				// get the data associated with this key
 				const data = this._internalStore._data.get(key)
 				this.instance().runtime.log(
 					"warn",
@@ -469,6 +478,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 					this._internalStore._data,
 					this._internalStore._data.get(key)
 				)
+
 				if (!groups[group[0] as KeyOfMap<Groups>]) groups[group[0] as KeyOfMap<Groups>] = []
 				if (data) {
 					groups[group[0] as KeyOfMap<Groups>].push(data.value)
