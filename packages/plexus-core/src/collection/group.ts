@@ -49,7 +49,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	private runWatchers() {
 		this._internalStore._watchers.forEach((callback) => {
 			this.instance().runtime.log("warn", "_GroupsValue_\n", this.collection().groups)
-			callback(this.collection().groupsValue[this._internalStore._name])
+			callback(this.collection().getGroup(this._internalStore._name).value)
 		})
 	}
 	private rebuildWatchers() {
