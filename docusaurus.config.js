@@ -42,11 +42,16 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: true,
+        respectPrefersColorScheme: true,
+      },
       navbar: {
         title: '',
         logo: {
           alt: 'PlexusJS Logo',
-          src: 'img/TransparentLogo.png',
+          src: 'img/TransparentLogo.svg',
         },
         items: [
           {
