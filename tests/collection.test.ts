@@ -26,9 +26,9 @@ describe("Testing Collection", () => {
 		expect(myCollection.getItemValue(2)?.thing).toBe("lol3")
 		expect(myCollection.getItemValue(1)?.thing).toBe("lols")
 	})
-	test('Does it pass the vibe check ?', () => {
-		myCollection.collect({ thing: 'xqcL', id: 0 });
-		expect(myCollection.getItem(0).value?.thing).toBe('xqcL');
+	test("Does it pass the vibe check ?", () => {
+		myCollection.collect({ thing: "xqcL", id: 0 })
+		expect(myCollection.getItem(0).value?.thing).toBe("xqcL")
 	})
 	test("Do Groups Work?", () => {
 		expect(myCollection.value.length).toBe(0)
