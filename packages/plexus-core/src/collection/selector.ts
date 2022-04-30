@@ -38,6 +38,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 */
 	select(key: DataKey) {
 		this._internalStore._key = key
+		this.set(this.value)
 	}
 	/**
 	 * Set the value of the selected data instance

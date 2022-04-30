@@ -89,9 +89,17 @@ describe("Testing Collection", () => {
 		])
 		myCollection.getSelector("main").select(0)
 		// console.log(myCollection.getSelector("main").key)
+
+		const del = myCollection.getSelector("main").watch((v) => {
+			console.log(v)
+			expect(v.thing).toBe("haha")
+		})
+		expect(myCollection.getSelector("main").value?.thing).toBe("lol")
+		myCollection.update(0, { thing: "haha" })
+		del()
 		expect(myCollection.selectors.main.key).toBe(0)
 		expect(myCollection.getSelector("main").value?.id).toBe(0)
-		expect(myCollection.getSelector("main").value?.thing).toBe("lol")
+		expect(myCollection.getSelector("main").value?.thing).toBe("haha")
 	})
 	test("Watching Groups", () => {
 		myCollection.collect([
