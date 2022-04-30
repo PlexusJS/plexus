@@ -7,8 +7,10 @@ beforeEach(() => {
 })
 describe("Testing Collection", () => {
 	test("Can create collection", () => {
+		expect(myCollection.value.length).toBe(0)
 		// can properly collect data
 		myCollection.collect({ thing: "lol", id: 0 })
+		expect(myCollection.value.length).toBe(1)
 		// myCollection.getSelector("")
 		// myCollection.getGroup("group1")
 		myCollection.collect([
@@ -66,6 +68,8 @@ describe("Testing Collection", () => {
 		expect(myCollection.getItemValue(5).thing).toBe("idk")
 		expect(myCollection.getGroup("group1")).toBeDefined()
 		expect(myCollection.getGroup("group1").value[0].thing).toBe("lol")
+
+		console.log("GroupsValue: ", myCollection.getGroup("group1"))
 	})
 
 	test("Do Selectors Work?", () => {
@@ -76,7 +80,7 @@ describe("Testing Collection", () => {
 			{ thing: "lols", id: 1 },
 		])
 		myCollection.getSelector("main").select(0)
-		console.log(myCollection.getSelector("main").key)
+		// console.log(myCollection.getSelector("main").key)
 		expect(myCollection.selectors.main.key).toBe(0)
 		expect(myCollection.getSelector("main").value?.id).toBe(0)
 		expect(myCollection.getSelector("main").value?.thing).toBe("lol")
