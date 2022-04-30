@@ -180,7 +180,6 @@ export class ApiInstance {
 
 		this.headers(options.headers)
 		return this
-		if (this._internalStore._noFetch) return this
 	}
 	/**
 	 * Send a get request
