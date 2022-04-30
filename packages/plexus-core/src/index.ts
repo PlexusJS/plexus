@@ -1,8 +1,9 @@
 import { instance } from "./instance"
+import { PlexusInstance } from "./instance"
+import { WatchableValue } from "./watchable"
 import { _state, PlexusStateInstance } from "./state"
-import { _event, PlexusEventInstance } from "./event"
-import { storage as _storage, StorageOverride } from "./storage"
-import { PlexusPlugin, PlexusPluginConfig } from "./plugin"
+import { _computed, PlexusComputedStateInstance } from "./computed"
+import { _action, FunctionType, PlexusAction, PlexusActionHelpers } from "./action"
 import {
 	_collection,
 	PlexusCollectionConfig,
@@ -10,10 +11,9 @@ import {
 	PlexusCollectionSelector,
 	PlexusCollectionGroup,
 } from "./collection/collection"
-import { PlexusInstance } from "./instance"
-import { _computed, PlexusComputedStateInstance } from "./computed"
-
-import { WatchableValue } from "./watchable"
+import { _event, PlexusEventInstance } from "./event"
+import { storage as _storage, StorageOverride } from "./storage"
+import { PlexusPlugin, PlexusPluginConfig } from "./plugin"
 
 /**
  * Generate a Plexus State
@@ -59,6 +59,14 @@ export function event<PayloadType = any>() {
 export function collection<Type extends { [key: string]: any }>(config?: PlexusCollectionConfig<Type>) {
 	return _collection<Type>(() => instance(), config)
 }
+/**
+ * Generate a Plexus Action
+ * @param fn The Plexus action function to run
+ * @returns The intended return value of fn, or null if an error is caught
+ */
+export function action(fn: FunctionType) {
+	return _action(() => instance(), fn)
+}
 
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
 function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
@@ -69,11 +77,13 @@ export function usePlugin(plugin: PlexusPlugin) {
 }
 
 export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
-export { action, PlexusAction, PlexusActionHelpers } from "./action"
 export { gql } from "./gql"
+
 export {
 	instance,
+	PlexusAction,
 	PlexusPlugin,
+	PlexusActionHelpers,
 	PlexusPluginConfig,
 	PlexusCollectionConfig,
 	PlexusCollectionInstance,
