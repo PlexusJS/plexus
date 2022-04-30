@@ -100,7 +100,9 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	 * The data values of the items in the group
 	 */
 	get value() {
-		return this.collection().groupsValue[this._internalStore._name]
+		return Array.from(this._internalStore._includedKeys)
+			.map((key) => this.collection().getItemValue(key))
+			.filter((v) => v !== undefined) as DataType[]
 	}
 	/**
 	 * The data in the group

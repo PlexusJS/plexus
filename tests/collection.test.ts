@@ -67,13 +67,13 @@ describe("Testing Collection", () => {
 		// console.log(myCollection.getGroup('group1').value)
 		expect(myCollection.getItemValue(5).thing).toBe("idk")
 		expect(myCollection.getGroup("group1")).toBeDefined()
-		expect(myCollection.getGroup("group1").value[0].thing).toBe("lol")
+		expect(myCollection.getGroup("group1").value[0].thing).toBe("idk")
 
 		// we should be able to have two groups that return different values :)
-		myCollection.collect({ thing: 'hehe', id: 78 }, 'yes');
-		expect(myCollection.getGroup('yes').value[0]?.thing).toBe('hehe');
-		myCollection.collect({ thing: 'hoho', id: 96 }, 'no');
-		expect(myCollection.getGroup('no').value[0]?.thing).toBe('hoho');
+		myCollection.collect({ thing: "hehe", id: 78 }, "yes")
+		expect(myCollection.getGroup("yes").value[0].thing).toBe("hehe")
+		myCollection.collect({ thing: "hoho", id: 96 }, "no")
+		expect(myCollection.getGroup("no").value[0]?.thing).toBe("hoho")
 	})
 
 	test("Do Selectors Work?", () => {
