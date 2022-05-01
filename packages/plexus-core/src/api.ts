@@ -111,6 +111,8 @@ export class ApiInstance {
 				throw e
 			}
 		}
+		// Reset body after request
+		this._internalStore._options.body = undefined;
 		let data: ResponseDataType
 		let rawData: string
 
