@@ -73,7 +73,8 @@ export class ApiInstance {
 				this._headers.set("Content-Type", "text/html")
 			}
 		}
-		// console.log(_internalStore._options.headers, _internalStore._options.method)
+		if (["get","head"].includes(this._internalStore._options.method?.toLowerCase())) this._internalStore._options.body = undefined;
+ 		// console.log(_internalStore._options.headers, _internalStore._options.method)
 		let timedOut = false
 		let res: Response | undefined
 		try {
