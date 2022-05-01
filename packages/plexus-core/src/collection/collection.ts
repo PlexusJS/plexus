@@ -340,7 +340,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			return group.watch(callback)
 		} else {
 			// TODO Replace with runtime log
-			console.warn("no group found for name", name)
+			console.warn("No group found for name", name)
 			return () => {}
 		}
 	}
