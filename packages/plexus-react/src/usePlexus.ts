@@ -29,7 +29,6 @@ export function usePlexus<V extends WatchableValue[]>(deps: V | [] | WatchableVa
 				// if not a watchable, then we can't watch it, skip to next iteration
 				if (!(dep instanceof WatchableValue)) continue
 				const unsubscribe = dep.watch(function (v) {
-					console.log('should updated', { v })
 					set({})
 				})
 				depUnsubs.add(unsubscribe)
