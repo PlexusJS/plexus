@@ -102,33 +102,97 @@ describe("Testing Collection", () => {
 		expect(myCollection.getSelector("main").value?.thing).toBe("haha")
 	})
 	test("Watching Groups", () => {
-		myCollection.collect([
-			{ thing: "lol", id: 0 },
-			{ thing: "lol3", id: 2 },
-			{ thing: "lols", id: 1 },
-		])
-		myCollection.collect([
-			{ thing: "lol", id: 0 },
-			{ thing: "lol3", id: 2 },
-			{ thing: "lols", id: 1 },
-		])
+		myCollection.collect(
+			[
+				{ thing: "lol", id: 0 },
+				{ thing: "lol3", id: 2 },
+				{ thing: "lols", id: 1 },
+			],
+			"group1"
+		)
+		// myCollection.collect([
+		// 	{ thing: "lol", id: 0 },
+		// 	{ thing: "lol3", id: 2 },
+		// 	{ thing: "lols", id: 1 },
+		// ])
 
-		expect(myCollection.value.length).toBe(3)
-		expect(myCollection.value[0].thing).toBe("lol")
-		expect(myCollection.value[1].thing).toBe("lol3")
-		expect(myCollection.value[2].thing).toBe("lols")
+		// can add to groups
+
+		let watcherCalled = false
+		// watch for any change on group1 using the shorthand method
+		const rem = myCollection.watchGroup("group1", (group) => {
+			console.log("group1 changed\n%o\n%o", group, myCollection.groups.group1.index)
+			expect(group[0].thing).toBeDefined()
+			watcherCalled = true
+		})
+		console.log(myCollection.getGroup("group1").index)
+		expect(watcherCalled).toBe(false)
+		myCollection.update(2, { thing: "lol2" })
+
+		expect(watcherCalled).toBe(true)
+
+		rem()
+		watcherCalled = false
+
+		const rem2 = myCollection.getGroup("group1").watch((group) => {
+			console.log("group1 changed\n%o\n%o", group, myCollection.groups.group1.index)
+			expect(group[0].thing).toBeDefined()
+			watcherCalled = true
+		})
+
+		expect(watcherCalled).toBe(false)
+		myCollection.update(1, { thing: "lol3" })
+
+		expect(watcherCalled).toBe(true)
+
+		rem2()
+	})
+
+	test("Watching Selectors", () => {
+		myCollection.collect([
+			{ thing: "lol", id: 0 },
+			{ thing: "lol3", id: 2 },
+			{ thing: "lols", id: 1 },
+		])
 
 		// can add to groups
 		// console.log(myCollection.getGroupsOf(5))
 		myCollection.collect({ thing: "lol", id: 5 }, "group1")
-
-		expect(myCollection.getGroupsOf(5)).toEqual(["group1"])
-
-		// watch for any change on group1
-		myCollection.watchGroup("group1", (group) => {
-			console.log("group1 changed\n%o\n%o", group, myCollection.groups.group1.index)
-			expect(group[0].thing).toBeDefined()
+		myCollection.getSelector("main").select(5)
+		let watcherCalled = false
+		// watch for any change on selector main
+		myCollection.getSelector("main").watch((value) => {
+			console.log("selector changed\n%o\n%o", value, myCollection.getSelector("main").value)
+			expect(value).toBeDefined()
+			watcherCalled = true
 		})
+		expect(watcherCalled).toBe(false)
 		myCollection.update(5, { thing: "lol2", id: 5 })
+
+		expect(watcherCalled).toBe(true)
+	})
+	test("Watching Data", () => {
+		myCollection.collect([
+			{ thing: "lol", id: 0 },
+			{ thing: "lol3", id: 2 },
+			{ thing: "lols", id: 1 },
+		])
+
+		// can add to groups
+		// console.log(myCollection.getGroupsOf(5))
+		myCollection.collect({ thing: "lol", id: 5 }, "group1")
+		myCollection.getSelector("main").select(5)
+
+		let watcherCalled = false
+		// watch for any change on group1
+		myCollection.getSelector("main").data.watch((value) => {
+			console.log("selector changed\n%o\n%o", value, myCollection.getSelector("main").value)
+			expect(value).toBeDefined()
+			watcherCalled = true
+		})
+		expect(watcherCalled).toBe(false)
+		myCollection.update(5, { thing: "lol2", id: 5 })
+
+		expect(watcherCalled).toBe(true)
 	})
 })
