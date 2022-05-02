@@ -9,6 +9,8 @@ interface CollectionSelectorStore<ValueType = any> {
 	_name: string
 	_key: DataKey | null
 	_collectionId: string
+	_dataWatcherDestroyer: (() => void) | null
+	_watchers: Set<PlexusWatcher<ValueType>>
 }
 
 export type PlexusCollectionSelector<ValueType extends Record<string, any> = Record<string, any>> = CollectionSelector<ValueType>
@@ -22,9 +24,14 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			_name: name,
 			_key: null as DataKey | null,
 			_collectionId: collection().name,
+			_dataWatcherDestroyer: null,
+			_watchers: new Set(),
 		}
 		this.collection = collection
 		this.instance = instance
+	}
+	private runWatchers() {
+		this._internalStore._watchers.forEach((callback) => callback(this.value))
 	}
 	/**
 	 * The key of a data item assigned to this selector
@@ -37,7 +44,16 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * @param key The key to select
 	 */
 	select(key: DataKey) {
+		this._internalStore._dataWatcherDestroyer?.()
+
 		this._internalStore._key = key
+		// this.set(this.value)
+		const dataWatcherDestroyer =
+			this.data?.watch((value) => {
+				this.runWatchers()
+			}) || null
+		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer
+		this.runWatchers()
 	}
 	/**
 	 * Set the value of the selected data instance
@@ -48,6 +64,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	set(value: ValueType, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
 		// TODO add a warning here if the key is not set
 		this.data?.set(value, config)
+		this.runWatchers()
 	}
 	/**
 	 * Return the data value of the selected item
@@ -73,7 +90,13 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<ValueType>) {
-		return this.data?.watch(callback) || (() => {})
+		this._internalStore._watchers.add(callback)
+
+		// const destroyer = this.data?.watch(callback)
+		const destroyer = () => {
+			this._internalStore._watchers.delete(callback)
+		}
+		return destroyer || (() => {})
 	}
 }
 

@@ -49,7 +49,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	private runWatchers() {
 		this._internalStore._watchers.forEach((callback) => {
 			this.instance().runtime.log("warn", "_GroupsValue_\n", this.collection().groups)
-			callback(this.collection().groupsValue[this._internalStore._name])
+			callback(this.collection().getGroup(this._internalStore._name).value)
 		})
 	}
 	private rebuildWatchers() {
@@ -60,6 +60,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 			const destroyer = this.collection()
 				.getItem(key)
 				?.watch(() => {
+					// console.log("watching a new item")
 					this.runWatchers()
 				})
 			if (destroyer) this._internalStore._watcherDestroyers.add(destroyer)
@@ -100,7 +101,9 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	 * The data values of the items in the group
 	 */
 	get value() {
-		return this.collection().groupsValue[this._internalStore._name]
+		return Array.from(this._internalStore._includedKeys)
+			.map((key) => this.collection().getItemValue(key))
+			.filter((v) => v !== undefined) as DataType[]
 	}
 	/**
 	 * The data in the group

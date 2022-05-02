@@ -57,23 +57,23 @@ export class ApiInstance {
 			this._internalStore._noFetch = true
 		}
 	}
-	private async send<ResponseDataType>(path: string): Promise<PlexusApiRes<ResponseDataType>> {
+	private async send<ResponseDataType>(path: string, options: {
+		method: RequestInit['method'];
+		body?: RequestInit['body']
+	}): Promise<PlexusApiRes<ResponseDataType>> {
 		if (this._internalStore._noFetch) return { status: 408, response: {}, rawData: "", data: {} as ResponseDataType }
 
-		if (this._internalStore._options.method === undefined) {
-			this._internalStore._options.method = "GET"
-		}
 		if (this._internalStore._options.headers === undefined) {
 			this._internalStore._options.headers = {}
 		}
 		if (!this._headers.has("Content-Type")) {
-			if (this._internalStore._options.body !== undefined) {
+			if (options.body !== undefined) {
 				this._headers.set("Content-Type", "application/json")
 			} else {
 				this._headers.set("Content-Type", "text/html")
 			}
 		}
-		// console.log(_internalStore._options.headers, _internalStore._options.method)
+ 		// console.log(_internalStore._options.headers, _internalStore._options.method)
 		let timedOut = false
 		let res: Response | undefined
 		try {
@@ -89,7 +89,7 @@ export class ApiInstance {
 					}, this._internalStore._timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
-					fetch(uri, { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers) })
+					fetch(uri, { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers), ...options })
 						.then((response) => {
 							clearTimeout(to)
 							resolve(response)
@@ -104,7 +104,7 @@ export class ApiInstance {
 					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: "", data: {} as ResponseDataType }
 				}
 			} else {
-				res = await fetch(uri, { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers) })
+				res = await fetch(uri, { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers), ...options })
 			}
 		} catch (e) {
 			if (!this._internalStore._silentFail) {
@@ -125,20 +125,12 @@ export class ApiInstance {
 
 		if (res.status >= 200 && res.status < 600) {
 			const text = await res.text()
-			if (
-				this._headers.get("Content-Type") === "application/json" ||
-				this._headers.get("Content-Type") === "application/x-www-form-urlencoded"
-			) {
-				let parsed: ResponseDataType = {} as ResponseDataType
-				try {
-					parsed = JSON.parse(text) as ResponseDataType
-				} catch (e) {}
-				data = parsed ?? ({} as ResponseDataType)
-				rawData = text
-			} else {
-				rawData = text
-				data = text as any as ResponseDataType
-			}
+			let parsed: ResponseDataType = undefined as any;
+			try {
+				parsed = JSON.parse(text) as ResponseDataType
+			} catch (e) {}
+			data = parsed ?? text as any as ResponseDataType
+			rawData = text
 
 			return {
 				status: res.status,
@@ -180,36 +172,38 @@ export class ApiInstance {
 
 		this.headers(options.headers)
 		return this
-		if (this._internalStore._noFetch) return this
 	}
 	/**
 	 * Send a get request
 	 * @param url The url to send the request to
 	 */
-	get(path: string, query?: Record<string, any>) {
+	get<ResponseType = any>(path: string, query?: Record<string, any>) {
 		if (this._internalStore._noFetch) return null
-		this._internalStore._options.method = "GET"
 		const params = new URLSearchParams(query)
 
-		return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
+		return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, {
+			method: 'GET'
+		})
 	}
 	/**
 	 * Send a post request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	post(path: string, body: Record<string, any> | string = {}) {
+	post<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
 		if (this._internalStore._noFetch) return null
-		this._internalStore._options.method = "POST"
 		if (typeof body !== "string") {
 			body = JSON.stringify(body)
 		}
-		this._internalStore._options.body = body
+		const options = {
+			method: 'POST',
+			body
+		}
 		if (this._headers && this._headers.get("Content-Type") === "application/x-www-form-urlencoded") {
 			const params = new URLSearchParams(body)
-			return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`)
+			return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, options)
 		} else {
-			return this.send<ResponseType>(path)
+			return this.send<ResponseType>(path, options)
 		}
 	}
 	/**
@@ -217,52 +211,58 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	put(path: string, body: Record<string, any> | string = {}) {
+	put<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
 		if (this._internalStore._noFetch) return null
-		this._internalStore._options.method = "PUT"
 		if (typeof body !== "string") {
-			this._internalStore._options.body = JSON.stringify(body)
+			body = JSON.stringify(body)
 		}
-		return this.send<ResponseType>(path)
+		return this.send<ResponseType>(path, {
+			method: 'PUT',
+			body
+		})
 	}
 	/**
 	 * Send a delete request
 	 * @param url The url to send the request to
 	 */
-	delete(path: string) {
+	delete<ResponseType = any>(path: string) {
 		if (this._internalStore._noFetch) return null
-		this._internalStore._options.method = "DELETE"
-		return this.send<ResponseType>(path)
+		return this.send<ResponseType>(path, {
+			method: 'DELETE'
+		})
 	}
 	/**
 	 * Send a patch request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	patch(path: string, body: Record<string, any> | string = {}) {
+	patch<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
 		if (this._internalStore._noFetch) return null
-		this._internalStore._options.method = "PATCH"
 		if (typeof body !== "string") {
-			this._internalStore._options.body = JSON.stringify(body)
+			body = JSON.stringify(body)
 		}
-		return this.send<ResponseType>(path)
+		return this.send<ResponseType>(path, {
+			method: 'PATCH',
+			body
+		})
 	}
 	/**
 	 * Send a graphql request
 	 * @param query The gql query to send
 	 * @param variables Variables
 	 */
-	gql(query: string, variables?: Record<string, any>) {
-		if (this._internalStore._noFetch) return null
-		this._internalStore._options.method = "POST"
-		this._internalStore._options.body = JSON.stringify({
-			query,
-			variables,
-		})
+	gql<ResponseType = any>(query: string, variables?: Record<string, any>) {
+		if (this._internalStore._noFetch) return null;
 
 		this._headers.set("Content-Type", "application/json")
 
-		return this.send<ResponseType>("")
+		return this.send<ResponseType>("", {
+			method: 'POST',
+			body: JSON.stringify({
+				query,
+				variables,
+			})
+		})
 	}
 	/**
 	 * Set the authentication details for the request

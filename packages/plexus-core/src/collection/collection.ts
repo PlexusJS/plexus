@@ -26,7 +26,7 @@ interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	_internalId: string
 	_lookup: Map<string, string>
 	_key: string
-	_data: Map<string, PlexusDataInstance<DataType>>
+	_data: Map<string | number, PlexusDataInstance<DataType>>
 	_groups: Map<GroupName, PlexusCollectionGroup<DataType>>
 	_selectors: Map<SelectorName, PlexusCollectionSelector<DataType>>
 	_name: string
@@ -112,9 +112,10 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	collect(data: DataType, groups?: GroupName[] | GroupName): void
 	collect(data: DataType | DataType[], groups?: GroupName[] | GroupName) {
 		const collectItem = (item: DataType) => {
+			if (!item) return;
 			if (item[this._internalStore._key] !== undefined && item[this._internalStore._key] !== null) {
 				// normalizing the key type to string
-				const dataKey = item[this._internalStore._key].toString()
+				const dataKey = item[this._internalStore._key]
 				// if there is already a state for that key, update it
 				if (this._internalStore._data.has(dataKey)) {
 					this._internalStore._data.get(dataKey)?.set(item)
@@ -135,21 +136,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			}
 		} else {
 			collectItem(data)
-			// if (data[this._internalStore._key] !== undefined && data[this._internalStore._key] !== null) {
-			// 	// if there is already a state for that key, update it
-			// 	if (this._internalStore._data.has(data[this._internalStore._key].toString())) {
-			// 		this._internalStore._data.get(data[this._internalStore._key].toString())?.set(data)
-			// 	}
-			// 	// if there is no state for that key, create it
-			// 	else {
-			// 		const datainstance = _data(() => this.instance(), this._internalStore._key, data)
-			// 		if (datainstance) {
-			// 			this._internalStore._data.set(data[this._internalStore._key].toString(), datainstance)
-			// 		}
-			// 	}
-			// 	if (groups) this.addToGroups(data[this._internalStore._key], groups)
-			// }
 		}
+		this.mount()
 	}
 	/**
 	 * Update the collection with data;
@@ -160,7 +148,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param config.deep Should the update be deep or shallow
 	 */
 	update(key: DataKey, data: Partial<DataType>, config: { deep: boolean } = { deep: true }) {
-		key = key.toString()
+		key = key
 		if (config.deep) {
 			if (this._internalStore._data.has(key)) {
 				this._internalStore._data.get(key)?.set({ ...data, [this._internalStore._key]: key } as Partial<DataType>, { mode: "patch" })
@@ -174,6 +162,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				console.warn("no data found for key", key)
 			}
 		}
+		this.mount()
 	}
 	/**
 	 * Get the
@@ -181,7 +170,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns
 	 */
 	getItem(key: DataKey) {
-		return this._internalStore._data.get(key.toString())
+		return this._internalStore._data.get(key)
 	}
 	/**
 	 * Get the value of an item in the collection
@@ -216,14 +205,6 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	createSelectors<Names extends SelectorName>(selectorNames: [Names, ...Names[]]) {
 		for (const selectorName of selectorNames) {
-			// this._internalStore._selectors.set(
-			// 	selectorName,
-			// 	_selector(
-			// 		() => this.instance(),
-			// 		() => this,
-			// 		selectorName
-			// 	)
-			// )
 			this.createSelector(selectorName)
 		}
 		return this as CollectionInstance<DataType, Groups, Selectors & Map<typeof selectorNames[number], PlexusCollectionSelector<DataType>>>
@@ -277,24 +258,10 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The new Collection Instance
 	 */
 	createGroups<Names extends GroupName>(groupNames: [Names, ...Names[]]) {
-		let ret: CollectionInstance<DataType, Groups, Selectors> = this
 		for (const groupName of groupNames) {
-			// this._internalStore._groups.set(
-			// 	groupName,
-			// 	_group(
-			// 		() => this.instance(),
-			// 		() => this,
-			// 		groupName
-			// 	)
-			// )
 			this.createGroup(groupName)
 		}
-		// for (const groupName of groupNames) {
-		// 	ret = this.createGroup(groupName)
-		// }
 
-		// TODO: Fix this type issue
-		// need to return any as it throws a type error with the getGroup function
 		return this as CollectionInstance<DataType, Groups & Map<typeof groupNames[number], PlexusCollectionGroup<DataType>>, Selectors>
 	}
 	/**
@@ -374,7 +341,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			return group.watch(callback)
 		} else {
 			// TODO Replace with runtime log
-			console.warn("no group found for name", name)
+			console.warn("No group found for name", name)
 			return () => {}
 		}
 	}
@@ -383,8 +350,9 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param keys The data key(s) to use for lookup
 	 */
 	delete(keys: DataKey | DataKey[]) {
+		// the function to remove the data
 		const rm = (key: DataKey) => {
-			key = key.toString()
+			key = key
 			this._internalStore._data.get(key)?.delete()
 
 			for (let groupName of this.getGroupsOf(key)) {
@@ -392,6 +360,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			}
 			this._internalStore._data.delete(key)
 		}
+		// if an array, iterate through the keys and remove them each
 		if (Array.isArray(keys)) {
 			keys.forEach(rm)
 		} else {
@@ -440,6 +409,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The collection data values as an array
 	 */
 	get value() {
+		this.mount()
 		return Array.from(this._internalStore._data.values()).map((item) => item.value)
 	}
 	/**
@@ -454,27 +424,16 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		return groups
 	}
 	/**
-	 * Get all the groups and their childrens data values as an object
-	 * @returns The groups paired with their childrens data values as an object
+	 * Get all the groups and their children's data values as an object
+	 * @returns The groups paired with their children's data values as an object
 	 */
 	get groupsValue() {
+		// holder for groups values
 		const groups: Record<KeyOfMap<Groups>, DataType[]> = {} as Record<KeyOfMap<Groups>, DataType[]>
-		for (let group of this._internalStore._groups.entries()) {
-			const keys = Array.from(group[1].index)
-			for (let key in keys) {
-				const data = this._internalStore._data.get(key)
-				this.instance().runtime.log(
-					"warn",
-					`_in groupsValue_ looking for ${key} ==>> `,
-					this._internalStore._data,
-					this._internalStore._data.get(key)
-				)
-				if (!groups[group[0] as KeyOfMap<Groups>]) groups[group[0] as KeyOfMap<Groups>] = []
-				if (data) {
-					groups[group[0] as KeyOfMap<Groups>].push(data.value)
-				}
-			}
-		}
+
+		// iterate through the groups
+		const groupNames: KeyOfMap<Groups>[] = Array.from(this._internalStore._groups.keys()) as KeyOfMap<Groups>[]
+		groupNames.forEach((name: KeyOfMap<Groups>) => (groups[name as KeyOfMap<Groups>] = [...this.getGroup(name as KeyOfMap<Groups>).value]))
 		return groups
 	}
 	/**
@@ -518,12 +477,6 @@ export function _collection<
 	 * Helper Function; Mounts the collection to the instance
 	 */
 
-	// initalization //
-	// if (instance()._collections.has(_internalStore._name + "")) {
-	// 	instance()._collections.delete(_internalStore._name + "")
-	// }
-
-	// instance()._collections.set(_internalStore._name + "", collection)
 	const collection = new CollectionInstance<DataType, Groups, Selectors>(instance, _config)
 	return collection
 }
