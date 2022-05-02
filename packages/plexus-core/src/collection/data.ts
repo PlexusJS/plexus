@@ -1,4 +1,5 @@
 import { PlexusStateInstance, state } from ".."
+import { WatchableValue } from "./../watchable"
 import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
 import { StateInstance } from "../state"
@@ -17,6 +18,7 @@ export class CollectionDataInstance<ValueType extends DataObjectType<PK> = any, 
 	primaryKey: PK
 	private _internalStore: PlexusDataStore<ValueType>
 	constructor(instance: () => PlexusInstance, primaryKey: PK, value: ValueType) {
+		// super(instance, value)
 		this.instance = instance
 		this.primaryKey = primaryKey
 		this._internalStore = {
