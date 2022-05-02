@@ -1,6 +1,7 @@
 node_modules
 coverage
 .turbo
+.vscode
 dist
 packages/*.js
 __snapshots__
