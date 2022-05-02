@@ -132,7 +132,7 @@ export class ApiInstance {
 			try {
 				parsed = JSON.parse(text) as ResponseDataType
 			} catch (e) {}
-			data = parsed ?? (text === "" ? ({} as ResponseDataType) : (text as any as ResponseDataType))
+			data = parsed ?? ({} as ResponseDataType)
 			rawData = text
 
 			return {
