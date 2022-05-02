@@ -110,7 +110,7 @@ export class RuntimeInstance {
 				...message
 			)
 		// TODO Logging must only occur when the config parameter is set
-		if (this.config?.logLevel) {
+		if (this.instance().settings?.logLevel) {
 			switch (this.instance().settings.logLevel) {
 				case "warn": {
 					if (type === "error" || type === "warn") callLog()

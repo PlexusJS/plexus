@@ -28,7 +28,7 @@ export function usePlexus<V extends WatchableValue[]>(deps: V | [] | WatchableVa
 			for (let dep of depsArr) {
 				// if not a watchable, then we can't watch it, skip to next iteration
 				if (!(dep instanceof WatchableValue)) continue
-				const unsubscribe = dep.watch(function () {
+				const unsubscribe = dep.watch(function (v) {
 					set({})
 				})
 				depUnsubs.add(unsubscribe)
