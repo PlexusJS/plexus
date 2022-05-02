@@ -112,6 +112,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	collect(data: DataType, groups?: GroupName[] | GroupName): void
 	collect(data: DataType | DataType[], groups?: GroupName[] | GroupName) {
 		const collectItem = (item: DataType) => {
+			if (!item) return;
 			if (item[this._internalStore._key] !== undefined && item[this._internalStore._key] !== null) {
 				// normalizing the key type to string
 				const dataKey = item[this._internalStore._key]
