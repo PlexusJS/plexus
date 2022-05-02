@@ -1,7 +1,7 @@
 import { deepClone, deepMerge } from "./helpers"
 import { instance } from "./instance"
 export interface PlexusApiConfig {
-	options?: RequestInit
+	defaultOptions?: PlexusAPIReq
 	timeout?: number
 	silentFail?: boolean
 }
@@ -12,10 +12,7 @@ export interface PlexusApiRes<DataType = any> {
 	data: DataType
 }
 export interface PlexusAPIReq {
-	headers: Record<string, string>
-	body?: RequestInit["body"]
 	cache?: RequestInit["cache"]
-	method?: RequestInit["method"]
 	credentials?: RequestInit["credentials"]
 	integrity?: RequestInit["integrity"]
 	keepalive?: RequestInit["keepalive"]
@@ -28,22 +25,25 @@ export interface PlexusAPIReq {
 
 export type PlexusApi = ApiInstance
 interface ApiStore {
-	_options: RequestInit
-	_optionsInit: RequestInit
+	_options: PlexusAPIReq
+	_optionsInit: PlexusAPIReq
 	_timeout: number | undefined
 	_baseURL: string
 	_noFetch: boolean
 	_authToken: string
 	_silentFail: boolean
 }
+/**
+ *
+ */
 export class ApiInstance {
 	// private
 	private _internalStore: ApiStore
 	private _headers: Map<string, string> = new Map()
-	constructor(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }) {
+	constructor(baseURL: string = "", config: PlexusApiConfig = { defaultOptions: {} }) {
 		this._internalStore = {
-			_options: config.options ?? {},
-			_optionsInit: { ...config.options },
+			_options: config.defaultOptions ?? {},
+			_optionsInit: { ...config.defaultOptions },
 			_timeout: config.timeout || undefined,
 			_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 			_noFetch: false,
@@ -57,15 +57,17 @@ export class ApiInstance {
 			this._internalStore._noFetch = true
 		}
 	}
-	private async send<ResponseDataType>(path: string, options: {
-		method: RequestInit['method'];
-		body?: RequestInit['body']
-	}): Promise<PlexusApiRes<ResponseDataType>> {
-		if (this._internalStore._noFetch) return { status: 408, response: {}, rawData: "", data: {} as ResponseDataType }
-
-		if (this._internalStore._options.headers === undefined) {
-			this._internalStore._options.headers = {}
+	private async send<ResponseDataType>(
+		path: string,
+		options: {
+			method: RequestInit["method"]
+			body?: RequestInit["body"]
 		}
+	): Promise<PlexusApiRes<ResponseDataType>> {
+		// if we don't have fetch, return a blank response object
+		if (this._internalStore._noFetch) return ApiInstance.createEmptyRes<ResponseDataType>()
+
+		//
 		if (!this._headers.has("Content-Type")) {
 			if (options.body !== undefined) {
 				this._headers.set("Content-Type", "application/json")
@@ -73,12 +75,15 @@ export class ApiInstance {
 				this._headers.set("Content-Type", "text/html")
 			}
 		}
- 		// console.log(_internalStore._options.headers, _internalStore._options.method)
+		// init values used later
 		let timedOut = false
 		let res: Response | undefined
 		try {
+			// build out the URI
 			const matches = path.match(/^http(s)?/g)
 			const uri = matches && matches?.length > 0 ? path : `${this._internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
+			const requestObject = { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers), ...options }
+			// if we have a timeout set
 			if (this._internalStore._timeout) {
 				// res = await
 				let to: any
@@ -89,7 +94,7 @@ export class ApiInstance {
 					}, this._internalStore._timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
-					fetch(uri, { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers), ...options })
+					fetch(uri, requestObject)
 						.then((response) => {
 							clearTimeout(to)
 							resolve(response)
@@ -100,36 +105,34 @@ export class ApiInstance {
 				if (raceResult) {
 					res = raceResult
 				} else {
-					// a -1 response status means the programmatic timeout was surpassed
-					return { status: timedOut ? 504 : res?.status ?? 513, response: {}, rawData: "", data: {} as ResponseDataType }
+					// a 504 response status means the programmatic timeout was surpassed
+					return ApiInstance.createEmptyRes<ResponseDataType>(timedOut ? 504 : res?.status ?? 513)
 				}
-			} else {
-				res = await fetch(uri, { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers), ...options })
+			}
+			// if we don't have a timeout set, just try to fetch
+			else {
+				res = await fetch(uri, requestObject)
 			}
 		} catch (e) {
+			// if silentFail is enabled, don't throw the error; Otherwise, throw an error
 			if (!this._internalStore._silentFail) {
 				throw e
 			}
 		}
 		let data: ResponseDataType
 		let rawData: string
-
+		// we never got a response
 		if (res === undefined) {
-			return {
-				status: 500,
-				response: {},
-				rawData: "",
-				data: {} as ResponseDataType,
-			}
+			return ApiInstance.createEmptyRes<ResponseDataType>(500)
 		}
 
 		if (res.status >= 200 && res.status < 600) {
 			const text = await res.text()
-			let parsed: ResponseDataType = undefined as any;
+			let parsed: ResponseDataType = undefined as any
 			try {
 				parsed = JSON.parse(text) as ResponseDataType
 			} catch (e) {}
-			data = parsed ?? text as any as ResponseDataType
+			data = parsed ?? (text as any as ResponseDataType)
 			rawData = text
 
 			return {
@@ -160,8 +163,8 @@ export class ApiInstance {
 	 * @param options RequestInit - Same as fetch options
 	 * @param overwrite (optional) If true, will overwrite the current options object
 	 */
-	options(options: PlexusAPIReq, overwrite: boolean)
-	options(options: PlexusAPIReq)
+	options(options: RequestInit, overwrite: boolean)
+	options(options: RequestInit)
 	options(options: RequestInit, overwrite: boolean = false) {
 		if (overwrite) {
 			this._internalStore._options = deepClone(options) as RequestInit & { headers: Record<string, string> }
@@ -178,11 +181,10 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 */
 	get<ResponseType = any>(path: string, query?: Record<string, any>) {
-		if (this._internalStore._noFetch) return null
 		const params = new URLSearchParams(query)
 
 		return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, {
-			method: 'GET'
+			method: "GET",
 		})
 	}
 	/**
@@ -191,13 +193,12 @@ export class ApiInstance {
 	 * @param body The body of the request (can be a string or object)
 	 */
 	post<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
-		if (this._internalStore._noFetch) return null
 		if (typeof body !== "string") {
 			body = JSON.stringify(body)
 		}
 		const options = {
-			method: 'POST',
-			body
+			method: "POST",
+			body,
 		}
 		if (this._headers && this._headers.get("Content-Type") === "application/x-www-form-urlencoded") {
 			const params = new URLSearchParams(body)
@@ -212,13 +213,12 @@ export class ApiInstance {
 	 * @param body The body of the request (can be a string or object)
 	 */
 	put<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
-		if (this._internalStore._noFetch) return null
 		if (typeof body !== "string") {
 			body = JSON.stringify(body)
 		}
 		return this.send<ResponseType>(path, {
-			method: 'PUT',
-			body
+			method: "PUT",
+			body,
 		})
 	}
 	/**
@@ -226,9 +226,8 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 */
 	delete<ResponseType = any>(path: string) {
-		if (this._internalStore._noFetch) return null
 		return this.send<ResponseType>(path, {
-			method: 'DELETE'
+			method: "DELETE",
 		})
 	}
 	/**
@@ -237,13 +236,12 @@ export class ApiInstance {
 	 * @param body The body of the request (can be a string or object)
 	 */
 	patch<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
-		if (this._internalStore._noFetch) return null
 		if (typeof body !== "string") {
 			body = JSON.stringify(body)
 		}
 		return this.send<ResponseType>(path, {
-			method: 'PATCH',
-			body
+			method: "PATCH",
+			body,
 		})
 	}
 	/**
@@ -252,16 +250,14 @@ export class ApiInstance {
 	 * @param variables Variables
 	 */
 	gql<ResponseType = any>(query: string, variables?: Record<string, any>) {
-		if (this._internalStore._noFetch) return null;
-
 		this._headers.set("Content-Type", "application/json")
 
 		return this.send<ResponseType>("", {
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify({
 				query,
 				variables,
-			})
+			}),
 		})
 	}
 	/**
@@ -327,8 +323,11 @@ export class ApiInstance {
 			headers: Record<string, string>
 		} & RequestInit
 	}
+	private static createEmptyRes<ResponseDataType = any>(status: number = 408) {
+		return { status, response: {}, rawData: "", data: {} as ResponseDataType }
+	}
 }
 
-export function api(baseURL: string = "", config: PlexusApiConfig = { options: { headers: {} } }) {
+export function api(baseURL: string = "", config: PlexusApiConfig = { defaultOptions: {} }) {
 	return new ApiInstance(baseURL, config)
 }
