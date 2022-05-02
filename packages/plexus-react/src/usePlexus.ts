@@ -24,21 +24,21 @@ export function usePlexus<V extends WatchableValue[]>(deps: V | [] | WatchableVa
 
 	useEffect(() => {
 		if (Array.isArray(depsArr)) {
-			const depUnsubs: Set<() => void> = new Set()
+			const depUnsubs: Array<() => void> = []
 			for (let dep of depsArr) {
 				// if not a watchable, then we can't watch it, skip to next iteration
 				if (!(dep instanceof WatchableValue)) continue
 				const unsubscribe = dep.watch(function (v) {
 					set({})
 				})
-				depUnsubs.add(unsubscribe)
+				depUnsubs.push(unsubscribe)
 			}
 			// unsubscribe on component destroy
 			return () => {
-				for (let unsub of Array.from(depUnsubs.values())) {
+				for (let unsub of depUnsubs) {
 					unsub()
-					depUnsubs.delete(unsub)
 				}
+				depUnsubs.length = 0
 			}
 		}
 	}, [])
