@@ -148,9 +148,10 @@ export class StorageInstance {
 
 			// instance().storage.monitor(key, object)
 			let storedValue = this.get(key)
+
 			if (storedValue) {
 				const val = object.value
-				if (val && (val !== storedValue || !isEqual(val, storedValue))) {
+				if (val && !isEqual(val, storedValue)) {
 					this.instance().runtime.log(
 						"info",
 						`Syncing "${key}" with storage value "${convertToString(val)}" to "${convertToString(storedValue)}"`
