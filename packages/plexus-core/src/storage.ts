@@ -119,7 +119,7 @@ export class StorageInstance {
 
 		this._internalStore.tracking.add(object)
 		let storedValue = this.get(key)
-		this.instance().runtime.log("info", `Persisting new key ${key}`, JSON.stringify(this.watching))
+		this.instance().runtime.log("info", `Persisting new key ${key}` /*, JSON.stringify(this.watching)*/)
 		if (!storedValue) {
 			this.instance().storage?.set(key, object.value)
 		}
