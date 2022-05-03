@@ -1,6 +1,6 @@
 import { instance } from "./instance"
 import { PlexusInstance } from "./instance"
-import { WatchableValue } from "./watchable"
+import { WatchableValue, Watchable } from "./watchable"
 import { _state, PlexusStateInstance } from "./state"
 import { _computed, PlexusComputedStateInstance } from "./computed"
 import { _action, FunctionType, PlexusAction, PlexusActionHelpers } from "./action"
@@ -94,4 +94,5 @@ export {
 	PlexusComputedStateInstance,
 	PlexusInstance,
 	WatchableValue,
+	Watchable,
 }

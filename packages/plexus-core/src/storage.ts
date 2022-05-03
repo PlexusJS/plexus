@@ -1,8 +1,8 @@
 import { convertStringToType, convertToString, deepMerge, isEqual, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
-import { WatchableValue } from "./watchable"
+import { Watchable, WatchableValue } from "./watchable"
 
-type ExtendedWatchable = WatchableValue<any> & Record<string, any>
+type ExtendedWatchable = Watchable<any> & Record<string, any>
 type AlmostAnything = string | number | symbol | Record<any, any> | Array<any>
 export type StorageOverride = {
 	prefix: string
@@ -111,7 +111,7 @@ export class StorageInstance {
 	get watching() {
 		return Array.from(this._internalStore.tracking)
 	}
-	monitor(key: string, object: WatchableValue<any>) {
+	monitor(key: string, object: Watchable<any>) {
 		if (key === "" || key === undefined) {
 			this.instance().runtime.log("warn", `Can't monitor an object with no key`)
 			return

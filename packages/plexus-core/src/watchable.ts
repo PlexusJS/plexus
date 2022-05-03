@@ -11,9 +11,9 @@ interface WatchableStore<Value = any> {
 	_watchers: Set<PlexusWatcher<Value>>
 	_internalId: string
 }
-export class WatchableValue<ValueType = any> {
+export class Watchable<ValueType = any> {
 	protected _watchableStore: WatchableStore<ValueType>
-	private _instance: () => PlexusInstance
+	protected _instance: () => PlexusInstance
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		this._instance = instance
 		this._watchableStore = {
@@ -31,12 +31,20 @@ export class WatchableValue<ValueType = any> {
 		this._watchableStore._watchers.add(destroyer)
 
 		return () => {
+			destroyer()
 			this._watchableStore._watchers.delete(destroyer)
 		}
 	}
 	get value(): ValueType {
 		return deepClone(this._watchableStore._value)
 	}
+}
+
+export class WatchableValue<ValueType = any> extends Watchable<ValueType> {
+	constructor(instance: () => PlexusInstance, init: ValueType) {
+		super(instance, init)
+	}
+
 	set(value?: ValueType) {
 		this._watchableStore._lastValue = this._watchableStore._value
 		if (isObject(value) && isObject(this._watchableStore._value)) {

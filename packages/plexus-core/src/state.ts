@@ -238,7 +238,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * The initial (default) value of the state
 	 */
 	get initialValue() {
-		return this._internalStore._initialValue
+		return deepClone(this._internalStore._initialValue)
 	}
 }
 
