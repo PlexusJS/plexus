@@ -72,6 +72,11 @@ const config = {
       },
       footer: {
         style: 'dark',
+        logo: {
+          alt: 'Powered By Vercel',
+          src: "https://www.datocms-assets.com/31049/1618983297-powered-by-vercel.svg",
+          href: "https://vercel.com?utm_source=plexusjs&utm_campaign=oss"
+        },
         links: [
           {
             title: 'Resources',
@@ -109,6 +114,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        defaultLanguage: 'typescript',
       },
     }),
 };

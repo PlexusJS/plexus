@@ -1,0 +1,69 @@
+---
+sidebar_position: 5
+---
+
+# API
+
+## Basic Use
+
+```ts
+import { api, action } from "@plexusjs/core"
+const myCoolApi = api("https://api.example.com")
+
+const fetchUsers = action(async ({ onCatch }) => {
+	onCatch(console.error)
+	return myCoolApi.get("/users")
+})
+
+const users = await fetchUsers() //=> [{id: 1, name: "John"}, {id: 2, name: "Jane"}] or something
+```
+
+## Properties
+
+### api `.config`
+
+The configuration of this api
+
+## Methods
+
+### api `.get()`
+
+Send a get request
+
+#### Arguments
+
+> `path: string` The path to send the request to
+
+> `query: Record<string, string>` The path to send the request to
+
+### api `.post()`
+
+Send a post request
+
+### api `.put()`
+
+Send a put request
+
+### api `.delete()`
+
+Send a delete request
+
+### api `.patch()`
+
+Send a patch request
+
+### api `.options()`
+
+Set the configuration options for fetch
+
+### api `.auth()`
+
+Set the authentication details for the request
+
+### api `.headers()`
+
+Set headers for the request
+
+### api `.reset()`
+
+Reset this routes configuration
