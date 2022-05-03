@@ -23,14 +23,11 @@ import emoji from "node-emoji"
 
 ## What is it?
 
-Plexus is a SSOT toolkit for building out scaleable reactive applications. In other words, we make state management, api communication, event management, & data manipulation a breeze.
+Plexus is a SSOT toolkit for building out scaleable reactive applications. In other words, we make state management, api communication, event management, & data manipulation a breeze. According to a dictionary somewhere, "plexus" is defined as <i>"a network of nerves or vessels in the body"</i>. The name is a metaphor for how plexus works. The tools in this package span the entire project and each one is interconnected like nerves in the body!
 
-## What does "Plexus" mean?
+## Motivation
 
-<p>
-	According to a dictionary somewhere, "plexus" means <i>"a network of nerves or vessels in the body"</i>. The way plexus is supposed to work, it
-	fits that definition almost perfectly. The tools in this package span the entire project and is interconnected like nerves in the body!
-</p>
+Most state libraries come along with complex syntax, confusing terminology and lack functionality out of the box. Pulse gets straight to the point providing not only the tools needed to create small and large scale applications
 
 ## Why use Plexus instead of...
 
@@ -38,22 +35,23 @@ Plexus is a SSOT toolkit for building out scaleable reactive applications. In ot
 
 -   Restricted & opinionated design/structure
 -   immutable state (which causes excessive use of memory)
+    There are a few potential cons of using Redux: 1) It can be tricky to set up; you need to configure both the store and the actions before you can use Redux in your app. 2) It can be difficult to debug; if something goes wrong, it can be hard to figure out what the problem is. 3) It's not always necessary; if you're just building a simple app, you might not need the extra complexity that Redux adds.
 
 ### ...VueX?
 
-Ea laborum exercitation cupidatat laboris. Laborum qui exercitation nisi mollit. Dolore labore nisi minim non anim sunt occaecat dolore aliquip. Aliquip pariatur qui eu ut fugiat deserunt. Reprehenderit cillum eiusmod veniam anim cillum id velit aliqua ea magna ea aute duis labore. Aute quis excepteur exercitation in minim proident culpa dolor ea excepteur ut. Deserunt Lorem ad ex ipsum velit nisi duis veniam labore ut aliquip ut dolore aute.
+VueX can make your code more difficult to read and debug, since it introduces a lot of new concepts and can be confusing at first. Additionally, VueX can make your application more complex and difficult to maintain, since it adds a lot of new code to your project. Finally, VueX can impact the performance of your application, since it adds a lot of overhead.
 
 ### ...RxJs?
 
-Ea laborum exercitation cupidatat laboris. Laborum qui exercitation nisi mollit. Dolore labore nisi minim non anim sunt occaecat dolore aliquip. Aliquip pariatur qui eu ut fugiat deserunt. Reprehenderit cillum eiusmod veniam anim cillum id velit aliqua ea magna ea aute duis labore. Aute quis excepteur exercitation in minim proident culpa dolor ea excepteur ut. Deserunt Lorem ad ex ipsum velit nisi duis veniam labore ut aliquip ut dolore aute.
+There are a few potential drawbacks to using RxJS that you should be aware of before deciding to incorporate it into your project. First, RxJS is a large and complex library, which can make it difficult to learn and use. Second, RxJS is not always compatible with other libraries and frameworks, which can limit its usefulness in some cases. Finally, some developers have found that RxJS can be challenging to debug, which can be a major downside if you're working on a large or complex project.
 
 ### ...MobX?
 
-Ea laborum exercitation cupidatat laboris. Laborum qui exercitation nisi mollit. Dolore labore nisi minim non anim sunt occaecat dolore aliquip. Aliquip pariatur qui eu ut fugiat deserunt. Reprehenderit cillum eiusmod veniam anim cillum id velit aliqua ea magna ea aute duis labore. Aute quis excepteur exercitation in minim proident culpa dolor ea excepteur ut. Deserunt Lorem ad ex ipsum velit nisi duis veniam labore ut aliquip ut dolore aute.
+There are a few potential cons of using MobX, including the possibility of messy code if not used correctly, and the potential for performance issues if state is not handled optimally. However, overall, MobX can be a very helpful tool for managing state in JavaScript applications.
 
 ### ...Context API?
 
-Ea laborum exercitation cupidatat laboris. Laborum qui exercitation nisi mollit. Dolore labore nisi minim non anim sunt occaecat dolore aliquip. Aliquip pariatur qui eu ut fugiat deserunt. Reprehenderit cillum eiusmod veniam anim cillum id velit aliqua ea magna ea aute duis labore. Aute quis excepteur exercitation in minim proident culpa dolor ea excepteur ut. Deserunt Lorem ad ex ipsum velit nisi duis veniam labore ut aliquip ut dolore aute.
+First, it can create unnecessary complexity in your code if not used carefully. Second, the Context API is still fairly new and may change in future versions of React, which could break your code. Finally, some developers argue that the Context API goes against the React philosophy of keeping components modular and self-contained.
 
 ## Community & Contributions
 
