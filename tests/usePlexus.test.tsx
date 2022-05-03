@@ -1,4 +1,4 @@
-import { collection, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core"
+import { collection, computed, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core"
 import React, { useEffect } from "react"
 import { usePlexus } from "../packages/plexus-react/src"
 import * as renderer from "react-test-renderer"
@@ -13,6 +13,9 @@ beforeEach(() => {
 	myState2 = state(1)
 	myState3 = state<Partial<{ name: string }>>({ name: "test" })
 	myCollection.collect({ id: "poggers", a: 2 }, "test")
+	myState4 = computed(() => {
+		return myState2.value + 12
+	}, [myState])
 })
 afterEach(() => {
 	myCollection.clear()
@@ -101,6 +104,20 @@ describe("Test react integration", () => {
 			return (
 				<div>
 					<p>{JSON.stringify(g1)}</p>
+				</div>
+			)
+		}
+		const tree = renderer.create(<RandomComponent />).toJSON()
+		expect(tree).toMatchSnapshot()
+	})
+
+	test("usePlexus hook with computed", () => {
+		function RandomComponent() {
+			const computedThing = usePlexus(myState4)
+			// const [groupValue] = usePlexus([myCollection.groups.test])
+			return (
+				<div>
+					<p>{computedThing}</p>
 				</div>
 			)
 		}

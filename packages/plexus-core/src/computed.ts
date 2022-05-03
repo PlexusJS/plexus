@@ -112,7 +112,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * The value (reactive) of the state
 	 */
 	get value(): ValueType {
-		this.mount()
+		// this.mount()
 		// return this._internalStore._state.value
 		return super.value
 	}
