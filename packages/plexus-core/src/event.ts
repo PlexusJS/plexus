@@ -86,5 +86,5 @@ export class EventInstance<PayloadType = any> {
 }
 
 export function _event<PayloadType = any>(instance: () => PlexusInstance) {
-	return new EventInstance(instance)
+	return new EventInstance<PayloadType>(instance)
 }
