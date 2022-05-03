@@ -36,7 +36,13 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		}
 		this.refreshDeps()
 	}
-
+	private mount() {
+		if (!this.instance()._computedStates.has(this)) {
+			this.instance().runtime.log("info", `Hoisting state ${this.id} with value ${this.value} to instance`)
+			this.instance()._computedStates.add(this)
+			// this.instance().storage?.sync()
+		}
+	}
 	/**
 	 *  Internal Helper Function; for each dependency, add a watcher to the state that will update the computed state when a dependency changes
 	 * @internal
@@ -83,7 +89,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
 
 		// update the runtime conductor
-		// this.mount()
+		this.mount()
 		this._instance().runtime.broadcast(this._watchableStore._internalId, value)
 	}
 	/**
@@ -106,6 +112,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * The value (reactive) of the state
 	 */
 	get value(): ValueType {
+		this.mount()
 		// return this._internalStore._state.value
 		return super.value
 	}
@@ -127,31 +134,6 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 */
 	get deps() {
 		return Array.from(this._internalStore._deps.values())
-	}
-
-	/**
-	 * Persist the state to selected storage
-	 * @param name The storage prefix to use
-	 */
-
-	persist(name: string) {
-		// this._internalStore._state.persist(name)
-
-		// if there is a name, change the states internal name
-		if (name) this._internalStore._name = `cState_${name}`
-
-		if (this.instance().storage) {
-			// this should only run on initial load of the state when this function is called
-			this.instance().runtime.log("info", `Persisting ${this._internalStore._name}`)
-
-			// if (storedValue !== undefined && storedValue !== null) {
-			// 	instance().runtime.log("info", "apply persisted value")
-			// 	this.set(storedValue)
-			// }
-			this.instance().storage?.monitor(this._internalStore._name, this)
-			this._internalStore._persist = true
-		}
-		return this
 	}
 
 	/**
