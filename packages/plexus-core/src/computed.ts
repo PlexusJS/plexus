@@ -66,13 +66,24 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> {
 	get name(): string {
 		return this._internalStore._state.name
 	}
+	/**
+	 * Returns a list of dependencies for the computed state
+	 */
 	get deps() {
 		return Array.from(this._internalStore._deps.values())
 	}
+	/**
+	 *	Adds a dependency to the computed state
+	 * @param dep
+	 */
 	addDep(dep: WatchableValue<any>): void {
 		this._internalStore._deps.add(dep)
 		this.refreshDeps()
 	}
+	/**
+	 * Removes a dependency from the computed state
+	 * @param dep
+	 */
 	removeDep(dep: WatchableValue<any>) {
 		this._internalStore._deps.delete(dep)
 		this.refreshDeps()

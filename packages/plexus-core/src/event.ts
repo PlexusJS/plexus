@@ -77,7 +77,7 @@ export class EventInstance<PayloadType = any> {
 		}
 	}
 	/**
-	 * Turn the Event Manager off
+	 * Turn the Event Manager off/on
 	 * @param disable {boolean} Should this event Engine be disabled
 	 */
 	disable(disable: boolean = true) {

@@ -179,6 +179,7 @@ export class ApiInstance {
 	/**
 	 * Send a get request
 	 * @param url The url to send the request to
+	 * @param query The url query to send
 	 */
 	get<ResponseType = any>(path: string, query?: Record<string, any>) {
 		const params = new URLSearchParams(query)

@@ -112,7 +112,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	collect(data: DataType, groups?: GroupName[] | GroupName): void
 	collect(data: DataType | DataType[], groups?: GroupName[] | GroupName) {
 		const collectItem = (item: DataType) => {
-			if (!item) return;
+			if (!item) return
 			if (item[this._internalStore._key] !== undefined && item[this._internalStore._key] !== null) {
 				// normalizing the key type to string
 				const dataKey = item[this._internalStore._key]
@@ -165,7 +165,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		this.mount()
 	}
 	/**
-	 * Get the
+	 * Get the Value of the data item with the provided key (the raw data).
 	 * @param key
 	 * @returns
 	 */
@@ -397,7 +397,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		this.delete(Array.from(this._internalStore._data.keys()))
 	}
 	/**
-	 * Set the key of the collection for internal tracking
+	 * Set the key of the collection for enhanced internal tracking
 	 */
 	key(key: string) {
 		this._internalStore._name = key
