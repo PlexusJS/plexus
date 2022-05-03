@@ -1,0 +1,91 @@
+---
+sidebar_position: 1
+---
+
+# State
+
+## Basic Use
+
+```ts
+import { state } from "@plexusjs/core"
+// A state instance is created with a state module
+const myCoolAgeState = state(23)
+
+myCoolAgeState.value // Output: 23
+
+myCoolAgeState.set(42)
+
+myCoolAgeState.value // Output: 42
+```
+
+## Properties
+
+### state `.value`
+
+The value (reactive) of the state
+
+### state `.lastValue`
+
+The previous value (reactive) of the state
+
+### state `.nextValue`
+
+The next value to apply to the state
+
+:::tip Value Prepping
+This is normally managed internally, but you can set it to "prep" the state before applying the value.
+
+```ts
+// Set the next value to prep the state
+state.nextValue = { foo: "bar" }
+state.set()
+state.value //=> { foo: "bar" }
+```
+
+:::
+
+### state `.initialValue`
+
+The initial (default) value of the state
+
+### state `.name`
+
+The name of the state (NOTE: set with the `.key()` function)
+
+## Methods
+
+### state `.set()`
+
+Set the value of the state
+
+### state `.patch()`
+
+Patch the current value of the state
+
+### state `.watch()`
+
+Watch for changes on this state
+
+### state `.interval()`
+
+On a set interval, run a function to update the state
+
+### state `.clearInterval()`
+
+Stop the state interval
+
+### state `.persist()`
+
+Persist the state to selected storage
+
+### state `.undo()`
+
+Reset the state to the previous value
+
+### state `.reset()`
+
+Reset the state to the initial value
+
+### state `.key()`
+
+Set the key of the state for internal tracking

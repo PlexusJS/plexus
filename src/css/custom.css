@@ -66,3 +66,8 @@ ul.list {
 	list-style: disc;
 	margin-left: 2rem;
 }
+
+mark {
+	background-color: rgba(0, 0, 0, 0);
+	color: var(--ifm-color-primary-lightest);
+}
