@@ -71,3 +71,9 @@ mark {
 	background-color: rgba(0, 0, 0, 0);
 	color: var(--ifm-color-primary-lightest);
 }
+.hr {
+	border-width: 0;
+	height: 1px;
+	background-color: darkgray;
+	margin: 1rem 0;
+}
