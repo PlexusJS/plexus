@@ -1,7 +1,21 @@
 ---
-title: Larger Project
+title: Scalable
 sidebar_position: 2
 ---
+
+## Quick Setup
+
+<small>With Yarn</small>
+
+```bash prefix="$"
+yarn create plexus-core --typescript --template=scalable
+```
+
+<small>With NPX</small>
+
+```bash
+npx create-plexus-core --typescript --template=scalable
+```
 
 ## Ideology
 
@@ -44,7 +58,7 @@ We can create our types and interfaces in this file and export it for the rest o
 export interface UserData {
 	uuid: string
 	first_name: string
-	last_name: number
+	last_name: string
 	email: string
 	status: "online" | "offline"
 }
@@ -113,13 +127,14 @@ export const startMessageSession = action(async ({ onCatch }, uuid: string, mess
 	onCatch(console.error)
 
 	// Retrieve the full friend object from the collection
-	const friendToMessage = friends.getDataValue(uuid)
+	const friendToMessage = friends.getItemValue(uuid)
 
 	// Call the api with a post request to send the message; the second param sent as a request body
 	const { data } = await userBroker.post<SendMessageRes>("/message/send", {
 		to: friendToMessage.uuid,
 		message,
 	})
+	return data
 })
 
 // this action is used to populate the friends collection
