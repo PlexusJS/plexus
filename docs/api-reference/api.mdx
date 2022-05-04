@@ -2,6 +2,8 @@
 sidebar_position: 5
 ---
 
+import CollapseContainer from "../../src/components/Collapse.tsx"
+
 # API
 
 ## Basic Use
@@ -30,40 +32,139 @@ The configuration of this api
 
 Send a get request
 
-#### Arguments
-
-> `path: string` The path to send the request to
-
-> `query: Record<string, string>` The path to send the request to
+<CollapseContainer
+	title="Arguments"
+	data={[
+		{ key: "Path", type: "string", description: "The path to call on the api." },
+		{ key: "Query", optional: true, type: "Record<string, string>", description: "The object to use for the url query string." },
+	]}
+/>
 
 ### api `.post()`
 
 Send a post request
 
+<CollapseContainer
+	title="Arguments"
+	data={[
+		{ key: "Path", type: "string", description: "The path to call on the api." },
+		{ key: "Body", optional: true, type: "Record<string, string>", description: "The object to use for the request body." },
+	]}
+/>
+
 ### api `.put()`
 
 Send a put request
+
+<CollapseContainer
+	title="Arguments"
+	data={[
+		{ key: "Path", type: "string", description: "The path to call on the api." },
+		{ key: "Body", optional: true, type: "Record<string, string>", description: "The object to use for the request body." },
+	]}
+/>
 
 ### api `.delete()`
 
 Send a delete request
 
+<CollapseContainer title="Arguments" data={[{ key: "Path", type: "string", description: "The path to call on the api." }]} />
+
 ### api `.patch()`
 
 Send a patch request
+
+<CollapseContainer
+	title="Arguments"
+	data={[
+		{ key: "Path", type: "string", description: "The path to call on the api." },
+		{ key: "Body", optional: true, type: "Record<string, string>", description: "The object to use for the request body." },
+	]}
+/>
 
 ### api `.options()`
 
 Set the configuration options for fetch
 
+<CollapseContainer
+	title="Arguments"
+	data={[
+		{ key: "Path", type: "string", description: "The path to call on the api." },
+		{ key: "Query", optional: true, type: "Record<string, string>", description: "The object to use for the url query string" },
+	]}
+/>
+
 ### api `.auth()`
 
-Set the authentication details for the request
+Set the the Authorization header for the request
+
+:::note Stored Differently From other Headers
+This is stored seprately from other headers. If there is another value for the Authorization header in options, this value will override it.
+:::
+
+<CollapseContainer
+	title="Arguments"
+	data={[
+		{
+			key: "AuthType",
+			type: `"bearer" | "basic" | "jwt"`,
+			description: "The type of API token being used. This determines the prefix of the Authorization header.",
+		},
+		{ key: "TokenValue", type: "string", description: "The object to use for the url query string" },
+	]}
+/>
 
 ### api `.headers()`
 
-Set headers for the request
+Set headers for the requests of this API Instance
+
+<CollapseContainer
+	title="Arguments"
+	data={[
+		{
+			key: "HeaderObject",
+			type: `Record<string, string>`,
+			description: "An object of headers to set for the request.",
+		},
+	]}
+/>
 
 ### api `.reset()`
 
 Reset this routes configuration
+
+<CollapseContainer
+	title="Returns"
+	data={[
+		{
+			type: `ApiInstance`,
+			description: "Returns the reset API Instance",
+		},
+	]}
+/>
+
+## Response
+
+### apiResponse `.data`
+
+The data returned from the request in JSON format. If the data is not supposed to be JSON, use [apiResponse`.rawData`](#apiresponse-rawdata)
+
+<h6>Returns</h6>
+
+### apiResponse `.status`
+
+The HTTP status of the request
+
+<h6>Returns</h6>
+
+### apiResponse `.rawData`
+
+The raw string of the response data
+
+<h6>Returns</h6>
+
+### apiResponse `.response`
+
+The HTTP response object ([ResponseInit](https://developer.mozilla.org/en-US/docs/Web/API/Response/Response))
+
+<h6>Returns</h6>
