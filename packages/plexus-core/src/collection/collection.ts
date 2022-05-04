@@ -413,6 +413,13 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		return Array.from(this._internalStore._data.values()).map((item) => item.value)
 	}
 	/**
+	 * Get all of the collection data keys as an array
+	 * @returns The collection data values as an array
+	 */
+	get keys() {
+		return Array.from(this._internalStore._data.keys())
+	}
+	/**
 	 * Get all the groups in the collection as an object
 	 * @returns The groups in the collection
 	 */
