@@ -3,7 +3,9 @@
 	"version": "1.0.1",
 	"bin": "bin.js",
 	"license": "MIT",
+	"type": "module",
 	"dependencies": {
+		"chalk": "^5.0.1",
 		"yargs": "^17.4.1"
 	},
 	"repository": "https://github.com/PlexusJS/create-plexus-core.git"
