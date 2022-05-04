@@ -21,14 +21,18 @@ export interface PlexusCollectionConfig<DataType> {
 	 * The name (or key) of the collection
 	 */
 	name?: string
+	/**
+	 * Create a group called "default"
+	 */
+	defaultGroup?: boolean
 }
 interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	_internalId: string
 	_lookup: Map<string, string>
 	_key: string
 	_data: Map<string | number, PlexusDataInstance<DataType>>
-	_groups: Map<GroupName, PlexusCollectionGroup<DataType>>
-	_selectors: Map<SelectorName, PlexusCollectionSelector<DataType>>
+	_groups: GroupMap<DataType>
+	_selectors: SelectorMap<DataType>
 	_name: string
 	_externalName: string
 	set externalName(value: string)
@@ -56,7 +60,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	id: string
 
-	constructor(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType> = { primaryKey: "id" } as const) {
+	constructor(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType> = { primaryKey: "id", defaultGroup: false } as const) {
 		this.instance = instance
 		this.config = _config
 		this._internalStore = {
@@ -78,6 +82,9 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			},
 		}
 		this.id = this._internalStore._internalId
+		if (_config.defaultGroup) {
+			this.createGroup("default")
+		}
 	}
 	/**
 	 * Helper function; Checks to see if the provided name is a group name
