@@ -58,7 +58,19 @@ h3 {
 	font-size: 1.5rem;
 	font-style: italic;
 	font-weight: thin;
-	color: var(--ifm-color-primary-lightest);
+	color: var(--ifm-color-primary-light);
+}
+h4 {
+	font-size: 1.2rem;
+	font-style: normal;
+	font-weight: thin;
+	text-decoration: underline;
+	/* color: var(--ifm-color-primary-dark); */
+}
+h5 {
+	font-size: 1.2rem;
+	font-style: normal;
+	font-weight: 500;
 }
 li {
 }
@@ -76,4 +88,8 @@ mark {
 	height: 1px;
 	background-color: darkgray;
 	margin: 1rem 0;
+}
+
+a {
+	color: var(--ifm-color-primary-lightest);
 }
