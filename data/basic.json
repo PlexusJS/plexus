@@ -1,0 +1,62 @@
+{
+	"$schema": {
+		"js": [
+			{
+				"name": "states",
+				"ext": "js",
+				"type": "file",
+				"content": "import { state, collection, computed } from \"@plexusjs/core\"\n// Importing the ChannelData type\n\n// Create a state instance\nexport const userData = state({\n\tname: \"\",\n\tage: -1,\n})\n\n// This collection is used to store the channels, the objects should be of type ChannelData defined above\nexport const channelsCollection = collection({\n\tprimaryKey: \"uuid\", // default value is \"id\"\n})"
+			},
+			{
+				"name": "index",
+				"ext": "js",
+				"type": "file",
+				"content": "// Import your module instances\nimport * as actions from \"./actions\"\nimport * as states from \"./states\"\nimport * as api from \"./api\"\n\n// Export your module instances from a single index.js file\nexport { actions, states, api }"
+			},
+			{
+				"name": "api",
+				"ext": "js",
+				"type": "file",
+				"content": "import { api } from \"@plexusjs/core\"\n\n// You can use the api to make requests to the server at a specific endpoint\nexport const channelBroker = api(\"https://api.example.com/channels\").auth(\"MyCoolAuthToken\", \"bearer\")"
+			},
+			{
+				"name": "actions",
+				"ext": "js",
+				"type": "file",
+				"content": "import { actions } from \"@plexusjs/core\"\n\n// Import your module instances\nimport { channelsCollection } from \"./states\"\nimport { channelBroker } from \"./api\"\n\n// This action is used to fetch the channels from the API\nexport const subscribeToChannel = actions(async ({ onCatch }) => {\n\tonCatch(console.error)\n\tconst { data } = await channelBroker.get(\"/get-channels\")\n\n\tchannelsCollection.collect(data)\n})"
+			}
+		],
+		"ts": [
+			{
+				"name": "states",
+				"ext": "ts",
+				"type": "file",
+				"content": "import { state, collection, computed } from \"@plexusjs/core\"\n// Importing the ChannelData type\nimport { ChannelData } from \"./types\"\n\n// Create a state instance\nexport const userData = state({\n\tname: \"\",\n\tage: -1,\n})\n\n// This collection is used to store the channels, the objects should be of type ChannelData defined above\nexport const channelsCollection = collection<ChannelData>({\n\tprimaryKey: \"uuid\", // default value is \"id\"\n})"
+			},
+			{
+				"name": "index",
+				"ext": "ts",
+				"type": "file",
+				"content": "// Import your module instances\nimport * as actions from \"./actions\"\nimport * as states from \"./states\"\nimport * as api from \"./api\"\n\n// Export your module instances from a single index.ts file\nexport { actions, states, api }"
+			},
+			{
+				"name": "actions",
+				"ext": "ts",
+				"type": "file",
+				"content": "import { actions } from \"@plexusjs/core\"\n\n// Import your module instances\nimport { channelsCollection } from \"./states\"\nimport { channelBroker } from \"./api\"\n\n// This action is used to fetch the channels from the API\nexport const subscribeToChannel = actions(async ({ onCatch }) => {\n\tonCatch(console.error)\n\tconst { data } = await channelBroker.get(\"/get-channels\")\n\n\tchannelsCollection.collect(data)\n})"
+			},
+			{
+				"name": "api",
+				"ext": "ts",
+				"type": "file",
+				"content": "import { api } from \"@plexusjs/core\"\n\n// You can use the api to make requests to the server at a specific endpoint\nexport const channelBroker = api(\"https://api.example.com/channels\").auth(\"MyCoolAuthToken\", \"bearer\")"
+			},
+			{
+				"name": "types",
+				"ext": "ts",
+				"type": "file",
+				"content": "export interface ChannelData {\n\tuuid: string\n\tname: string\n\tfollowers: number\n}"
+			}
+		]
+	}
+}
