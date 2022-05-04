@@ -276,6 +276,10 @@ const genFiles = (template = 'basic') => {
 }
 
 function run() {
+	if (yargs.argv.help) {
+		console.log(helpString)
+		return
+	}
 	// parse the command line arguments
 	if (yargs.argv.template) {
 		// try installing the packages
