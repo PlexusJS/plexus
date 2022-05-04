@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'PlexusJS Docs',
   tagline: 'Dinosaurs are cool',
-  url: 'https://docs.plexusjs.org',
+  url: 'https://plexusjs.org',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
