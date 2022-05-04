@@ -4,10 +4,29 @@ sidebar_position: 1
 ---
 
 ## Strategy
-We designed Plexus to take the business logic away from the components; this essentially turns your components into puppets for Plexus to orchestrate. Keeping business log seprate has many benifits, including versitility. 
+
+We designed Plexus to take the business logic away from the components; this essentially turns your components into puppets for Plexus to orchestrate. Keeping business log seprate has many benifits, including versitility.
 
 ## Structure
+
 Pulse was designed to be completely unopinionated on how to structure your app. You can technically place our functions anywhere, but we have several style guides you can follow if you don't know where to start. We are also working on an NPX script to set up a particular Plexus style in your project for you!
 
-## Reactivity
+## Internal Terms
 
+<ul>
+	<li>
+		<code>Costructor Function (CF):</code> The <mark>functions you import</mark> from our package. You use these to{" "}
+		<mark>
+			create <i>Instances</i>.
+		</mark>
+	</li>
+	<li>
+		<code>Instance:</code> An <mark>object</mark> that is <mark>connected to the plexus "network"</mark>.
+	</li>
+	<li>
+		<code>Core:</code> The <mark>optional object</mark> where you merge all your instances together, <mark>structured however you want!</mark>
+	</li>
+	<li>
+		<code>Stateful:</code> A <mark>reactive variable</mark> that can be subscribed to and updated.
+	</li>
+</ul>
