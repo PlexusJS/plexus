@@ -116,6 +116,7 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
         defaultLanguage: 'typescript',
+        additionalLanguages: ['powershell', 'bash'],
       },
     }),
 };

@@ -16,7 +16,7 @@ The focus of this style is to be extendable, scalable, and intuative to navigate
 ## File Structure Suggestion
 
 ```ts
-/
+/project-root
 ├─ core/
 │ ├─ modules/
 │ │ ├─ user/
@@ -36,7 +36,7 @@ The focus of this style is to be extendable, scalable, and intuative to navigate
 
 ## File Content Examples
 
-### `./core/user/types.ts`
+### `/core/user/types.ts`
 
 We can create our types and interfaces in this file and export it for the rest of our core (or the rest of our app if we want).
 
@@ -59,9 +59,9 @@ export type RetrieveFriendsRes = {
 }
 ```
 
-### `./core/user/states.ts`
+### `/core/user/states.ts`
 
-This is where we define [stateful](/docs/getting-started/concepts#internal-terms) [instances](/docs/getting-started/concepts#internal-terms) things like states, computed, and collections.
+This is where we define [stateful instances](/docs/getting-started/concepts#internal-terms) things like states, computed, and collections.
 
 ```ts
 import { state, collection, computed } from "@plexusjs/core"
@@ -84,7 +84,7 @@ export const friends = collection<UserData>({
 	.createSelector("messaging")
 ```
 
-### `./core/user/api.ts`
+### `/core/user/api.ts`
 
 This is where we can create our API [instances](/docs/getting-started/concepts#internal-terms). we can interract with this elsewhere to interract with data from the server.
 
@@ -92,15 +92,15 @@ This is where we can create our API [instances](/docs/getting-started/concepts#i
 import { api } from "@plexusjs/core"
 
 // You can use the api to make requests to the server at a specific endpoint
-export const userBroker = api("https://api.example.com/users").auth("bearer", "MySeCrEtToKeN")
+export const userBroker = api("https://api.example.com/users").auth("MySeCrEtToKeN", "bearer")
 ```
 
-### `./core/user/actions.ts`
+### `/core/user/actions.ts`
 
 Here is where we define our <i>actions</i>. An <i>action</i> is a function that is called to preform business logic. Technically, an <i>action</i> is just a buffed up function, so you can just use it as a function wrapper to gain the benifits of the <i>action hooks</i>.
 
 ```ts
-import { actions } from "@plexusjs/core"
+import { action } from "@plexusjs/core"
 
 // Import your module's resources
 import { friends, userData } from "./states"
@@ -108,7 +108,7 @@ import { userBroker } from "./api"
 import { RetrieveFriendsRes, SendMessageRes } from "./types"
 
 // This action is used to message a friend. It takes in a user id and an optional message. We can take that and proccess
-export const startMessageSession = actions(async ({ onCatch }, uuid: string, message?: string) => {
+export const startMessageSession = action(async ({ onCatch }, uuid: string, message?: string) => {
 	// If any part of this action throws an error, it will be caught here
 	onCatch(console.error)
 
@@ -123,7 +123,7 @@ export const startMessageSession = actions(async ({ onCatch }, uuid: string, mes
 })
 
 // this action is used to populate the friends collection
-export const getFriends = actions(async ({ onCatch }) => {
+export const getFriends = action(async ({ onCatch }) => {
 	// If any part of this action throws an error, it will be caught here
 	onCatch(console.error)
 
@@ -143,7 +143,7 @@ export const getFriends = actions(async ({ onCatch }) => {
 })
 ```
 
-### `./core/user/index.ts`
+### `/core/user/index.ts`
 
 Here is the final file we make for this module; the index file takes all of your [instances](/docs/getting-started/concepts#internal-terms) from the other files and exports them into single point.
 
@@ -159,7 +159,7 @@ const user = { actions, states, api }
 export default user
 ```
 
-### `./core/index.ts`
+### `/core/index.ts`
 
 Here is the final file we make; the index file takes all of your [instances](/docs/getting-started/concepts#internal-terms) from the other files and exports them into single point.
 
