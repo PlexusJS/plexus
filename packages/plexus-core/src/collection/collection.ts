@@ -116,9 +116,9 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param data Object[] | Object ::
 	 * @param groups string | string[] :: The groups to add the items to
 	 */
-	collect(data: DataType[], groups?: GroupName[] | GroupName): void
-	collect(data: DataType, groups?: GroupName[] | GroupName): void
-	collect(data: DataType | DataType[], groups?: GroupName[] | GroupName) {
+	collect(data: DataType[], groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
+	collect(data: DataType, groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
+	collect(data: DataType | DataType[], groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
 		const collectItem = (item: DataType) => {
 			if (!item) return
 			if (item[this._internalStore._key] !== undefined && item[this._internalStore._key] !== null) {
@@ -128,7 +128,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				if (this._internalStore._data.has(dataKey)) {
 					this._internalStore._data.get(dataKey)?.set(item)
 				}
-				// if there is no state for that key, create it
+				// if there is no data instance for that key, create it
 				else {
 					const datainstance = _data(
 						() => this.instance(),
@@ -136,6 +136,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 						this._internalStore._key,
 						item
 					)
+					// if we get a valid data instance, add it to the collection
 					if (datainstance) {
 						this._internalStore._data.set(dataKey, datainstance)
 					}
@@ -319,7 +320,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param key The key of the item to add
 	 * @param groups The group(s) to add the item to
 	 */
-	addToGroups(key: DataKey, groups: GroupName[] | GroupName) {
+	addToGroups(key: DataKey, groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
 		if (groups) {
 			if (Array.isArray(groups)) {
 				for (let group in groups) {
