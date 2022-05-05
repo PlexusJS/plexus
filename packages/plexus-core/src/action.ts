@@ -69,7 +69,6 @@ export type PlexusAction = typeof _action
 
 export function _action<Fn extends FunctionType>(instance: () => PlexusInstance, fn: Fn) {
 	const helpers = new PlexusActionHelpers(instance)
-	console.log("_action", fn.toString(), fn.constructor.name, fn.constructor)
 	if (fn.constructor.name === "Function") {
 		const newAction = (...args) => {
 			try {
