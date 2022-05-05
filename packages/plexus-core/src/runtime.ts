@@ -1,4 +1,5 @@
 import { EventEngine } from "./engine"
+import { isAsyncFunction } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { PlexusStateType } from "./state"
 
@@ -13,6 +14,8 @@ type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin
 export class RuntimeInstance {
 	private _internalStore: { _conductor: EventEngine }
 	private instance: () => PlexusInstance
+	private static initializing = false
+	private initsCompleted = 0
 	constructor(instance: () => PlexusInstance, protected config: Partial<RuntimeConfig> = {}) {
 		this.instance = instance
 		this._internalStore = {
@@ -128,7 +131,7 @@ export class RuntimeInstance {
 			return
 		}
 
-		// commanet or uncomment to allow or disallow dev logging (always on)
+		// comment or uncomment to allow or disallow dev logging (always on)
 		// callLog()
 	}
 	/**
@@ -136,6 +139,47 @@ export class RuntimeInstance {
 	 */
 	get engine() {
 		return this._internalStore._conductor
+	}
+
+	/**
+	 * You can use either the callback, or the promise to know when the instance runtime is ready
+	 * @param callback
+	 * @returns
+	 */
+	runInit(callback?: (...args: any[]) => any) {
+		return new Promise<void>((resolve, reject) => {
+			const inits = Array.from(this.instance()._inits.values())
+			// if we already initialized, don't do it again
+			if (this.instance().ready) {
+				return
+			}
+			// if we are already initializing, wait for it to finish
+			if (RuntimeInstance.initializing) {
+				return
+			}
+
+			// set the initializing flag
+			RuntimeInstance.initializing = true
+			this.log("info", "Initializing Instance...")
+			const size = inits.length
+			// create an array of init action instances, and run them in parallel
+			const runners = inits.map((init) => (init.complete ? async () => {} : init.run()))
+
+			// wait for all inits to complete in parallel
+			Promise.allSettled(runners).then(() => {
+				// set the ready flag
+				this.instance().ready = true
+				// reset the initializing flag
+				RuntimeInstance.initializing = false
+				// run the callback if there is one
+				callback?.()
+				//set the number of initsCompleted
+				this.initsCompleted = size
+
+				// resolve the promise
+				resolve()
+			})
+		})
 	}
 }
 /**

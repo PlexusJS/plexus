@@ -14,6 +14,7 @@ import {
 import { _event, PlexusEventInstance } from "./event"
 import { storage as _storage, StorageOverride } from "./storage"
 import { PlexusPlugin, PlexusPluginConfig } from "./plugin"
+import { PlexusPreActionConfig, _preaction } from "./preaction"
 
 /**
  * Generate a Plexus State
@@ -66,6 +67,14 @@ export function collection<Type extends { [key: string]: any }>(config?: PlexusC
  */
 export function action<Fn extends FunctionType>(fn: Fn) {
 	return _action<Fn>(() => instance(), fn)
+}
+/**
+ * Generate a Plexus Action
+ * @param fn The Plexus action function to run
+ * @returns The intended return value of fn, or null if an error is caught
+ */
+export function preaction<Fn extends FunctionType>(fn: Fn, config?: PlexusPreActionConfig) {
+	return _preaction<Fn>(() => instance(), fn, config)
 }
 
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet

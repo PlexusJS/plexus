@@ -8,11 +8,17 @@ export interface PlexusActionHooks {
 	 *
 	 */
 	onCatch(handler?: ErrorHandler): void
+	/**
+	 * Ignore the default hault preActions
+	 */
+	ignoreInit(): void
 }
 export class PlexusActionHelpers {
 	private _internalStore = {
 		_errorHandlers: new Set<ErrorHandler>(),
 	}
+	_skipInit = false
+
 	constructor(private instance: () => PlexusInstance) {}
 	/**
 	 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
@@ -37,6 +43,10 @@ export class PlexusActionHelpers {
 		return this._internalStore._errorHandlers.size > 0
 	}
 
+	ignoreInit() {
+		this._skipInit = true
+	}
+
 	/**
 	 * @internal
 	 * Eject the external functions object returned to the user in the first function argument
@@ -45,6 +55,9 @@ export class PlexusActionHelpers {
 		const onCatch = (handler?: ErrorHandler): void => {
 			return this.onCatch(handler)
 		}
+		const ignoreInit = (): void => {
+			return this.ignoreInit()
+		}
 		return {
 			/**
 			 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
@@ -52,13 +65,17 @@ export class PlexusActionHelpers {
 			 *
 			 */
 			onCatch,
+			ignoreInit,
 		}
 	}
 }
 
 export type FunctionType = (helpers: PlexusActionHooks, ...args: any[]) => any
 
-type InnerFunction<ResultFn extends FunctionType> = ResultFn extends (helpers: PlexusActionHooks, ...args: infer Params) => ReturnType<ResultFn>
+export type InnerFunction<ResultFn extends FunctionType> = ResultFn extends (
+	helpers: PlexusActionHooks,
+	...args: infer Params
+) => ReturnType<ResultFn>
 	? (...args: Params) => ReturnType<ResultFn>
 	: never
 
@@ -69,9 +86,21 @@ export type PlexusAction = typeof _action
 
 export function _action<Fn extends FunctionType>(instance: () => PlexusInstance, fn: Fn) {
 	const helpers = new PlexusActionHelpers(instance)
+
 	if (fn.constructor.name === "Function") {
 		const newAction = (...args) => {
 			try {
+				// if the instance is not ready, wait for it to be
+				// !NOTE: this is probably not a good way to do this, but it works for now
+				if (!instance().ready && !helpers._skipInit) {
+					let hold = true
+					while (hold) {
+						instance().runtime.runInit(() => {
+							hold = false
+						})
+					}
+				}
+				// run the function
 				const ret = fn(helpers.hooks, ...args)
 				return ret
 			} catch (e) {
@@ -82,10 +111,17 @@ export function _action<Fn extends FunctionType>(instance: () => PlexusInstance,
 				return null
 			}
 		}
+		// return the proxy function
 		return newAction as InnerFunction<Fn>
+		// return proxyFn as InnerFunction<Fn>
 	} else if (fn.constructor.name === "AsyncFunction") {
 		const newAction = async (...args) => {
 			try {
+				// if the instance is not ready, wait for it to be
+				if (!instance().ready && !helpers._skipInit) {
+					await instance().runtime.runInit()
+				}
+				// run the function
 				const ret = await fn(helpers.hooks, ...args)
 				return ret
 			} catch (e) {
@@ -96,7 +132,9 @@ export function _action<Fn extends FunctionType>(instance: () => PlexusInstance,
 				return null
 			}
 		}
+		// return the proxy function
 		return newAction as InnerFunction<Fn>
+		// return proxyFn as InnerFunction<Fn>
 	} else {
 		console.warn("%cPlexus WARN:%c An action must be of type Function.", "color: #f00;", "color: #FFF;")
 		throw new Error("An action must be of type Function.")

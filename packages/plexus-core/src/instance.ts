@@ -5,6 +5,8 @@ import { PlexusStorageInstance, storage } from "./storage"
 import { PlexusCollectionInstance } from "."
 import { CollectionInstance } from "./collection/collection"
 import { isEqual } from "./helpers"
+import { FunctionType } from "./action"
+import { PlexusPreAction } from "./preaction"
 
 const getInstanceName = (name: string = "default") => `__plexusInstance__${name.length > 0 ? name : "default"}__`
 interface PlexusInstanceStore {
@@ -25,6 +27,11 @@ export class PlexusInstance {
 	_storages = new Map<string, PlexusStorageInstance>()
 
 	_mounted = new Map<string, any>()
+
+	/**
+	 * Holds the hash containing a list of InitActions to be executed when the instance is ready
+	 */
+	_inits = new Map<string, PlexusPreAction>()
 
 	constructor(config?: Partial<PlexusInstanceConfig>) {
 		this._internalStore = {
