@@ -382,21 +382,32 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	/**
 	 * Remove a data item from a set of groups
 	 * @param keys The data key(s) to use for lookup
-	 * @param groups Either a single group or an array of gorups to remove the data from
+	 * @param groups Either a single group or an array of groups to remove the data from
 	 */
 	remove(keys: DataKey | DataKey[], groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
 		const rm = (key) => {
 			if (Array.isArray(groups)) {
-				for (let groupName of this.getGroupsOf(key)) {
-					this._internalStore._groups.get(groupName)?.remove(key)
+				for (let groupName of groups) {
+					if (this.isCreatedGroup(groupName)) {
+						this._internalStore._groups.get(groupName)?.remove(key)
+					}
 				}
+			} else if (typeof groups === "string") {
+				if (this.isCreatedGroup(groups)) {
+					this._internalStore._groups.get(groups)?.remove(key)
+				}
+				// for (let groupName of this.getGroupsOf(key)) {
+				// }
 			}
 		}
+
+		// if an array, iterate through the keys and remove them from each associated group
 		if (Array.isArray(keys)) {
 			keys.forEach(rm)
 		} else {
 			rm(keys)
 		}
+		// ! This is commented out because the user may still want to keep the data in the collection. If they want to completely delete the data, they should use `.delete()`
 		// if it's removed from all groups, delete the data entirely
 		// if(this.getGroupsOf(key).length === 0){
 		//   this.delete(key)
