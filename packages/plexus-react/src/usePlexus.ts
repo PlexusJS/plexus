@@ -19,11 +19,12 @@ export function usePlexus<V extends Watchable[]>(deps: V | []): PlexusValueArray
  */
 export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): PlexusValue<V> | PlexusValueArray<V> {
 	const [_, set] = useState({})
-
-	const depsArr = normalizeDeps(deps)
+	const [depsArray, setDepsArray] = useState<Watchable[]>(normalizeDeps(deps))
 
 	useEffect(() => {
+		const depsArr = normalizeDeps(deps)
 		if (Array.isArray(depsArr)) {
+			setDepsArray(depsArr)
 			const depUnsubs: Array<() => void> = []
 			for (let dep of depsArr) {
 				// if not a watchable, then we can't watch it, skip to next iteration
@@ -43,9 +44,9 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		}
 	}, [])
 	// The "!" at the end of the values here tell the tsc that these values will never be "undefined"
-	if (!Array.isArray(deps) && depsArr.length === 1) {
-		return depsArr[0].value! as PlexusValue<V>
+	if (!Array.isArray(deps) && depsArray.length === 1) {
+		return depsArray[0].value! as PlexusValue<V>
 	}
 
-	return depsArr.map((dep) => dep.value!) as PlexusValueArray<V>
+	return depsArray.map((dep) => dep.value!) as PlexusValueArray<V>
 }

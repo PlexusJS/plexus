@@ -24,7 +24,7 @@ export class EventInstance<PayloadType = any> {
 			_events: new Map<string | number, Map<string | Number, EventHandler>>(),
 			_destroyers: new Map<string, () => unknown>(),
 			_once_destroyers: new Map<string, () => unknown>(),
-			_name: `e${instance().genNonce()}`,
+			_name: `evt_${instance().genId()}`,
 			_uses: 0,
 			_maxUses: -1,
 			_disabled: false,

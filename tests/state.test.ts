@@ -95,4 +95,6 @@ describe("Testing State Function", () => {
 		console.log(objectState.value, objectState.nextValue)
 		expect(objectState.nextValue).toStrictEqual(objectState.value)
 	})
+
+	
 })

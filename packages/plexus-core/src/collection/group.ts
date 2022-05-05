@@ -26,6 +26,13 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	private instance: () => PlexusInstance
 	config: PlexusCollectionGroupConfig<DataType>
 
+	/**
+	 * The internal ID of the Group
+	 */
+	get id() {
+		return `${this._watchableStore._internalId}`
+	}
+
 	constructor(
 		instance: () => PlexusInstance,
 		collection: () => PlexusCollectionInstance<DataType>,
@@ -40,7 +47,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 		this._internalStore = {
 			addWhen: config?.addWhen || (() => false),
 			_name: name,
-			_collectionId: collection().name,
+			_collectionId: collection().id,
 			_includedKeys: new Set(),
 			_watcherDestroyers: new Set(),
 			_watchers: new Set(),
@@ -48,14 +55,16 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	}
 	private runWatchers() {
 		this._internalStore._watchers.forEach((callback) => {
-			this.instance().runtime.log("warn", "_GroupsValue_\n", this.collection().groups)
+			this.instance().runtime.log("info", `Running watchers on group ${this._internalStore._name}(${this.id})...`)
 			callback(this.collection().getGroup(this._internalStore._name).value)
 		})
 	}
 	private rebuildWatchers() {
+		this.instance().runtime.log("info", `Rebuilding watchers on group ${this._internalStore._name}(${this.id})...`)
 		this._internalStore._watcherDestroyers.forEach((destroyer) => destroyer())
 		this._internalStore._watcherDestroyers.clear()
 
+		// loop through each key, get the data associated with it, then add a watcher to that data that runs the group's watchers
 		Array.from(this._internalStore._includedKeys).forEach((key) => {
 			const destroyer = this.collection()
 				.getItem(key)
@@ -106,7 +115,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 			.filter((v) => v !== undefined) as DataType[]
 	}
 	/**
-	 * The data in the group
+	 * The data Items in the group
 	 */
 	get data() {
 		return Array.from(this._internalStore._includedKeys).map((key) => this.collection().getItem(key))

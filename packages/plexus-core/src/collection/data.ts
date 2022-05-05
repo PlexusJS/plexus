@@ -4,6 +4,7 @@ import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
 import { StateInstance } from "../state"
 import { PlexusCollectionInstance } from "./collection"
+import { isEqual } from "../helpers"
 interface PlexusDataStore<DataType extends Record<string, any>> {
 	_key: string | number
 	primaryKey: string
@@ -52,21 +53,22 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 				value[this._internalStore.primaryKey as PK].toString() === this._internalStore._key.toString()
 			this.instance().runtime.log(
 				"warn",
-				`The new data value ${valid ? "WILL" : "WILL NOT"} be set in "${config.mode}" mode`,
-				value,
-				value[this._internalStore.primaryKey],
+				`The new data value ${valid ? "WILL" : "WILL NOT"} be set in "${config.mode}" mode...`,
 				this._internalStore._key,
 				value[this._internalStore.primaryKey] === this._internalStore._key
 			)
 			return valid
 		}
-		if (config.mode === "replace") {
-			if (checkIfHasKey()) {
-				this._internalStore._state.set(value as DataType)
-			}
-		} else {
-			if (checkIfHasKey()) {
-				this._internalStore._state.patch(value as DataType)
+		// maybe this check should be done inside of the state?
+		if (!isEqual(value as DataType, this.value)) {
+			if (config.mode === "replace") {
+				if (checkIfHasKey()) {
+					this._internalStore._state.set(value as DataType)
+				}
+			} else {
+				if (checkIfHasKey()) {
+					this._internalStore._state.patch(value as DataType)
+				}
 			}
 		}
 	}

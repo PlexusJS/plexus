@@ -37,7 +37,7 @@ export class RuntimeInstance {
 	}
 	/**
 	 *
-	 * @param _key The key of the object being wathced
+	 * @param _key The key of the object being watched
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
 	 */

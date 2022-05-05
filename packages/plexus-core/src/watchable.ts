@@ -1,5 +1,5 @@
 import { PlexusInstance } from "."
-import { deepClone, deepMerge, isObject } from "./helpers"
+import { deepClone, deepMerge, genUID, isObject } from "./helpers"
 import { AlmostAnything } from "./interfaces"
 export type PlexusWatcher<V extends any = any> = (value: V) => void
 interface WatchableStore<Value = any> {
@@ -16,7 +16,7 @@ export class Watchable<ValueType = any> {
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		this._instance = instance
 		this._watchableStore = {
-			_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+			_internalId: instance().genId(),
 			_nextValue: init,
 			_value: init,
 			_initialValue: init,

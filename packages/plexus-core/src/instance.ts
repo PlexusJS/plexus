@@ -2,12 +2,14 @@ import { StateInstance } from "./state"
 import { PlexusPlugin } from "./plugin"
 import { PlexusRuntime, RuntimeInstance, _runtime } from "./runtime"
 import { PlexusStorageInstance, storage } from "./storage"
-import { PlexusCollectionInstance } from "."
 import { CollectionInstance } from "./collection/collection"
-import { isEqual } from "./helpers"
-import { FunctionType } from "./action"
+import { genUID, isEqual } from "./helpers"
 import { PlexusPreAction } from "./preaction"
 
+/**
+ * Get the correctly formatted instance name
+ * @returns The formatted name of the instance
+ */
 const getInstanceName = (name: string = "default") => `__plexusInstance__${name.length > 0 ? name : "default"}__`
 interface PlexusInstanceStore {
 	_nonce: number
@@ -77,11 +79,14 @@ export class PlexusInstance {
 		this._internalStore._nonce += 1
 		return this._internalStore._nonce
 	}
-
 	/**
-	 * Get the correctly formatted instance name
-	 * @returns The formatted name of the instance
+	 * Is this instance ready?
+	 * @internal
+	 * @returns {string} A new unique id (used internally to generate new watchable value keys)
 	 */
+	genId() {
+		return `${genUID()}`
+	}
 }
 
 interface PlexusInstanceConfig {

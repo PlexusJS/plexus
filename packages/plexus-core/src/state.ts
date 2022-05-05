@@ -27,6 +27,13 @@ export type PlexusStateInstance<Value extends PlexusStateType = any> = StateInst
 export class StateInstance<StateValue extends PlexusStateType> extends WatchableValue<StateValue> {
 	private _internalStore: StateStore<StateValue>
 	private instance: () => PlexusInstance
+	/**
+	 * The internal id of the state
+	 */
+	get id(): string {
+		// return this._internalStore._internalId
+		return this._watchableStore._internalId
+	}
 	constructor(instance: () => PlexusInstance, init: StateValue) {
 		super(instance, init)
 		this.instance = instance
@@ -116,6 +123,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this._internalStore._watchers.add(destroyer)
 		// return keyOrCallback
 		return () => {
+			this.instance().runtime.log("info", `Killing a watcher from state ${this._internalStore._internalId}`)
 			destroyer()
 			this._internalStore._watchers.delete(destroyer)
 			// this.watcherRemovers.value
@@ -199,7 +207,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	get value() {
 		// instance().runtime.log("info", `getting value; persist ${_internalStore._persist ? "enabled" : "disabled"}`)
-		this.mount()
+		// this.mount()
 		// if (_internalStore._persist) {
 		// 	let storedValue = instance().storage.get(_internalStore.externalName)
 		// 	this.set(storedValue)

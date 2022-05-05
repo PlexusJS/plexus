@@ -18,12 +18,19 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	private _internalStore: CollectionSelectorStore<ValueType>
 	private collection: () => PlexusCollectionInstance<ValueType>
 	private instance: () => PlexusInstance
+
+	/**
+	 * The internal ID of the Selector
+	 */
+	get id() {
+		return `${this._watchableStore._internalId}`
+	}
 	constructor(instance: () => PlexusInstance, collection: () => PlexusCollectionInstance<ValueType>, name: string) {
 		super(instance, {} as ValueType)
 		this._internalStore = {
 			_name: name,
 			_key: null as DataKey | null,
-			_collectionId: collection().name,
+			_collectionId: collection().id,
 			_dataWatcherDestroyer: null,
 			_watchers: new Set(),
 		}
@@ -31,7 +38,10 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		this.instance = instance
 	}
 	private runWatchers() {
-		this._internalStore._watchers.forEach((callback) => callback(this.value))
+		this._internalStore._watchers.forEach((callback) => {
+			this.instance().runtime.log("info", `Running watchers on selector ${this.id}...`)
+			callback(this.value)
+		})
 	}
 	/**
 	 * The key of a data item assigned to this selector
@@ -44,6 +54,10 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * @param key The key to select
 	 */
 	select(key: DataKey) {
+		if (key === this._internalStore._key) {
+			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.id}...`)
+			return
+		}
 		this._internalStore._dataWatcherDestroyer?.()
 
 		this._internalStore._key = key
@@ -53,6 +67,8 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 				this.runWatchers()
 			}) || null
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer
+
+		// broadcast the change
 		this.runWatchers()
 	}
 	/**
@@ -96,7 +112,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		const destroyer = () => {
 			this._internalStore._watchers.delete(callback)
 		}
-		return destroyer || (() => {})
+		return destroyer
 	}
 }
 
