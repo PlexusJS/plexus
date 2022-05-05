@@ -3,7 +3,7 @@ import { PlexusInstance } from "./instance"
 import { WatchableValue, Watchable } from "./watchable"
 import { _state, PlexusStateInstance } from "./state"
 import { _computed, PlexusComputedStateInstance } from "./computed"
-import { _action, FunctionType, PlexusAction, PlexusActionHelpers } from "./action"
+import { _action, FunctionType, PlexusAction, PlexusActionHelpers, PlexusActionHooks } from "./action"
 import {
 	_collection,
 	PlexusCollectionConfig,
@@ -64,8 +64,8 @@ export function collection<Type extends { [key: string]: any }>(config?: PlexusC
  * @param fn The Plexus action function to run
  * @returns The intended return value of fn, or null if an error is caught
  */
-export function action(fn: FunctionType) {
-	return _action(() => instance(), fn)
+export function action<Fn extends FunctionType>(fn: Fn) {
+	return _action<Fn>(() => instance(), fn)
 }
 
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
@@ -84,6 +84,7 @@ export {
 	PlexusAction,
 	PlexusPlugin,
 	PlexusActionHelpers,
+	PlexusActionHooks,
 	PlexusPluginConfig,
 	PlexusCollectionConfig,
 	PlexusCollectionInstance,

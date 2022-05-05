@@ -1,5 +1,14 @@
 import { PlexusInstance } from "./instance"
 type ErrorHandler = (error: any) => unknown
+
+export interface PlexusActionHooks {
+	/**
+	 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
+	 * @param handler? A function that will be called when an error occurs; omit to fail silently.
+	 *
+	 */
+	onCatch(handler?: ErrorHandler): void
+}
 export class PlexusActionHelpers {
 	private _internalStore = {
 		_errorHandlers: new Set<ErrorHandler>(),
@@ -32,7 +41,7 @@ export class PlexusActionHelpers {
 	 * @internal
 	 * Eject the external functions object returned to the user in the first function argument
 	 */
-	get hooks() {
+	get hooks(): PlexusActionHooks {
 		const onCatch = (handler?: ErrorHandler): void => {
 			return this.onCatch(handler)
 		}
@@ -47,9 +56,9 @@ export class PlexusActionHelpers {
 	}
 }
 
-export type FunctionType = (helpers: PlexusActionHelpers["hooks"], ...args: any) => any
+export type FunctionType = (helpers: PlexusActionHooks, ...args: any[]) => any
 
-type InnerFunction<ResultFn extends FunctionType> = ResultFn extends (helpers: PlexusActionHelpers, ...args: infer Params) => ReturnType<ResultFn>
+type InnerFunction<ResultFn extends FunctionType> = ResultFn extends (helpers: PlexusActionHooks, ...args: infer Params) => ReturnType<ResultFn>
 	? (...args: Params) => ReturnType<ResultFn>
 	: never
 
@@ -58,9 +67,9 @@ export type PlexusAction = typeof _action
 
 // export function action<ReturnData=any>(fn: FunctionType): (...args: any) => ReturnData| Promise<ReturnData>;
 
-export function _action<Fn extends FunctionType = FunctionType>(instance: () => PlexusInstance, fn: Fn) {
+export function _action<Fn extends FunctionType>(instance: () => PlexusInstance, fn: Fn) {
 	const helpers = new PlexusActionHelpers(instance)
-
+	console.log("_action", fn.toString(), fn.constructor.name, fn.constructor)
 	if (fn.constructor.name === "Function") {
 		const newAction = (...args) => {
 			try {
