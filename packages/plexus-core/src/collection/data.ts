@@ -3,28 +3,31 @@ import { WatchableValue } from "./../watchable"
 import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
 import { StateInstance } from "../state"
-interface PlexusDataStore<ValueType extends Record<string, any>> {
-	_key: string
+import { PlexusCollectionInstance } from "./collection"
+interface PlexusDataStore<DataType extends Record<string, any>> {
+	_key: string | number
 	primaryKey: string
-	_state: StateInstance<ValueType>
+	_state: StateInstance<DataType>
+	_wDestroyers: Set<() => void>
 }
 
-export type PlexusDataInstance<ValueType extends Record<string, any> = Record<string, any>> = CollectionDataInstance<ValueType>
+export type PlexusDataInstance<DataType extends Record<string, any> = Record<string, any>> = CollectionDataInstance<DataType>
 export type DataKey = string | number
 
 type DataObjectType<PK extends string = "id"> = Record<string, any> & { [Key in PK]: DataKey }
-export class CollectionDataInstance<ValueType extends DataObjectType<PK> = any, PK extends string = string> {
+export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> {
 	private instance: () => PlexusInstance
 	primaryKey: PK
-	private _internalStore: PlexusDataStore<ValueType>
-	constructor(instance: () => PlexusInstance, primaryKey: PK, value: ValueType) {
+	private _internalStore: PlexusDataStore<DataType>
+	constructor(instance: () => PlexusInstance, public collection: () => PlexusCollectionInstance<DataType>, primaryKey: PK, value: DataType) {
 		// super(instance, value)
 		this.instance = instance
 		this.primaryKey = primaryKey
 		this._internalStore = {
-			_key: value[primaryKey].toString(),
+			_key: value[primaryKey],
 			primaryKey,
-			_state: state<ValueType>(value).key(`collection_data_${value[primaryKey]}`),
+			_state: state<DataType>(value).key(`collection_data_${collection().id}_${value[primaryKey]}`),
+			_wDestroyers: new Set<() => void>(),
 		}
 		// this.value = value
 	}
@@ -40,9 +43,10 @@ export class CollectionDataInstance<ValueType extends DataObjectType<PK> = any, 
 	 * @param config The config to use when setting the value
 	 * @param config.mode should we 'patch' or 'replace' the value
 	 */
-	set(value: Partial<ValueType>, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
+	set(value: Partial<DataType>, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
 		const checkIfHasKey = () => {
 			const v = value[this._internalStore.primaryKey as PK]
+			// Check if the value has the primary key, and verify the key is the same as the data instance
 			const valid =
 				value[this._internalStore.primaryKey] !== undefined &&
 				value[this._internalStore.primaryKey as PK].toString() === this._internalStore._key.toString()
@@ -58,11 +62,11 @@ export class CollectionDataInstance<ValueType extends DataObjectType<PK> = any, 
 		}
 		if (config.mode === "replace") {
 			if (checkIfHasKey()) {
-				this._internalStore._state.set(value as ValueType)
+				this._internalStore._state.set(value as DataType)
 			}
 		} else {
 			if (checkIfHasKey()) {
-				this._internalStore._state.patch(value as ValueType)
+				this._internalStore._state.patch(value as DataType)
 			}
 		}
 	}
@@ -76,25 +80,36 @@ export class CollectionDataInstance<ValueType extends DataObjectType<PK> = any, 
 	 * Delete the data instance
 	 */
 	delete() {
-		this.instance().runtime.removeWatchers("state", this._internalStore._state.name)
-		this.instance()._states.delete(this._internalStore._state)
+		// this.instance().runtime.removeWatchers("state", this._internalStore._state.name)
+		this.collection().delete(this._internalStore._key)
+
 		// delete _internalStore._state
+	}
+	/**
+	 * Clean this data instance (remove all watchers & remove the state from the instance)
+	 */
+	clean() {
+		this._internalStore._wDestroyers.forEach((destroyer) => destroyer())
+		this._internalStore._wDestroyers.clear()
+		this.instance()._states.delete(this._internalStore._state)
 	}
 	/**
 	 * Watch for changes on this data instance
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<ValueType>) {
-		return this._internalStore._state.watch(callback)
+	watch(callback: PlexusWatcher<DataType>) {
+		const destroyer = this._internalStore._state.watch(callback)
+		return destroyer
 	}
 }
 
-export function _data<ValueType extends Record<string, any>>(
+export function _data<DataType extends Record<string, any>>(
 	instance: () => PlexusInstance,
+	collection: () => PlexusCollectionInstance<DataType>,
 	primaryKey: string,
-	value: ValueType
-): PlexusDataInstance<ValueType> | null {
+	value: DataType
+): PlexusDataInstance<DataType> | null {
 	// const _internalStore = {
 	// 	_key: value[primaryKey],
 	// 	primaryKey,
@@ -102,7 +117,7 @@ export function _data<ValueType extends Record<string, any>>(
 	// }
 
 	if (value[primaryKey] !== undefined && value[primaryKey] !== null) {
-		return new CollectionDataInstance(instance, primaryKey, value)
+		return new CollectionDataInstance(instance, collection, primaryKey, value)
 	}
 	return null
 }

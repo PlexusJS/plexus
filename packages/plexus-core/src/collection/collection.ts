@@ -58,7 +58,9 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	/**
 	 * The internal ID of the collection
 	 */
-	id: string
+	get id(): string {
+		return this._internalStore._internalId
+	}
 
 	constructor(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType> = { primaryKey: "id", defaultGroup: false } as const) {
 		this.instance = instance
@@ -81,7 +83,6 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				this._persist = value
 			},
 		}
-		this.id = this._internalStore._internalId
 		if (_config.defaultGroup) {
 			this.createGroup("default")
 		}
@@ -129,7 +130,12 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				}
 				// if there is no state for that key, create it
 				else {
-					const datainstance = _data(() => this.instance(), this._internalStore._key, item)
+					const datainstance = _data(
+						() => this.instance(),
+						() => this,
+						this._internalStore._key,
+						item
+					)
 					if (datainstance) {
 						this._internalStore._data.set(dataKey, datainstance)
 					}
@@ -359,8 +365,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	delete(keys: DataKey | DataKey[]) {
 		// the function to remove the data
 		const rm = (key: DataKey) => {
-			key = key
-			this._internalStore._data.get(key)?.delete()
+			this._internalStore._data.get(key)?.clean()
 
 			for (let groupName of this.getGroupsOf(key)) {
 				this._internalStore._groups.get(groupName)?.remove(key)
