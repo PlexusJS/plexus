@@ -8,16 +8,23 @@ export interface PlexusPreActionConfig {
 }
 export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 	private _internalStore = {
-		_errorHandlers: new Set<ErrorHandler>(),
-		_finished: false,
+		_ran: false,
+		_id: genUID(),
 	}
 
+	/**
+	 * The action associated with this PreAction
+	 */
 	action: ReturnType<typeof _action>
-	id: string
+	/**
+	 *	The internal id of the PreAction
+	 */
+	get id(): string {
+		return this._internalStore._id
+	}
 
 	constructor(private instance: () => PlexusInstance, fn: Fn, config: PlexusPreActionConfig = {}) {
 		this.action = _action<Fn>(instance, fn)
-		this.id = genUID()
 		instance()._inits.set(this.id, this)
 		if (!config.lazy) {
 			this.run()
@@ -28,9 +35,13 @@ export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 	 * Is this action complete?
 	 */
 	get complete() {
-		return this._internalStore._finished
+		return this._internalStore._ran
 	}
 
+	/**
+	 *
+	 * @returns
+	 */
 	async run() {
 		let result: any
 		if (this.action instanceof Function && this.action.constructor.name === "Function") {
@@ -38,7 +49,7 @@ export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 		} else if (this.action.constructor.name === "AsyncFunction") {
 			result = await this.action()
 		}
-		this._internalStore._finished = true
+		this._internalStore._ran = true
 		return result
 	}
 }
