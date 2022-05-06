@@ -69,7 +69,6 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 			const destroyer = this.collection()
 				.getItem(key)
 				?.watch(() => {
-					// console.log("watching a new item")
 					this.runWatchers()
 				})
 			if (destroyer) this._internalStore._watcherDestroyers.add(destroyer)

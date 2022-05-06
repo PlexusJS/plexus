@@ -12,7 +12,7 @@ const myCollection = collection<{ id: string; a: number }>().createGroup("test")
 beforeEach(() => {
 	myState2 = state(1)
 	myState3 = state<Partial<{ name: string }>>({ name: "test" })
-	myCollection.collect({ id: "poggers", a: 2 }, "test")
+	myCollection.collect({ id: "poggers", a: 2 }, ["test"])
 	myState4 = computed(() => {
 		return myState2.value + 12
 	}, [myState])
@@ -60,12 +60,10 @@ describe("Test react integration", () => {
 			logLevel: "debug",
 		})
 		function RandomComponent() {
-			const s1 = usePlexus(myCollection.getSelector("main"))
 			myCollection.collect({ id: "pog", a: 1 }, "test")
 			myCollection.getSelector("main").select("pog")
-			useEffect(() => {
-				console.log("yay!")
-			}, [])
+			const s1 = usePlexus(myCollection.getSelector("main"))
+
 			useEffect(() => {
 				console.log(s1)
 			}, [s1])
@@ -73,13 +71,16 @@ describe("Test react integration", () => {
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
-					<p id="data">{JSON.stringify(s1)}</p>
+					<p id="data">
+						{s1.a} as {s1.id}
+					</p>
 				</div>
 			)
 		}
 		const tree = renderer.create(<RandomComponent />)
 		expect(tree.toJSON()).toMatchSnapshot()
-		expect(tree.root.findByProps({ id: "data" }).children).toEqual([{ id: "pog", a: 1 }])
+		expect(myCollection.getSelector("main").value).toEqual({ id: "pog", a: 1 })
+		expect(tree.root.findByProps({ id: "data" }).children).toEqual(["1", " as ", "pog"])
 	})
 	test("usePlexus hook with group", () => {
 		// instance({
@@ -92,12 +93,22 @@ describe("Test react integration", () => {
 			const [g1] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
-					<p>{JSON.stringify(g1)}</p>
+					<p id="data">{JSON.stringify(g1)}</p>
 				</div>
 			)
 		}
-		const tree = renderer.create(<RandomComponent />).toJSON()
-		expect(tree).toMatchSnapshot()
+		const tree = renderer.create(<RandomComponent />)
+		expect(tree.toJSON()).toMatchSnapshot()
+		expect(myCollection.getGroup("test").value).toEqual([
+			{ id: "poggers", a: 2 },
+			{ id: "pog", a: 1 },
+		])
+		expect(tree.root.findByProps({ id: "data" }).children).toEqual([
+			JSON.stringify([
+				{ id: "poggers", a: 2 },
+				{ id: "pog", a: 1 },
+			]),
+		])
 	})
 
 	test("usePlexus hook with computed", () => {

@@ -130,18 +130,21 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				}
 				// if there is no data instance for that key, create it
 				else {
-					const datainstance = _data(
+					const dataInstance = _data(
 						() => this.instance(),
 						() => this,
 						this._internalStore._key,
 						item
 					)
 					// if we get a valid data instance, add it to the collection
-					if (datainstance) {
-						this._internalStore._data.set(dataKey, datainstance)
+					if (dataInstance) {
+						this._internalStore._data.set(dataKey, dataInstance)
 					}
 				}
-				if (groups) this.addToGroups(item[this._internalStore._key], groups)
+				// if a group (or groups) is provided, add the item to the group
+				if (groups) {
+					this.addToGroups(dataKey, groups)
+				}
 			}
 		}
 		if (Array.isArray(data)) {
@@ -321,32 +324,24 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param groups The group(s) to add the item to
 	 */
 	addToGroups(key: DataKey, groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
-		if (groups) {
-			if (Array.isArray(groups)) {
-				for (let group in groups) {
-					let g = this._internalStore._groups.get(group as GroupName)
-					if (!g) {
-						g = _group(
-							() => this.instance(),
-							() => this,
-							group
-						)
-						this._internalStore._groups.set(group as GroupName, g)
-					}
-					g.add(key)
-				}
-			} else {
-				let g = this._internalStore._groups.get(groups as GroupName)
-				if (!g) {
-					g = _group(
-						() => this.instance(),
-						() => this,
-						groups
-					)
-					this._internalStore._groups.set(groups as GroupName, g)
-				}
-				g.add(key)
+		const addToGroup = (group: GroupName) => {
+			let g = this._internalStore._groups.get(group as GroupName)
+			if (!g) {
+				g = _group(
+					() => this.instance(),
+					() => this,
+					group
+				)
+				this._internalStore._groups.set(group as GroupName, g)
 			}
+			g.add(key)
+		}
+		if (Array.isArray(groups)) {
+			for (let group of groups) {
+				addToGroup(group)
+			}
+		} else {
+			addToGroup(groups)
 		}
 	}
 	watchGroup(name: KeyOfMap<Groups> | string, callback: PlexusWatcher<DataType[]>) {

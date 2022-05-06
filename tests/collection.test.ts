@@ -17,6 +17,7 @@ describe("Testing Collection", () => {
 			{ thing: "lol3", id: 2 },
 			{ thing: "lols", id: 1 },
 		])
+		// can return the data values as an array
 		expect(myCollection.value[0].thing).toBe("lol")
 		expect(myCollection.value[1].thing).toBe("lol3")
 		expect(myCollection.value[2].thing).toBe("lols")
@@ -45,20 +46,23 @@ describe("Testing Collection", () => {
 		])
 
 		expect(myCollection.value.length).toBe(3)
-		console.log(myCollection.value)
+
+		// can properly export data values
 		expect(myCollection.value[0].thing).toBe("lol")
 		expect(myCollection.value[1].thing).toBe("lol3")
 		expect(myCollection.value[2].thing).toBe("lols")
 
 		// can add to groups
-		// console.log(myCollection.getGroupsOf(5))
 		myCollection.collect({ thing: "lol", id: 5 }, "group1")
-		expect(myCollection.getGroupsOf(5)).toBeDefined()
+		expect(myCollection.getGroupsOf(5)).toEqual(["group1"])
+		
+		myCollection.collect({ thing: "yay", id: 12 }, ["group1"])
+		expect(myCollection.getGroupsOf(12)).toEqual(["group1"])
 		// console.log(myCollection.getGroupsOf(5))
 		// console.log(myCollection.getGroup('group1').index)
 		// console.log(myCollection.groups.group1.index)
 
-		expect(myCollection.groups.group1.index.size).toBe(1)
+		expect(myCollection.groups.group1.index.size).toBe(2)
 		console.log(myCollection.groups, myCollection.groups.group1.value)
 
 		// if we try to change the key of an item, it should do nothing and fail silently
@@ -158,7 +162,7 @@ describe("Testing Collection", () => {
 		// can add to groups
 		// console.log(myCollection.getGroupsOf(5))
 		myCollection.collect({ thing: "lol", id: 5 }, "group1")
-		myCollection.getSelector("main").select(5)
+
 		let watcherCalled = false
 		// watch for any change on selector main
 		myCollection.getSelector("main").watch((value) => {
@@ -166,10 +170,19 @@ describe("Testing Collection", () => {
 			expect(value).toBeDefined()
 			watcherCalled = true
 		})
+
 		expect(watcherCalled).toBe(false)
+		// does update cause the watcher to be called?
+		myCollection.getSelector("main").select(5)
 		myCollection.update(5, { thing: "lol2", id: 5 })
 
 		expect(watcherCalled).toBe(true)
+		watcherCalled = false
+
+		// // does `collect` cause the watcher fire?
+		// myCollection.collect({ thing: "lol2", id: 9 }, "group1")
+
+		// expect(watcherCalled).toBe(true)
 	})
 	test("Watching Data", () => {
 		myCollection.collect([
@@ -227,7 +240,7 @@ describe("Testing Collection", () => {
 		myCollection.remove(1, "group1")
 
 		expect(myCollection.value.length).toBe(3)
-		
+
 		expect(myCollection.getGroup("group1").value.length).toBe(2)
 	})
 })
