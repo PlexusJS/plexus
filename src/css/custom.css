@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("../../static/font/silka/stylesheet.css");
+@import url("../../static/font/strawford/stylesheet.css");
 /**
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
@@ -18,6 +20,7 @@
 	--ifm-color-primary-lighter: #1d147b;
 	--ifm-color-primary-lightest: #251a9e;
 	--ifm-code-font-size: 95%;
+	--ifm-font-family-base: "strawford", sans-serif;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -45,19 +48,25 @@
 	align-items: stretch;
 	display: flex;
 }
+html,
+body {
+	font-family: "silka" !important;
+}
 h1 {
 	font-size: 3.5rem;
 	font-weight: bold;
+	/* font-family: "silka" !important; */
 }
 
 h2 {
 	font-size: 2.5rem;
 	font-weight: bold;
+	/* font-family: "silka" !important; */
 }
 h3 {
-	font-size: 1.5rem;
+	font-size: 1.85rem;
 	font-style: italic;
-	font-weight: thin;
+	font-weight: 500;
 	color: var(--ifm-color-primary-light);
 }
 h4 {
@@ -92,4 +101,18 @@ mark {
 
 a {
 	color: var(--ifm-color-primary-lightest);
+	/* display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	gap: 0.2rem;
+	flex-wrap: nowrap; */
+}
+
+.navbar__item,
+.footer__link-item {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	gap: 0.2rem;
+	flex-wrap: nowrap;
 }
