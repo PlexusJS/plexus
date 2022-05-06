@@ -54,7 +54,7 @@ The focus of this style is to be extendable, scalable, and intuative to navigate
 
 We can create our types and interfaces in this file and export it for the rest of our core (or the rest of our app if we want).
 
-```ts
+```ts title="/core/user/types.ts"
 export interface UserData {
 	uuid: string
 	first_name: string
@@ -77,7 +77,7 @@ export type RetrieveFriendsRes = {
 
 This is where we define [stateful instances](/docs/getting-started/concepts#internal-terms) things like states, computed, and collections.
 
-```ts
+```ts title="/core/user/states.ts"
 import { state, collection, computed } from "@plexusjs/core"
 import { UserData } from "./types"
 
@@ -102,7 +102,7 @@ export const friends = collection<UserData>({
 
 This is where we can create our API [instances](/docs/getting-started/concepts#internal-terms). we can interract with this elsewhere to interract with data from the server.
 
-```ts
+```ts title="/core/user/api.ts"
 import { api } from "@plexusjs/core"
 
 // You can use the api to make requests to the server at a specific endpoint
@@ -113,7 +113,7 @@ export const userBroker = api("https://api.example.com/users").auth("MySeCrEtToK
 
 Here is where we define our <i>actions</i>. An <i>action</i> is a function that is called to preform business logic. Technically, an <i>action</i> is just a buffed up function, so you can just use it as a function wrapper to gain the benifits of the <i>action hooks</i>.
 
-```ts
+```ts title="/core/user/actions.ts"
 import { action } from "@plexusjs/core"
 
 // Import your module's resources
@@ -162,7 +162,7 @@ export const getFriends = action(async ({ onCatch }) => {
 
 Here is the final file we make for this module; the index file takes all of your [instances](/docs/getting-started/concepts#internal-terms) from the other files and exports them into single point.
 
-```ts
+```ts title="/core/user/index.ts"
 // Import your module instances
 import * as actions from "./actions"
 import * as states from "./states"
@@ -178,7 +178,7 @@ export default user
 
 Here is the final file we make; the index file takes all of your [instances](/docs/getting-started/concepts#internal-terms) from the other files and exports them into single point.
 
-```ts
+```ts title="/core/index.ts"
 // Import your module instances
 import { users } from "./modules/users"
 import { channels } from "./modules/channels"
