@@ -10,6 +10,7 @@ export interface PlexusApiRes<DataType = any> {
 	response: ResponseInit
 	rawData: string
 	data: DataType
+	ok: boolean
 }
 export interface PlexusAPIReq {
 	cache?: RequestInit["cache"]
@@ -139,6 +140,7 @@ export class ApiInstance {
 				status: res.status,
 				response: res,
 				rawData,
+				ok: res.status > 199 && res.status < 300,
 				data,
 			}
 		} else {
@@ -146,6 +148,7 @@ export class ApiInstance {
 				status: res.status,
 				response: res,
 				rawData: "",
+				ok: res.status > 199 && res.status < 300,
 				data: {} as ResponseDataType,
 			}
 		}
@@ -325,7 +328,7 @@ export class ApiInstance {
 		} & RequestInit
 	}
 	private static createEmptyRes<ResponseDataType = any>(status: number = 408) {
-		return { status, response: {}, rawData: "", data: {} as ResponseDataType }
+		return { status, response: {}, rawData: "", data: {} as ResponseDataType, ok: status > 199 && status < 300 }
 	}
 }
 
