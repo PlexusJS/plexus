@@ -20,7 +20,7 @@
 	--ifm-color-primary-lighter: #1d147b;
 	--ifm-color-primary-lightest: #251a9e;
 	--ifm-code-font-size: 95%;
-	--ifm-font-family-base: "strawford", sans-serif;
+	--ifm-font-family-base: "strawfordmedium", sans-serif;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -116,3 +116,7 @@ a {
 	gap: 0.2rem;
 	flex-wrap: nowrap;
 }
+
+/* p {
+	font-family: "silkaregular" !important;
+} */
