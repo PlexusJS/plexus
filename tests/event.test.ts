@@ -1,6 +1,4 @@
-import { api, PlexusApi, PlexusAction, event, state } from "@plexusjs/core"
-// import { instance } from '../src/instance';
-// import { PlexusEvent, PxState, PxStateInstance } from '../src/interfaces';
+import { event, state } from "@plexusjs/core"
 
 describe("Testing Event Function", () => {
 	test("Emitting a string", async () => {
@@ -30,10 +28,27 @@ describe("Testing Event Function", () => {
 				ret()
 				expect(_value.value).toBe(4)
 				destroy()
-				
 			}, 100)
 		})
 
 		// console.log(myApi.config)
+	})
+
+	test("Emitting a string, once", async () => {
+		const myEvent = event<string>()
+		// const value = state(1)
+		let count = 0
+		const destroy = myEvent.once((value) => {
+			expect(value).toBeDefined()
+			expect(value).toBe("test")
+			++count
+		})
+
+		myEvent.emit("test")
+		expect(count).toBe(1)
+		myEvent.emit("test")
+		expect(count).toBe(1)
+		// console.log(myApi.config)
+		destroy()
 	})
 })

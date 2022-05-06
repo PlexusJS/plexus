@@ -37,7 +37,7 @@ export class EventInstance<PayloadType = any> {
 	once(callback: (payload: PayloadType) => void) {
 		// if disabled, do nothing
 		if (this._internalStore._disabled) {
-			return
+			return () => {}
 		}
 		// subscribe to the event on the runtime
 		const cleanup = this.instance().runtime.subscribe(`${this._internalStore._name}`, callback, { type: "event" })
