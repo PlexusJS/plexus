@@ -1,15 +1,21 @@
-import { collection, computed, instance, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core"
-import React, { useEffect } from "react"
-import { usePlexus } from "../packages/plexus-react/src"
+import { collection, computed, instance, PlexusComputedStateInstance, PlexusStateInstance, PlexusEventInstance, state, event } from "@plexusjs/core"
+import React, { useEffect, useState } from "react"
+import { useEvent, usePlexus } from "../packages/plexus-react/src"
 import * as renderer from "react-test-renderer"
 
+type Payload = {
+	name: string
+	status: string
+}
 let myState = state("yes")
 let myState2: PlexusStateInstance<number>
 let myState3: PlexusStateInstance<Partial<{ name: string }>>
 let myState4: PlexusComputedStateInstance<number>
+let myEvents: PlexusEventInstance<Payload>
 
 const myCollection = collection<{ id: string; a: number }>().createGroup("test").createSelector("main")
 beforeEach(() => {
+	myEvents = event<Payload>()
 	myState2 = state(1)
 	myState3 = state<Partial<{ name: string }>>({ name: "test" })
 	myCollection.collect({ id: "poggers", a: 2 }, ["test"])
@@ -21,7 +27,7 @@ afterEach(() => {
 	myCollection.clear()
 })
 
-describe("Test react integration", () => {
+describe("Test react integration (usePlexus)", () => {
 	test("usePlexus hook w/state", () => {
 		function RandomComponent() {
 			const stateValue = usePlexus(myState)
@@ -48,7 +54,7 @@ describe("Test react integration", () => {
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
-					<p>{JSON.stringify(groupValue)}</p>
+					<p id="data">{JSON.stringify(groupValue)}</p>
 				</div>
 			)
 		}
@@ -117,11 +123,35 @@ describe("Test react integration", () => {
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
-					<p>{computedThing}</p>
+					<p id="data">{computedThing}</p>
 				</div>
 			)
 		}
 		const tree = renderer.create(<RandomComponent />).toJSON()
 		expect(tree).toMatchSnapshot()
+	})
+})
+describe("Test react integration (useEvent)", () => {
+	test("test useEvent", () => {
+		function RandomComponent() {
+			const [val, setVal] = useState("")
+			const computedThing = useEvent(myEvents, (payload) => {
+				setVal(payload.name)
+			})
+
+			useEffect(() => {
+				myEvents.emit({ name: "test", status: "test" })
+			}, [])
+			// const [groupValue] = usePlexus([myCollection.groups.test])
+			return (
+				<div>
+					<p id="data">{val}</p>
+				</div>
+			)
+		}
+		const tree = renderer.create(<RandomComponent />)
+		expect(tree.toJSON()).toMatchSnapshot()
+		// expect().toEqual()
+		expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
 	})
 })
