@@ -83,6 +83,31 @@ describe("Testing State Function", () => {
 		expect(callbackCalled).toBe(true)
 	})
 
+	test("Checking state.watch()", () => {
+		let callbackCalled = false
+		let callback2Called = false
+		// can add watcher
+		const watcherDestroyer = stringState.watch((value) => {
+			console.log("callback called", value)
+			callbackCalled = true
+		})
+		const watcherDestroyer2 = booleanState.watch((value) => {
+			console.log("callback 2 called", value)
+			callback2Called = true
+		})
+		// console.log(instance().runtime.engine.events.entries())
+		stringState.set("Hello World")
+		expect(callbackCalled).toBe(true)
+		expect(callback2Called).toBe(false)
+
+		// can remove watcher
+		// stringState.removeWatcher(watcherKey);
+		watcherDestroyer()
+		// console.log(watcherDestroyer.toString(), instance().runtime.engine.events.entries())
+		stringState.set("new value")
+		expect(callbackCalled).toBe(true)
+	})
+
 	test("Checking state nextValue", () => {
 		// check .set(value: object)
 		objectState.set({ a: { b: false } })
@@ -95,6 +120,4 @@ describe("Testing State Function", () => {
 		console.log(objectState.value, objectState.nextValue)
 		expect(objectState.nextValue).toStrictEqual(objectState.value)
 	})
-
-	
 })
