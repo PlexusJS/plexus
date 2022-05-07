@@ -1,6 +1,6 @@
 {
   "name": "@plexusjs/core",
-  "version": "1.0.6",
+  "version": "1.0.6-canary.33+1d631b7",
   "description": "A library for building modular interconnected applications",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,7 @@
     "test": "jest",
     "prepublish": "yarn build"
   },
-  "gitHead": "db9d5b57a0343ac7109699a81671a961a028a903",
+  "gitHead": "1d631b777dc92877cb122aea1040196af8b3afa4",
   "devDependencies": {
     "isomorphic-fetch": "^3.0.0"
   }
