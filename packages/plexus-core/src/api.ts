@@ -293,7 +293,7 @@ export class ApiInstance {
 			temp[
 				key
 					.split("-")
-					.map((v) => `${v.at(0)}${v.substring(1)}`)
+					.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
 					.join("-")
 			] = value
 		})
@@ -302,7 +302,7 @@ export class ApiInstance {
 			temp[
 				key
 					.split("-")
-					.map((v) => `${v.at(0)}${v.substring(1)}`)
+					.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
 					.join("-")
 			] = value
 		})
