@@ -23,5 +23,5 @@
     "test": "jest",
     "prepublish": "yarn build"
   },
-  "gitHead": "1d631b777dc92877cb122aea1040196af8b3afa4"
+  "gitHead": "7101e8567a2437c6a5e776002ea577e825bef71a"
 }

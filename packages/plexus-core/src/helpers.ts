@@ -1,7 +1,7 @@
 export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object
 
 export function isObject(item: any): item is Object {
-	return item && typeof item === "object" && !Array.isArray(item)
+	return item && item !== null && typeof item === "object" && !Array.isArray(item)
 }
 
 export function deepMerge<Thing extends Object>(target: Thing, source: Thing): Thing {
@@ -36,7 +36,7 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 		return new RegExp(thing) as any as Type
 	}
 	// must be an object
-	if (typeof thing === "object") {
+	if (isObject(thing)) {
 		const cloned: Type = Object.create(thing as Object)
 		for (const key in thing) {
 			if ((thing as Object).hasOwnProperty(key)) {
