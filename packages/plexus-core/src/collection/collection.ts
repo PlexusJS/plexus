@@ -190,8 +190,22 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param key
 	 * @returns
 	 */
-	getItem(key: DataKey) {
-		return this._internalStore._data.get(key)
+	getItem(dataKey: DataKey) {
+		if (this._internalStore._data.has(dataKey)) {
+			return this._internalStore._data.get(dataKey)
+		}
+		const dataInstance: PlexusDataInstance<DataType> | null = _data(
+			() => this.instance(),
+			() => this,
+			this._internalStore._key,
+			{ [this._internalStore._key]: dataKey } as any as DataType,
+			{ prov: true }
+		)
+		// if we get a valid data instance, add it to the collection
+		if (dataInstance) {
+			this._internalStore._data.set(dataKey, dataInstance)
+		}
+		return dataInstance
 	}
 	/**
 	 * Get the value of an item in the collection

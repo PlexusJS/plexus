@@ -1,4 +1,4 @@
-import { PlexusStateInstance, state } from ".."
+import { PlexusStateInstance, state, Watchable } from ".."
 import { WatchableValue } from "./../watchable"
 import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
@@ -16,12 +16,12 @@ export type PlexusDataInstance<DataType extends Record<string, any> = Record<str
 export type DataKey = string | number
 
 type DataObjectType<PK extends string = "id"> = Record<string, any> & { [Key in PK]: DataKey }
-export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> {
+export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> extends Watchable<DataType> {
 	private instance: () => PlexusInstance
 	primaryKey: PK
 	private _internalStore: PlexusDataStore<DataType>
 	constructor(instance: () => PlexusInstance, public collection: () => PlexusCollectionInstance<DataType>, primaryKey: PK, value: DataType) {
-		// super(instance, value)
+		super(instance, value)
 		this.instance = instance
 		this.primaryKey = primaryKey
 		this._internalStore = {
@@ -110,7 +110,8 @@ export function _data<DataType extends Record<string, any>>(
 	instance: () => PlexusInstance,
 	collection: () => PlexusCollectionInstance<DataType>,
 	primaryKey: string,
-	value: DataType
+	value: DataType,
+	config: { prov: boolean } = { prov: false }
 ): PlexusDataInstance<DataType> | null {
 	// const _internalStore = {
 	// 	_key: value[primaryKey],
@@ -118,7 +119,7 @@ export function _data<DataType extends Record<string, any>>(
 	// 	_state: state<Value>(value).key(`collection_data_${value[primaryKey]}`),
 	// }
 
-	if (value[primaryKey] !== undefined && value[primaryKey] !== null) {
+	if ((value[primaryKey] !== undefined && value[primaryKey] !== null) || config.prov) {
 		return new CollectionDataInstance(instance, collection, primaryKey, value)
 	}
 	return null
