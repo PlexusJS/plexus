@@ -92,9 +92,10 @@ describe("Test react integration (usePlexus)", () => {
 		// instance({
 		// 	logLevel: "debug",
 		// })
-		myCollection.collect({ id: "pog", a: 1 }, "test")
 		function RandomComponent() {
-			useEffect(() => {}, [])
+			useEffect(() => {
+				myCollection.collect({ id: "pog", a: 1 }, "test")
+			}, [])
 			// const g1 = usePlexus(myCollection.getGroup("test"))
 			const [g1] = usePlexus([myCollection.groups.test])
 			return (
