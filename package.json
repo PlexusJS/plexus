@@ -18,7 +18,7 @@
 		"build": "lerna run build --scope @plexusjs/core && lerna run build --scope @plexusjs/react && lerna run build",
 		"prepublish": "yarn build",
 		"prepublishOnly": "pinst --disable",
-		"postpublish": "pinst --enable",
+		"postpublish": "pinst --enable && git push",
 		"publish-canary": "lerna publish --canary prerelease --preid canary --force-publish --yes",
 		"publish-stable": "lerna publish --yes --force-publish",
 		"_postinstall": "husky install",
