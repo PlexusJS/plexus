@@ -118,6 +118,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	collect(data: DataType[], groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
 	collect(data: DataType, groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
+	collect(data: DataType[], groups?: GroupName[] | GroupName): void
+	collect(data: DataType, groups?: GroupName[] | GroupName): void
 	collect(data: DataType | DataType[], groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
 		const collectItem = (item: DataType) => {
 			if (!item) return
