@@ -36,7 +36,7 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 		return new RegExp(thing) as any as Type
 	}
 	// must be an object
-	if (typeof thing === "object") {
+	if (isObject(thing)) {
 		const cloned: Type = Object.create(thing as Object)
 		for (const key in thing) {
 			if ((thing as Object).hasOwnProperty(key)) {
