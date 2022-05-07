@@ -158,7 +158,7 @@ export class StorageInstance {
 					)
 					object.set(storedValue)
 				} else {
-					this.instance().runtime.log("info", `Skipping the storage sync of item "${key}"; Values are already equal.`)
+					this.instance().runtime.log("info", `Skipping the storage sync of item "${key}"; Values are already equal. (state["${convertToString(val)}"] storage["${convertToString(storedValue)}"])`)
 				}
 			}
 		})
