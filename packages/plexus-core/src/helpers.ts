@@ -1,12 +1,10 @@
 export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object
 
 export function isObject(item: any): item is Object {
-	return item && typeof item === "object" && !Array.isArray(item)
+	return item && item !== null && typeof item === "object" && !Array.isArray(item)
 }
 
 export function deepMerge<Thing extends Object>(target: Thing, source: Thing): Thing {
-	// @ts-ignore ~ @HOTFIX @TODO: find a better way to handle this
-	if (!target) return null;
 	let output = Object.assign({}, target)
 	if ((isObject(target) && isObject(source)) || (Array.isArray(target) && Array.isArray(source))) {
 		for (const key in source) {
