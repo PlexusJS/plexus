@@ -32,14 +32,13 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	get id(): string {
 		// return this._internalStore._internalId
-		return this._watchableStore._internalId
+		return `${this._watchableStore._internalId}`
 	}
 	constructor(instance: () => PlexusInstance, init: StateValue) {
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
-			_internalId:
-				this._watchableStore._internalId || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+			_internalId: this._watchableStore._internalId,
 			_nextValue: init,
 			_value: init,
 			_initialValue: init,
@@ -53,12 +52,14 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	}
 	private mount() {
 		if (!this.instance()._states.has(this)) {
+			this.instance()._states.add(this)
 			this.instance().runtime.log(
 				"info",
 				`Hoisting state ${this._internalStore._internalId} with value ${this._internalStore._value} to instance`
 			)
-			this.instance()._states.add(this)
-			this.instance().storage?.sync()
+			if (this._internalStore._persist) {
+				this.instance().storage?.sync()
+			}
 		}
 	}
 	/**
@@ -207,7 +208,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	get value() {
 		this.instance().runtime.log("info", `getting value; persist ${this._internalStore._persist ? "enabled" : "disabled"}`)
-		this.mount();
+		this.mount()
 
 		return deepClone(this._internalStore._value)
 	}

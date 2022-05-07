@@ -105,9 +105,11 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	}
 	private mount() {
 		if (!this.instance()._collections.has(this)) {
-			this.instance().runtime.log("info", `Hoisting collection ${this.id} to instance`)
 			this.instance()._collections.add(this)
-			this.instance().storage?.sync()
+			this.instance().runtime.log("info", `Hoisting collection ${this.id} to instance`)
+			if (this._internalStore.persist) {
+				this.instance().storage?.sync()
+			}
 		}
 	}
 	/**

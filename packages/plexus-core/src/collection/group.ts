@@ -17,8 +17,7 @@ interface CollectionGroupStore<DataType = any> {
 	_name: string
 	_collectionId: string
 	_includedKeys: Set<string | number>
-	_watcherDestroyers: Set<() => void>
-	_watchers: Set<PlexusWatcher<DataType[]>>
+	_dataWatcherDestroyers: Set<() => void>
 }
 export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> {
 	private _internalStore: CollectionGroupStore<DataType>
@@ -30,7 +29,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	 * The internal ID of the Group
 	 */
 	get id() {
-		return `${this._watchableStore._internalId}`
+		return `grp_${this._watchableStore._internalId}`
 	}
 
 	constructor(
@@ -49,20 +48,20 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 			_name: name,
 			_collectionId: collection().id,
 			_includedKeys: new Set(),
-			_watcherDestroyers: new Set(),
-			_watchers: new Set(),
+			_dataWatcherDestroyers: new Set(),
 		}
 	}
 	private runWatchers() {
-		this._internalStore._watchers.forEach((callback) => {
-			this.instance().runtime.log("info", `Running watchers on group ${this._internalStore._name}(${this.id})...`)
-			callback(this.collection().getGroup(this._internalStore._name).value)
-		})
+		this.instance().runtime.log("info", `Running watchers on group ${this._internalStore._name}(${this.id})...`)
+		// this._internalStore._groupWatchers.forEach((callback) => {
+		// 	callback(this.value)
+		// })
+		this.instance().runtime.broadcast(this.id, this.value)
 	}
-	private rebuildWatchers() {
-		this.instance().runtime.log("info", `Rebuilding watchers on group ${this._internalStore._name}(${this.id})...`)
-		this._internalStore._watcherDestroyers.forEach((destroyer) => destroyer())
-		this._internalStore._watcherDestroyers.clear()
+	private rebuildDataWatchers() {
+		this.instance().runtime.log("info", `Rebuilding data watcher connections on group ${this._internalStore._name}(${this.id})...`)
+		this._internalStore._dataWatcherDestroyers.forEach((destroyer) => destroyer())
+		this._internalStore._dataWatcherDestroyers.clear()
 
 		// loop through each key, get the data associated with it, then add a watcher to that data that runs the group's watchers
 		Array.from(this._internalStore._includedKeys).forEach((key) => {
@@ -71,8 +70,9 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 				?.watch(() => {
 					this.runWatchers()
 				})
-			if (destroyer) this._internalStore._watcherDestroyers.add(destroyer)
+			if (destroyer) this._internalStore._dataWatcherDestroyers.add(destroyer)
 		})
+		this.runWatchers()
 	}
 	/**
 	 * Check if the group contains the given item
@@ -87,7 +87,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	 */
 	add(key: DataKey) {
 		this._internalStore._includedKeys.add(key)
-		this.rebuildWatchers()
+		this.rebuildDataWatchers()
 		return this as PlexusCollectionGroup<DataType>
 	}
 	/**
@@ -96,7 +96,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	 */
 	remove(key: DataKey) {
 		this._internalStore._includedKeys.delete(key)
-		this.rebuildWatchers()
+		this.rebuildDataWatchers()
 		return this as PlexusCollectionGroup<DataType>
 	}
 	/**
@@ -125,13 +125,12 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<DataType[]>) {
-		// const destroyers = this.data.map((data) => data.watch(callback))
-		this._internalStore._watchers.add(callback)
-		const destroyer = () => {
-			// destroyers.forEach((destroyer) => destroyer())
-			this._internalStore._watchers.delete(callback)
-		}
-		return destroyer
+		// this._internalStore._groupWatchers.add(callback)
+		// const destroyer = () => {
+		// 	this._internalStore._groupWatchers.delete(callback)
+		// }
+		// return destroyer
+		return this.instance().runtime.subscribe(this.id, callback)
 	}
 }
 
