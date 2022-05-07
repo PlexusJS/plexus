@@ -1,6 +1,6 @@
 {
   "name": "@plexusjs/react",
-  "version": "1.0.6-canary.33+1d631b7",
+  "version": "1.0.6-canary.35+c01af55",
   "description": "React Plugin for PlexusJS",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,5 +23,5 @@
     "test": "jest",
     "prepublish": "yarn build"
   },
-  "gitHead": "7101e8567a2437c6a5e776002ea577e825bef71a"
+  "gitHead": "c01af55a1d1e24be7f19672e7773855490c162b5"
 }
