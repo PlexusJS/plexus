@@ -42,7 +42,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 				depUnsubs.length = 0
 			}
 		}
-	}, [])
+	}, [deps])
 	// The "!" at the end of the values here tell the tsc that these values will never be "undefined"
 	if (!Array.isArray(deps) && depsArray.length === 1) {
 		return depsArray[0].value! as PlexusValue<V>
