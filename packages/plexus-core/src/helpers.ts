@@ -5,6 +5,8 @@ export function isObject(item: any): item is Object {
 }
 
 export function deepMerge<Thing extends Object>(target: Thing, source: Thing): Thing {
+	// @ts-ignore ~ @HOTFIX @TODO: find a better way to handle this
+	if (!target) return null;
 	let output = Object.assign({}, target)
 	if ((isObject(target) && isObject(source)) || (Array.isArray(target) && Array.isArray(source))) {
 		for (const key in source) {
