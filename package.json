@@ -1,12 +1,12 @@
 {
-	"name": "create-plexus-core",
-	"version": "1.1.2",
-	"bin": "bin.js",
+	"name": "plexus-cli",
+	"version": "1.0.0",
+	"main": " ",
+	"repository": "https://github.com/PlexusJS/plexus-cli.git",
+	"author": "Philippe Clesca <hello@philippec.me>",
 	"license": "MIT",
-	"type": "module",
-	"dependencies": {
-		"chalk": "^5.0.1",
-		"yargs": "^17.4.1"
-	},
-	"repository": "https://github.com/PlexusJS/create-plexus-core.git"
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	]
 }

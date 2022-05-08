@@ -1,6 +1,5 @@
-#!/usr/bin/env node
+
 import chalk from 'chalk'
-import path from 'path'
 import yArgs from 'yargs'
 import fs from 'fs'
 import { execSync } from 'child_process'
@@ -173,8 +172,15 @@ const templates = {
 
 const helpString = `
 	Usage:
-		$ npx create-plexus-core <options>
+		$ npx create-plexus-core <command> <options>
+
+	Commands:
+		
+		module <name>			Create a new module in your plexus core
+		update					Update your plexus install
+
 	Options:
+
 	    --skip-install			Skip the install of the PlexusJS packages
 		--typescript			Create TypeScript files
 		--react					Install the React package
@@ -224,7 +230,7 @@ const genFileOrDir = (arr, path = '/core') => {
 	return true
 }
 
-const installPlexus = () => {
+const installPlexus = (tag = "") => {
 	if (!yargs.argv["skip-install"]) {
 		// initialize the prefix with npm install syntax 
 		let prefix = 'npm install --save'
@@ -238,7 +244,8 @@ const installPlexus = () => {
 			console.log(chalk.cyan.bgWhite('Using NPM Package Manager'))
 		}
 		// install the packages
-		tryIt(() => execSync(`${prefix} @plexusjs/core${yargs.argv.react ? ' @plexusjs/react' : yargs.argv.next ? ' @plexusjs/react @plexusjs/next' : ""}`, { stdio: 'inherit' }))
+		const tagFinal = tag && ['canary', 'latest'].includes(tag) ? `@${tag}` : ''
+		tryIt(() => execSync(`${prefix} @plexusjs/core${tagFinal}${yargs.argv.react ? ` @plexusjs/react${tagFinal}` : yargs.argv.next ? ` @plexusjs/react${tagFinal} @plexusjs/next${tagFinal}` : ""}`, { stdio: 'inherit' }))
 			? console.log(chalk.bgGreen.black('Plexus installed successfully'))
 			: console.error(chalk.bgRed.black('Failed to install Plexus Packages'))
 	}
@@ -248,6 +255,7 @@ const installPlexus = () => {
 }
 // make the core directory in the root folder
 const lookForCore = () => tryIt(() => !fs.existsSync(`${__dirname} /core`) && !fs.mkdirSync(`${__dirname}/core`))
+const lookForCoreModules = () => tryIt(() => !fs.existsSync(`${__dirname} /core/modules`) && !fs.mkdirSync(`${__dirname}/core/modules`))
 
 const genFiles = (template = 'basic') => {
 	// check if the template string is one of the available templates
@@ -264,13 +272,13 @@ const genFiles = (template = 'basic') => {
 	// const struct = JSON.parse(structRaw)
 	const struct = templates[template]
 
-	if (yargs.argv.typescript) {
+	if (yargs.argv.typescript || yargs.argv.ts) {
 		console.log(chalk.bgWhite.black('Creating TS Files...'))
-		genFileOrDir(struct?.$schema?.ts, '/core')
+		genFileOrDir(struct?.$schema?.ts)
 	}
 	else {
 		console.log(chalk.bgWhite.black('Creating JS Files...'))
-		genFileOrDir(struct?.$schema?.js, '/core')
+		genFileOrDir(struct?.$schema?.js)
 
 	}
 }
@@ -279,6 +287,24 @@ function run() {
 	if (yargs.argv.help) {
 		console.log(helpString)
 		return
+	}
+	if (yargs.argv._) {
+		if (yargs.argv._[0] === 'module') {
+			if (yargs.argv._[1]) {
+
+			}
+		}
+		if (yargs.argv._[0] === 'update') {
+			if (yargs.argv.canary) {
+				console.log(chalk.bgWhite.black('Updating PlexusJS to latest Canary build...'))
+				installPlexus('canary')
+			}
+			if (yargs.argv.latest) {
+				console.log(chalk.bgWhite.black('Updating PlexusJS to Latest stable build...'))
+				installPlexus('latest')
+			}
+			installPlexus()
+		}
 	}
 	// parse the command line arguments
 	if (yargs.argv.template) {
