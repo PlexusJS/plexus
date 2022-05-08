@@ -7,7 +7,7 @@ import { execSync } from 'child_process'
 
 const upperScriptTag = "#!/usr/bin/env node"
 
-const path = './bin.js'
+const path = './out/bin.js'
 if (fs.existsSync(path)) {
 
 	console.log(chalk.green('Found bin.js file...'))

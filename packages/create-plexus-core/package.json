@@ -15,7 +15,7 @@
 		"preexecute": "yarn build",
 		"execute": "npx .",
 		"prepublish": "yarn build",
-		"publish:stable": "yarn publish"
+		"publish-stable": "yarn publish"
 	},
 	"repository": {
 		"type": "git",
