@@ -112,7 +112,7 @@ export function _data<DataType extends Record<string, any>>(
 	primaryKey: string,
 	value: DataType,
 	config: { prov: boolean } = { prov: false }
-): PlexusDataInstance<DataType> | null {
+) {
 	// const _internalStore = {
 	// 	_key: value[primaryKey],
 	// 	primaryKey,
