@@ -1,19 +1,11 @@
 #!/usr/bin/env node
-'use strict';
+import chalk from 'chalk';
+import yArgs from 'yargs';
+import fs from 'fs';
+import { execSync } from 'child_process';
 
-var chalk = require('chalk');
-var yArgs = require('yargs');
-var fs = require('fs');
-var child_process = require('child_process');
-
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var chalk__default = /*#__PURE__*/_interopDefaultLegacy(chalk);
-var yArgs__default = /*#__PURE__*/_interopDefaultLegacy(yArgs);
-var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
-
-const yargs = yArgs__default["default"](process.argv);
-const __dirname$1 = process.cwd();
+const yargs = yArgs(process.argv);
+const __dirname = process.cwd();
 
 const templates = {
 	basic: {
@@ -219,17 +211,17 @@ const genFileOrDir = (arr, path = '/core') => {
 		// if we are creating a file
 		if (obj.type === 'file') {
 
-			process.stdout.write(`Creating ${chalk__default["default"].cyan(`"${path}/${fileName}"`)}... ::`);
-			tryIt(() => fs__default["default"].writeFileSync(`${__dirname$1}${filePath}`, obj.content))
-				? process.stdout.write(chalk__default["default"].green(`Success!\n`))
-				: process.stdout.write(chalk__default["default"].yellow(`Failure!\n`));
+			process.stdout.write(`Creating ${chalk.cyan(`"${path}/${fileName}"`)}... ::`);
+			tryIt(() => fs.writeFileSync(`${__dirname}${filePath}`, obj.content))
+				? process.stdout.write(chalk.green(`Success!\n`))
+				: process.stdout.write(chalk.yellow(`Failure!\n`));
 		}
 		// if we are creating a directory
 		else if (obj.type === 'dir') {
-			process.stdout.write(`Creating ${chalk__default["default"].cyan(`"${path}/${obj.name}/"`)}... ::`);
-			tryIt(() => fs__default["default"].mkdirSync(`${__dirname$1}${path}/${obj.name}`))
-				? process.stdout.write(chalk__default["default"].green(`Success\n`))
-				: process.stdout.write(chalk__default["default"].yellow(`Failed\n`));
+			process.stdout.write(`Creating ${chalk.cyan(`"${path}/${obj.name}/"`)}... ::`);
+			tryIt(() => fs.mkdirSync(`${__dirname}${path}/${obj.name}`))
+				? process.stdout.write(chalk.green(`Success\n`))
+				: process.stdout.write(chalk.yellow(`Failed\n`));
 			// recurse into the directory
 			genFileOrDir(obj.content, `${path}/${obj.name}`);
 		}
@@ -243,25 +235,25 @@ const installPlexus = (tag = "") => {
 		let prefix = 'npm install --save';
 		// if we have a yarn.lock file, use yarn to install
 
-		if (fs__default["default"].existsSync(`${__dirname$1}/yarn.lock`)) {
-			console.log(chalk__default["default"].cyan.bgWhite(`Using Yarn Package Manager`));
+		if (fs.existsSync(`${__dirname}/yarn.lock`)) {
+			console.log(chalk.cyan.bgWhite(`Using Yarn Package Manager`));
 			prefix = "yarn add";
 		}
 		else {
-			console.log(chalk__default["default"].cyan.bgWhite('Using NPM Package Manager'));
+			console.log(chalk.cyan.bgWhite('Using NPM Package Manager'));
 		}
 		// install the packages
 		const tagFinal = tag && ['canary', 'latest'].includes(tag) ? `@${tag}` : '';
-		tryIt(() => child_process.execSync(`${prefix} @plexusjs/core${tagFinal}${yargs.argv.react ? ` @plexusjs/react${tagFinal}` : yargs.argv.next ? ` @plexusjs/react${tagFinal} @plexusjs/next${tagFinal}` : ""}`, { stdio: 'inherit' }))
-			? console.log(chalk__default["default"].bgGreen.black('Plexus installed successfully'))
-			: console.error(chalk__default["default"].bgRed.black('Failed to install Plexus Packages'));
+		tryIt(() => execSync(`${prefix} @plexusjs/core${tagFinal}${yargs.argv.react ? ` @plexusjs/react${tagFinal}` : yargs.argv.next ? ` @plexusjs/react${tagFinal} @plexusjs/next${tagFinal}` : ""}`, { stdio: 'inherit' }))
+			? console.log(chalk.bgGreen.black('Plexus installed successfully'))
+			: console.error(chalk.bgRed.black('Failed to install Plexus Packages'));
 	}
 	else {
 		console.log('Skipping Install...');
 	}
 };
 // make the core directory in the root folder
-const lookForCore = () => tryIt(() => !fs__default["default"].existsSync(`${__dirname$1} /core`) && !fs__default["default"].mkdirSync(`${__dirname$1}/core`));
+const lookForCore = () => tryIt(() => !fs.existsSync(`${__dirname} /core`) && !fs.mkdirSync(`${__dirname}/core`));
 
 const genFiles = (template = 'basic') => {
 	// check if the template string is one of the available templates
@@ -279,11 +271,11 @@ const genFiles = (template = 'basic') => {
 	const struct = templates[template];
 
 	if (yargs.argv.typescript || yargs.argv.ts) {
-		console.log(chalk__default["default"].bgWhite.black('Creating TS Files...'));
+		console.log(chalk.bgWhite.black('Creating TS Files...'));
 		genFileOrDir(struct?.$schema?.ts);
 	}
 	else {
-		console.log(chalk__default["default"].bgWhite.black('Creating JS Files...'));
+		console.log(chalk.bgWhite.black('Creating JS Files...'));
 		genFileOrDir(struct?.$schema?.js);
 
 	}
@@ -300,11 +292,11 @@ function run() {
 		}
 		if (yargs.argv._[0] === 'update') {
 			if (yargs.argv.canary) {
-				console.log(chalk__default["default"].bgWhite.black('Updating PlexusJS to latest Canary build...'));
+				console.log(chalk.bgWhite.black('Updating PlexusJS to latest Canary build...'));
 				installPlexus('canary');
 			}
 			if (yargs.argv.latest) {
-				console.log(chalk__default["default"].bgWhite.black('Updating PlexusJS to Latest stable build...'));
+				console.log(chalk.bgWhite.black('Updating PlexusJS to Latest stable build...'));
 				installPlexus('latest');
 			}
 			installPlexus();

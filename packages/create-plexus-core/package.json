@@ -1,7 +1,7 @@
 {
 	"name": "create-plexus-core",
 	"version": "1.2.0",
-	"bin": "lib/bin.js",
+	"bin": "./bin.js",
 	"license": "MIT",
 	"type": "module",
 	"dependencies": {
@@ -9,14 +9,19 @@
 		"yargs": "^17.4.1"
 	},
 	"scripts": {
-		"build": "rollup src/bin.js --file ./bin.js --format cjs",
+		"prebuild": "rm -f ./bin.js",
+		"build": "rollup --config ./rollup.config.js",
 		"postbuild": "node ./lib/postbuild.js",
 		"preexecute": "yarn build",
 		"execute": "npx .",
 		"prepublish": "yarn build",
 		"publish": "yarn publish"
 	},
-	"repository": "https://github.com/PlexusJS/plexus-cli.git",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/PlexusJS/plexus-cli.git",
+		"directory": "packages/create-plexus-core"
+	},
 	"private": false,
 	"devDependencies": {
 		"rollup": "^2.72.1"
