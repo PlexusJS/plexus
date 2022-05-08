@@ -1,7 +1,8 @@
 {
 	"name": "create-plexus-core",
-	"version": "1.2.4",
+	"version": "1.2.5",
 	"bin": "./out/bin.js",
+	"main": "./out/bin.js",
 	"license": "MIT",
 	"type": "module",
 	"dependencies": {
