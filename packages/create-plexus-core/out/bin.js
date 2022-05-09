@@ -245,15 +245,15 @@ const installPlexus = (tag = "") => {
 		// install the packages
 		const tagFinal = tag && ['canary', 'latest'].includes(tag) ? `@${tag}` : '';
 		tryIt(() => execSync(`${prefix} @plexusjs/core${tagFinal}${yargs.argv.react ? ` @plexusjs/react${tagFinal}` : yargs.argv.next ? ` @plexusjs/react${tagFinal} @plexusjs/next${tagFinal}` : ""}`, { stdio: 'inherit' }))
-			? console.log(chalk.bgGreen.black('Plexus installed successfully'))
-			: console.error(chalk.bgRed.black('Failed to install Plexus Packages'));
+			? console.log(chalk.bgGreen.black(`Plexus${tag ? `(${tag})` : ``} installed successfully!`))
+			: console.error(chalk.bgRed.black('Failed to install Plexus Packages. 😞'));
 	}
 	else {
 		console.log('Skipping Install...');
 	}
 };
 // make the core directory in the root folder
-const lookForCore = () => tryIt(() => !fs.existsSync(`${__dirname} /core`) && !fs.mkdirSync(`${__dirname}/core`));
+const lookForCore = () => tryIt(() => !fs.existsSync(`${__dirname}/core`) && !fs.mkdirSync(`${__dirname}/core`));
 
 const genFiles = (template = 'basic') => {
 	// check if the template string is one of the available templates
@@ -286,22 +286,23 @@ function run() {
 		console.log(helpString);
 		return
 	}
-	if (yargs.argv._) {
-		if (yargs.argv._[0] === 'module') {
-			if (yargs.argv._[1]) ;
-		}
-		if (yargs.argv._[0] === 'update') {
-			if (yargs.argv.canary) {
-				console.log(chalk.bgWhite.black('Updating PlexusJS to latest Canary build...'));
-				installPlexus('canary');
-			}
-			if (yargs.argv.latest) {
-				console.log(chalk.bgWhite.black('Updating PlexusJS to Latest stable build...'));
-				installPlexus('latest');
-			}
-			installPlexus();
-		}
+	if (yargs.argv._[2] === 'module') {
+		if (yargs.argv._[1]) ;
+		return
 	}
+	if (yargs.argv._[2] === 'update') {
+		if (yargs.argv.canary) {
+			console.log(chalk.bgWhite.black('Updating PlexusJS to latest Canary build...'));
+			installPlexus('canary');
+		}
+		if (yargs.argv.latest) {
+			console.log(chalk.bgWhite.black('Updating PlexusJS to Latest stable build...'));
+			installPlexus('latest');
+		}
+		installPlexus();
+		return
+	}
+
 	// parse the command line arguments
 	if (yargs.argv.template) {
 		// try installing the packages
@@ -332,6 +333,10 @@ function run() {
 		}
 
 	}
+
+
+
+
 }
 
 run();
