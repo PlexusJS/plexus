@@ -177,10 +177,11 @@ const helpString = `
 	Commands:
 		
 		module <name>			Create a new module in your plexus core
-		update					Update your plexus install
+		update --<tag>			Update your plexus install
 
 	Options:
-
+		--canary				Use the canary version of plexus
+		--dev					Use the dev version of plexus
 	    --skip-install			Skip the install of the PlexusJS packages
 		--typescript			Create TypeScript files
 		--react					Install the React package
@@ -282,10 +283,8 @@ const genFiles = (template = 'basic') => {
 };
 
 function run() {
-	if (yargs.argv.help) {
-		console.log(helpString);
-		return
-	}
+	const commandRan = false;
+
 	if (yargs.argv._[2] === 'module') {
 		if (yargs.argv._[1]) ;
 		return
@@ -300,6 +299,7 @@ function run() {
 			installPlexus('latest');
 		}
 		installPlexus();
+		commandRan = true;
 		return
 	}
 
@@ -331,10 +331,15 @@ function run() {
 		else {
 			console.warn('Invalid Template');
 		}
-
+		commandRan = true;
+		return
 	}
 
+	if (!commandRan) {
+		console.log(helpString);
 
+		return
+	}
 
 
 }
