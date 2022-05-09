@@ -298,11 +298,13 @@ function run() {
 			console.log(chalk.bgWhite.black('Updating PlexusJS to latest Canary build...'))
 			installPlexus('canary')
 		}
-		if (yargs.argv.latest) {
+		else if (yargs.argv.latest) {
 			console.log(chalk.bgWhite.black('Updating PlexusJS to Latest stable build...'))
 			installPlexus('latest')
 		}
-		installPlexus()
+		else {
+			installPlexus()
+		}
 		commandRan = true
 		return
 	}
