@@ -285,7 +285,7 @@ const genFiles = (template = 'basic') => {
 }
 
 function run() {
-	const commandRan = false
+	let commandRan = false
 
 	if (yargs.argv._[2] === 'module') {
 		if (yargs.argv._[1]) {
