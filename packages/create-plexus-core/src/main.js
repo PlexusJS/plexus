@@ -292,6 +292,7 @@ function run() {
 		if (yargs.argv._[1]) {
 
 		}
+		return
 	}
 	if (yargs.argv._[2] === 'update') {
 		if (yargs.argv.canary) {
@@ -303,6 +304,7 @@ function run() {
 			installPlexus('latest')
 		}
 		installPlexus()
+		return
 	}
 
 	// parse the command line arguments
@@ -333,8 +335,14 @@ function run() {
 		else {
 			console.warn('Invalid Template')
 		}
+		
+	}
+
+	if(){
 
 	}
+
+
 }
 
 run()
