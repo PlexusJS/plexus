@@ -1,5 +1,5 @@
 import { PlexusCollectionGroup, WatchableValue, Watchable } from "@plexusjs/core"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const normalizeDeps = (deps: Watchable | Watchable[]) => (Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable])
 
@@ -19,14 +19,14 @@ export function usePlexus<V extends Watchable[]>(deps: V | []): PlexusValueArray
  */
 export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): PlexusValue<V> | PlexusValueArray<V> {
 	const [_, set] = useState({})
-	const [depsArray, setDepsArray] = useState<Watchable[]>(normalizeDeps(deps))
+	// const [depsArray, setDepsArray] = useState<Watchable[]>(normalizeDeps(deps))
 
+	const depsArray = useRef(normalizeDeps(deps))
 	useEffect(() => {
-		const depsArr = normalizeDeps(deps)
-		if (Array.isArray(depsArr)) {
-			setDepsArray(depsArr)
+		if (Array.isArray(depsArray.current)) {
+			// setDepsArray(depsArr)
 			const depUnsubs: Array<() => void> = []
-			for (let dep of depsArr) {
+			for (let dep of depsArray.current) {
 				// if not a watchable, then we can't watch it, skip to next iteration
 				if (!(dep instanceof Watchable)) continue
 				const unsubscribe = dep.watch(function (v) {
@@ -44,9 +44,9 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		}
 	}, [])
 	// The "!" at the end of the values here tell the tsc that these values will never be "undefined"
-	if (!Array.isArray(deps) && depsArray.length === 1) {
-		return depsArray[0].value! as PlexusValue<V>
+	if (!Array.isArray(deps) && depsArray.current.length === 1) {
+		return depsArray.current[0].value! as PlexusValue<V>
 	}
 
-	return depsArray.map((dep) => dep.value!) as PlexusValueArray<V>
+	return depsArray.current.map((dep) => dep.value!) as PlexusValueArray<V>
 }
