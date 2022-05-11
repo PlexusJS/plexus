@@ -84,7 +84,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			},
 		}
 		if (_config.defaultGroup) {
-			this.createGroup("default")
+			// this ensured default shows up as a group name option
+			return this.createGroup("default")
 		}
 	}
 	/**
@@ -147,6 +148,12 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				}
 				// if a group (or groups) is provided, add the item to the group
 				if (groups) {
+					if (Array.isArray(groups)) {
+						if (this.config.defaultGroup && !groups.includes("default" as any)) groups.push("default" as any)
+					} else {
+						if (this.config.defaultGroup && groups !== "default") this.addToGroups(dataKey, "default" as any)
+					}
+
 					this.addToGroups(dataKey, groups)
 				}
 			}
