@@ -210,7 +210,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this.instance().runtime.log("info", `getting value; persist ${this._internalStore._persist ? "enabled" : "disabled"}`)
 		this.mount()
 
-		return deepClone(this._internalStore._value)
+		// return deepClone(this._internalStore._value)
+		return this._internalStore._value
 	}
 	/**
 	 * The previous (reactive) value of the state

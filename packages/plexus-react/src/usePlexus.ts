@@ -19,7 +19,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | []): PlexusValueArray
  */
 export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): PlexusValue<V> | PlexusValueArray<V> {
 	const [_, set] = useState({})
-	const [changedIndex, setChangedIndex] = useState(-1)
+	// const [changedIndex, setChangedIndex] = useState(-1)
 	// const [depsArray, setDepsArray] = useState<Watchable[]>(normalizeDeps(deps))
 
 	const depsArray = useRef([...normalizeDeps(deps)])
@@ -35,7 +35,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 				// if not a watchable, then we can't watch it, skip to next iteration
 				if (!(dep instanceof Watchable)) continue
 				const unsubscribe = dep.watch(function (v) {
-					setChangedIndex(index)
+					// setChangedIndex(index)
 					set({})
 				})
 				depUnsubs.push(unsubscribe)
