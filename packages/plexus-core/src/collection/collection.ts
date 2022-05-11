@@ -148,10 +148,13 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				}
 				// if a group (or groups) is provided, add the item to the group
 				if (groups) {
-					if (Array.isArray(groups)) {
-						if (this.config.defaultGroup && !groups.includes("default" as any)) groups.push("default" as any)
-					} else {
-						if (this.config.defaultGroup && groups !== "default") this.addToGroups(dataKey, "default" as any)
+					if (this.config.defaultGroup) {
+						// if "groups" var is array...
+						Array.isArray(groups)
+							? // push default into the array
+							  !groups.includes("default" as any) && groups.push("default" as any)
+							: // if it is not (undefined or some other string), add to group
+							  groups !== "default" && this.addToGroups(dataKey, "default" as any)
 					}
 
 					this.addToGroups(dataKey, groups)
