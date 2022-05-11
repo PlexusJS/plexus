@@ -27,7 +27,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	useEffect(() => {
 		if (Array.isArray(depsArray.current)) {
 			// setDepsArray(depsArr)
-			
+
 			const depUnsubs: Array<() => void> = []
 			let index = -1
 			for (let dep of depsArray.current) {
@@ -46,10 +46,9 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 					unsub()
 				}
 				depUnsubs.length = 0
-				
 			}
 		}
-	}, [changedIndex])
+	}, [])
 	// The "!" at the end of the values here tell the tsc that these values will never be "undefined"
 	if (!Array.isArray(deps) && depsArray.current.length === 1) {
 		return depsArray.current[0].value! as PlexusValue<V>
