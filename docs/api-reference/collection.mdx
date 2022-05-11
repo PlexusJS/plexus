@@ -3,6 +3,8 @@ title: Collection
 sidebar_position: 3
 ---
 
+import CollapseContainer from "../../src/components/Collapse.tsx"
+
 ## Basic Use
 
 ```ts
@@ -32,7 +34,7 @@ myCoolCollection.update("1", {
 myCoolCollection.value //=> [{ id: "1", name: "John Doe", age: 30 }]
 ```
 
-## Properties
+## Collection Properties
 
 ### collecton `.id`
 
@@ -66,7 +68,7 @@ Get all the groups and their childrens data values as an object
 
 Get the name (generated or custom) of the collection store
 
-## Methods
+## Collection Methods
 
 ### collecton `.collect()`
 
@@ -134,3 +136,22 @@ Given a key, get all Group names that the key is in
 Add a data item to a group or groups
 
 ### collecton `.watchGroup()`
+
+## Selector Properties
+
+## Selector Methods
+
+## Group Properties
+
+## Group Methods
+
+## Data Properties
+
+## Data Methods
+
+### state `.isEqual()`
+
+Compare a thing to the current value, if they are equal, returns true
+
+<CollapseContainer title="Arguments" data={[{ key: "value", type: "any", description: "The thing to compare the current value to." }]} />
+<CollapseContainer miniTitle="Returns" data={[{ type: "boolean", description: "A boolean representing if they are equal." }]} />
