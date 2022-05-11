@@ -100,6 +100,39 @@ describe("Test react integration (usePlexus)", () => {
 		expect(myCollection.getSelector("main").value).toEqual({ id: "pog", a: 1 })
 		expect(tree.root.findByProps({ id: "data" }).children).toEqual(["1", " as ", "pog"])
 	})
+	// test("usePlexus: Check react reload", () => {
+	// 	instance({
+	// 		logLevel: "debug",
+	// 	})
+	// 	function RandomComponent() {
+	// 		myCollection.collect({ id: "pog", a: 1 }, "test")
+	// 		myCollection.getSelector("main").select("pog")
+	// 		const s1 = usePlexus(myCollection.getSelector("main"))
+
+	// 		const [temp, setTemp] = useState(0)
+
+	// 		useEffect(() => {
+	// 			console.log(s1)
+
+	// 		}, [s1])
+
+	// 		// const [groupValue] = usePlexus([myCollection.groups.test])
+	// 		return (
+	// 			<div>
+	// 				<p id="data">
+	// 					{s1.a} as {s1.id}
+	// 				</p>
+	// 			</div>
+	// 		)
+	// 	}
+	// 	let tree
+	// 	renderer.act(() => {
+	// 		tree = renderer.create(<RandomComponent />)
+	// 	})
+	// 	expect(tree.toJSON()).toMatchSnapshot()
+	// 	expect(myCollection.getSelector("main").value).toEqual({ id: "pog", a: 1 })
+	// 	expect(tree.root.findByProps({ id: "data" }).children).toEqual(["1", " as ", "pog"])
+	// })
 	test("usePlexus hook with group", () => {
 		instance({
 			logLevel: "debug",
