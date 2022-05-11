@@ -1,6 +1,6 @@
 import { collection, PlexusCollectionInstance } from "@plexusjs/core/src"
 
-let myCollection = collection<{ thing: string; id: number }>().createGroups(["group1", "group2"]).createSelector("main")
+let myCollection = collection<{ thing: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
 
 beforeEach(() => {
 	myCollection.clear()
@@ -242,5 +242,21 @@ describe("Testing Collection", () => {
 		expect(myCollection.value.length).toBe(3)
 
 		expect(myCollection.getGroup("group1").value.length).toBe(2)
+	})
+
+	test("Using default group", () => {
+		myCollection.collect(
+			[
+				{ thing: "lol", id: 0 },
+				{ thing: "lol3", id: 2 },
+				{ thing: "lols", id: 1 },
+			],
+			"group1"
+		)
+		expect(myCollection.getGroup("default").index.size).toBe(3)
+
+		expect(myCollection.value.length).toBe(3)
+		myCollection.delete(1)
+		expect(myCollection.getGroup("default").value.length).toBe(2)
 	})
 })
