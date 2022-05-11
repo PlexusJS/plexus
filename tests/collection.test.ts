@@ -54,10 +54,10 @@ describe("Testing Collection", () => {
 
 		// can add to groups
 		myCollection.collect({ thing: "lol", id: 5 }, "group1")
-		expect(myCollection.getGroupsOf(5)).toEqual(["group1"])
+		expect(myCollection.getGroupsOf(5)).toEqual(["default", "group1"])
 
 		myCollection.collect({ thing: "yay", id: 12 }, ["group1"])
-		expect(myCollection.getGroupsOf(12)).toEqual(["group1"])
+		expect(myCollection.getGroupsOf(12)).toEqual(["default", "group1"])
 		// console.log(myCollection.getGroupsOf(5))
 		// console.log(myCollection.getGroup('group1').index)
 		// console.log(myCollection.groups.group1.index)
