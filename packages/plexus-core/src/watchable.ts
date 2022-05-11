@@ -6,6 +6,7 @@ interface WatchableStore<Value = any> {
 	_initialValue: Value
 	_lastValue: Value
 	_value: Value
+	_publicValue: Value
 	_nextValue: Value
 	_watchers: Set<PlexusWatcher<Value>>
 	_internalId: string
@@ -19,6 +20,7 @@ export class Watchable<ValueType = any> {
 			_internalId: instance().genId(),
 			_nextValue: init,
 			_value: init,
+			_publicValue: init,
 			_initialValue: init,
 			_lastValue: init,
 			_watchers: new Set(),
@@ -35,7 +37,7 @@ export class Watchable<ValueType = any> {
 		}
 	}
 	get value(): ValueType {
-		return deepClone(this._watchableStore._value)
+		return this._watchableStore._publicValue
 	}
 }
 
@@ -60,6 +62,7 @@ export class WatchableValue<ValueType = any> extends Watchable<ValueType> {
 		} else {
 			this._watchableStore._value = value
 		}
+		this._watchableStore._publicValue = deepClone(this._watchableStore._value)
 		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
 
 		// update the runtime conductor

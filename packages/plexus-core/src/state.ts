@@ -12,6 +12,7 @@ export interface StateStore<Value> {
 	_initialValue: Value
 	_lastValue: Value
 	_value: Value
+	_publicValue: Value
 	_nextValue: Value
 	_watchers: Set<DestroyFn>
 	_name: string
@@ -41,6 +42,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 			_internalId: this._watchableStore._internalId,
 			_nextValue: init,
 			_value: init,
+			_publicValue: init,
 			_initialValue: init,
 			_lastValue: init,
 			_watchers: new Set<DestroyFn>(),
@@ -82,6 +84,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		} else {
 			this._internalStore._value = value
 		}
+		this._internalStore._publicValue = deepClone(this._internalStore._value)
 		this._internalStore._nextValue = deepClone(this._internalStore._value)
 
 		// update the runtime conductor
@@ -211,7 +214,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this.mount()
 
 		// return deepClone(this._internalStore._value)
-		return this._internalStore._value
+		return this._internalStore._publicValue
 	}
 	/**
 	 * The previous (reactive) value of the state
