@@ -1,4 +1,4 @@
-import { AlmostAnything, convertToString, deepClone, deepMerge, hash, isObject } from "./helpers"
+import { AlmostAnything, convertToString, deepClone, deepMerge, hash, isEqual, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { PlexusWatcher } from "./interfaces"
 import { WatchableValue } from "./watchable"
@@ -191,6 +191,14 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 			}
 		}, ms ?? 3000)
 		return this
+	}
+	/**
+	 * Compare a thing to the current value, if they are equal, returns true
+	 * @param value The thing to compare the current value to
+	 * @returns {boolean} A boolean representing if they are equal
+	 */
+	isEqual(value: any) {
+		return isEqual(value as any, this._internalStore._value as any)
 	}
 	/**
 	 * Stop the state interval

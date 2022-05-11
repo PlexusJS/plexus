@@ -79,6 +79,14 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		return this._internalStore._state
 	}
 	/**
+	 * Compare a thing to the current value, if they are equal, returns true
+	 * @param value The thing to compare the current value to
+	 * @returns {boolean} A boolean representing if they are equal
+	 */
+	isEqual(value: any) {
+		return this.state.isEqual(value)
+	}
+	/**
 	 * Delete the data instance
 	 */
 	delete() {
