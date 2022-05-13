@@ -444,9 +444,20 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	}
 	/**
 	 * Delete all data in the collection
+	 * @param {string} [GroupName] - (Optional) Either an array or a single group name to clear data from
 	 */
-	clear() {
-		this.delete(Array.from(this._internalStore._data.keys()))
+	clear(groupNames?: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+		// this means we want to clear a group, not the whole collection
+		if (groupNames) {
+			if (Array.isArray(groupNames)) {
+				groupNames.forEach((groupName) => this.isCreatedGroup(groupName) && this.getGroup(groupName).clear())
+			} else {
+				this.isCreatedGroup(groupNames) && this.getGroup(groupNames).clear()
+			}
+		} else {
+			this.delete(Array.from(this._internalStore._data.keys()))
+		}
+		return this
 	}
 
 	/**

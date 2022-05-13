@@ -285,4 +285,22 @@ describe("Testing Collection", () => {
 
 		expect(myCollection.getGroup("default").value.length).toBe(2)
 	})
+
+	test("Clearing Groups", () => {
+		myCollection.collect(
+			[
+				{ thing: "lol", id: 0 },
+				{ thing: "lol3", id: 2 },
+				{ thing: "lols", id: 1 },
+			],
+			"group1"
+		)
+		expect(myCollection.value.length).toBe(3)
+
+		myCollection.clear("group1")
+
+		expect(myCollection.value.length).toBe(3)
+
+		expect(myCollection.getGroup("group1").value.length).toBe(0)
+	})
 })

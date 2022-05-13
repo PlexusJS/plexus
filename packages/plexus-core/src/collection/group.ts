@@ -100,6 +100,15 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 		return this as PlexusCollectionGroup<DataType>
 	}
 	/**
+	 * Clears the group of all items
+	 * @returns {this} This Group instance
+	 */
+	clear() {
+		this._internalStore._includedKeys.clear()
+		this.rebuildDataWatchers()
+		return this as PlexusCollectionGroup<DataType>
+	}
+	/**
 	 * Peek at the index of the group (get all of the lookup keys for the group)
 	 */
 	get index() {
