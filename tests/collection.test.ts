@@ -237,7 +237,7 @@ describe("Testing Collection", () => {
 		)
 		expect(myCollection.value.length).toBe(3)
 
-		myCollection.remove(1, "group1")
+		myCollection.removeFromGroup(1, "group1")
 
 		expect(myCollection.value.length).toBe(3)
 
@@ -257,6 +257,32 @@ describe("Testing Collection", () => {
 
 		expect(myCollection.value.length).toBe(3)
 		myCollection.delete(1)
+		expect(myCollection.getGroup("default").value.length).toBe(2)
+	})
+	test("Collecting into a group, then ensuring the group is up to date", () => {
+		let collected = false
+		let deleted = false
+		let updated = false
+		myCollection.groups.group1.watch(() => {
+			if (collected && deleted) updated = true
+			if (collected) deleted = true
+			collected = true
+		})
+		myCollection.collect(
+			[
+				{ thing: "lol", id: 0 },
+				{ thing: "lol3", id: 2 },
+				{ thing: "lols", id: 1 },
+			],
+			"group1"
+		)
+		expect(collected).toBe(true)
+		myCollection.delete(1)
+		expect(deleted).toBe(true)
+
+		myCollection.update(2, { thing: "lol2" })
+		expect(updated).toBe(true)
+
 		expect(myCollection.getGroup("default").value.length).toBe(2)
 	})
 })

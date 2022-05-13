@@ -169,6 +169,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			collectItem(data)
 		}
 		this.mount()
+		return this
 	}
 	/**
 	 * Update the collection with data;
@@ -194,6 +195,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			}
 		}
 		this.mount()
+		return this
 	}
 	/**
 	 * Get the Value of the data item with the provided key (the raw data).
@@ -373,6 +375,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			addToGroup(groups)
 		}
 	}
+	watchGroup(name: KeyOfMap<Groups>, callback: PlexusWatcher<DataType[]>)
+	watchGroup(name: string, callback: PlexusWatcher<DataType[]>)
 	watchGroup(name: KeyOfMap<Groups> | string, callback: PlexusWatcher<DataType[]>) {
 		const group = this.getGroup(name)
 		if (this.isCreatedGroup(name) && group) {
@@ -409,7 +413,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param keys The data key(s) to use for lookup
 	 * @param groups Either a single group or an array of groups to remove the data from
 	 */
-	remove(keys: DataKey | DataKey[], groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+	removeFromGroup(keys: DataKey | DataKey[], groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
 		const rm = (key) => {
 			if (Array.isArray(groups)) {
 				for (let groupName of groups) {
@@ -444,6 +448,12 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	clear() {
 		this.delete(Array.from(this._internalStore._data.keys()))
 	}
+
+	/**
+	 * Run this function when data is collected to format it in a particular way; useful for converting one datatype into another
+	 * @param fn
+	 */
+	compute(fn: (v: DataType) => DataType) {}
 	/**
 	 * Set the key of the collection for enhanced internal tracking
 	 */
