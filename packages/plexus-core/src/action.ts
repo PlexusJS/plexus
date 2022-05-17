@@ -43,13 +43,16 @@ export class PlexusActionHelpers {
 		return this._internalStore._errorHandlers.size > 0
 	}
 
+	/**
+	 * Ignore the default halt for preActions
+	 */
 	ignoreInit() {
 		this._skipInit = true
 	}
 
 	/**
 	 * @internal
-	 * Eject the external functions object returned to the user in the first function argument
+	 * Eject the external functions object returned to the user in the first argument of the action function
 	 */
 	get hooks(): PlexusActionHooks {
 		const onCatch = (handler?: ErrorHandler): void => {
