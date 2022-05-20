@@ -236,6 +236,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The new Collection Instance
 	 */
 	createSelector<Name extends SelectorName>(selectorName: Name) {
+		if (this._internalStore._selectors.has(selectorName)) return this
+		if (selectorName.length === 0) return this
 		this._internalStore._selectors.set(
 			selectorName,
 			_selector(
@@ -287,6 +289,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The new Collection Instance
 	 */
 	createGroup<Name extends GroupName>(groupName: Name, config?: PlexusCollectionGroupConfig<DataType>) {
+		if (this._internalStore._groups.has(groupName)) return this
+		if (groupName.length === 0) return this
 		this._internalStore._groups.set(
 			groupName,
 			_group(
