@@ -91,6 +91,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._internalStore._value)
 		this.mount()
 		this.instance().runtime.broadcast(this._internalStore._internalId, value, { type: "state" })
+
+		return this
 	}
 	/**
 	 * Patch the current value of the state
@@ -108,6 +110,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 			this.set(value)
 		}
 		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._internalStore._value)
+
+		return this
 	}
 	/**
 	 * Watch for changes on this state
