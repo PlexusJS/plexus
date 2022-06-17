@@ -28,6 +28,7 @@ export interface PlexusCollectionConfig<DataType> {
 }
 interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	_internalId: string
+	_lastChanged: number | string
 	_lookup: Map<string, string>
 	_key: string
 	_data: Map<string | number, PlexusDataInstance<DataType>>
@@ -68,6 +69,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		this._internalStore = {
 			_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
 			_lookup: new Map<string, string>(),
+			_lastChanged: "",
 			_key: _config?.primaryKey || "id",
 			_data: new Map<string, PlexusDataInstance<DataType>>(),
 			_groups: new Map<GroupName, PlexusCollectionGroup<DataType>>() as Groups,
@@ -546,6 +548,13 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	get name() {
 		return this._internalStore._name
+	}
+
+	set lastUpdatedKey(value: string | number) {
+		this._internalStore._lastChanged = value
+	}
+	get lastUpdatedKey() {
+		return this._internalStore._lastChanged
 	}
 }
 export function _collection<

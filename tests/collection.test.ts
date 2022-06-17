@@ -303,4 +303,23 @@ describe("Testing Collection", () => {
 
 		expect(myCollection.getGroup("group1").value.length).toBe(0)
 	})
+
+	test("Checking lastUpdatedKey", () => {
+		myCollection.collect(
+			[
+				{ thing: "lol", id: 0 },
+				{ thing: "lol3", id: 2 },
+				{ thing: "lols", id: 1 },
+			],
+			"group1"
+		)
+
+		expect(myCollection.value.length).toBe(3)
+
+		myCollection.update(2, { thing: "lol2" })
+		expect(myCollection.lastUpdatedKey).toBe(2)
+		myCollection.update(1, { thing: "lol5" })
+		expect(myCollection.lastUpdatedKey).toBe(1)
+		expect(myCollection.value.length).toBe(3)
+	})
 })

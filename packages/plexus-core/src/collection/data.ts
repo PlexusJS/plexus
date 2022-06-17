@@ -71,6 +71,8 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 				}
 			}
 		}
+		this.collection().lastUpdatedKey = this._internalStore._key
+		return this
 	}
 	/**
 	 * The state that powers this data instance
