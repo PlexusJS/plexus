@@ -15,6 +15,10 @@ type DepositControls<T = any> = {
 	 */
 	reset: () => void
 	/**
+	 * Discard the current edit and call the *onDiscard* callback
+	 */
+	discard: () => void
+	/**
 	 * The original value of the deposit
 	 */
 	original: T
@@ -68,13 +72,17 @@ export function useDeposit<T = any>(
 	settings: {
 		onSave: (updates: Partial<T>) => (boolean | void) | Promise<boolean | void>
 		onEdit?: (key: keyof T, value: T[keyof T]) => any | Promise<any>
+		onDiscard?: () => void | Promise<void>
 		autoSave?: number
 	}
 ): DepositControls<T> {
-	const [value, setValue] = useState<any>({})
+	// The current value of the deposit
+	const [value, setValue] = useState<T>({ ...original })
+	// snapshot of the last saved value
 	const [snapshot, setSnapshot] = useState<string>("")
 	const [pendingChanges, setPC] = useState(false)
 	const [saving, setSaving] = useState(false)
+	// the changes made to the deposit (Excludes any unchanged values)
 	const [changes, setChanges] = useState<Partial<T>>({})
 	const [to, setTo] = useState<number | undefined>()
 
@@ -85,7 +93,7 @@ export function useDeposit<T = any>(
 		const diff = !sameLength && !sameText
 
 		if (diff) {
-			setSnapshot(JSON.stringify(original))
+			setSnapshot(snapNow)
 			setValue(original)
 		}
 	}, [original])
@@ -149,6 +157,16 @@ export function useDeposit<T = any>(
 		setSaving(false)
 	}
 
+	const discard = async () => {
+		setTo((oto) => {
+			clearTimeout(oto)
+			return undefined
+		})
+		setValue(JSON.parse(snapshot))
+		setChanges({})
+		await settings.onDiscard?.()
+	}
+
 	const reset = async () => {
 		const orig = JSON.parse(snapshot)
 		setValue(orig)
@@ -164,9 +182,10 @@ export function useDeposit<T = any>(
 
 	return {
 		edit,
-		changes,
 		save: async () => await save(),
 		reset,
+		discard,
+		changes,
 		original: _original,
 		value,
 		pendingChanges,
