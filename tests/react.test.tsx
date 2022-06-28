@@ -1,6 +1,6 @@
 import { collection, computed, instance, PlexusComputedStateInstance, PlexusStateInstance, PlexusEventInstance, state, event } from "@plexusjs/core"
 import React, { useEffect, useState } from "react"
-import { useEvent, usePlexus } from "../packages/plexus-react/src"
+import { useDeposit, useEvent, usePlexus } from "../packages/plexus-react/src"
 import * as renderer from "react-test-renderer"
 
 type Payload = {
@@ -190,9 +190,42 @@ describe("Test react integration (useEvent)", () => {
 	test("test useEvent", () => {
 		function RandomComponent() {
 			const [val, setVal] = useState("")
-			const computedThing = useEvent(myEvents, (payload) => {
+			useEvent(myEvents, (payload) => {
 				setVal(payload.name)
 			})
+
+			useEffect(() => {
+				myEvents.emit({ name: "test", status: "test" })
+			}, [])
+			// const [groupValue] = usePlexus([myCollection.groups.test])
+			return (
+				<div>
+					<p id="data">{val}</p>
+				</div>
+			)
+		}
+		let tree: any
+		renderer.act(() => {
+			tree = renderer.create(<RandomComponent />)
+		})
+		expect(tree.toJSON()).toMatchSnapshot()
+		// expect().toEqual()
+		expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
+	})
+})
+describe("Test react integration (useDeposit)", () => {
+	test("test useDeposit", () => {
+		// lol idk how to test this without user input
+		function RandomComponent() {
+			const [val, setVal] = useState("")
+			const { save, edit } = useDeposit(
+				{ name: "string" },
+				{
+					onSave(payload) {
+						setVal(payload.name ?? "")
+					},
+				}
+			)
 
 			useEffect(() => {
 				myEvents.emit({ name: "test", status: "test" })
