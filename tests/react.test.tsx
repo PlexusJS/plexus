@@ -245,4 +245,25 @@ describe("Test react integration (useDeposit)", () => {
 		// expect().toEqual()
 		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
 	})
+
+	test('testing types of useDeposit', () => {
+
+		function RandomComponent() {
+			const [val, setVal] = useState("")
+			const { save, edit } = useDeposit<Payload>(
+				{ name: "string" },
+				{
+					onSave(payload) {
+						setVal(payload.name ?? "")
+					},
+				}
+			)
+			// const [groupValue] = usePlexus([myCollection.groups.test])
+			return (
+				<div>
+					<p id="data">{val}</p>
+				</div>
+			)
+		}
+	})
 })

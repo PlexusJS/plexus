@@ -69,7 +69,7 @@ type DepositControls<T = any> = {
  * @returns
  */
 export function useDeposit<T = any>(
-	original: T,
+	original: Partial<T>,
 	settings: {
 		onSave: (updates: Partial<T>) => (boolean | void) | Promise<boolean | void>
 		onEdit?: (key: keyof T, value: T[keyof T]) => any | Promise<any>
@@ -78,7 +78,7 @@ export function useDeposit<T = any>(
 	}
 ): DepositControls<T> {
 	// The current value of the deposit
-	const [value, setValue] = useState<T>({ ...original })
+	const [value, setValue] = useState<any>({ ...original })
 	// snapshot of the last saved value
 	const [snapshot, setSnapshot] = useState<string>("")
 	const [pendingChanges, setPC] = useState(false)
