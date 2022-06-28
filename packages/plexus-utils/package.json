@@ -1,0 +1,22 @@
+{
+	"name": "@plexusjs/utils",
+	"version": "1.1.1-canary.0+48b37fe",
+	"description": "Useful utils by the PlexusJS Team.",
+	"main": "./dist/index.js",
+	"types": "dist/index.d.ts",
+	"publishConfig": {
+		"access": "public"
+	},
+	"license": "MIT",
+	"peerDependencies": {
+		"@plexusjs/core": "~1.0.0"
+	},
+	"devDependencies": {
+	},
+	"scripts": {
+		"build": "tsc --build --force",
+		"test": "jest",
+		"prepublish": "yarn build"
+	},
+	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc"
+}
