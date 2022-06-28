@@ -45,7 +45,7 @@ export class PlexusActionHelpers {
 	 * Does the helper instance have any errors handlers to handle an error?
 	 */
 	get catchError() {
-		return this._internalStore._errorHandlers.size > 0
+		return this._internalStore._errorHandlers.size > 0 ?? typeof this.instance()._globalCatch === 'function'
 	}
 
 	/**
