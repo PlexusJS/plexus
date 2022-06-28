@@ -33,6 +33,11 @@ export class PlexusActionHelpers {
 	 * Run all available error handlers
 	 */
 	runErrorHandlers(e: unknown) {
+		if (this.instance()._globalCatch) {
+			this.instance()._globalCatch?.(e);
+			// Don't run other onCatch's
+			if (this.instance().settings.exlusiveGlobalError) return;
+		}
 		this._internalStore._errorHandlers.forEach((handler) => handler(e))
 	}
 	/**
