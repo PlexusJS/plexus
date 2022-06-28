@@ -23,7 +23,8 @@
 
 ## Used by 🤝
 
-[![SoloSegment](https://solosegment.com/wp-content/uploads/2021/10/SoloSegment-logo-orange-white.png)](https://solosegment.com/)
+[![SoloSegment](https://knowledgebase.solosegment.com/wp-content/uploads/2022/01/solosegment-google.png)](https://solosegment.com/)
+[![Wander](https://www.wander.com/images/wander-horizontal-white.svg)](https://www.wander.com/)
 
 ## Links & Socials 🔗
 
@@ -38,11 +39,11 @@
 <small>With Yarn</small>
 
 ```bash prefix="$"
-yarn create plexus-core --typescript --template=scalable
+yarn create plexus-core --typescript --next --template=scalable
 ```
 
 <small>With NPX</small>
 
 ```bash
-npx create-plexus-core --typescript --template=scalable
+npx create-plexus-core --typescript --next --template=scalable
 ```
