@@ -64,6 +64,7 @@ type DepositControls<T = any> = {
  * @param settings - The settings of this deposit
  * @param settings.onSave{Function} - A callback function that will be called when the save function is called. NOTE: Must return a boolean indicating whether the save action was successful. NOTE: The param of this function ONLY returns the CHANGES to the original object. Any unchanged properties/values will not be included.
  * @param settings.onEdit{Function} - A callback function that will be called when the edit function is called.
+ * @param settings.Discard{Function} - A callback function that will be called when the discard function is called.
  * @param settings.autoSave{number} - The number of milliseconds to wait before saving.
  * @returns
  */
