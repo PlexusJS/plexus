@@ -27,8 +27,6 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			const depsArray = [...normalizeDeps(deps)]
 			const depUnsubs: Array<() => void> = []
 			if (Array.isArray(depsArray)) {
-				// setDepsArray(depsArr)
-
 				let index = -1
 				for (let dep of depsArray) {
 					++index
@@ -49,6 +47,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 				depUnsubs.length = 0
 			}
 		}, [deps]),
+
 		// GetValue callback
 		useCallback(() => {
 			const depsArray = [...normalizeDeps(deps)]
@@ -56,7 +55,6 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			if (!Array.isArray(deps) && depsArray.length === 1) {
 				return depsArray[0].value! as PlexusValue<V>
 			}
-
 			return depsArray.map((dep) => dep.value!) as PlexusValueArray<V>
 		}, [deps])
 	)
