@@ -1,3 +1,5 @@
+import { Watchable } from "."
+
 export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object
 
 export function isObject(item: any): item is Object {

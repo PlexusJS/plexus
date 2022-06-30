@@ -57,7 +57,9 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 			this.instance()._states.add(this)
 			this.instance().runtime.log(
 				"info",
-				`Hoisting state ${this._internalStore._internalId} with value ${this._internalStore._value} to instance`
+				`Hoisting state ${this._internalStore._internalId} with value`,
+				this._internalStore._value,
+				`to instance`
 			)
 			if (this._internalStore._persist) {
 				this.instance().storage?.sync()

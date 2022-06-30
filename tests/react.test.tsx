@@ -1,8 +1,7 @@
 import { collection, computed, instance, PlexusComputedStateInstance, PlexusStateInstance, PlexusEventInstance, state, event } from "@plexusjs/core"
 import React, { useEffect, useState } from "react"
-import { useDeposit, useEvent, usePlexus } from "../packages/plexus-react/src"
+import { useDeposit, useEvent, usePlexus } from "@plexusjs/react"
 import * as renderer from "react-test-renderer"
-import { useSyncExternalStore } from "use-sync-external-store"
 
 type Payload = {
 	name: string
