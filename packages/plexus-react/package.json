@@ -4,6 +4,15 @@
 	"description": "React Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
+	"keywords": [
+		"plexusjs",
+		"plexus",
+		"plexus-react",
+		"react",
+		"reactjs",
+		"global state",
+		"plugin"
+	],
 	"publishConfig": {
 		"access": "public"
 	},
