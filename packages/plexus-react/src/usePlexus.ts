@@ -23,34 +23,15 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	// if we are serverside, return
 	// if (typeof window === "undefined") throw new Error("usePlexus is not supported on server-side yet.")
 	// const [_, set] = useState({})
-	const returnArray = useRef<any[]>([])
+	const returnArray = useRef<PlexusValueArray<V>>()
 
-	const subscribe = (onChange: () => void) => {
-		const depsArray = [...normalizeDeps(deps)]
-		return concurrentWatch(onChange, depsArray)
-		// const depUnsubs: Array<() => void> = []
-		// if (Array.isArray(depsArray)) {
-		// 	let index = -1
-		// 	for (let dep of depsArray) {
-		// 		++index
-		// 		// if not a watchable, then we can't watch it, skip to next iteration
-		// 		if (!(dep instanceof Watchable)) continue
-		// 		const unsubscribe = dep.watch(function (v) {
-		// 			// setChangedIndex(index)
-		// 			// set({})
-		// 			onChange()
-		// 		})
-		// 		depUnsubs.push(unsubscribe)
-		// 	}
-		// 	// unsubscribe on component destroy
-		// }
-		// return () => {
-		// 	for (let unsub of depUnsubs) {
-		// 		unsub()
-		// 	}
-		// 	depUnsubs.length = 0
-		// }
-	}
+	const subscribe = useCallback(
+		(onChange: () => void) => {
+			const depsArray = [...normalizeDeps(deps)]
+			return concurrentWatch(onChange, depsArray)
+		},
+		[deps]
+	)
 	const fetchValues = useCallback(() => {
 		const depsArray = [...normalizeDeps(deps)]
 		// The "!" at the end of the values here tell the tsc that these values will never be "undefined"
@@ -58,11 +39,18 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			return depsArray[0].value! as PlexusValue<V>
 		}
 		// get the memoized array of values, if it's length does not match the deps length, then we need to update the array reference
+		// if the array is not set
+		if (!returnArray.current) {
+			returnArray.current = [...(depsArray.map((dep) => dep.value!) as PlexusValueArray<V>)] as PlexusValueArray<V>
+		}
+		// this means the array is already set, so here, we should clear the array (to keep the same reference) and then push the values to the array
+		else {
+			// reset the array
+			returnArray.current.length = 0
+			// fill the array with the values
+			returnArray.current.push(...(depsArray.map((dep) => dep.value!) as PlexusValueArray<V>))
+		}
 		// returnArray.current = returnArray.current.length !== depsArray.length ? [] : returnArray.current)
-		// reset the array
-		returnArray.current.length = 0
-		// fill the array with the values
-		returnArray.current.push(depsArray.map((dep) => dep.value!) as PlexusValueArray<V>)
 
 		// return the array and give it the correct type
 		return returnArray.current as PlexusValueArray<V>
@@ -72,7 +60,6 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		subscribe,
 		// GetValue callback
 		fetchValues,
-
 		fetchValues
 	)
 }
