@@ -23,5 +23,9 @@
 		"test": "jest",
 		"prepublish": "yarn build"
 	},
-	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc"
+	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc",
+	"dependencies": {
+		"@types/use-sync-external-store": "^0.0.3",
+		"use-sync-external-store": "^1.2.0"
+	}
 }

@@ -2,6 +2,7 @@ import { collection, computed, instance, PlexusComputedStateInstance, PlexusStat
 import React, { useEffect, useState } from "react"
 import { useDeposit, useEvent, usePlexus } from "../packages/plexus-react/src"
 import * as renderer from "react-test-renderer"
+import { useSyncExternalStore } from "use-sync-external-store"
 
 type Payload = {
 	name: string
@@ -246,8 +247,7 @@ describe("Test react integration (useDeposit)", () => {
 		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
 	})
 
-	test('testing types of useDeposit', () => {
-
+	test("testing types of useDeposit", () => {
 		function RandomComponent() {
 			const [val, setVal] = useState("")
 			const { save, edit } = useDeposit<Payload>(
