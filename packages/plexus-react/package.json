@@ -10,12 +10,12 @@
 	"license": "MIT",
 	"peerDependencies": {
 		"@plexusjs/core": "~1.0.0",
-		"react": "^16.8.6"
+		"react": "^18.0.0"
 	},
 	"devDependencies": {
 		"@types/react": "^16.9.49",
 		"@types/react-test-renderer": "^16.9.3",
-		"react": "^17.0.2",
+		"react": "^18.2.0",
 		"react-test-renderer": "^16.13.1"
 	},
 	"scripts": {
