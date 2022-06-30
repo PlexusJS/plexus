@@ -32,7 +32,7 @@ describe("Test react integration (usePlexus)", () => {
 		function RandomComponent() {
 			const stateValue = usePlexus(myState)
 			const [stateValue1, stateValue2] = usePlexus([myState, myState2])
-			const [stateValue3] = usePlexus([myState3])
+			const stateValue3 = usePlexus(myState3)
 
 			return (
 				<div>

@@ -36,12 +36,13 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		const depsArray = [...normalizeDeps(deps)]
 		// The "!" at the end of the values here tell the tsc that these values will never be "undefined"
 		if (!Array.isArray(deps) && depsArray.length === 1) {
-			return depsArray[0].value! as PlexusValue<V>
+			// return depsArray[0].value! as PlexusValue<V>
+			return deps.value! as PlexusValue<V>
 		}
 		// get the memoized array of values, if it's length does not match the deps length, then we need to update the array reference
 		// if the array is not set
 		if (!returnArray.current) {
-			returnArray.current = [...(depsArray.map((dep) => dep.value!) as PlexusValueArray<V>)] as PlexusValueArray<V>
+			returnArray.current = [...depsArray.map((dep) => dep.value!)] as PlexusValueArray<V>
 		}
 		// this means the array is already set, so here, we should clear the array (to keep the same reference) and then push the values to the array
 		else {
@@ -53,7 +54,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		// returnArray.current = returnArray.current.length !== depsArray.length ? [] : returnArray.current)
 
 		// return the array and give it the correct type
-		return returnArray.current as PlexusValueArray<V>
+		return returnArray.current
 	}, [deps])
 	return useSyncExternalStore(
 		// Subscription callback
