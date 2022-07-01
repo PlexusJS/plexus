@@ -1,5 +1,3 @@
-import { Watchable } from "."
-
 export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object
 
 export function isObject(item: any): item is Object {
@@ -95,7 +93,7 @@ export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
 	return false
 }
 
-export const convertToString = (input: any) =>
+export const convertThingToString = (input: any) =>
 	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)
 export const hash = function (input: string) {
 	/* Simple hash function. */
@@ -116,7 +114,7 @@ export const hash = function (input: string) {
 	return String(a)
 }
 
-export const convertStringToType = (inp: string) => {
+export const convertStringToThing = (inp: string) => {
 	try {
 		// try to parse it as JSON (array or object)
 		return JSON.parse(inp)

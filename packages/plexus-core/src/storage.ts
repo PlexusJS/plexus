@@ -1,4 +1,4 @@
-import { convertStringToType, convertToString, deepMerge, isEqual, isObject } from "./helpers"
+import { convertStringToThing, convertThingToString, deepMerge, isEqual, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { Watchable, WatchableValue } from "./watchable"
 
@@ -48,8 +48,8 @@ export class StorageInstance {
 		}
 		this.instance().runtime.log("info", `Retrieving value for key ${this.getKey(key)}`)
 		const val = StorageInstance.getLocalStorage()?.getItem(this.getKey(key))
-		if (typeof val === "string" && convertStringToType(val)) {
-			return convertStringToType(val)
+		if (typeof val === "string" && convertStringToThing(val)) {
+			return convertStringToThing(val)
 		} else return null
 	}
 
@@ -154,11 +154,16 @@ export class StorageInstance {
 				if (!isEqual(val, storedValue)) {
 					this.instance().runtime.log(
 						"info",
-						`Syncing "${key}" with storage value "${convertToString(val)}" to "${convertToString(storedValue)}"`
+						`Syncing "${key}" with storage value "${convertThingToString(val)}" to "${convertThingToString(storedValue)}"`
 					)
 					object.set(storedValue)
 				} else {
-					this.instance().runtime.log("info", `Skipping the storage sync of item "${key}"; Values are already equal. (state["${convertToString(val)}"] storage["${convertToString(storedValue)}"])`)
+					this.instance().runtime.log(
+						"info",
+						`Skipping the storage sync of item "${key}"; Values are already equal. (state["${convertThingToString(
+							val
+						)}"] storage["${convertThingToString(storedValue)}"])`
+					)
 				}
 			}
 		})

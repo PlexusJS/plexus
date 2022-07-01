@@ -1,7 +1,7 @@
-import { PlexusCollectionGroup, WatchableValue, Watchable } from "@plexusjs/core"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { Watchable } from "@plexusjs/core"
+import { useCallback, useRef } from "react"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
-import { concurrentWatch } from "./utils"
+import { concurrentWatch, convertThingToString, deepClone } from "./utils"
 
 const normalizeDeps = (deps: Watchable | Watchable[]) => (Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable])
 
@@ -35,11 +35,17 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	)
 	const fetchValues = useCallback(() => {
 		const depsArray = [...normalizeDeps(deps)]
-		// The "!" at the end of the values here tell the tsc that these values will never be "undefined"
+		// If this is the single argument syntax...
 		if (!Array.isArray(deps) && depsArray.length === 1) {
 			// return depsArray[0].value! as PlexusValue<V>
-			return deps.value! as PlexusValue<V>
+			const compSnapshot = convertThingToString(deps.value)
+			if (snapshot.current === compSnapshot) {
+				return deps.value! as PlexusValue<V>
+			}
+			snapshot.current = compSnapshot
+			return deepClone(deps.value!) as PlexusValue<V>
 		}
+		// If this is the array syntax...
 		const values = depsArray.map((dep) => dep.value!)
 		const compSnapshot = JSON.stringify(values)
 		if (!snapshot.current) {

@@ -1,4 +1,4 @@
-import { AlmostAnything, convertToString, deepClone, deepMerge, hash, isEqual, isObject } from "./helpers"
+import { AlmostAnything, convertThingToString, deepClone, deepMerge, hash, isEqual, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { PlexusWatcher } from "./interfaces"
 import { WatchableValue } from "./watchable"
