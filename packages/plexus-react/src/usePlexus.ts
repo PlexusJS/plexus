@@ -58,7 +58,6 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		}
 		// this means the array is already set, so here, we should clear the array (to keep the same reference) and then push the values to the array
 		else {
-			console.log(snapshot.current, compSnapshot, snapshot.current === compSnapshot)
 			// fill the array with the values
 			if (snapshot.current === compSnapshot) {
 				// reset the array
