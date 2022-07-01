@@ -51,7 +51,7 @@ describe("Test react integration (usePlexus)", () => {
 		// myState.set("no")
 	})
 	test("usePlexus hook w/collection group", () => {
-		instance({ logLevel: "debug" })
+		// instance({ logLevel: "debug" })
 		function RandomComponent() {
 			useEffect(() => {
 				myCollection.collect({ id: "pog", a: 1 }, "test")
@@ -71,16 +71,16 @@ describe("Test react integration (usePlexus)", () => {
 		expect(tree).toMatchSnapshot()
 	})
 	test("usePlexus hook with selector", () => {
-		instance({
-			logLevel: "debug",
-		})
+		// instance({
+		// 	logLevel: "debug",
+		// })
 		function RandomComponent() {
 			myCollection.collect({ id: "pog", a: 1 }, "test")
 			myCollection.getSelector("main").select("pog")
-			const s1 = usePlexus(myCollection.getSelector("main"))
+			const [s1] = usePlexus([myCollection.getSelector("main")])
 
 			useEffect(() => {
-				console.log(s1)
+				// console.log(s1)
 			}, [s1])
 
 			// const [groupValue] = usePlexus([myCollection.groups.test])
@@ -134,9 +134,9 @@ describe("Test react integration (usePlexus)", () => {
 	// 	expect(tree.root.findByProps({ id: "data" }).children).toEqual(["1", " as ", "pog"])
 	// })
 	test("usePlexus hook with group", () => {
-		instance({
-			logLevel: "debug",
-		})
+		// instance({
+		// 	logLevel: "debug",
+		// })
 		function RandomComponent() {
 			useEffect(() => {}, [])
 			// const g1 = usePlexus(myCollection.getGroup("test"))
@@ -150,9 +150,9 @@ describe("Test react integration (usePlexus)", () => {
 		let tree: any
 		renderer.act(() => {
 			tree = renderer.create(<RandomComponent />)
-			console.log("collecting a new item")
+			// console.log("collecting a new item")
 			myCollection.collect({ id: "pog", a: 1 }, "test")
-			console.log(`collected item`, { id: "pog", a: 1 })
+			// console.log(`collected item`, { id: "pog", a: 1 })
 		})
 		expect(tree.toJSON()).toMatchSnapshot()
 

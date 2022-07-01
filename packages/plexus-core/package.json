@@ -20,7 +20,8 @@
 	"scripts": {
 		"build": "tsc --build --force && echo \"Build complete.\"",
 		"test": "jest",
-		"prepublish": "yarn build"
+		"prepublish": "yarn build",
+		"dev": "tsc --watch"
 	},
 	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc",
 	"devDependencies": {
