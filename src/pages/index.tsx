@@ -6,6 +6,7 @@ import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
 import styles from "./index.module.css"
 import HomepageFeatures from "@site/src/components/HomepageFeatures"
 import { motion } from "framer-motion"
+import Head from "@docusaurus/Head"
 
 function HomepageHeader() {
 	const { siteConfig } = useDocusaurusContext()
@@ -54,7 +55,7 @@ function HomepageHeader() {
 					</motion.svg>
 				</svg>
 				<div className={styles.buttons}>
-					<Link className="button button--secondary button--lg" to="/docs/intro">
+					<Link className="button button--secondary button--lg" to="/docs">
 						Docs (WIP)
 					</Link>
 				</div>
@@ -68,6 +69,9 @@ export default function Home(): JSX.Element {
 
 	return (
 		<Layout title={`Home`} description="The Home">
+			<Head>
+				<meta name="twitter:card" content="summary_large_image" />
+			</Head>
 			<HomepageHeader />
 			<main>
 				<HomepageFeatures />

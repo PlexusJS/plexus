@@ -1,6 +1,7 @@
 ---
 title: Introduction
 sidebar_position: 1
+slug: /
 ---
 
 import { Badges } from "../src/components/Badges.tsx"
@@ -8,7 +9,7 @@ import emoji from "node-emoji"
 
 # Welcome to Plexus
 
-#### The ultimate toolkit for building reactive web applications
+#### The ultimate toolkit for orchestrating data in reactive web applications
 
 <Badges />
 
@@ -19,46 +20,169 @@ import emoji from "node-emoji"
 	<li>📡 Powerful Built in HTTP Client </li>
 	<li>🚌 Custom Event Engine </li>
 	<li>📜 Easy to Read </li>
-	<li>🪶 Super Lightweight (Only 34kb) with 0 Dependancies </li>
+	<li>
+		🪶 Super Lightweight (Only 40kb) with <strong>0 Dependancies</strong>
+	</li>
 	<li>🔌 Extendable </li>
 </ul>
 
 :::caution Docs are still a work in progress.
 
-Forgive the current state of the documentation; we are still working on it. Join [our Discord](https://discord.gg/kWJ2kVnykH) for additional help & updates in the meantime.
+Forgive the current state of the documentation; we're still working on it. Join [our Discord](https://discord.gg/kWJ2kVnykH) for additional help & updates in the meantime.
 :::
 
 ## What is it?
 
-Plexus is a SSOT toolkit for building out scalable reactive applications. In other words, we make state management, api communication, event management, & data manipulation a breeze. According to a dictionary somewhere, "plexus" is defined as <i>"a network of nerves or vessels in the body"</i>. The name is a metaphor for how plexus works. The tools in this package span the entire project and each one is interconnected like nerves in the body!
+<mark>Plexus is a toolkit for orchestrating data in scalable reactive applications</mark>. In other words, we make state management, api
+communication, event management, & data manipulation significantly easier. The word "plexus" is defined as <i>
+	"a network of nerves or vessels in the body"
+</i>. The name is a metaphor for how plexus works. The tools in this package span the entire project and each one is interconnected behind the scenes like
+nerves in the body!
+
+Unlike nerves though, plexus can be inserted incrementally and over time. It also scales with your application and incredibly performant.
 
 ## Motivation
 
-Most state libraries come along with complex syntax, confusing terminology and lack functionality out of the box. Plexus gets straight to the point, providing not only the tools needed to create scalable applications, but the flexibility to build in many different ways.
+We designed Plexus to be highly modular, unopinionated, and flexible, providing not only the tools needed to create scalable applications, but the flexibility to build it however you want.
 
-## Why use Plexus instead of...
+## Should you addopt Plexus?
 
-### ...Redux?
+Absolutely! You can <em>easily incrementally adopt</em> it into to your project <strong>no matter the stage or size</strong>.
 
-Redux has a very Restricted & opinionated design/structure. You do it the Redux way, or no way. It can be tricky to set up; you need to configure both the store and the actions before you can use Redux in your app. Redux is also very difficult to debug. It's not always necessary; if you're just building a simple app, you might not need the extra complexity that Redux adds.
+## Use Cases
 
-### ...VueX?
+Here are a couple of use cases to get you started. Your app can utilize some of these, or all of these. Totally up to you. And this is all treeshakable so production builds only use what's needed.
 
-VueX can make your code more difficult to read and debug, since it introduces a lot of new concepts and can be confusing at first. Additionally, VueX can make your application more complex and difficult to maintain, since it adds a lot of new code to your project. Finally, VueX can impact the performance of your application, since it adds a lot of overhead.
+---
 
-### ...RxJs?
+### SSOT
 
-RxJS is a large and complex library, which can make it difficult to learn and use. Second, RxJS is not always compatible with other libraries and frameworks, which can limit its usefulness in some cases. Finally, some developers have found that RxJS can be challenging to debug, which can be a major downside if you're working on a large or complex project.
+Here is a simple example of a small utilization of Plexus in a react application. We are creating a core instance (which is a fancy way of saying an object) of our data. We can then export that core and use it and edit it in out components. Every component that uses thes value will be reactive to edits across the DOM.
 
-### ...MobX?
+```ts title="/core/index.ts"
+import { state, collection } from "@plexusjs/core"
+export const core = {
+	tasks: {
+		collection: collection().createGroups(["completed", "incomplete"]),
+	},
+	user: {
+		name: state("default_username"),
+	},
+}
 
-There are a few potential cons of using MobX, including the possibility of messy code if not used correctly, and the potential for performance issues if state is not handled optimally. However, overall, MobX can be a very helpful tool for managing state in JavaScript applications.
+export default core
+```
 
-### ...Context API?
+Above, we are creating a small <strong>core</strong> where everything Plexus related is defined in a single file. 😰 While you can <em>technically</em> orchestrate your data this way, it's <em>probably</em> not the best idea. Things will get very messy as the number of data points grows.
 
-It can create unnecessary complexity in your code if not used carefully. The Context API is still fairly new and may change in future versions of React, which could break your code.
+If you would like to see the core templates we came up with to keep your data structure scalable, check out our [Style Guides Page](/docs/style-guides). We recommend chosing a [Style](/docs/style-guides) that best fit's the application.
+
+```tsx live title="/pages/index.tsx"
+import { state } from "@plexusjs/core"
+import { usePlexus } from "@plexusjs/react"
+import core from "/core"
+
+export default function Home() {
+	const completedTasks = usePlexus(core.tasks.collection.groups.complete)
+	return (
+		<div>
+			{completedTasks.map((v) => (
+				<div>{v.name}</div>
+			))}
+		</div>
+	)
+}
+```
+
+#### Try It!
+
+<div
+	className="rounded-md overflow-hidden"
+>
+
+<iframe
+	src="https://codesandbox.io/embed/plexusjs-simple-core-example-mvj50r?fontsize=14&hidenavigation=1&theme=dark"
+	style={{ width: "100%", height: "500px", border: 0, borderRadius: "4px", overflow: "hidden" }}
+	title="PlexusJS Simple Core Example"
+	allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+	sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+/>
+</div>
+
+### API Requests
+
+Here is an example of a user creating Plexus API Instances to communicate with a server.
+
+```tsx live title="/pages/index.tsx"
+import { api } from "@plexusjs/core"
+// this baseURL should lead to a path on your server. So We can point at `api/v1` for example.
+const apiv1 = api("/api/v1")
+interface User {
+	name: string
+	age: number
+}
+export default function Home() {
+	const getUsers = async () => {
+		// Here you chose a method to call the API, also providing a path and a payload (if needed).
+		const response = await apiv1.get<User[]>("/users")
+
+		if (response.ok) {
+			// response.data will be of type User[]
+			console.log(response.data)
+		}
+	}
+	return (
+		<div>
+			{data.map((v) => (
+				<button onClick={() => getUsers()}>Call Api</button>
+			))}
+		</div>
+	)
+}
+```
+
+### Event Management
+
+You can create and patch over custom events using the `event()` from PlexusJS
+
+```ts title="/core/index.ts"
+import { event } from "@plexusjs/core"
+type FilterData = {
+	filters?: {
+		size?: "small" | "medium" | "large"
+	}
+}
+export const core = {
+	search: {
+		filtering: event<FilterData>(),
+	},
+}
+
+export default core
+```
+
+### Data Orchestration
+
+When you edit a [Stateful](/docs/getting-started/concepts#internal-terms) value, it will update everything that is watching it.
+
+### Data Persistence
+
+You can easily persist your data to a user's browser Session Storage and <em>soon any other long term storage.</em>
+
+```ts title="/core/index.ts"
+import { state } from "@plexusjs/core"
+export const core = {
+	user: {
+		name: state("default_username").persist("username"),
+	},
+}
+
+export default core
+```
 
 ## Community & Contributions
+
+This library was made with hard work by <strong>Philippe Clesca</strong> & <em>Nicolas Theck</em>. We hope it helps you build awesome things! 🚀
 
 <iframe
 	src="https://discord.com/widget?id=941858479793123358&theme=dark"

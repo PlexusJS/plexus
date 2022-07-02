@@ -42,7 +42,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      metadata: [{ name: 'keywords', content: 'plexusjs, plexus, state management, state, management, npm, http-client, http, client' }],
+      metadata: [{ name: 'keywords', content: 'plexusjs, plexus, state management, state, management, npm, node, nodejs, http-client, http, client' }],
       image: 'img/OriginalLogo.png',
       colorMode: {
         defaultMode: 'dark',

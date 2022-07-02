@@ -17,10 +17,12 @@
 		"typecheck": "tsc"
 	},
 	"dependencies": {
-		"@docusaurus/core": "^2.0.0-beta.20",
-		"@docusaurus/preset-classic": "^2.0.0-beta.20",
-		"@docusaurus/theme-live-codeblock": "^2.0.0-beta.18",
+		"@docusaurus/core": "^2.0.0-beta.21",
+		"@docusaurus/preset-classic": "^2.0.0-beta.21",
+		"@docusaurus/theme-live-codeblock": "^2.0.0-beta.21",
 		"@mdx-js/react": "^1.6.22",
+		"@plexusjs/core": "^1.1.0",
+		"@plexusjs/react": "^1.1.0",
 		"autoprefixer": "^10.4.5",
 		"clsx": "^1.1.1",
 		"framer-motion": "^6.3.3",
@@ -32,7 +34,7 @@
 		"tailwindcss": "^3.0.24"
 	},
 	"devDependencies": {
-		"@docusaurus/module-type-aliases": "2.0.0-beta.18",
+		"@docusaurus/module-type-aliases": "^2.0.0-beta.21",
 		"@tsconfig/docusaurus": "^1.0.5",
 		"@types/node": "^17.0.30",
 		"@types/react": "^18.0.8",

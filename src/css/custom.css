@@ -61,6 +61,8 @@ h1 {
 h2 {
 	font-size: 2.5rem;
 	font-weight: bold;
+	text-transform: lowercase;
+	/* letter-spacing: 2px; */
 	/* font-family: "silka" !important; */
 }
 h3 {
@@ -91,7 +93,12 @@ ul.list {
 	list-style: disc;
 	margin-left: 2rem;
 }
-
+i {
+	@apply text-slate-400;
+}
+strong {
+	@apply text-slate-400;
+}
 mark {
 	background-color: rgba(0, 0, 0, 0);
 	color: var(--ifm-color-primary-lightest);
