@@ -33,6 +33,11 @@ export class PlexusActionHelpers {
 	 * Run all available error handlers
 	 */
 	runErrorHandlers(e: unknown) {
+		if (this.instance()._globalCatch) {
+			this.instance()._globalCatch?.(e);
+			// Don't run other onCatch's
+			if (this.instance().settings.exlusiveGlobalError) return;
+		}
 		this._internalStore._errorHandlers.forEach((handler) => handler(e))
 	}
 	/**
@@ -40,16 +45,19 @@ export class PlexusActionHelpers {
 	 * Does the helper instance have any errors handlers to handle an error?
 	 */
 	get catchError() {
-		return this._internalStore._errorHandlers.size > 0
+		return this._internalStore._errorHandlers.size > 0 ?? typeof this.instance()._globalCatch === 'function'
 	}
 
+	/**
+	 * Ignore the default halt for preActions
+	 */
 	ignoreInit() {
 		this._skipInit = true
 	}
 
 	/**
 	 * @internal
-	 * Eject the external functions object returned to the user in the first function argument
+	 * Eject the external functions object returned to the user in the first argument of the action function
 	 */
 	get hooks(): PlexusActionHooks {
 		const onCatch = (handler?: ErrorHandler): void => {

@@ -1,7 +1,7 @@
 import { PlexusCollectionInstance } from ".."
 import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
-import { WatchableValue } from "../watchable"
+import { Watchable } from "../watchable"
 
 import { DataKey, PlexusDataInstance } from "./data"
 
@@ -19,7 +19,7 @@ interface CollectionGroupStore<DataType = any> {
 	_includedKeys: Set<string | number>
 	_dataWatcherDestroyers: Set<() => void>
 }
-export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> {
+export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	private _internalStore: CollectionGroupStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>
 	private instance: () => PlexusInstance
@@ -56,6 +56,9 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 		// this._internalStore._groupWatchers.forEach((callback) => {
 		// 	callback(this.value)
 		// })
+		const keys = Array.from(this._internalStore._includedKeys)
+		// memoization: this updates the groups stored value! This reduces computation as the state of the group is only updated when the data changes
+		this._watchableStore._publicValue = keys.map((key) => this.collection().getItemValue(key)).filter((v) => v !== undefined) as DataType[]
 		this.instance().runtime.broadcast(this.id, this.value)
 	}
 	private rebuildDataWatchers() {
@@ -64,7 +67,8 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 		this._internalStore._dataWatcherDestroyers.clear()
 
 		// loop through each key, get the data associated with it, then add a watcher to that data that runs the group's watchers
-		Array.from(this._internalStore._includedKeys).forEach((key) => {
+		const keys = Array.from(this._internalStore._includedKeys)
+		keys.forEach((key) => {
 			const destroyer = this.collection()
 				.getItem(key)
 				?.watch(() => {
@@ -72,6 +76,7 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 				})
 			if (destroyer) this._internalStore._dataWatcherDestroyers.add(destroyer)
 		})
+
 		this.runWatchers()
 	}
 	/**
@@ -100,6 +105,15 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 		return this as PlexusCollectionGroup<DataType>
 	}
 	/**
+	 * Clears the group of all items
+	 * @returns {this} This Group instance
+	 */
+	clear() {
+		this._internalStore._includedKeys.clear()
+		this.rebuildDataWatchers()
+		return this as PlexusCollectionGroup<DataType>
+	}
+	/**
 	 * Peek at the index of the group (get all of the lookup keys for the group)
 	 */
 	get index() {
@@ -109,9 +123,10 @@ export class CollectionGroup<DataType = any> extends WatchableValue<DataType[]> 
 	 * The data values of the items in the group
 	 */
 	get value() {
-		return Array.from(this._internalStore._includedKeys)
-			.map((key) => this.collection().getItemValue(key))
-			.filter((v) => v !== undefined) as DataType[]
+		// return Array.from(this._internalStore._includedKeys)
+		// 	.map((key) => this.collection().getItemValue(key))
+		// 	.filter((v) => v !== undefined) as DataType[]
+		return super.value
 	}
 	/**
 	 * The data Items in the group

@@ -27,6 +27,8 @@ export class PlexusInstance {
 	_plugins = new Map<string, PlexusPlugin>()
 	_collections = new Set<CollectionInstance<any, any, any>>()
 	_storages = new Map<string, PlexusStorageInstance>()
+	
+	_globalCatch: ((error: any) => unknown) | undefined;
 
 	_mounted = new Map<string, any>()
 
@@ -45,6 +47,7 @@ export class PlexusInstance {
 		}
 		this.runtime = _runtime(() => instance(), { logLevel: this._internalStore._settings?.logLevel })
 	}
+
 	get name() {
 		return this._internalStore._id || "default"
 	}
@@ -92,6 +95,7 @@ export class PlexusInstance {
 interface PlexusInstanceConfig {
 	instanceId: string
 	logLevel: "debug" | "warn" | "error" | "silent"
+	exlusiveGlobalError: boolean;
 }
 interface PlexusMaster {
 	_ready: false

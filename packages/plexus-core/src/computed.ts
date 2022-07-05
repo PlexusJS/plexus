@@ -38,7 +38,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	}
 	private mount() {
 		if (!this.instance()._computedStates.has(this)) {
-			this.instance().runtime.log("info", `Hoisting state ${this.id} with value ${this.value} to instance`)
+			this.instance().runtime.log("info", `Hoisting state ${this.id} with value`, this.value, ` to instance`)
 			this.instance()._computedStates.add(this)
 			// this.instance().storage?.sync()
 		}

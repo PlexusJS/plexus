@@ -4,24 +4,38 @@
 	"description": "React Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
+	"keywords": [
+		"plexusjs",
+		"plexus",
+		"plexus-react",
+		"react",
+		"reactjs",
+		"global state",
+		"plugin"
+	],
 	"publishConfig": {
 		"access": "public"
 	},
 	"license": "MIT",
 	"peerDependencies": {
 		"@plexusjs/core": "~1.0.0",
-		"react": "^16.8.6"
+		"react": "^18.2"
 	},
 	"devDependencies": {
 		"@types/react": "^16.9.49",
-		"@types/react-test-renderer": "^16.9.3",
-		"react": "^17.0.2",
-		"react-test-renderer": "^16.13.1"
+		"@types/react-test-renderer": "^18.0.0",
+		"@types/use-sync-external-store": "^0.0.3",
+		"react": "^18.2.0",
+		"react-test-renderer": "^18.2.0"
 	},
 	"scripts": {
 		"build": "tsc --build --force",
 		"test": "jest",
-		"prepublish": "yarn build"
+		"prepublish": "yarn build",
+		"dev": "tsc --watch"
 	},
-	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc"
+	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc",
+	"dependencies": {
+		"use-sync-external-store": "^1.2.0"
+	}
 }

@@ -1,7 +1,7 @@
 {
-	"name": "@plexusjs/core",
+	"name": "@plexusjs/utils",
 	"version": "1.1.1-canary.0+48b37fe",
-	"description": "A library for building modular interconnected applications",
+	"description": "Useful utils by the PlexusJS Team.",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
 	"publishConfig": {
@@ -10,21 +10,22 @@
 	"keywords": [
 		"plexusjs",
 		"plexus",
-		"plexus-core",
+		"plexus-utils",
 		"react",
 		"reactjs",
 		"global state",
 		"plugin"
 	],
 	"license": "MIT",
+	"peerDependencies": {
+		"@plexusjs/core": "~1.0.0"
+	},
+	"devDependencies": {},
 	"scripts": {
-		"build": "tsc --build --force && echo \"Build complete.\"",
+		"build": "tsc --build --force",
 		"test": "jest",
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc",
-	"devDependencies": {
-		"isomorphic-fetch": "^3.0.0"
-	}
+	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc"
 }

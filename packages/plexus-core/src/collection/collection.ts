@@ -28,6 +28,7 @@ export interface PlexusCollectionConfig<DataType> {
 }
 interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	_internalId: string
+	_lastChanged: number | string
 	_lookup: Map<string, string>
 	_key: string
 	_data: Map<string | number, PlexusDataInstance<DataType>>
@@ -68,6 +69,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		this._internalStore = {
 			_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
 			_lookup: new Map<string, string>(),
+			_lastChanged: "",
 			_key: _config?.primaryKey || "id",
 			_data: new Map<string, PlexusDataInstance<DataType>>(),
 			_groups: new Map<GroupName, PlexusCollectionGroup<DataType>>() as Groups,
@@ -183,13 +185,13 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		key = key
 		if (config.deep) {
 			if (this._internalStore._data.has(key)) {
-				this._internalStore._data.get(key)?.set({ ...data, [this._internalStore._key]: key } as Partial<DataType>, { mode: "patch" })
+				this._internalStore._data.get(key)?.patch({ ...data, [this._internalStore._key]: key } as Partial<DataType>)
 			} else {
 				console.warn("no data found for key", key)
 			}
 		} else {
 			if (this._internalStore._data.has(key)) {
-				this._internalStore._data.get(key)?.set(data as DataType, { mode: "replace" })
+				this._internalStore._data.get(key)?.set(data as DataType)
 			} else {
 				console.warn("no data found for key", key)
 			}
@@ -236,6 +238,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The new Collection Instance
 	 */
 	createSelector<Name extends SelectorName>(selectorName: Name) {
+		if (this._internalStore._selectors.has(selectorName)) return this
+		if (selectorName.length === 0) return this
 		this._internalStore._selectors.set(
 			selectorName,
 			_selector(
@@ -287,6 +291,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The new Collection Instance
 	 */
 	createGroup<Name extends GroupName>(groupName: Name, config?: PlexusCollectionGroupConfig<DataType>) {
+		if (this._internalStore._groups.has(groupName)) return this
+		if (groupName.length === 0) return this
 		this._internalStore._groups.set(
 			groupName,
 			_group(
@@ -444,9 +450,20 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	}
 	/**
 	 * Delete all data in the collection
+	 * @param {string} [GroupName] - (Optional) Either an array or a single group name to clear data from
 	 */
-	clear() {
-		this.delete(Array.from(this._internalStore._data.keys()))
+	clear(groupNames?: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+		// this means we want to clear a group, not the whole collection
+		if (groupNames) {
+			if (Array.isArray(groupNames)) {
+				groupNames.forEach((groupName) => this.isCreatedGroup(groupName) && this.getGroup(groupName).clear())
+			} else {
+				this.isCreatedGroup(groupNames) && this.getGroup(groupNames).clear()
+			}
+		} else {
+			this.delete(Array.from(this._internalStore._data.keys()))
+		}
+		return this
 	}
 
 	/**
@@ -531,6 +548,13 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	get name() {
 		return this._internalStore._name
+	}
+
+	set lastUpdatedKey(value: string | number) {
+		this._internalStore._lastChanged = value
+	}
+	get lastUpdatedKey() {
+		return this._internalStore._lastChanged
 	}
 }
 export function _collection<

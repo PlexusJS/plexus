@@ -79,7 +79,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 */
 	set(value: ValueType, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
 		// TODO add a warning here if the key is not set
-		this.data?.set(value, config)
+		config.mode === "replace" ? this.data?.set(value) : this.data?.patch(value)
 		this.runWatchers()
 	}
 	/**

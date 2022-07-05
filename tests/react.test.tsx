@@ -1,6 +1,6 @@
 import { collection, computed, instance, PlexusComputedStateInstance, PlexusStateInstance, PlexusEventInstance, state, event } from "@plexusjs/core"
 import React, { useEffect, useState } from "react"
-import { useEvent, usePlexus } from "../packages/plexus-react/src"
+import { useDeposit, useEvent, usePlexus } from "@plexusjs/react"
 import * as renderer from "react-test-renderer"
 
 type Payload = {
@@ -32,7 +32,7 @@ describe("Test react integration (usePlexus)", () => {
 		function RandomComponent() {
 			const stateValue = usePlexus(myState)
 			const [stateValue1, stateValue2] = usePlexus([myState, myState2])
-			const [stateValue3] = usePlexus([myState3])
+			const stateValue3 = usePlexus(myState3)
 
 			return (
 				<div>
@@ -51,7 +51,7 @@ describe("Test react integration (usePlexus)", () => {
 		// myState.set("no")
 	})
 	test("usePlexus hook w/collection group", () => {
-		instance({ logLevel: "debug" })
+		// instance({ logLevel: "debug" })
 		function RandomComponent() {
 			useEffect(() => {
 				myCollection.collect({ id: "pog", a: 1 }, "test")
@@ -71,16 +71,16 @@ describe("Test react integration (usePlexus)", () => {
 		expect(tree).toMatchSnapshot()
 	})
 	test("usePlexus hook with selector", () => {
-		instance({
-			logLevel: "debug",
-		})
+		// instance({
+		// 	logLevel: "debug",
+		// })
 		function RandomComponent() {
 			myCollection.collect({ id: "pog", a: 1 }, "test")
 			myCollection.getSelector("main").select("pog")
-			const s1 = usePlexus(myCollection.getSelector("main"))
+			const [s1] = usePlexus([myCollection.getSelector("main")])
 
 			useEffect(() => {
-				console.log(s1)
+				// console.log(s1)
 			}, [s1])
 
 			// const [groupValue] = usePlexus([myCollection.groups.test])
@@ -134,9 +134,9 @@ describe("Test react integration (usePlexus)", () => {
 	// 	expect(tree.root.findByProps({ id: "data" }).children).toEqual(["1", " as ", "pog"])
 	// })
 	test("usePlexus hook with group", () => {
-		instance({
-			logLevel: "debug",
-		})
+		// instance({
+		// 	logLevel: "debug",
+		// })
 		function RandomComponent() {
 			useEffect(() => {}, [])
 			// const g1 = usePlexus(myCollection.getGroup("test"))
@@ -150,9 +150,9 @@ describe("Test react integration (usePlexus)", () => {
 		let tree: any
 		renderer.act(() => {
 			tree = renderer.create(<RandomComponent />)
-			console.log("collecting a new item")
+			// console.log("collecting a new item")
 			myCollection.collect({ id: "pog", a: 1 }, "test")
-			console.log(`collected item`, { id: "pog", a: 1 })
+			// console.log(`collected item`, { id: "pog", a: 1 })
 		})
 		expect(tree.toJSON()).toMatchSnapshot()
 
@@ -190,7 +190,7 @@ describe("Test react integration (useEvent)", () => {
 	test("test useEvent", () => {
 		function RandomComponent() {
 			const [val, setVal] = useState("")
-			const computedThing = useEvent(myEvents, (payload) => {
+			useEvent(myEvents, (payload) => {
 				setVal(payload.name)
 			})
 
@@ -211,5 +211,58 @@ describe("Test react integration (useEvent)", () => {
 		expect(tree.toJSON()).toMatchSnapshot()
 		// expect().toEqual()
 		expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
+	})
+})
+describe("Test react integration (useDeposit)", () => {
+	test("test useDeposit", () => {
+		// lol idk how to test this without user input
+		function RandomComponent() {
+			const [val, setVal] = useState("")
+			const { save, edit } = useDeposit(
+				{ name: "string" },
+				{
+					onSave(payload) {
+						setVal(payload.name ?? "")
+					},
+				}
+			)
+
+			useEffect(() => {
+				myEvents.emit({ name: "test", status: "test" })
+			}, [])
+			// const [groupValue] = usePlexus([myCollection.groups.test])
+			return (
+				<div>
+					<p id="data">{val}</p>
+				</div>
+			)
+		}
+		let tree: any
+		renderer.act(() => {
+			tree = renderer.create(<RandomComponent />)
+		})
+		expect(tree.toJSON()).toMatchSnapshot()
+		// expect().toEqual()
+		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
+	})
+
+	test("testing types of useDeposit", () => {
+		function RandomComponent() {
+			const [val, setVal] = useState("")
+			const { save, edit } = useDeposit<Payload>(
+				{ name: "string" },
+				{
+					onSave(payload) {
+						setVal(payload.name ?? "")
+					},
+				}
+			)
+			// const [groupValue] = usePlexus([myCollection.groups.test])
+			return (
+				<div>
+					<p id="data">{val}</p>
+				</div>
+			)
+		}
 	})
 })

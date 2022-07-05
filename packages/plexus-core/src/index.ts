@@ -77,6 +77,10 @@ export function preaction<Fn extends FunctionType>(fn: Fn, config?: PlexusPreAct
 	return _preaction<Fn>(() => instance(), fn, config)
 }
 
+export function setGlobalCatch(catcher: (err: any) => unknown) {
+	instance()._globalCatch = catcher;
+}
+
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
 function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
 
