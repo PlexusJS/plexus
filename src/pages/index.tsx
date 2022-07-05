@@ -63,10 +63,10 @@ function HomepageHeader() {
 		</header>
 	)
 }
-
+const description = ""
 export default function Home(): JSX.Element {
 	const { siteConfig } = useDocusaurusContext()
-
+	// Intuitive, type safe, light and flexible Store for any Frontend Application!
 	return (
 		<Layout title={`Home`} description="The Home">
 			<Head>
