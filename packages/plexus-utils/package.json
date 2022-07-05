@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/utils",
-	"version": "1.1.1-canary.0+48b37fe",
+	"version": "1.2.0",
 	"description": "Useful utils by the PlexusJS Team.",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,7 +20,6 @@
 	"peerDependencies": {
 		"@plexusjs/core": "~1.0.0"
 	},
-	"devDependencies": {},
 	"scripts": {
 		"build": "tsc --build --force",
 		"test": "jest",
