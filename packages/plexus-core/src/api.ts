@@ -11,6 +11,7 @@ export interface PlexusApiRes<DataType = any> {
 	rawData: string
 	data: DataType
 	ok: boolean
+	hasCookie: (cookieName: string) => boolean
 }
 export interface PlexusAPIReq {
 	cache?: RequestInit["cache"]
@@ -126,6 +127,9 @@ export class ApiInstance {
 		if (res === undefined) {
 			return ApiInstance.createEmptyRes<ResponseDataType>(500)
 		}
+		const hasCookie = (cName: string): boolean => {
+			return res?.headers?.get("set-cookie")?.includes(cName) ?? false
+		}
 
 		if (res.status >= 200 && res.status < 600) {
 			const text = await res.text()
@@ -142,6 +146,7 @@ export class ApiInstance {
 				rawData,
 				ok: res.status > 199 && res.status < 300,
 				data,
+				hasCookie,
 			}
 		} else {
 			return {
@@ -150,6 +155,7 @@ export class ApiInstance {
 				rawData: "",
 				ok: res.status > 199 && res.status < 300,
 				data: {} as ResponseDataType,
+				hasCookie,
 			}
 		}
 	}
@@ -328,7 +334,14 @@ export class ApiInstance {
 		} & RequestInit
 	}
 	private static createEmptyRes<ResponseDataType = any>(status: number = 408) {
-		return { status, response: {}, rawData: "", data: {} as ResponseDataType, ok: status > 199 && status < 300 }
+		return {
+			status,
+			response: {},
+			rawData: "",
+			data: {} as ResponseDataType,
+			ok: status > 199 && status < 300,
+			hasCookie: (name: string) => false,
+		}
 	}
 }
 
