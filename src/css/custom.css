@@ -53,39 +53,47 @@ body {
 	font-family: "silka" !important;
 }
 h1 {
-	font-size: 3.5rem;
+	@apply text-8xl;
+	/* font-size: 3.5rem; */
 	font-weight: bold;
 	/* font-family: "silka" !important; */
 }
 
 h2 {
-	font-size: 2.5rem;
+	/* font-size 2.5rem; */
+	@apply text-6xl;
 	font-weight: bold;
 	text-transform: lowercase;
 	/* letter-spacing: 2px; */
 	/* font-family: "silka" !important; */
 }
 h3 {
-	font-size: 1.85rem;
-	font-style: italic;
+	/* font-size: 1.85rem; */
+	@apply text-5xl;
 	font-weight: 500;
-	color: var(--ifm-color-primary-light);
+	@apply text-stone-500;
 }
 h4 {
-	font-size: 1.2rem;
+	/* font-size: 1.2rem; */
+	@apply text-4xl text-opacity-70 text-white;
 	font-style: normal;
 	font-weight: thin;
 	text-decoration: underline;
+
 	/* color: var(--ifm-color-primary-dark); */
 }
 h5 {
-	font-size: 1.2rem;
+	/* font-size: 1.2rem; */
+	@apply text-2xl;
 	font-style: normal;
 	font-weight: 500;
 
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
+}
+h6 {
+	@apply text-xl;
 }
 li {
 }
@@ -97,11 +105,15 @@ i {
 	@apply text-slate-400;
 }
 strong {
-	@apply text-slate-400;
+	@apply text-orange-500;
 }
-mark {
+mark,
+em {
+	@apply text-orange-400;
 	background-color: rgba(0, 0, 0, 0);
-	color: var(--ifm-color-primary-lightest);
+}
+button {
+	@apply border-blue-400 border px-5 py-2 rounded-md hover:border-blue-500;
 }
 .hr {
 	border-width: 0;
@@ -111,7 +123,7 @@ mark {
 }
 
 a {
-	color: var(--ifm-color-primary-lightest);
+	@apply text-blue-400;
 	/* display: inline-flex !important;
 	align-items: center;
 	justify-content: center;

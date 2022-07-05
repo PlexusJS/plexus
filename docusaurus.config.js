@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'PlexusJS Docs',
-  tagline: 'Dinosaurs are cool',
+  tagline: 'The ultimate toolkit for orchestrating data in reactive web applications!',
   url: 'https://plexusjs.org',
   baseUrl: '/',
   onBrokenLinks: 'throw',
