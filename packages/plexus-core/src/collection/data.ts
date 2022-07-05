@@ -1,4 +1,4 @@
-import { PlexusStateInstance, state, Watchable } from ".."
+import { state } from ".."
 import { WatchableValue } from "./../watchable"
 import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
@@ -17,7 +17,7 @@ export type DataKey = string | number
 
 // TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
 type DataObjectType<PK extends string = "id"> = Record<string, any> & { [Key in PK]: DataKey }
-export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> extends Watchable<DataType> {
+export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> extends WatchableValue<DataType> {
 	private instance: () => PlexusInstance
 	primaryKey: PK
 	private _internalStore: PlexusDataStore<DataType>
@@ -33,6 +33,20 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		}
 		// this.value = value
 	}
+	private checkIfHasKey(value) {
+		const v = value[this._internalStore.primaryKey as PK]
+		// Check if the value has the primary key, and verify the key is the same as the data instance
+		const valid =
+			value[this._internalStore.primaryKey] !== undefined &&
+			value[this._internalStore.primaryKey as PK].toString() === this._internalStore._key.toString()
+		this.instance().runtime.log(
+			"warn",
+			`The new data value ${valid ? "WILL" : "WILL NOT"} be set in "replace" mode...`,
+			this._internalStore._key,
+			value[this._internalStore.primaryKey] === this._internalStore._key
+		)
+		return valid
+	}
 	/**
 	 * Get the value of the data instance
 	 */
@@ -45,36 +59,38 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * @param config The config to use when setting the value
 	 * @param config.mode should we 'patch' or 'replace' the value
 	 */
-	set(value: Partial<DataType>, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
-		const checkIfHasKey = () => {
-			const v = value[this._internalStore.primaryKey as PK]
-			// Check if the value has the primary key, and verify the key is the same as the data instance
-			const valid =
-				value[this._internalStore.primaryKey] !== undefined &&
-				value[this._internalStore.primaryKey as PK].toString() === this._internalStore._key.toString()
-			this.instance().runtime.log(
-				"warn",
-				`The new data value ${valid ? "WILL" : "WILL NOT"} be set in "${config.mode}" mode...`,
-				this._internalStore._key,
-				value[this._internalStore.primaryKey] === this._internalStore._key
-			)
-			return valid
-		}
+	set(value?: Partial<DataType>) {
+		if (!value) return this
+
 		// maybe this check should be done inside of the state?
 		if (!isEqual(value as DataType, this.value)) {
-			if (config.mode === "replace") {
-				if (checkIfHasKey()) {
-					this._internalStore._state.set(value as DataType)
-				}
-			} else {
-				if (checkIfHasKey()) {
-					this._internalStore._state.patch(value as DataType)
-				}
+			if (this.checkIfHasKey(value)) {
+				this._internalStore._state.set(value as DataType)
 			}
+			// if (config.mode === "replace") {
+			// } else {
+			// 	if (checkIfHasKey()) {
+			// 		this._internalStore._state.patch(value as DataType)
+			// 	}
+			// }
 		}
 		this.collection().lastUpdatedKey = this._internalStore._key
 		return this
 	}
+	/**
+	 * Patch the current value of the state
+	 * @param value A value of the state to merge with the current value
+	 */
+	patch(value: Partial<DataType>) {
+		if (this.checkIfHasKey(value)) {
+			this._internalStore._state.patch(value as DataType)
+		} else {
+			this.instance().runtime.log("warn", `Can't find key "${value[this.primaryKey]}" in collection ${this.collection().id}...`)
+		}
+		this.collection().lastUpdatedKey = this._internalStore._key
+		return this
+	}
+
 	/**
 	 * The state that powers this data instance
 	 */

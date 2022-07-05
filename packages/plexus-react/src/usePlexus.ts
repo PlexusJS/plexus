@@ -15,7 +15,7 @@ export function usePlexus<V extends Watchable>(deps: V): PlexusValue<V>
 // array argument
 export function usePlexus<V extends Watchable[]>(deps: V | []): PlexusValueArray<V>
 /**
- * A react hook to extract the values from plexus objects and reactively update the component and value when the values change
+ * A React hook to extract the values from plexus objects and reactively update the component and value when the values change
  * @param deps A list of plexus watchable objects (ex. State, Group, Selector, Computed)
  * @returns The reactive values of the plexus objects
  */

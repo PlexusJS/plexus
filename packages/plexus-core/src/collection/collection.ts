@@ -185,13 +185,13 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		key = key
 		if (config.deep) {
 			if (this._internalStore._data.has(key)) {
-				this._internalStore._data.get(key)?.set({ ...data, [this._internalStore._key]: key } as Partial<DataType>, { mode: "patch" })
+				this._internalStore._data.get(key)?.patch({ ...data, [this._internalStore._key]: key } as Partial<DataType>)
 			} else {
 				console.warn("no data found for key", key)
 			}
 		} else {
 			if (this._internalStore._data.has(key)) {
-				this._internalStore._data.get(key)?.set(data as DataType, { mode: "replace" })
+				this._internalStore._data.get(key)?.set(data as DataType)
 			} else {
 				console.warn("no data found for key", key)
 			}
