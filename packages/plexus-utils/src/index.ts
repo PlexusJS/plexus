@@ -49,6 +49,30 @@ export const convertStringToThing = (inp: string) => {
 		return inp
 	}
 }
+// A function to deeply merge two things (objects or arrays).
+export function deepMerge<Thing extends Object>(target: Thing, source: Thing): Thing {
+	let output = Object.assign({}, target)
+	if ((isObject(target) && isObject(source)) || (Array.isArray(target) && Array.isArray(source))) {
+		for (const key in source) {
+			if (isObject(source[key])) {
+				if (!(key in target)) {
+					Object.assign(output, { [key]: source[key] })
+				} else {
+					output[key] = deepMerge(target[key], source[key])
+				}
+			} else {
+				Object.assign(output, { [key]: source[key] })
+			}
+		}
+	}
+	// if it was originally an array, return an array
+	if (Array.isArray(target) && Array.isArray(source)) {
+		return Object.values(output) as any as Thing
+	}
+
+	return output
+}
+
 // a deep clone of anything
 export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 	if (thing instanceof Date) {

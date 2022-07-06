@@ -78,7 +78,7 @@ export function preaction<Fn extends FunctionType>(fn: Fn, config?: PlexusPreAct
 }
 
 export function setGlobalCatch(catcher: (err: any) => unknown) {
-	instance()._globalCatch = catcher;
+	instance()._globalCatch = catcher
 }
 
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
@@ -89,7 +89,8 @@ export function usePlugin(plugin: PlexusPlugin) {
 	instance()._plugins.set(plugin.name, plugin)
 }
 
-export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
+// export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
+export * from "./api"
 export { gql } from "./gql"
 
 export {

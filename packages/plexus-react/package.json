@@ -36,6 +36,7 @@
 	},
 	"gitHead": "48b37fe6945b413ee01261a57e744f71aa39d6fc",
 	"dependencies": {
-		"use-sync-external-store": "^1.2.0"
+		"use-sync-external-store": "^1.2.0",
+		"@plexusjs/utils": "^1"
 	}
 }

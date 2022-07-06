@@ -30,6 +30,7 @@
 		"react": "^17.0.2",
 		"react-test-renderer": "^16.13.1"
 	},
+	
 	"scripts": {
 		"build": "tsc --build --force",
 		"test": "jest",
