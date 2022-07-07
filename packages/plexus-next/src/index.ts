@@ -85,9 +85,6 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 							if (gKeys?.length > 0) {
 								const groups = collection.getGroup(gName)
 								for (const gk of gKeys) groups.add(gk)
-								// TODO THIS IS A LAZY FIX, MUST BE PROPERLY FIXED
-								const toCol = fromSSR.data.filter((d) => gKeys.includes(d[collection.config.primaryKey || ""]))
-								for (const data of toCol) collection.collect(data, gName)
 							}
 						}
 					}
