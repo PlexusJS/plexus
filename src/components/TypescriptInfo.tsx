@@ -48,7 +48,7 @@ const TypescriptInfo = () => {
 					animate={controlp}
 					transition={{ delay: 0.1 }}
 				>
-					Because Plexus was written in TypeScript, you'll benefit from full type safety & intellesense. Have Fun! 🎉
+					Plexus was written in TypeScript and strong types. You'll benefit from full type safety & intellisense. Have Fun! 🎉
 				</motion.p>
 			</div>
 		</div>
