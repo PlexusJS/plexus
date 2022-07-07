@@ -9,7 +9,7 @@ interface PlexusNextData {
 			name: string
 			data: Array<Object>
 			groups: {
-				[key: string]: Array<string>
+				[key: string]: Array<Object>
 			}
 			selectors: {
 				[key: string]: any
@@ -43,7 +43,7 @@ export function preserveServerState(
 				data.collections[collection.name] = {
 					name: collection.name,
 					data: collection.value,
-					groups: Object.keys(collection.groupsValue).map((k) => ({ [k]: (collection.groupsValue[k] as Object[]).map((d: Object) => `${d[collection.config.primaryKey || 'id']}`) })) as any,
+					groups: collection.groupsValue,
 					selectors: collection.selectorsValue,
 				}
 			}
@@ -81,14 +81,8 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 
 					if (fromSSR.groups) {
 						for (const gName in fromSSR.groups) {
-							const gKeys = fromSSR.groups[gName]
-							if (gKeys?.length > 0) {
-								const groups = collection.getGroup(gName)
-								for (const gk of gKeys) groups.add(gk)
-								// TODO THIS IS A LAZY FIX, MUST BE PROPERLY FIXED
-								const toCol = fromSSR.data.filter((d) => gKeys.includes(d[collection.config.primaryKey || ""]))
-								for (const data of toCol) collection.collect(data, gName)
-							}
+							const groupData = fromSSR.groups[gName]
+							collection.collect(groupData, gName)
 						}
 					}
 
