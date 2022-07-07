@@ -57,12 +57,14 @@ export function preserveServerState(
 
 export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = globalThis?.__NEXT_DATA__?.props?.pageProps?.PLEXUS_DATA) {
 	try {
-		if (isServer()) return
-
 		if (!plexus) plexus = instance()
+
+		if (isServer()) return plexus.runtime.log('debug', `not running loadServerState as we are on the server`)
 
 		const collections = plexus._collections
 		const states = plexus._states
+
+		plexus.runtime.log('debug', `Running loadServerState with data`, data);
 
 		if (data) {
 			for (const state of states.values()) {
