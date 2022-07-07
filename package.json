@@ -15,11 +15,11 @@
 		"bootstrap": "lerna bootstrap",
 		"dev": "yarn && nodemon",
 		"prebuild": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
-		"build": "lerna run build --scope @plexusjs/core && lerna run build --scope @plexusjs/react && lerna run build",
+		"build": "lerna run build --scope @plexusjs/utils && lerna run build --scope @plexusjs/api && lerna run build --scope @plexusjs/core && lerna run build --scope @plexusjs/react && lerna run build",
 		"prepublish": "yarn build",
 		"prepublishOnly": "pinst --disable",
 		"postpublish": "pinst --enable",
-		"publish-canary": "lerna publish --canary prerelease --preid canary --force-publish --yes",
+		"publish-canary": "lerna publish --canary  --preid canary --force-publish --yes",
 		"publish-stable": "lerna publish --yes --force-publish",
 		"_postinstall": "husky install",
 		"test": "yarn build && jest -u"
