@@ -57,7 +57,7 @@ export function preserveServerState(
 
 export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = globalThis?.__NEXT_DATA__?.props?.pageProps?.PLEXUS_DATA) {
 	try {
-		if (!isServer()) return
+		if (isServer()) return
 
 		if (!plexus) plexus = instance()
 
@@ -110,7 +110,7 @@ export * from "@plexusjs/react"
 const PlexusNext: PlexusPlugin = {
 	name: "NextJS",
 	init: (inst) => {
-		loadServerState(inst())
+		loadServerState()
 	},
 }
 
