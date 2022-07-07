@@ -71,7 +71,7 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 		if (data) {
 			for (const state of states.values()) {
 				const v = data.state[state.name]
-				if (state.name && v) state.set(v)
+				if (state.name && v && !state.name.includes('state_collection_date')) state.set(v)
 			}
 
 			for (const collection of collections.values()) {
@@ -85,6 +85,9 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 							if (gKeys?.length > 0) {
 								const groups = collection.getGroup(gName)
 								for (const gk of gKeys) groups.add(gk)
+								// TODO THIS IS A LAZY FIX, MUST BE PROPERLY FIXED
+								const toCol = fromSSR.data.filter((d) => gKeys.includes(d[collection.config.primaryKey || ""]))
+								for (const data of toCol) collection.collect(data, gName)
 							}
 						}
 					}
