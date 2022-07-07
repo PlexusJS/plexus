@@ -69,6 +69,11 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          {
+            label: 'Discord',
+            position: 'right',
+            href: 'https://discord.gg/kWJ2kVnykH',
+          },
         ],
       },
       footer: {
@@ -94,6 +99,7 @@ const config = {
                 label: 'GitHub',
                 href: 'https://github.com/PlexusJS/plexus',
               },
+
             ],
           },
           {

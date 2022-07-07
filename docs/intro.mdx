@@ -12,27 +12,30 @@ import emoji from "node-emoji"
 
 ###### The ultimate toolkit for orchestrating data in reactive web applications
 
+:::caution Docs are still a work in progress.
+
+Forgive the current state of the documentation; we're still working on it. Join [our Discord](https://discord.gg/kWJ2kVnykH) for additional help & updates in the meantime.
+:::
+
 <hr className="hr" />
 
 <div className="pb-5">
 	<Badges />
 </div>
 
+## Features
+
 <ul className="list">
 	<li>⚡️ SSOT-Based State Orchestration </li>
+	<li>📕 Full Type Safety and Autocomplete</li>
 	<li>📡 Powerful Built in HTTP Client </li>
 	<li>🚌 Custom Event Engine </li>
-	<li>📜 Easy to Read </li>
+	<li>📜 Awesome DX - Easy to Read, Write, and Understand </li>
 	<li>
-		🪶 Super Lightweight (Only 40kb) with <strong>0 external Dependancies</strong>
+		🪶 Lightweight (Only 40kb) with <strong>0 External Dependancies</strong>
 	</li>
 	<li>🔌 Extendable </li>
 </ul>
-
-:::caution Docs are still a work in progress.
-
-Forgive the current state of the documentation; we're still working on it. Join [our Discord](https://discord.gg/kWJ2kVnykH) for additional help & updates in the meantime.
-:::
 
 ## What is it?
 
@@ -42,16 +45,17 @@ communication, event management, & data manipulation significantly easier. The w
 </i>. The name is a metaphor for how plexus works. The tools in this package span the entire project and each one is intelligently interconnected behind
 the scenes like nerves in the body!
 
-Plexus can be adopted incrementally, over time. It also scales with your application and incredibly performant.
+Plexus can be adopted incrementally, over time, scales with your application, and incredibly performant.
 
 ## Motivation
 
-We designed Plexus to be highly modular, unopinionated, and flexible, providing not only the tools needed to create scalable applications, but the flexibility to build it however you want.
+We designed Plexus to be highly modular, unopinionated, and flexible, providing not only the tools needed to create scalable applications, but the flexibility to build it however you want. No ContextAPI needed to ensure all of the components using your data are in sync.
 
 ## Should you addopt Plexus?
 
 Absolutely! You can <em>easily incrementally adopt</em> it into to your project <strong>no matter the stage or size</strong>.
-Here are a couple of use cases to get you started. Your app can utilize some of these, or all of these. Totally up to you. And this is all treeshakable so production builds only use what's needed.
+
+Here are a couple of use cases to get you started. Your app can utilize some of these, or all of these. Totally up to you. And it's all treeshakable so production builds only use what's needed.
 
 ## Use Cases
 
@@ -67,30 +71,6 @@ Here are a couple of use cases to get you started. Your app can utilize some of 
 		</div>
 	}
 	href="/docs/use-cases/ssot"
-	linkText="Read More"
-/>
-
-#### API Requests
-
-<MenuOption
-	left={
-		<div>
-			You can use Plexus as an <mark>http client</mark> using the <code>api()</code> Instance!
-		</div>
-	}
-	href="/docs/use-cases/api-requests"
-	linkText="Read More"
-/>
-
-#### Event Engines
-
-<MenuOption
-	left={
-		<div>
-			You can emit and recieve over custom events using the <code>event()</code> Instance from PlexusJS.
-		</div>
-	}
-	href="/docs/use-cases/events"
 	linkText="Read More"
 />
 
@@ -122,18 +102,37 @@ Here are a couple of use cases to get you started. Your app can utilize some of 
 	linkText="Read More"
 />
 
+#### API Requests
+
+<MenuOption
+	left={
+		<div>
+			You can use Plexus's powerful yet simple <mark>built in http client</mark> using the <code>api()</code> Instance!
+		</div>
+	}
+	href="/docs/use-cases/api-requests"
+	linkText="Read More"
+/>
+
+#### Event Engines
+
+<MenuOption
+	left={
+		<div>
+			You can emit and recieve over custom events using the <code>event()</code> Instance from PlexusJS. This is connected to the Plexus Network
+			for some cool superpowers!
+		</div>
+	}
+	href="/docs/use-cases/events"
+	linkText="Read More"
+/>
+
 ## Community & Contributions
 
-This package was made with hard work by <strong>Philippe Clesca</strong> & <em>Nicolas Theck</em>. We hope it helps you build awesome things! 🚀
+This package was made with hard work from [Philippe Clesca](https://twitter.com/philippec_me) &
+[Nicolas Theck](https://twitter.com/RemsItIs).
 
-<iframe
-	src="https://discord.com/widget?id=941858479793123358&theme=dark"
-	width="350"
-	height="500"
-	allowtransparency="true"
-	frameborder="0"
-	sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-></iframe>
+<strong>We hope it helps you build awesome things!</strong> 🚀
 
 ## Made With Love
 

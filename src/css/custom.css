@@ -56,6 +56,7 @@ h1 {
 	@apply text-8xl;
 	/* font-size: 3.5rem; */
 	font-weight: bold;
+	@apply pb-8;
 	/* font-family: "silka" !important; */
 }
 
@@ -64,6 +65,7 @@ h2 {
 	@apply text-6xl;
 	font-weight: bold;
 	text-transform: lowercase;
+	@apply pt-3;
 	/* letter-spacing: 2px; */
 	/* font-family: "silka" !important; */
 }

@@ -21,20 +21,20 @@ export const Badges = () => {
 			<div className="inline-block">
 				<img src="https://img.shields.io/npm/v/@plexusjs/core?style=flat" alt="License" />
 			</div>
-			<div className="inline-block">
+			{/* <div className="inline-block">
 				<a href="https://discord.gg/kWJ2kVnykH" target="_blank">
 					<img src="https://discordapp.com/api/guilds/941858479793123358/embed.png" alt="Join the Plexus Discord" />
 				</a>
-			</div>
+			</div> */}
 			<div className="inline-block"></div>
-			<div className="inline-block">
+			{/* <div className="inline-block">
 				<a href="https://twitter.com/plexusjs" target="_blank">
 					<img
 						src="https://img.shields.io/twitter/follow/plexusjs?color=%09%231DA1F2&logo=Twitter&logoColor=%09%231DA1F2&style=flat"
 						alt="Follow Plexus on Twitter"
 					/>
 				</a>
-			</div>
+			</div> */}
 		</div>
 	)
 }
