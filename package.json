@@ -15,7 +15,7 @@
 		"bootstrap": "lerna bootstrap",
 		"dev": "yarn && nodemon",
 		"prebuild": "rimraf packages/**/dist packages/**/tsconfig.tsbuildinfo",
-		"build": "lerna run build --scope @plexusjs/utils && lerna run build --scope @plexusjs/api && lerna run build --scope @plexusjs/core && lerna run build --scope @plexusjs/react && lerna run build",
+		"build": "lerna run build --scope @plexusjs/utils && lerna run build --scope @plexusjs/api && lerna run build --scope @plexusjs/core && lerna run build --scope @plexusjs/react && lerna run build --scope @plexusjs/next",
 		"prepublish": "yarn build",
 		"prepublishOnly": "pinst --disable",
 		"postpublish": "pinst --enable",
