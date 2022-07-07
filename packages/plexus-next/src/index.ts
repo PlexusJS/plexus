@@ -64,6 +64,8 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 		const collections = plexus._collections
 		const states = plexus._states
 
+		console.log({ plexus, data });
+
 		plexus.runtime.log('debug', `Running loadServerState with data`, data);
 
 		if (data) {
