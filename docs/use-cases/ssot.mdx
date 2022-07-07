@@ -5,7 +5,7 @@ sidebar_position: 1
 
 Here is a simple example of a small utilization of Plexus in a react application. We are creating a core instance (which is a fancy way of saying an object) of our data. We can then export that core and use it and edit it in out components. Every component that uses thes value will be reactive to edits across the DOM.
 
-# Single Source of Truth
+# Core
 
 ```ts title="/core/index.ts"
 import { state, collection } from "@plexusjs/core"
@@ -45,7 +45,7 @@ export default function Home() {
 #### Try It!
 
 <div
-	className="rounded-md overflow-hidden"
+	className="rounded-lg overflow-hidden"
 >
 
 <iframe
