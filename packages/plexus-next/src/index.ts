@@ -43,7 +43,7 @@ export function preserveServerState(
 				data.collections[collection.name] = {
 					name: collection.name,
 					data: collection.value,
-					groups: collection.groupsValue,
+					groups: Object.keys(collection.groupsValue).map((k) => ({ [k]: (collection.groupsValue[k] as Object[]).map((d: Object) => `${d[collection.config.primaryKey || 'id']}`) })) as any,
 					selectors: collection.selectorsValue,
 				}
 			}
