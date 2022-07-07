@@ -41,7 +41,7 @@ export class Watchable<ValueType = any> {
 	}
 }
 
-export class WatchableValue<ValueType = any> extends Watchable<ValueType> {
+export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		super(instance, init)
 	}

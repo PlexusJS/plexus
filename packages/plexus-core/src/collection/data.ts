@@ -1,5 +1,5 @@
 import { state } from ".."
-import { WatchableValue } from "./../watchable"
+import { WatchableMutable } from "./../watchable"
 import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
 import { StateInstance } from "../state"
@@ -17,7 +17,7 @@ export type DataKey = string | number
 
 // TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
 type DataObjectType<PK extends string = "id"> = Record<string, any> & { [Key in PK]: DataKey }
-export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> extends WatchableValue<DataType> {
+export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> extends WatchableMutable<DataType> {
 	private instance: () => PlexusInstance
 	primaryKey: PK
 	private _internalStore: PlexusDataStore<DataType>

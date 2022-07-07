@@ -1,7 +1,7 @@
 import { AlmostAnything, convertThingToString, deepClone, deepMerge, hash, isEqual, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { PlexusWatcher } from "./interfaces"
-import { WatchableValue } from "./watchable"
+import { WatchableMutable } from "./watchable"
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
 export type PlexusStateType = AlmostAnything | null
 export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, input: PxStateValue) => StateInstance<PxStateValue>
@@ -25,7 +25,7 @@ export type PlexusStateInstance<Value extends PlexusStateType = any> = StateInst
 /**
  * A trackable State
  */
-export class StateInstance<StateValue extends PlexusStateType> extends WatchableValue<StateValue> {
+export class StateInstance<StateValue extends PlexusStateType> extends WatchableMutable<StateValue> {
 	private _internalStore: StateStore<StateValue>
 	private instance: () => PlexusInstance
 	/**

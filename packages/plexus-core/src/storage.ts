@@ -1,6 +1,6 @@
 import { convertStringToThing, convertThingToString, deepMerge, isEqual, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
-import { Watchable, WatchableValue } from "./watchable"
+import { Watchable, WatchableMutable } from "./watchable"
 
 type ExtendedWatchable = Watchable<any> & Record<string, any>
 type AlmostAnything = string | number | symbol | Record<any, any> | Array<any>

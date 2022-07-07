@@ -1,7 +1,7 @@
 import { PlexusCollectionInstance } from ".."
 import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
-import { WatchableValue } from "../watchable"
+import { WatchableMutable } from "../watchable"
 
 import { DataKey, PlexusDataInstance } from "./data"
 export type SelectorName = string
@@ -14,7 +14,7 @@ interface CollectionSelectorStore<ValueType = any> {
 }
 
 export type PlexusCollectionSelector<ValueType extends Record<string, any> = Record<string, any>> = CollectionSelector<ValueType>
-export class CollectionSelector<ValueType extends Record<string, any>> extends WatchableValue<ValueType> {
+export class CollectionSelector<ValueType extends Record<string, any>> extends WatchableMutable<ValueType> {
 	private _internalStore: CollectionSelectorStore<ValueType>
 	private collection: () => PlexusCollectionInstance<ValueType>
 	private instance: () => PlexusInstance

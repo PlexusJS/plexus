@@ -1,6 +1,6 @@
 import { instance } from "./instance"
 import { PlexusInstance } from "./instance"
-import { WatchableValue, Watchable } from "./watchable"
+import { WatchableMutable, Watchable } from "./watchable"
 import { _state, PlexusStateInstance } from "./state"
 import { _computed, PlexusComputedStateInstance } from "./computed"
 import { _action, FunctionType, PlexusAction, PlexusActionHelpers, PlexusActionHooks } from "./action"
@@ -29,7 +29,7 @@ export function state<Value = any>(item: Value) {
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function computed<Value = any>(item: (value?: Value) => Value, dependencies: Array<WatchableValue<any>> | WatchableValue<any>) {
+export function computed<Value = any>(item: (value?: Value) => Value, dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>) {
 	if (!Array.isArray(dependencies)) {
 		return _computed(() => instance(), item, [dependencies])
 	}
@@ -108,6 +108,6 @@ export {
 	PlexusCollectionSelector,
 	PlexusComputedStateInstance,
 	PlexusInstance,
-	WatchableValue,
+	WatchableMutable as WatchableValue,
 	Watchable,
 }
