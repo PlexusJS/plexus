@@ -9,9 +9,9 @@ export function isObject(item: any): item is Object {
 export const concurrentWatch = (onChange: () => void, depsArray: Watchable[]) => {
 	const depUnsubs: Array<() => void> = []
 	if (Array.isArray(depsArray)) {
-		let index = -1
+		// let index = -1
 		for (let dep of depsArray) {
-			++index
+			// ++index
 			// if not a watchable, then we can't watch it, skip to next iteration
 			if (!(dep instanceof Watchable)) continue
 			const unsubscribe = dep.watch(function (v) {
@@ -19,8 +19,8 @@ export const concurrentWatch = (onChange: () => void, depsArray: Watchable[]) =>
 			})
 			depUnsubs.push(unsubscribe)
 		}
-		// unsubscribe on component destroy
 	}
+	// unsubscribe on component destroy
 	return () => {
 		for (let unsub of depUnsubs) {
 			unsub()

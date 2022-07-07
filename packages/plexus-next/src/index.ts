@@ -61,21 +61,21 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 	try {
 		if (!plexus) plexus = instance()
 
-		if (isServer()) return plexus.runtime.log('debug', `not running loadServerState as we are on the server`)
+		if (isServer()) return plexus.runtime.log("debug", `not running loadServerState as we are on the server`)
 
 		const collections = plexus._collections
 		const states = plexus._states
 
-		plexus.runtime.log('debug', `Running loadServerState with data`, data);
+		plexus.runtime.log("debug", `Running loadServerState with data`, data)
 
 		if (data) {
 			for (const state of states.values()) {
 				const v = data.state[state.name]
-				if (state.name && v && !state.name.includes('state_collection_date')) state.set(v)
+				if (state.name && v && !state.name.includes("state_collection_date")) state.set(v)
 			}
 
 			for (const collection of collections.values()) {
-				const fromSSR = data.collections[collection.name];
+				const fromSSR = data.collections[collection.name]
 				if (fromSSR) {
 					if (fromSSR.data?.length > 0) collection.collect(fromSSR.data)
 
@@ -102,8 +102,6 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 export function isServer() {
 	return typeof process !== "undefined" && process?.release?.name === "node"
 }
-
-export * from "@plexusjs/react"
 
 const PlexusNext: PlexusPlugin = {
 	name: "NextJS",

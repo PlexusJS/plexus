@@ -1,7 +1,16 @@
+import { beforeEach, afterEach, describe, test, expect } from "vitest"
+
 import { collection, computed, instance, PlexusComputedStateInstance, PlexusStateInstance, PlexusEventInstance, state, event } from "@plexusjs/core"
 import React, { useEffect, useState } from "react"
 import { useDeposit, useEvent, usePlexus } from "@plexusjs/react"
 import * as renderer from "react-test-renderer"
+
+function toJson(component: renderer.ReactTestRenderer) {
+	const result = component.toJSON()
+	expect(result).toBeDefined()
+	expect(result).not.toBeInstanceOf(Array)
+	return result as renderer.ReactTestRendererJSON
+}
 
 type Payload = {
 	name: string
@@ -36,7 +45,7 @@ describe("Test react integration (usePlexus)", () => {
 
 			return (
 				<div>
-					<p>{stateValue}</p>
+					<p id="string-state">{stateValue}</p>
 					<p>{stateValue1}</p>
 					<p>{stateValue2}</p>
 					<strong>{stateValue3.name}</strong>
@@ -46,6 +55,8 @@ describe("Test react integration (usePlexus)", () => {
 		let tree: any
 		renderer.act(() => {
 			tree = renderer.create(<RandomComponent />).toJSON()
+			tree
+			myState.set("no")
 		})
 		expect(tree).toMatchSnapshot()
 		// myState.set("no")
@@ -160,12 +171,12 @@ describe("Test react integration (usePlexus)", () => {
 			{ id: "poggers", a: 2 },
 			{ id: "pog", a: 1 },
 		])
-		// expect(tree.root.findByProps({ id: "data" }).children).toEqual([
-		// 	JSON.stringify([
-		// 		{ id: "poggers", a: 2 },
-		// 		{ id: "pog", a: 1 },
-		// 	]),
-		// ])
+		expect(tree.root.findByProps({ id: "data" }).children).toEqual([
+			JSON.stringify([
+				{ id: "poggers", a: 2 },
+				{ id: "pog", a: 1 },
+			]),
+		])
 	})
 
 	test("usePlexus hook with computed", () => {

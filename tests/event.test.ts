@@ -1,3 +1,4 @@
+import { beforeEach, afterEach, describe, test, expect } from "vitest"
 import { event, state } from "@plexusjs/core"
 
 describe("Testing Event Function", () => {

@@ -33,7 +33,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		},
 		[deps]
 	)
-	const fetchValues = useCallback(() => {
+	const fetchValues = () => {
 		const depsArray = [...normalizeDeps(deps)]
 		// If this is the single argument syntax...
 		if (!Array.isArray(deps) && depsArray.length === 1) {
@@ -73,7 +73,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 
 		// return the array and give it the correct type
 		return returnArray.current
-	}, [deps])
+	}
 	return useSyncExternalStore(
 		// Subscription callback
 		subscribe,

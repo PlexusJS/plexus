@@ -1,4 +1,5 @@
 "use strict"
+import { beforeEach, afterEach, describe, test, expect } from "vitest"
 import { instance, PlexusStateInstance, state } from "@plexusjs/core"
 // import { PlexusState, PlexusStateInstance } from '../src/interfaces';
 type ObjectStateExample = Partial<{ a: { a?: boolean; b?: boolean }; b: boolean; c: { b?: boolean } }>
