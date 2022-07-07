@@ -76,7 +76,6 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 
 			for (const collection of collections.values()) {
 				const fromSSR = data.collections[collection.name];
-				console.log({ fromSSR, collection, ssrCol: data.collections });
 				if (fromSSR) {
 					if (fromSSR.data?.length > 0) collection.collect(fromSSR.data)
 

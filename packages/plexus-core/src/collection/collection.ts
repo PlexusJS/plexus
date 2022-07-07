@@ -89,7 +89,6 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			// this ensured default shows up as a group name option
 			return this.createGroup("default")
 		}
-		this.mount()
 	}
 	/**
 	 * Helper function; Checks to see if the provided name is a group name
@@ -221,6 +220,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			// }
 			return dataInstance as PlexusDataInstance<DataType>
 		}
+		this.mount()
 		return data
 	}
 	/**
@@ -249,6 +249,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				selectorName
 			)
 		)
+		this.mount()
 		return this as CollectionInstance<DataType, Groups, Selectors & Map<Name, PlexusCollectionSelector<DataType>>>
 	}
 	/**
@@ -292,6 +293,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The new Collection Instance
 	 */
 	createGroup<Name extends GroupName>(groupName: Name, config?: PlexusCollectionGroupConfig<DataType>) {
+		this.mount()
 		if (this._internalStore._groups.has(groupName)) return this
 		if (groupName.length === 0) return this
 		this._internalStore._groups.set(
@@ -414,6 +416,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		} else {
 			rm(keys)
 		}
+		this.mount()
 	}
 	/**
 	 * Remove a data item from a set of groups
@@ -421,6 +424,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param groups Either a single group or an array of groups to remove the data from
 	 */
 	removeFromGroup(keys: DataKey | DataKey[], groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+		this.mount()
 		const rm = (key) => {
 			if (Array.isArray(groups)) {
 				for (let groupName of groups) {
