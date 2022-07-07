@@ -111,7 +111,7 @@ export * from "@plexusjs/react"
 
 const PlexusNext: PlexusPlugin = {
 	name: "NextJS",
-	init: (inst) => {
+	init: () => {
 		loadServerState()
 	},
 }
