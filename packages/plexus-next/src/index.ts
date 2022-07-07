@@ -4,16 +4,18 @@ interface PlexusNextData {
 	state: {
 		[key: string]: any
 	}
-	collections: Array<{
-		name: string
-		data: Array<Object>
-		groups: {
-			[key: string]: Array<string>
+	collections: {
+		[key: string]: {
+			name: string
+			data: Array<Object>
+			groups: {
+				[key: string]: Array<string>
+			}
+			selectors: {
+				[key: string]: any
+			}
 		}
-		selectors: {
-			[key: string]: any
-		}
-	}>
+	}
 }
 
 export function preserveServerState(
@@ -26,7 +28,7 @@ export function preserveServerState(
 		const states = instance()._states
 
 		const data: PlexusNextData = {
-			collections: [],
+			collections: {},
 			state: {},
 		}
 
@@ -37,13 +39,13 @@ export function preserveServerState(
 		}
 
 		for (const collection of collections.values()) {
-			if (collection.value.length > 0) {
-				data.collections.push({
+			if (collection.value.length > 0 && collection.name) {
+				data.collections[collection.name] = {
 					name: collection.name,
 					data: collection.value,
 					groups: collection.groupsValue,
 					selectors: collection.selectorsValue,
-				})
+				}
 			}
 		}
 
@@ -64,8 +66,6 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 		const collections = plexus._collections
 		const states = plexus._states
 
-		console.log({ plexus, data });
-
 		plexus.runtime.log('debug', `Running loadServerState with data`, data);
 
 		if (data) {
@@ -75,8 +75,10 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 			}
 
 			for (const collection of collections.values()) {
-				const fromSSR = data.collections.find((c) => c.name === collection.name)
+				const fromSSR = data.collections[collection.name];
 				if (fromSSR) {
+					if (fromSSR.data?.length > 0) collection.collect(fromSSR.data)
+					
 					if (fromSSR.groups) {
 						for (const gName in fromSSR.groups) {
 							const gKeys = fromSSR.groups[gName]
@@ -89,8 +91,6 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 							}
 						}
 					}
-
-					if (fromSSR.data?.length > 0) collection.collect(fromSSR.data)
 
 					for (const name in fromSSR.selectors) {
 						const selector = collection.selectors[name]
