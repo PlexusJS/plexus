@@ -1,7 +1,7 @@
 import { Watchable } from "@plexusjs/core"
 import { isEqual } from "@plexusjs/utils/dist/shared"
 import { useCallback, useRef } from "react"
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
+import { useSyncExternalStore } from "use-sync-external-store/shim"
 import { concurrentWatch, convertThingToString, deepClone } from "./utils"
 
 const normalizeDeps = (deps: Watchable | Watchable[]) => (Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable])
@@ -38,7 +38,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			const depsArray = holding.current
 			return concurrentWatch(onChange, depsArray)
 		},
-		[holding.current.map((dep) => dep.value)]
+		[deps, ...holding.current.map((dep) => dep.value)]
 	)
 	const fetchValues = useCallback(() => {
 		const depsArray = holding.current
@@ -89,20 +89,20 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 
 		// return the array and give it the correct type
 		return returnArray.current
-	}, [holding.current.map((dep) => dep.value)])
+	}, [deps, ...holding.current.map((dep) => dep.value)])
 
-	return useSyncExternalStoreWithSelector(
+	return useSyncExternalStore(
 		// Subscription callback
 		subscribe,
 		// GetValue callback
 		fetchValues,
-		fetchValues,
-		(v) => {
-			return v
-		},
-		(a, b) => {
-			console.log("usePlexus", id.current, "comparing", a, b)
-			return isEqual(a as any, b as any)
-		}
+		fetchValues
+		// (v) => {
+		// 	return v
+		// },
+		// (a, b) => {
+		// 	console.log("usePlexus", id.current, "comparing", a, b)
+		// 	return isEqual(a as any, b as any)
+		// }
 	)
 }
