@@ -26,7 +26,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	// const [_, set] = useState({})
 	const id = useRef(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15))
 	const holding = useRef(normalizeDeps(deps))
-	console.log("usePlexus", id.current, "holding", holding.current)
+	// console.log("usePlexus", id.current, "holding", holding.current)
 	const returnArray = useRef<PlexusValueArray<V>>()
 	const snapshot = useRef<string>()
 
@@ -34,7 +34,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	// In reality, this should be done in the runtime. I'll investigate this later.
 	const subscribe = useCallback(
 		(onChange: () => void) => {
-			console.log("usePlexus", id.current, "subscribe", deps)
+			// console.log("usePlexus", id.current, "subscribe", deps)
 			const depsArray = holding.current
 			return concurrentWatch(onChange, depsArray)
 		},
@@ -49,7 +49,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			if (!snapshot.current) {
 				snapshot.current = compSnapshot
 			}
-			console.log("usePlexus", id.current, "fetchValues", snapshot.current, compSnapshot)
+			// console.log("usePlexus", id.current, "fetchValues", snapshot.current, compSnapshot)
 			if (snapshot.current !== compSnapshot) {
 				return deps.value! as PlexusValue<V>
 			}
@@ -71,7 +71,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		else {
 			// fill the array with the values
 			if (snapshot.current === compSnapshot) {
-				console.log(id.current, "same values so just resetting the array reference", values, deps[0].value)
+				// console.log(id.current, "same values so just resetting the array reference", values, deps[0].value)
 
 				// reset the array
 				returnArray.current.length = 0
