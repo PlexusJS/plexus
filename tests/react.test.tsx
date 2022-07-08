@@ -1,8 +1,17 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
 
-import { collection, computed, instance, PlexusComputedStateInstance, PlexusStateInstance, PlexusEventInstance, state, event } from "@plexusjs/core"
+import {
+	collection,
+	computed,
+	instance,
+	PlexusComputedStateInstance,
+	PlexusStateInstance,
+	PlexusEventInstance,
+	state,
+	event,
+} from "../packages/plexus-core"
 import React, { useEffect, useState } from "react"
-import { useDeposit, useEvent, usePlexus } from "@plexusjs/react"
+import { useDeposit, useEvent, usePlexus } from "../packages/plexus-react/src"
 import * as renderer from "react-test-renderer"
 
 function toJson(component: renderer.ReactTestRenderer) {
@@ -16,50 +25,58 @@ type Payload = {
 	name: string
 	status: string
 }
-let myState = state("yes")
-let myState2: PlexusStateInstance<number>
-let myState3: PlexusStateInstance<Partial<{ name: string }>>
-let myState4: PlexusComputedStateInstance<number>
-let myEvents: PlexusEventInstance<Payload>
+
+const myEvents = event<Payload>()
+const myState = state<string>("yes")
+const myState2 = state(1)
+const myState3 = state<Partial<{ name: string }>>({ name: "test" })
+const myState4 = computed(() => {
+	return myState2.value + 12
+}, [myState])
 
 const myCollection = collection<{ id: string; a: number }>().createGroup("test").createSelector("main")
 beforeEach(() => {
-	myEvents = event<Payload>()
-	myState2 = state(1)
-	myState3 = state<Partial<{ name: string }>>({ name: "test" })
 	myCollection.collect({ id: "poggers", a: 2 }, ["test"])
-	myState4 = computed(() => {
-		return myState2.value + 12
-	}, [myState])
 })
 afterEach(() => {
+	myState2.reset()
+	myState.reset()
+	myState3.reset()
+	myState4.reset()
+
 	myCollection.clear()
 })
 
 describe("Test react integration (usePlexus)", () => {
 	test("usePlexus hook w/state", () => {
+		instance({ logLevel: "debug" })
 		function RandomComponent() {
 			const stateValue = usePlexus(myState)
-			const [stateValue1, stateValue2] = usePlexus([myState, myState2])
-			const stateValue3 = usePlexus(myState3)
+			// const [stateValue4, stateValue2] = usePlexus([myState4, myState2])
+			// const stateValue3 = usePlexus(myState3)
 
 			return (
 				<div>
 					<p id="string-state">{stateValue}</p>
-					<p>{stateValue1}</p>
-					<p>{stateValue2}</p>
-					<strong>{stateValue3.name}</strong>
+					{/* <p>{stateValue4}</p> */}
+					{/* <p>{stateValue2}</p> */}
+					{/* <strong>{stateValue3.name}</strong> */}
 				</div>
 			)
 		}
-		let tree: any
+
+		const component = renderer.create(<RandomComponent />)
+		let tree = toJson(component)
 		renderer.act(() => {
-			tree = renderer.create(<RandomComponent />).toJSON()
-			tree
 			myState.set("no")
+			console.log('setting state to "no"', myState.value)
+			myState2.set(2)
+			console.log("setting state2 to 2")
+			instance({ logLevel: "silent" })
+			tree = toJson(component)
+
+			expect(component.root.findByProps({ id: "string-state" }).props.children).toBe("no")
 		})
-		expect(tree).toMatchSnapshot()
-		// myState.set("no")
 	})
 	test("usePlexus hook w/collection group", () => {
 		// instance({ logLevel: "debug" })
@@ -68,18 +85,23 @@ describe("Test react integration (usePlexus)", () => {
 				myCollection.collect({ id: "pog", a: 1 }, "test")
 			}, [])
 			const [groupValue, stateItem] = usePlexus([myCollection.getGroup("test"), myState2])
+			const stateValue = usePlexus(myState)
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
 					<p id="data">{JSON.stringify(groupValue)}</p>
+					<p id="string-state">{stateValue}</p>
 				</div>
 			)
 		}
-		let tree: any
+		const component = renderer.create(<RandomComponent />)
+		let tree = toJson(component)
 		renderer.act(() => {
-			tree = renderer.create(<RandomComponent />).toJSON()
+			myState.set("no")
+			tree = toJson(component)
+			expect(tree).toMatchSnapshot()
+			expect(component.root.findByProps({ id: "string-state" }).props.children).toBe("no")
 		})
-		expect(tree).toMatchSnapshot()
 	})
 	test("usePlexus hook with selector", () => {
 		// instance({
@@ -103,13 +125,14 @@ describe("Test react integration (usePlexus)", () => {
 				</div>
 			)
 		}
-		let tree
+		const component = renderer.create(<RandomComponent />)
+		let tree = toJson(component)
 		renderer.act(() => {
-			tree = renderer.create(<RandomComponent />)
+			// tree = renderer.create(<RandomComponent />)
 		})
-		expect(tree.toJSON()).toMatchSnapshot()
+		expect(tree).toMatchSnapshot()
 		expect(myCollection.getSelector("main").value).toEqual({ id: "pog", a: 1 })
-		expect(tree.root.findByProps({ id: "data" }).children).toEqual(["1", " as ", "pog"])
+		expect(component.root.findByProps({ id: "data" }).children).toEqual(["1", " as ", "pog"])
 	})
 	// test("usePlexus: Check react reload", () => {
 	// 	instance({

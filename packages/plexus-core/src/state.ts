@@ -9,12 +9,12 @@ export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, i
 type DestroyFn = () => void
 
 export interface StateStore<Value> {
-	_initialValue: Value
-	_lastValue: Value
-	_value: Value
-	_publicValue: Value
-	_nextValue: Value
-	_watchers: Set<DestroyFn>
+	// _initialValue: Value
+	// _lastValue: Value
+	// _value: Value
+	// _publicValue: Value
+	// _nextValue: Value
+	// _watchers: Set<DestroyFn>
 	_name: string
 	_persist: boolean
 	_interval: NodeJS.Timer | null
@@ -40,12 +40,12 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this.instance = instance
 		this._internalStore = {
 			_internalId: this._watchableStore._internalId,
-			_nextValue: init,
-			_value: init,
-			_publicValue: init,
-			_initialValue: init,
-			_lastValue: init,
-			_watchers: new Set<DestroyFn>(),
+			// _nextValue: init,
+			// _value: init,
+			// _publicValue: init,
+			// _initialValue: init,
+			// _lastValue: init,
+			// _watchers: new Set<DestroyFn>(),
 			_name: "",
 			_persist: false,
 			_interval: null,
@@ -57,8 +57,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 			this.instance()._states.add(this)
 			this.instance().runtime.log(
 				"info",
-				`Hoisting state ${this._internalStore._internalId} with value`,
-				this._internalStore._value,
+				`Hoisting state ${this._watchableStore._internalId} with value`,
+				this._watchableStore._value,
 				`to instance`
 			)
 			if (this._internalStore._persist) {
@@ -71,28 +71,31 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @param value A value of the state to merge with the current value
 	 */
 	set(value?: StateValue) {
-		this._internalStore._lastValue = this._internalStore._value
-		if (isObject(value) && isObject(this._internalStore._value)) {
-			this._internalStore._lastValue = deepClone(this._internalStore._value)
-		} else if (Array.isArray(value) && Array.isArray(this._internalStore._value)) {
-			const obj = deepMerge(this._internalStore._value, value)
-			this._internalStore._lastValue = Object.values(obj) as StateValue
-		} else {
-			this._internalStore._lastValue = this._internalStore._value
-		}
-		// apply the next value
-		if (value === undefined) {
-			this._internalStore._value = this._internalStore._nextValue
-		} else {
-			this._internalStore._value = value
-		}
-		this._internalStore._publicValue = deepClone(this._internalStore._value)
-		this._internalStore._nextValue = deepClone(this._internalStore._value)
+		// this._internalStore._lastValue = this._internalStore._value
+		// if (isObject(value) && isObject(this._internalStore._value)) {
+		// 	this._internalStore._lastValue = deepClone(this._internalStore._value)
+		// } else if (Array.isArray(value) && Array.isArray(this._internalStore._value)) {
+		// 	const obj = deepMerge(this._internalStore._value, value)
+		// 	this._internalStore._lastValue = Object.values(obj) as StateValue
+		// } else {
+		// 	this._internalStore._lastValue = this._internalStore._value
+		// }
+		// // apply the next value
+		// if (value === undefined) {
+		// 	this._internalStore._value = this._internalStore._nextValue
+		// } else {
+		// 	this._internalStore._value = value
+		// }
+		// this._internalStore._publicValue = deepClone(this._internalStore._value)
+		// this._internalStore._nextValue = deepClone(this._internalStore._value)
 
 		// update the runtime conductor
-		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._internalStore._value)
+		// if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._internalStore._value)
+		// this.instance().runtime.broadcast(this._internalStore._internalId, value)
+		super.set(value)
 		this.mount()
-		this.instance().runtime.broadcast(this._internalStore._internalId, value, { type: "state" })
+		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._watchableStore._value)
+		this.instance().runtime.broadcast(this._watchableStore._internalId, value)
 
 		return this
 	}
@@ -101,17 +104,17 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @param value A value of the state to merge with the current value
 	 */
 	patch(value: StateValue) {
-		if (isObject(value) && isObject(this._internalStore._value)) {
-			this.set(deepMerge(this._internalStore._value, value))
+		if (isObject(value) && isObject(this._watchableStore._value)) {
+			this.set(deepMerge(this._watchableStore._value, value))
 		}
 		// if the deep merge is on an array type, we need to convert the merged object back to an array
-		else if (Array.isArray(value) && Array.isArray(this._internalStore._value)) {
-			const obj = deepMerge(this._internalStore._value, value)
+		else if (Array.isArray(value) && Array.isArray(this._watchableStore._value)) {
+			const obj = deepMerge(this._watchableStore._value, value)
 			this.set(Object.values(obj) as StateValue)
 		} else {
 			this.set(value)
 		}
-		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._internalStore._value)
+		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._watchableStore._value)
 
 		return this
 	}
@@ -121,22 +124,21 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<StateValue>): () => void {
-		// TODO: This grows infinitely, need to investigate why
-		// if (typeof keyOrCallback === "function") {
-		// 	callback = keyOrCallback
-		// 	// generate a nonce from global instance
-		// 	keyOrCallback = `_plexus_state_watcher_${hash(convertToString(callback))}`
+		// add to internal list of named watchers
+		// const destroyer = this.instance().runtime.subscribe(this._watchableStore._internalId, callback, { type: "state" })
+		// this._internalStore._watchers.add(destroyer)
+		// // return keyOrCallback
+		// return () => {
+		// 	this.instance().runtime.log("info", `Killing a watcher from state ${this._watchableStore._internalId}`)
+		// 	destroyer()
+		// 	this._internalStore._watchers.delete(destroyer)
+		// 	// this.watcherRemovers.value
 		// }
 
-		// add to internal list of named watchers
-		const destroyer = this.instance().runtime.subscribe(this._internalStore._internalId, callback, { type: "state" })
-		this._internalStore._watchers.add(destroyer)
-		// return keyOrCallback
+		const destroyer = super.watch(callback)
 		return () => {
-			this.instance().runtime.log("info", `Killing a watcher from state ${this._internalStore._internalId}`)
+			this.instance().runtime.log("info", `Killing a watcher from state ${this._watchableStore._internalId}`)
 			destroyer()
-			this._internalStore._watchers.delete(destroyer)
-			// this.watcherRemovers.value
 		}
 	}
 
@@ -173,13 +175,13 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * Reset the state to the previous value
 	 */
 	undo() {
-		this.set(this._internalStore._lastValue)
+		this.set(this._watchableStore._lastValue)
 	}
 	/**
 	 * Reset the state to the initial value
 	 */
 	reset() {
-		this.set(this._internalStore._initialValue)
+		this.set(this._watchableStore._initialValue)
 	}
 	/**
 	 * On a set interval, run a function to update the state
@@ -204,7 +206,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @returns {boolean} A boolean representing if they are equal
 	 */
 	isEqual(value: any) {
-		return isEqual(value as any, this._internalStore._value as any)
+		return isEqual(value as any, this._watchableStore._value as any)
 	}
 	/**
 	 * Stop the state interval
@@ -228,13 +230,15 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this.mount()
 
 		// return deepClone(this._internalStore._value)
-		return this._internalStore._publicValue
+		// return this._internalStore._publicValue
+		return super.value
 	}
 	/**
 	 * The previous (reactive) value of the state
 	 */
 	get lastValue() {
-		return deepClone(this._internalStore._lastValue)
+		// return deepClone(this._internalStore._lastValue)
+		return deepClone(this._watchableStore._lastValue)
 	}
 	/**
 	 * The name of the state (NOTE: set with the `.key()` function)
@@ -243,7 +247,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		return this._internalStore._name
 	}
 	get watcherRemovers() {
-		return this.instance().runtime.getWatchers(this._internalStore._internalId)
+		return this.instance().runtime.getWatchers(this._watchableStore._internalId)
 	}
 	/**
 	 * The next value to apply to the state
@@ -252,16 +256,16 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * state.set(); // The state will be { foo: "bar" }
 	 */
 	get nextValue() {
-		return this._internalStore._nextValue
+		return this._watchableStore._nextValue
 	}
 	set nextValue(value: StateValue) {
-		this._internalStore._nextValue = value
+		this._watchableStore._nextValue = value
 	}
 	/**
 	 * The initial (default) value of the state
 	 */
 	get initialValue() {
-		return deepClone(this._internalStore._initialValue)
+		return deepClone(this._watchableStore._initialValue)
 	}
 }
 

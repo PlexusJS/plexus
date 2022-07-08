@@ -25,11 +25,6 @@ export class RuntimeInstance {
 	/**
 	 * track a change and propagate to all listening children in instance
 	 *  */
-	stateChange<Value = PlexusStateType>(key: string, value: Value) {
-		// this.broadcast(key, "state", { key, value })
-		this.broadcast(key, { key, value }, { type: "state" })
-		this.broadcast(key, { key, value }, { type: "*" })
-	}
 	broadcast<Value = PlexusStateType>(key: string, value: Value, options?: { type?: SubscriptionTypes }) {
 		this.log("info", `Broadcasting a change to ${key}`)
 		// _internalStore._conductor.emit(genEventName(type, key), { key, value })
@@ -112,7 +107,7 @@ export class RuntimeInstance {
 				"color: unset;",
 				...message
 			)
-		// TODO Logging must only occur when the config parameter is set
+
 		if (this.instance().settings?.logLevel) {
 			switch (this.instance().settings.logLevel) {
 				case "warn": {

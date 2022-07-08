@@ -18,8 +18,8 @@
 	],
 	"license": "MIT",
 	"scripts": {
+		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
 		"build": "tsc --build --force && echo \"Build complete.\"",
-		"test": "jest",
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},

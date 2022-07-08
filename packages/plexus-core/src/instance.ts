@@ -3,7 +3,7 @@ import { PlexusPlugin } from "./plugin"
 import { PlexusRuntime, RuntimeInstance, _runtime } from "./runtime"
 import { PlexusStorageInstance, storage } from "./storage"
 import { CollectionInstance } from "./collection/collection"
-import { genUID, isEqual } from "./helpers"
+import { deepMerge, genUID, isEqual } from "./helpers"
 import { PlexusPreAction } from "./preaction"
 
 /**
@@ -27,8 +27,8 @@ export class PlexusInstance {
 	_plugins = new Map<string, PlexusPlugin>()
 	_collections = new Set<CollectionInstance<any, any, any>>()
 	_storages = new Map<string, PlexusStorageInstance>()
-	
-	_globalCatch: ((error: any) => unknown) | undefined;
+
+	_globalCatch: ((error: any) => unknown) | undefined
 
 	_mounted = new Map<string, any>()
 
@@ -95,7 +95,7 @@ export class PlexusInstance {
 interface PlexusInstanceConfig {
 	instanceId: string
 	logLevel: "debug" | "warn" | "error" | "silent"
-	exlusiveGlobalError: boolean;
+	exlusiveGlobalError: boolean
 }
 interface PlexusMaster {
 	_ready: false
@@ -156,8 +156,8 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 
 		getPlexusInstance(newInstance.name).runtime.log("info", "Instance initialized")
 	} else if (config && !isEqual(config, getPlexusInstance(config?.instanceId || "").settings)) {
-		getPlexusInstance(config?.instanceId || "").settings = config
-		getPlexusInstance(config?.instanceId || "").runtime
+		getPlexusInstance(config?.instanceId || "").settings = deepMerge(getPlexusInstance(config?.instanceId || "").settings, config)
+		// getPlexusInstance(config?.instanceId || "").runtime
 	}
 	// return the instance
 	return getPlexusInstance(config?.instanceId || "") as PlexusInstance

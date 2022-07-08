@@ -30,10 +30,9 @@
 		"react": "^17.0.2",
 		"react-test-renderer": "^16.13.1"
 	},
-	
 	"scripts": {
+		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
 		"build": "tsc --build --force",
-		"test": "jest",
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},

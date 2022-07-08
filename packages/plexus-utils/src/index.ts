@@ -101,3 +101,39 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 	}
 	return thing
 }
+export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
+	if (a === b) {
+		return true
+	}
+	if (a instanceof Date && b instanceof Date) {
+		return a.getTime() === b.getTime()
+	}
+	if (a instanceof RegExp && b instanceof RegExp) {
+		return a.toString() === b.toString()
+	}
+	if (Array.isArray(a) && Array.isArray(b)) {
+		if (a.length !== b.length) {
+			return false
+		}
+		for (let i = 0; i < a.length; i++) {
+			if (!isEqual(a[i], b[i])) {
+				return false
+			}
+		}
+		return true
+	}
+	if (isObject(a) && isObject(b)) {
+		const aKeys = Object.keys(a)
+		const bKeys = Object.keys(b)
+		if (aKeys.length !== bKeys.length) {
+			return false
+		}
+		for (const key of aKeys) {
+			if (!isEqual(a[key], b[key])) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}

@@ -29,8 +29,8 @@
 		"react-test-renderer": "^18.2.0"
 	},
 	"scripts": {
+		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
 		"build": "tsc --build --force",
-		"test": "jest",
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
