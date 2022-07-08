@@ -1,4 +1,4 @@
-import { deepClone, deepMerge } from "@plexusjs/utils"
+import { deepClone, deepMerge } from "@plexusjs/utils/dist/shared"
 // import { instance } from "./ "
 export interface PlexusApiConfig {
 	defaultOptions?: PlexusAPIReq

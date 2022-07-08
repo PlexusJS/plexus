@@ -1,5 +1,5 @@
 import { Watchable } from "@plexusjs/core"
-import { isEqual } from "@plexusjs/utils"
+import { isEqual } from "@plexusjs/utils/dist/shared"
 import { useCallback, useRef } from "react"
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
 import { concurrentWatch, convertThingToString, deepClone } from "./utils"
