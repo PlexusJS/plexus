@@ -38,7 +38,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			const depsArray = holding.current
 			return concurrentWatch(onChange, depsArray)
 		},
-		[deps, ...holding.current.map((dep) => dep.value)]
+		[deps]
 	)
 	const fetchValues = useCallback(() => {
 		const depsArray = holding.current
@@ -50,7 +50,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 				snapshot.current = compSnapshot
 			}
 			// console.log("usePlexus", id.current, "fetchValues", snapshot.current, compSnapshot)
-			if (snapshot.current !== compSnapshot) {
+			if (snapshot.current === compSnapshot) {
 				return deps.value! as PlexusValue<V>
 			}
 			snapshot.current = compSnapshot
@@ -89,7 +89,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 
 		// return the array and give it the correct type
 		return returnArray.current
-	}, [deps, ...holding.current.map((dep) => dep.value)])
+	}, [deps])
 
 	return useSyncExternalStore(
 		// Subscription callback
