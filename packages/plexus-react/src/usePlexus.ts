@@ -1,6 +1,6 @@
 import { Watchable } from "@plexusjs/core"
 import { isEqual } from "@plexusjs/utils/dist/shared"
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useState } from "react"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
 import { concurrentWatch, convertThingToString, deepClone } from "./utils"
 
@@ -23,7 +23,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | []): PlexusValueArray
 export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): PlexusValue<V> | PlexusValueArray<V> {
 	// if we are serverside, return
 	// if (typeof window === "undefined") throw new Error("usePlexus is not supported on server-side yet.")
-	// const [_, set] = useState({})
+	const [_, set] = useState({})
 	const id = useRef(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15))
 	const holding = useRef(normalizeDeps(deps))
 	// console.log("usePlexus", id.current, "holding", holding.current)
@@ -36,7 +36,11 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		(onChange: () => void) => {
 			// console.log("usePlexus", id.current, "subscribe", deps)
 			const depsArray = holding.current
-			return concurrentWatch(onChange, depsArray)
+			return concurrentWatch(() => {
+				// console.log("usePlexus", id.current, "concurrentWatch", depsArray)
+				set({})
+				onChange()
+			}, depsArray)
 		},
 		[deps]
 	)
@@ -78,7 +82,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 				returnArray.current.push(...(values as PlexusValueArray<V>))
 				// returnArray.current = values as PlexusValueArray<V>
 			} else {
-				console.log(id.current, values)
+				// console.log(id.current, values)
 				// returnArray.current.push(...(values as PlexusValueArray<V>))
 				returnArray.current = [...values] as PlexusValueArray<V>
 			}

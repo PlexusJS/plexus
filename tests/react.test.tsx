@@ -72,11 +72,11 @@ describe("Test react integration (usePlexus)", () => {
 			console.log('setting state to "no"', myState.value)
 			myState2.set(2)
 			console.log("setting state2 to 2")
-			instance({ logLevel: "silent" })
-			tree = toJson(component)
-
-			expect(component.root.findByProps({ id: "string-state" }).props.children).toBe("no")
 		})
+		instance({ logLevel: "silent" })
+		tree = toJson(component)
+
+		expect(component.root.findByProps({ id: "string-state" }).props.children).toBe("no")
 	})
 	test("usePlexus hook w/collection group", () => {
 		// instance({ logLevel: "debug" })
@@ -98,10 +98,10 @@ describe("Test react integration (usePlexus)", () => {
 		let tree = toJson(component)
 		renderer.act(() => {
 			myState.set("no")
-			tree = toJson(component)
-			expect(tree).toMatchSnapshot()
-			expect(component.root.findByProps({ id: "string-state" }).props.children).toBe("no")
 		})
+		tree = toJson(component)
+		// expect(tree).toMatchSnapshot()
+		expect(component.root.findByProps({ id: "string-state" }).props.children).toBe("no")
 	})
 	test("usePlexus hook with selector", () => {
 		// instance({
