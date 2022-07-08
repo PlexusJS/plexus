@@ -4,11 +4,11 @@ import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
 import { StateInstance } from "../state"
 import { PlexusCollectionInstance } from "./collection"
-import { isEqual } from "../helpers"
+import { deepMerge, isEqual, isObject } from "../helpers"
 interface PlexusDataStore<DataType extends Record<string, any>> {
 	_key: string | number
 	primaryKey: string
-	_state: StateInstance<DataType>
+	// _state: StateInstance<DataType>
 	_wDestroyers: Set<() => void>
 }
 
@@ -28,11 +28,27 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		this._internalStore = {
 			_key: value[primaryKey],
 			primaryKey,
-			_state: state<DataType>(value).key(`collection_data_${collection().id}_${value[primaryKey]}`),
+			// _state: state<DataType>(value).key(`collection_data_${collection().id}_${value[primaryKey]}`),
 			_wDestroyers: new Set<() => void>(),
 		}
 		// this.value = value
 	}
+
+	private mount() {
+		if (!this.instance()._collectionData.has(this)) {
+			this.instance()._collectionData.add(this)
+			this.instance().runtime.log(
+				"info",
+				`Hoisting collection data ${this._watchableStore._internalId} with value`,
+				this._watchableStore._value,
+				`to instance`
+			)
+			// if (this._internalStore._persist) {
+			// 	this.instance().storage?.sync()
+			// }
+		}
+	}
+
 	private checkIfHasKey(value) {
 		const v = value[this._internalStore.primaryKey as PK]
 		// Check if the value has the primary key, and verify the key is the same as the data instance
@@ -51,7 +67,8 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * Get the value of the data instance
 	 */
 	get value() {
-		return this._internalStore._state.value
+		// return this._internalStore._state.value
+		return super.value
 	}
 	/**
 	 * Set the value of the data instance
@@ -65,7 +82,8 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		// maybe this check should be done inside of the state?
 		if (!isEqual(value as DataType, this.value)) {
 			if (this.checkIfHasKey(value)) {
-				this._internalStore._state.set(value as DataType)
+				// this._internalStore._state.set(value as DataType)
+				super.set(value as DataType)
 			}
 			// if (config.mode === "replace") {
 			// } else {
@@ -83,7 +101,10 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 */
 	patch(value: Partial<DataType>) {
 		if (this.checkIfHasKey(value)) {
-			this._internalStore._state.patch(value as DataType)
+			// this._internalStore._state.patch(value as DataType)
+			if (isObject(value) && isObject(this._watchableStore._value)) {
+				this.set(deepMerge(this._watchableStore._value, value))
+			}
 		} else {
 			this.instance().runtime.log("warn", `Can't find key "${value[this.primaryKey]}" in collection ${this.collection().id}...`)
 		}
@@ -91,19 +112,19 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		return this
 	}
 
-	/**
-	 * The state that powers this data instance
-	 */
-	get state() {
-		return this._internalStore._state
-	}
+	// /**
+	//  * The state that powers this data instance
+	//  */
+	// get state() {
+	// 	return this._internalStore._state
+	// }
 	/**
 	 * Compare a thing to the current value, if they are equal, returns true
 	 * @param value The thing to compare the current value to
 	 * @returns {boolean} A boolean representing if they are equal
 	 */
 	isEqual(value: any) {
-		return this.state.isEqual(value)
+		return isEqual(value, super._watchableStore._value)
 	}
 	/**
 	 * Delete the data instance
@@ -120,7 +141,8 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	clean() {
 		this._internalStore._wDestroyers.forEach((destroyer) => destroyer())
 		this._internalStore._wDestroyers.clear()
-		this.instance()._states.delete(this._internalStore._state)
+		// this.instance()._states.delete(this._internalStore._state)
+		this.instance()._collectionData.delete(this)
 	}
 	/**
 	 * Watch for changes on this data instance
@@ -128,7 +150,8 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<DataType>) {
-		const destroyer = this._internalStore._state.watch(callback)
+		// const destroyer = this._internalStore._state.watch(callback)
+		const destroyer = super.watch(callback)
 		return destroyer
 	}
 }

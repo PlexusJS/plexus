@@ -5,6 +5,7 @@ import { PlexusStorageInstance, storage } from "./storage"
 import { CollectionInstance } from "./collection/collection"
 import { deepMerge, genUID, isEqual } from "./helpers"
 import { PlexusPreAction } from "./preaction"
+import { CollectionDataInstance } from "./collection/data"
 
 /**
  * Get the correctly formatted instance name
@@ -26,6 +27,7 @@ export class PlexusInstance {
 	_states = new Set<StateInstance<any>>()
 	_plugins = new Map<string, PlexusPlugin>()
 	_collections = new Set<CollectionInstance<any, any, any>>()
+	_collectionData = new Set<CollectionDataInstance<any>>()
 	_storages = new Map<string, PlexusStorageInstance>()
 
 	_globalCatch: ((error: any) => unknown) | undefined
