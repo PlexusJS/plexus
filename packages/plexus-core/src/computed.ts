@@ -7,7 +7,6 @@ export type PlexusComputedStateInstance<ValueType extends PlexusStateType = any>
 
 export class ComputedStateInstance<ValueType extends PlexusStateType = any> extends Watchable<ValueType> {
 	private _internalStore: {
-		// _state: StateInstance<ValueType>
 		_name: string
 		_persist: boolean
 		// utilizing maps because it allows us to preform a lookup in O(1)
@@ -29,7 +28,6 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		this._internalStore = {
 			_name: "",
 			_persist: false,
-			// _state: _state(() => instance(), computeFn()),
 			// utilizing maps because it allows us to preform a lookup in O(1)
 			_depsDestroyers: new Map<Dependency, ReturnType<WatchableMutable["watch"]>>(),
 			_deps: new Set(deps),
