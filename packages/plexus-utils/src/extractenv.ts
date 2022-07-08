@@ -1,4 +1,5 @@
-import { existsSync, readFileSync } from "fs"
+import { isServer } from "./shared"
+import { readFileSync, existsSync } from "fs"
 import { join } from "path"
 
 const envMap: {
@@ -6,6 +7,7 @@ const envMap: {
 } = {}
 
 export function getEnv(dirname: string, maxIteration: number = 10, currentIteration: number = 0): Record<string, string> | undefined {
+	if (!isServer()) return undefined
 	const cached = envMap[dirname]
 	if (cached && typeof cached === "object") return cached
 	if (currentIteration >= maxIteration) return
@@ -28,6 +30,7 @@ export function getEnv(dirname: string, maxIteration: number = 10, currentIterat
 }
 
 export function extractEnv(key: string, defaultValue?: string, dirname: string = __dirname) {
+	if (!isServer()) return undefined
 	const inEnv = process.env[key]
 	if (inEnv) return inEnv
 	const env = getEnv(dirname)
