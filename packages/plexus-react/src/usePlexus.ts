@@ -100,7 +100,8 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		subscribe,
 		// GetValue callback
 		fetchValues,
-		fetchValues
+		() => fetchValues()
+
 		// (v) => {
 		// 	return v
 		// },

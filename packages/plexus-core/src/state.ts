@@ -51,6 +51,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 			_interval: null,
 			_ready: false,
 		}
+
+		this.mount()
 	}
 	private mount() {
 		if (!this.instance()._states.has(this)) {
