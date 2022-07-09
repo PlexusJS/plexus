@@ -124,7 +124,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 */
 	get lastValue(): ValueType {
 		// return this._internalStore._state.lastValue
-		return deepClone(super._watchableStore._lastValue)
+		return deepClone(this._watchableStore._lastValue)
 	}
 	/**
 	 * The name of the state (NOTE: set with the `.key()` function)
