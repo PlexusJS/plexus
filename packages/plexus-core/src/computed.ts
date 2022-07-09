@@ -1,3 +1,4 @@
+// import { isServer } from "@plexusjs/utils/dist/shared"
 import { deepClone, deepMerge, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { PlexusStateType, StateInstance, _state } from "./state"
@@ -33,8 +34,11 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 			_deps: new Set(deps),
 		}
 		this.refreshDeps()
+
+		this.mount()
 	}
 	private mount() {
+		// if (isServer()) return
 		if (!this.instance()._computedStates.has(this)) {
 			this.instance().runtime.log("info", `Hoisting computed state ${this.id} with value`, this.value, ` to instance`)
 			this.instance()._computedStates.add(this)
