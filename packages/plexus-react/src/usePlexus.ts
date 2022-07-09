@@ -25,7 +25,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	// if (typeof window === "undefined") throw new Error("usePlexus is not supported on server-side yet.")
 	const [_, set] = useState({})
 	const id = useRef(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15))
-	const depsArray = useMemo(() => normalizeDeps(deps), [deps])
+	// const depsArray = useMemo(() => normalizeDeps(deps), [deps])
 	// console.log("usePlexus", id.current, "holding", holding.current)
 	const returnArray = useRef<PlexusValueArray<V>>()
 	const snapshot = useRef<string>()
@@ -35,6 +35,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	const subscribe = useCallback(
 		(onChange: () => void) => {
 			// console.log("usePlexus", id.current, "subscribe", deps)
+			const depsArray = normalizeDeps(deps)
 			return concurrentWatch(() => {
 				// console.log("usePlexus", id.current, "concurrentWatch", depsArray)
 				set({})
@@ -44,6 +45,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		[deps]
 	)
 	const fetchValues = useCallback(() => {
+		const depsArray = normalizeDeps(deps)
 		// If this is the single argument syntax...
 		if (!Array.isArray(deps) && depsArray.length === 1) {
 			// return depsArray[0].value! as PlexusValue<V>
