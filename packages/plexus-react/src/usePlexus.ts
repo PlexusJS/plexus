@@ -45,6 +45,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		[deps]
 	)
 	const fetchValues = useCallback(() => {
+		instance({ instanceId: "react" }).runtime.log("debug", `fetching the values for  ${id.current}`)
 		const depsArray = normalizeDeps(deps)
 		// If this is the single argument syntax...
 		if (!Array.isArray(deps) && depsArray.length === 1) {

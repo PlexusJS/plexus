@@ -80,6 +80,7 @@ describe("Test react integration (usePlexus)", () => {
 		expect(screen.getByTestId("group-test").innerHTML).toBe(`[{"id":"poggers","a":2},{"id":"pog","a":2},{"id":"3","a":2}]`)
 
 		instance({ logLevel: "debug" })
+		instance({ logLevel: "debug", instanceId: "react" })
 		await renderer.act(async () => {
 			// test computed render
 			numberState.set(4)
