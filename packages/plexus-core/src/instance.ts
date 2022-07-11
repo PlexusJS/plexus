@@ -47,7 +47,7 @@ export class PlexusInstance {
 			_settings: { ...config },
 			_ready: false,
 		}
-		this.runtime = _runtime(() => instance(config), { logLevel: this._internalStore._settings?.logLevel })
+		this.runtime = _runtime(() => instance(this._internalStore._settings), { logLevel: this._internalStore._settings?.logLevel })
 	}
 
 	get name() {
@@ -97,7 +97,7 @@ export class PlexusInstance {
 interface PlexusInstanceConfig {
 	instanceId: string
 	logLevel: "debug" | "warn" | "error" | "silent"
-	exlusiveGlobalError: boolean
+	exclusiveGlobalError: boolean
 }
 interface PlexusMaster {
 	_ready: false
@@ -118,7 +118,7 @@ export const getPlexusMasterInstance = () => globalThis.__plexusMaster__ as Plex
 export const getPlexusInstance = (name: string = "default") => globalThis[getInstanceName(name)] as PlexusInstance
 
 /**
- * Generate a new instance of PlexusJS
+ * Generate a new instance (or pull the existing instance) of PlexusJS
  * @param config The configuration for the instance
  * @returns An instance of PlexusJS
  */
@@ -144,7 +144,7 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 		// initial instance configuration, do all pre-init stuff here
 		getPlexusInstance(newInstance.name)._storages.set(
 			"default",
-			storage(() => instance())
+			storage(() => instance(config))
 		)
 		getPlexusInstance(newInstance.name).storageEngine = "default"
 

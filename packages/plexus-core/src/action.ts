@@ -34,9 +34,9 @@ export class PlexusActionHelpers {
 	 */
 	runErrorHandlers(e: unknown) {
 		if (this.instance()._globalCatch) {
-			this.instance()._globalCatch?.(e);
+			this.instance()._globalCatch?.(e)
 			// Don't run other onCatch's
-			if (this.instance().settings.exlusiveGlobalError) return;
+			if (this.instance().settings.exclusiveGlobalError) return
 		}
 		this._internalStore._errorHandlers.forEach((handler) => handler(e))
 	}
@@ -45,7 +45,7 @@ export class PlexusActionHelpers {
 	 * Does the helper instance have any errors handlers to handle an error?
 	 */
 	get catchError() {
-		return this._internalStore._errorHandlers.size > 0 ?? typeof this.instance()._globalCatch === 'function'
+		return this._internalStore._errorHandlers.size > 0 ?? typeof this.instance()._globalCatch === "function"
 	}
 
 	/**
