@@ -13,6 +13,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		// utilizing maps because it allows us to preform a lookup in O(1)
 		_depsDestroyers: Map<Dependency, ReturnType<WatchableMutable<any>["watch"]>>
 		_deps: Set<WatchableMutable<any>>
+		_ready: boolean
 	}
 	private instance: () => PlexusInstance
 	private computeFn: () => ValueType
@@ -41,6 +42,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 			// utilizing maps because it allows us to preform a lookup in O(1)
 			_depsDestroyers: new Map<Dependency, ReturnType<WatchableMutable["watch"]>>(),
 			_deps: new Set(deps),
+			_ready: false,
 		}
 		this.refreshDeps()
 
@@ -51,8 +53,11 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		if (!this.instance()._computedStates.has(this)) {
 			this.instance().runtime.log("info", `Hoisting computed state ${this.id} with value`, this.value, ` to instance`)
 			this.instance()._computedStates.add(this)
-			// this.instance().storage?.sync()
+			this.instance().storage?.sync()
 		}
+		if (this._internalStore._ready) return
+		this._internalStore._ready = true
+		this.instance().runtime.log("info", `Computed state ${this.id} is ready`)
 	}
 	/**
 	 *  Internal Helper Function; for each dependency, add a watcher to the state that will update the computed state when a dependency changes

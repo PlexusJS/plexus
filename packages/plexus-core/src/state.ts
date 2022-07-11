@@ -72,6 +72,10 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 				this.instance().storage?.sync()
 			}
 		}
+		if (this._internalStore._ready) return
+		this._internalStore._ready = true
+		this.instance().runtime.log("info", `State ${this.id} is ready`)
+		// this.instance().runtime.broadcast(this.id, this._watchableStore._value)
 	}
 	/**
 	 * Set the value of the state
@@ -99,9 +103,9 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		// update the runtime conductor
 		// if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._internalStore._value)
 		// this.instance().runtime.broadcast(this._internalStore._internalId, value)
-		this.mount()
 		super.set(value)
 		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._watchableStore._value)
+		// if (!this._internalStore._ready) this.mount()
 		// this.instance().runtime.broadcast(this.id, value)
 
 		return this
@@ -236,16 +240,15 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this.instance().runtime.log("debug", `Accessing Stateful value ${this.instanceId}${this._internalStore._persist ? "; Persist Enabled" : ""}`)
 		this.mount()
 
-		if (this._internalStore._persist) {
-			const val = this.instance().storage?.get(this._internalStore._name)
-			if (super.value && isEqual(val, super.value)) {
-				this.instance().runtime.log("debug", `Stateful value ${this.instanceId} is equal to persisted value`) 
-			}
-			else{
-				this.instance().runtime.log("debug", `Stateful value ${this.instanceId} is not equal to persisted value`) 
-				this.set(val)
-			}
-		}
+		// if (this._internalStore._persist) {
+		// 	const val = this.instance().storage?.get(this._internalStore._name)
+		// 	if (super.value && isEqual(val, super.value)) {
+		// 		this.instance().runtime.log("debug", `Stateful value ${this.instanceId} is equal to persisted value`)
+		// 	} else {
+		// 		this.instance().runtime.log("debug", `Stateful value ${this.instanceId} is not equal to persisted value`)
+		// 		this.set(val)
+		// 	}
+		// }
 
 		// return deepClone(this._internalStore._value)
 		// return this._internalStore._publicValue
