@@ -25,6 +25,13 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	get id() {
 		return `${this._watchableStore._internalId}`
 	}
+	/**
+	 * The internal id of the Selector with an instance prefix
+	 */
+	get instanceId(): string {
+		// return this._internalStore._internalId
+		return `sel_${this._watchableStore._internalId}`
+	}
 	constructor(instance: () => PlexusInstance, collection: () => PlexusCollectionInstance<ValueType>, name: string) {
 		super(instance, {} as ValueType)
 		this._internalStore = {
@@ -39,7 +46,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	}
 	private runWatchers() {
 		this._internalStore._watchers.forEach((callback) => {
-			this.instance().runtime.log("info", `Running watchers on selector ${this.id}...`)
+			this.instance().runtime.log("info", `Running watchers on selector ${this.instanceId}...`)
 			callback(this.value)
 		})
 	}
@@ -55,7 +62,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 */
 	select(key: DataKey) {
 		if (key === this._internalStore._key) {
-			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.id}...`)
+			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.instanceId}...`)
 			return
 		}
 		this._internalStore._dataWatcherDestroyer?.()

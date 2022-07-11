@@ -2,7 +2,7 @@
 import { deepClone, deepMerge, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
 import { PlexusStateType, StateInstance, _state } from "./state"
-import { Watchable, WatchableMutable } from "./watchable"
+import { PlexusWatcher, Watchable, WatchableMutable } from "./watchable"
 
 export type PlexusComputedStateInstance<ValueType extends PlexusStateType = any> = ComputedStateInstance<ValueType>
 
@@ -16,9 +16,18 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	}
 	private instance: () => PlexusInstance
 	private computeFn: () => ValueType
-
+	/**
+	 * The internal id of the computed state
+	 */
 	get id(): string {
-		return this._watchableStore._internalId
+		return `${this._watchableStore._internalId}`
+	}
+	/**
+	 * The internal id of the computed state with an instance prefix
+	 */
+	get instanceId(): string {
+		// return this._internalStore._internalId
+		return `comp_${this._watchableStore._internalId}`
 	}
 
 	constructor(instance: () => PlexusInstance, computeFn: () => ValueType, deps: WatchableMutable<any>[]) {
@@ -52,19 +61,31 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	private refreshDeps() {
 		this._internalStore._depsDestroyers.forEach((destroyer) => destroyer())
 		this._internalStore._depsDestroyers.clear()
-
+		this.instance().runtime.log("info", `Mounting Dependencies for Computed state ${this.instanceId}`)
 		Array.from(this._internalStore._deps.values()).forEach((dep, i) => {
+			this.instance().runtime.log("debug", `Mounting Dependency(${i}) to Computed state ${this.instanceId}`)
 			const destroyer = dep.watch(() => {
+				this.instance().runtime.log("info", `Computed state ${this.instanceId} dependency ${i} changed`)
 				const value = this.computeFn()
-				// console.log(
-				// 	`${dep.name} changed; updating computed state to "${value}"; current value is "${_internalStore._state.value}"`,
-				// 	JSON.stringify(Array.from(_internalStore._deps.values()), null, 2)
-				// )
+
 				// this._internalStore._state.set(value)
 				this.set(value)
 			})
 			this._internalStore._depsDestroyers.set(dep, destroyer)
 		})
+	}
+	/**
+	 * Watch for changes on this computed state
+	 * @param callback The callback to run when the state changes
+	 * @returns The remove function to stop watching
+	 */
+	watch(callback: PlexusWatcher<ValueType>): () => void {
+		const destroyer = super.watch(callback)
+		this.refreshDeps()
+		return () => {
+			destroyer()
+			this.refreshDeps()
+		}
 	}
 
 	/**
@@ -93,7 +114,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 
 		// update the runtime conductor
 		this.mount()
-		this._instance().runtime.broadcast(this._watchableStore._internalId, value)
+		this._instance().runtime.broadcast(this.id, value)
 	}
 	/**
 	 *	Adds a dependency to the computed state

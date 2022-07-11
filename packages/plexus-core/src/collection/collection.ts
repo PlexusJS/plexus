@@ -60,7 +60,14 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * The internal ID of the collection
 	 */
 	get id(): string {
-		return this._internalStore._internalId
+		return `${this._internalStore._internalId}`
+	}
+	/**
+	 * The internal id of the collection with an instance prefix
+	 */
+	get instanceId(): string {
+		// return this._internalStore._internalId
+		return `coll_${this._internalStore._internalId}`
 	}
 
 	constructor(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType> = { primaryKey: "id", defaultGroup: false } as const) {
@@ -109,7 +116,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	private mount() {
 		if (!this.instance()._collections.has(this)) {
 			this.instance()._collections.add(this)
-			this.instance().runtime.log("info", `Hoisting collection ${this.id} to instance`)
+			this.instance().runtime.log("info", `Hoisting collection ${this.instanceId} to instance`)
 			if (this._internalStore.persist) {
 				this.instance().storage?.sync()
 			}

@@ -18,7 +18,7 @@ export interface StateStore<Value> {
 	_name: string
 	_persist: boolean
 	_interval: NodeJS.Timer | null
-	_internalId: string
+	// _internalId: string
 	_ready: boolean
 }
 export type PlexusStateInstance<Value extends PlexusStateType = any> = StateInstance<Value>
@@ -35,11 +35,18 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		// return this._internalStore._internalId
 		return `${this._watchableStore._internalId}`
 	}
+	/**
+	 * The internal id of the state with an instance prefix
+	 */
+	get instanceId(): string {
+		// return this._internalStore._internalId
+		return `ste_${this._watchableStore._internalId}`
+	}
 	constructor(instance: () => PlexusInstance, init: StateValue) {
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
-			_internalId: this._watchableStore._internalId,
+			// _internalId: this._watchableStore._internalId,
 			// _nextValue: init,
 			// _value: init,
 			// _publicValue: init,
@@ -57,12 +64,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	private mount() {
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
-			this.instance().runtime.log(
-				"info",
-				`Hoisting state ${this._watchableStore._internalId} with value`,
-				this._watchableStore._value,
-				`to instance`
-			)
+			this.instance().runtime.log("debug", `Hoisting state ${this.instanceId} with value`, this._watchableStore._value, `to instance`)
 			if (this._internalStore._persist) {
 				this.instance().storage?.sync()
 			}
@@ -94,10 +96,10 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		// update the runtime conductor
 		// if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._internalStore._value)
 		// this.instance().runtime.broadcast(this._internalStore._internalId, value)
-		super.set(value)
 		this.mount()
+		super.set(value)
 		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._watchableStore._value)
-		this.instance().runtime.broadcast(this._watchableStore._internalId, value)
+		// this.instance().runtime.broadcast(this.id, value)
 
 		return this
 	}
@@ -127,11 +129,11 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	watch(callback: PlexusWatcher<StateValue>): () => void {
 		// add to internal list of named watchers
-		// const destroyer = this.instance().runtime.subscribe(this._watchableStore._internalId, callback, { type: "state" })
+		// const destroyer = this.instance().runtime.subscribe(this.id, callback, { type: "state" })
 		// this._internalStore._watchers.add(destroyer)
 		// // return keyOrCallback
 		// return () => {
-		// 	this.instance().runtime.log("info", `Killing a watcher from state ${this._watchableStore._internalId}`)
+		// 	this.instance().runtime.log("info", `Killing a watcher from state ${this.id}`)
 		// 	destroyer()
 		// 	this._internalStore._watchers.delete(destroyer)
 		// 	// this.watcherRemovers.value
@@ -139,7 +141,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 
 		const destroyer = super.watch(callback)
 		return () => {
-			this.instance().runtime.log("info", `Killing a watcher from state ${this._watchableStore._internalId}`)
+			this.instance().runtime.log("info", `Killing a watcher from state ${this.instanceId}`)
 			destroyer()
 		}
 	}
@@ -228,7 +230,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * The value of the state
 	 */
 	get value() {
-		this.instance().runtime.log("info", `getting value; persist ${this._internalStore._persist ? "enabled" : "disabled"}`)
+		this.instance().runtime.log("debug", `Accessing Stateful value ${this.instanceId}${this._internalStore._persist ? "; Persist Enabled" : ""}`)
 		this.mount()
 
 		// return deepClone(this._internalStore._value)
@@ -249,7 +251,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		return this._internalStore._name
 	}
 	get watcherRemovers() {
-		return this.instance().runtime.getWatchers(this._watchableStore._internalId)
+		return this.instance().runtime.getWatchers(this.id)
 	}
 	/**
 	 * The next value to apply to the state

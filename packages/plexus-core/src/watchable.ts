@@ -28,7 +28,7 @@ export class Watchable<ValueType = any> {
 	}
 
 	watch<Value extends ValueType = ValueType>(callback: PlexusWatcher<ValueType>): () => void {
-		this._instance().runtime.log("debug", `Watching ${this._watchableStore._internalId}`)
+		this._instance().runtime.log("debug", `Watching Instance ${this._watchableStore._internalId}`)
 		const destroyer = this._instance().runtime.subscribe(this._watchableStore._internalId, callback)
 		this._watchableStore._watchers.add(destroyer)
 
@@ -68,6 +68,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 
 		// update the runtime conductor
 		// this.mount()
+		this._instance().runtime.log("debug", `Broadcasting to Instance ${this._watchableStore._internalId}`)
 		this._instance().runtime.broadcast(this._watchableStore._internalId, value)
 	}
 }

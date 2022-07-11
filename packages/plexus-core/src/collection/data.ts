@@ -32,17 +32,27 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 			_wDestroyers: new Set<() => void>(),
 		}
 		// this.value = value
+		this.mount()
+	}
+	/**
+	 * The internal id of the state with an instance prefix
+	 */
+	get id(): string {
+		// return this._internalStore._internalId
+		return `${this._watchableStore._internalId}`
+	}
+	/**
+	 * The internal id of the state with an instance prefix
+	 */
+	get instanceId(): string {
+		// return this._internalStore._internalId
+		return `dat_${this._watchableStore._internalId}`
 	}
 
 	private mount() {
 		if (!this.instance()._collectionData.has(this)) {
 			this.instance()._collectionData.add(this)
-			this.instance().runtime.log(
-				"info",
-				`Hoisting collection data ${this._watchableStore._internalId} with value`,
-				this._watchableStore._value,
-				`to instance`
-			)
+			this.instance().runtime.log("info", `Hoisting collection data ${this.instanceId} with value`, this._watchableStore._value, `to instance`)
 			// if (this._internalStore._persist) {
 			// 	this.instance().storage?.sync()
 			// }

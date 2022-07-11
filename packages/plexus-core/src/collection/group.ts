@@ -29,6 +29,13 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	 * The internal ID of the Group
 	 */
 	get id() {
+		return `${this._watchableStore._internalId}`
+	}
+	/**
+	 * The internal id of the group with an instance prefix
+	 */
+	get instanceId(): string {
+		// return this._internalStore._internalId
 		return `grp_${this._watchableStore._internalId}`
 	}
 
@@ -52,7 +59,7 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 		}
 	}
 	private runWatchers() {
-		this.instance().runtime.log("info", `Running watchers on group ${this._internalStore._name}(${this.id})...`)
+		this.instance().runtime.log("info", `Running watchers on group ${this._internalStore._name}(${this.instanceId})...`)
 		// this._internalStore._groupWatchers.forEach((callback) => {
 		// 	callback(this.value)
 		// })
@@ -62,7 +69,7 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 		this.instance().runtime.broadcast(this.id, this.value)
 	}
 	private rebuildDataWatchers() {
-		this.instance().runtime.log("info", `Rebuilding data watcher connections on group ${this._internalStore._name}(${this.id})...`)
+		this.instance().runtime.log("info", `Rebuilding data watcher connections on group ${this._internalStore._name}(${this.instanceId})...`)
 		this._internalStore._dataWatcherDestroyers.forEach((destroyer) => destroyer())
 		this._internalStore._dataWatcherDestroyers.clear()
 
