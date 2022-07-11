@@ -1,4 +1,4 @@
-import { Watchable } from "@plexusjs/core"
+import { instance, Watchable } from "@plexusjs/core"
 import { isEqual } from "@plexusjs/utils/dist/shared"
 import { useCallback, useMemo, useRef, useState } from "react"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
@@ -53,7 +53,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			if (!snapshot.current) {
 				snapshot.current = compSnapshot
 			}
-			// console.log("usePlexus", id.current, "fetchValues", snapshot.current, compSnapshot)
+			instance({ instanceId: "react" }).runtime.log("debug", id.current, "fetchValues", snapshot.current, compSnapshot)
 			if (snapshot.current === compSnapshot) {
 				return deps.value! as PlexusValue<V>
 			}

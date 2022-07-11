@@ -71,11 +71,13 @@ describe("Test react integration (usePlexus)", () => {
 			await waitFor(() => screen.getByTestId("str"))
 		})
 		expect(screen.getByTestId("str").innerHTML).toBe("yes")
+		expect(screen.getByTestId("group-test").innerHTML).toBe(`[{"id":"poggers","a":2},{"id":"pog","a":1}]`)
 		await renderer.act(async () => {
-			myCollection.collect({ id: "pog", a: 1 }, "test")
+			myCollection.collect({ id: "pog", a: 2 }, "test")
+			myCollection.collect({ id: "3", a: 2 }, "test")
 			await waitFor(() => screen.getByTestId("group-test"))
 		})
-		expect(screen.getByTestId("group-test").innerHTML).toBe(`[{"id":"poggers","a":2},{"id":"pog","a":1}]`)
+		expect(screen.getByTestId("group-test").innerHTML).toBe(`[{"id":"poggers","a":2},{"id":"pog","a":2},{"id":"3","a":2}]`)
 
 		instance({ logLevel: "debug" })
 		await renderer.act(async () => {

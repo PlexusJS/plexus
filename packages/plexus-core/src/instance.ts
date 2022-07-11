@@ -102,6 +102,7 @@ interface PlexusInstanceConfig {
 interface PlexusMaster {
 	_ready: false
 	_instances: Map<string, () => PlexusInstance>
+	_settings: Partial<PlexusInstanceConfig>
 }
 /**
  * Get the master instance
@@ -126,6 +127,7 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 	if (globalThis["__plexusMaster__"] === undefined) {
 		const plexusMaster: PlexusMaster = {
 			_ready: false,
+			_settings: {},
 			_instances: new Map<string, () => PlexusInstance>(),
 		}
 		globalThis["__plexusMaster__"] = plexusMaster
@@ -133,13 +135,6 @@ export function instance(config?: Partial<PlexusInstanceConfig>): PlexusInstance
 	const instanceName = getInstanceName(config?.instanceId)
 	// if the instance is not created, create it
 	if (globalThis[instanceName] === undefined) {
-		// const _internalStore = {
-		// 	_nonce: 0,
-		// 	_id: config?.instanceId || ``,
-		// 	_selectedStorage: undefined as string | undefined,
-		// 	_settings: { ...config },
-		// 	_ready: false,
-		// }
 		const newInstance: PlexusInstance = new PlexusInstance(config)
 
 		globalThis[instanceName] = newInstance
