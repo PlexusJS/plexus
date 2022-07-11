@@ -235,8 +235,16 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	get value() {
 		this.instance().runtime.log("debug", `Accessing Stateful value ${this.instanceId}${this._internalStore._persist ? "; Persist Enabled" : ""}`)
 		this.mount()
+
 		if (this._internalStore._persist) {
-			this.instance().storage?.sync()
+			const val = this.instance().storage?.get(this._internalStore._name)
+			if (super.value && isEqual(val, super.value)) {
+				this.instance().runtime.log("debug", `Stateful value ${this.instanceId} is equal to persisted value`) 
+			}
+			else{
+				this.instance().runtime.log("debug", `Stateful value ${this.instanceId} is not equal to persisted value`) 
+				this.set(val)
+			}
 		}
 
 		// return deepClone(this._internalStore._value)
