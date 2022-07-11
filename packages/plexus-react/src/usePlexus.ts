@@ -34,10 +34,12 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	// In reality, this should be done in the runtime. I'll investigate this later.
 	const subscribe = useCallback(
 		(onChange: () => void) => {
+			instance({ instanceId: "react" }).runtime.log("info", `Component subscribing to ${id.current}`)
 			// console.log("usePlexus", id.current, "subscribe", deps)
 			const depsArray = normalizeDeps(deps)
 			return concurrentWatch(() => {
-				// console.log("usePlexus", id.current, "concurrentWatch", depsArray)
+				instance({ instanceId: "react" }).runtime.log("info", `Component unsubscribing to ${id.current}`)
+
 				set({})
 				onChange()
 			}, depsArray)
@@ -45,7 +47,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		[deps]
 	)
 	const fetchValues = useCallback(() => {
-		instance({ instanceId: "react" }).runtime.log("debug", `fetching the values for  ${id.current}`)
+		instance({ instanceId: "react" }).runtime.log("info", `${id.current} Fetching (${snapshot.current})`)
 		const depsArray = normalizeDeps(deps)
 		// If this is the single argument syntax...
 		if (!Array.isArray(deps) && depsArray.length === 1) {
@@ -54,7 +56,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			if (!snapshot.current) {
 				snapshot.current = compSnapshot
 			}
-			instance({ instanceId: "react" }).runtime.log("debug", id.current, "fetchValues", snapshot.current, compSnapshot)
+			// instance({ instanceId: "react" }).runtime.log("debug", id.current, "fetchValues", snapshot.current, compSnapshot)
 			if (snapshot.current === compSnapshot) {
 				return deps.value! as PlexusValue<V>
 			}
