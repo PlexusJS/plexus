@@ -108,19 +108,22 @@ export class RuntimeInstance {
 				...message
 			)
 
-		if (this.instance().settings?.logLevel) {
+		if (this.instance().settings.logLevel) {
 			switch (this.instance().settings.logLevel) {
 				case "warn": {
 					if (type === "error" || type === "warn") callLog()
+					break
 				}
 				case "error": {
 					type === "error" && callLog()
+					break
 				}
 				case "silent": {
 					return
 				}
 				case "debug": {
 					callLog()
+					break
 				}
 			}
 			return
