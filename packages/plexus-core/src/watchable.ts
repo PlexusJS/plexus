@@ -53,7 +53,8 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 		super(instance, init)
 	}
 
-	set(value?: ValueType) {
+	set(newValue?: ValueType) {
+		const value = deepClone(newValue)
 		this._watchableStore._lastValue = this._watchableStore._value
 		if (isObject(value) && isObject(this._watchableStore._value)) {
 			this._watchableStore._lastValue = deepClone(this._watchableStore._value)

@@ -49,7 +49,7 @@ export class RuntimeInstance {
 		this.log("info", `Subscribing to changes of ${_key}`)
 		const callback = (data: { key: string; value: Value }) => {
 			const { key, value } = data
-			this.log("debug", `${_key}`)
+			this.log("debug", `${_key} has been changed to: `, value)
 			if (_key === key) {
 				_callback?.(value)
 			}
