@@ -1,10 +1,34 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
 import { deepClone, deepMerge, isObject } from "./helpers"
 import { PlexusInstance } from "./instance"
-import { PlexusStateType, StateInstance, _state } from "./state"
+import { PlexusStateType, StateInstance } from "./state"
 import { PlexusWatcher, Watchable, WatchableMutable } from "./watchable"
 
 export type PlexusComputedStateInstance<ValueType extends PlexusStateType = any> = ComputedStateInstance<ValueType>
+
+export const concurrentWatch = (onChange: (from?: string) => void, depsArray: Watchable[], from?: string) => {
+	const depUnsubs: Array<() => void> = []
+	// console.log("concurrentWatch", depsArray)
+
+	for (let dep of depsArray) {
+		// ++index
+		// if not a watchable, then we can't watch it, skip to next iteration
+		if (!(dep instanceof Watchable)) continue
+
+		const unsubscribe = dep.watch((depValue) => {
+			onChange(dep.id)
+		}, from)
+		depUnsubs.push(() => unsubscribe())
+	}
+
+	// unsubscribe on component destroy
+	return () => {
+		for (let unsub of depUnsubs) {
+			unsub()
+		}
+		depUnsubs.length = 0
+	}
+}
 
 export class ComputedStateInstance<ValueType extends PlexusStateType = any> extends Watchable<ValueType> {
 	private _internalStore: {
@@ -12,6 +36,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		_persist: boolean
 		// utilizing maps because it allows us to preform a lookup in O(1)
 		_depsDestroyers: Map<Dependency, ReturnType<WatchableMutable<any>["watch"]>>
+		_depUnsubscribe: () => void
 		_deps: Set<WatchableMutable<any>>
 		_ready: boolean
 	}
@@ -41,6 +66,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 			_persist: false,
 			// utilizing maps because it allows us to preform a lookup in O(1)
 			_depsDestroyers: new Map<Dependency, ReturnType<WatchableMutable["watch"]>>(),
+			_depUnsubscribe: () => {},
 			_deps: new Set(deps),
 			_ready: false,
 		}
@@ -64,21 +90,35 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * @internal
 	 * */
 	private refreshDeps() {
-		this._internalStore._depsDestroyers.forEach((destroyer) => destroyer())
-		this._internalStore._depsDestroyers.clear()
-		this.instance().runtime.log("info", `Mounting Dependencies for Computed state ${this.instanceId}`)
-		this._internalStore._deps.forEach((dep) => {
-			this.instance().runtime.log("debug", `Mounting Dependency(${dep.id}) to Computed state ${this.instanceId}`)
-			const destroyer = dep.watch(() => {
-				this.instance().runtime.log("info", `Computed state ${this.instanceId} dependency ${dep.id} changed`)
+		// this._internalStore._depsDestroyers.forEach((destroyer) => destroyer())
+		// this._internalStore._depsDestroyers.clear()
+		// this.instance().runtime.log("info", `Mounting Dependencies for Computed state ${this.instanceId}`)
+		// this._internalStore._deps.forEach((dep) => {
+		// 	this.instance().runtime.log("debug", `Mounting Dependency(${dep.id}) to Computed state ${this.instanceId}`)
+		// 	const destroyer = dep.watch(() => {
+		// 		this.instance().runtime.log("info", `Computed state ${this.instanceId} dependency ${dep.id} changed`)
+		// 		const value = this.computeFn()
+
+		// 		this.set(value)
+		// 		this.refreshDeps()
+		// 	}, this.id)
+		// 	this._internalStore._depsDestroyers.set(dep, destroyer)
+		// })
+		this._internalStore._depUnsubscribe()
+		this.instance().runtime.log("info", `Mounting Dependencies (${this.deps.map((v) => v.id).join(", ")}) to Computed state ${this.instanceId}`)
+		const unsubscribe = concurrentWatch(
+			(depId) => {
+				this.instance().runtime.log("info", `Computed state ${this.instanceId} dependency ${depId ?? "unknown"} changed`)
 				const value = this.computeFn()
 
-				// this._internalStore._state.set(value)
 				this.set(value)
 				this.refreshDeps()
-			}, this.id)
-			this._internalStore._depsDestroyers.set(dep, destroyer)
-		})
+			},
+			Array.from(this._internalStore._deps),
+			this.id
+		)
+
+		this._internalStore._depUnsubscribe = () => unsubscribe()
 	}
 	/**
 	 * Watch for changes on this computed state
@@ -151,7 +191,6 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * The previous value of the state
 	 */
 	get lastValue(): ValueType {
-		// return this._internalStore._state.lastValue
 		return deepClone(this._watchableStore._lastValue)
 	}
 	/**
@@ -171,14 +210,12 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * Reset the state to the previous value
 	 */
 	undo(): void {
-		// this._internalStore._state.undo()
 		this.set(this._watchableStore._lastValue)
 	}
 	/**
 	 * Reset the state to the initial value
 	 */
 	reset(): void {
-		// this._internalStore._state.reset()
 		this.set(this._watchableStore._initialValue)
 	}
 	/**
