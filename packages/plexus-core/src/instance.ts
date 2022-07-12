@@ -6,6 +6,7 @@ import { CollectionInstance } from "./collection/collection"
 import { deepMerge, genUID, isEqual } from "./helpers"
 import { PlexusPreAction } from "./preaction"
 import { CollectionDataInstance } from "./collection/data"
+import { PlexusComputedStateInstance } from "./computed"
 
 /**
  * Get the correctly formatted instance name
@@ -23,7 +24,7 @@ export class PlexusInstance {
 	private _internalStore: PlexusInstanceStore
 	runtime: RuntimeInstance
 
-	_computedStates = new Set<any>()
+	_computedStates = new Set<PlexusComputedStateInstance>()
 	_states = new Set<StateInstance<any>>()
 	_plugins = new Map<string, PlexusPlugin>()
 	_collections = new Set<CollectionInstance<any, any, any>>()

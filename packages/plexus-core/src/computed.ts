@@ -87,6 +87,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	watch(callback: PlexusWatcher<ValueType>): () => void {
 		const destroyer = super.watch(callback)
 		this.refreshDeps()
+		this.instance().runtime.log("info", `Setting a watcher on computed state ${this.instanceId}`)
 		return () => {
 			destroyer()
 			this.refreshDeps()
@@ -118,7 +119,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
 
 		// update the runtime conductor
-		this.mount()
+		// this.mount()
 		this._instance().runtime.broadcast(this.id, value)
 	}
 	/**

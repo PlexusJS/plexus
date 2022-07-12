@@ -87,6 +87,8 @@ describe("Test react integration (usePlexus)", () => {
 			await waitFor(() => screen.getByTestId("compu"))
 		})
 		expect(screen.getByTestId("compu").innerHTML).toBe("8")
+
+		expect(Array.from(instance()._computedStates.entries()).find((obj) => obj[1].id === computedState.id)?.[1].value).toBe(8)
 		await renderer.act(async () => {
 			stringState.set("no")
 			await waitFor(() => screen.getByTestId("str"))

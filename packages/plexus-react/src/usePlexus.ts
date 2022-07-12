@@ -38,13 +38,12 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			// console.log("usePlexus", id.current, "subscribe", deps)
 			const depsArray = normalizeDeps(deps)
 			return concurrentWatch(() => {
-				instance({ instanceId: "react" }).runtime.log("info", `Component unsubscribing to ${id.current}`)
-
+				instance({ instanceId: "react" }).runtime.log("info", `Re-rendering Component; Dependency (${depsArray.join(", ")}) updated`)
 				set({})
 				onChange()
 			}, depsArray)
 		},
-		[deps]
+		[deps, _]
 	)
 	const fetchValues = useCallback(() => {
 		instance({ instanceId: "react" }).runtime.log("info", `${id.current} Fetching (${snapshot.current})`)
@@ -96,7 +95,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 
 		// return the array and give it the correct type
 		return returnArray.current
-	}, [deps])
+	}, [deps, _])
 
 	return useSyncExternalStore(
 		// Subscription callback
