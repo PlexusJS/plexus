@@ -41,7 +41,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 				instance({ instanceId: "react" }).runtime.log(
 					"info",
 					`Re-rendering Component; Dependency (${depsArray.map((v) => v.id).join(", ")}) updated to ${depsArray
-						.map((v) => convertThingToString(v))
+						.map((v) => convertThingToString(v.value))
 						.join(", ")}`
 				)
 				set({})
