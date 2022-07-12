@@ -14,6 +14,12 @@ interface WatchableStore<Value = any> {
 export class Watchable<ValueType = any> {
 	protected _watchableStore: WatchableStore<ValueType>
 	protected _instance: () => PlexusInstance
+	/**
+	 * The internal id of the computed state
+	 */
+	get id(): string {
+		return `${this._watchableStore._internalId}`
+	}
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		this._instance = instance
 		this._watchableStore = {

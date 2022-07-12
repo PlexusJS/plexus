@@ -38,7 +38,12 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			// console.log("usePlexus", id.current, "subscribe", deps)
 			const depsArray = normalizeDeps(deps)
 			return concurrentWatch(() => {
-				instance({ instanceId: "react" }).runtime.log("info", `Re-rendering Component; Dependency (${depsArray.join(", ")}) updated`)
+				instance({ instanceId: "react" }).runtime.log(
+					"info",
+					`Re-rendering Component; Dependency (${depsArray.map((v) => v.id).join(", ")}) updated to ${depsArray
+						.map((v) => convertThingToString(v))
+						.join(", ")}`
+				)
 				set({})
 				onChange()
 			}, depsArray)
@@ -46,8 +51,8 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		[deps, _]
 	)
 	const fetchValues = useCallback(() => {
-		instance({ instanceId: "react" }).runtime.log("info", `${id.current} Fetching (${snapshot.current})`)
 		const depsArray = normalizeDeps(deps)
+		instance({ instanceId: "react" }).runtime.log("info", `${id.current} Fetching (${snapshot.current})`)
 		// If this is the single argument syntax...
 		if (!Array.isArray(deps) && depsArray.length === 1) {
 			// return depsArray[0].value! as PlexusValue<V>
