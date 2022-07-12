@@ -96,6 +96,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			// this ensured default shows up as a group name option
 			return this.createGroup("default")
 		}
+		this.mount()
 	}
 	/**
 	 * Helper function; Checks to see if the provided name is a group name

@@ -15,7 +15,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		_deps: Set<WatchableMutable<any>>
 		_ready: boolean
 	}
-	private instance: () => PlexusInstance
+	// private instance: () => PlexusInstance
 	private computeFn: () => ValueType
 	/**
 	 * The internal id of the computed state
@@ -67,15 +67,16 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		this._internalStore._depsDestroyers.forEach((destroyer) => destroyer())
 		this._internalStore._depsDestroyers.clear()
 		this.instance().runtime.log("info", `Mounting Dependencies for Computed state ${this.instanceId}`)
-		Array.from(this._internalStore._deps.values()).forEach((dep, i) => {
-			this.instance().runtime.log("debug", `Mounting Dependency(${i}) to Computed state ${this.instanceId}`)
+		this._internalStore._deps.forEach((dep) => {
+			this.instance().runtime.log("debug", `Mounting Dependency(${dep.id}) to Computed state ${this.instanceId}`)
 			const destroyer = dep.watch(() => {
-				this.instance().runtime.log("info", `Computed state ${this.instanceId} dependency ${i} changed`)
+				this.instance().runtime.log("info", `Computed state ${this.instanceId} dependency ${dep.id} changed`)
 				const value = this.computeFn()
 
 				// this._internalStore._state.set(value)
 				this.set(value)
-			})
+				this.refreshDeps()
+			}, this.id)
 			this._internalStore._depsDestroyers.set(dep, destroyer)
 		})
 	}
@@ -120,7 +121,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 
 		// update the runtime conductor
 		// this.mount()
-		this._instance().runtime.broadcast(this.id, value)
+		this.instance().runtime.broadcast(this.id, value)
 	}
 	/**
 	 *	Adds a dependency to the computed state

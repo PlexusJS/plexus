@@ -18,12 +18,12 @@ export type DataKey = string | number
 // TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
 type DataObjectType<PK extends string = "id"> = Record<string, any> & { [Key in PK]: DataKey }
 export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> extends WatchableMutable<DataType> {
-	private instance: () => PlexusInstance
+	// private instance: () => PlexusInstance
 	primaryKey: PK
 	private _internalStore: PlexusDataStore<DataType>
 	constructor(instance: () => PlexusInstance, public collection: () => PlexusCollectionInstance<DataType>, primaryKey: PK, value: DataType) {
 		super(instance, value)
-		this.instance = instance
+		// this.instance = instance
 		this.primaryKey = primaryKey
 		this._internalStore = {
 			_key: value[primaryKey],
@@ -159,9 +159,9 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<DataType>) {
+	watch(callback: PlexusWatcher<DataType>, from?: string) {
 		// const destroyer = this._internalStore._state.watch(callback)
-		const destroyer = super.watch(callback)
+		const destroyer = super.watch(callback, from)
 		return destroyer
 	}
 }

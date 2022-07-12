@@ -25,7 +25,7 @@ export class RuntimeInstance {
 	/**
 	 * track a change and propagate to all listening children in instance
 	 *  */
-	broadcast<Value = PlexusStateType>(key: string, value: Value, options?: { type?: SubscriptionTypes }) {
+	broadcast<Value = PlexusStateType>(key: string, value: Value) {
 		this.log("info", `Broadcasting a change to ${key}`)
 		// _internalStore._conductor.emit(genEventName(type, key), { key, value })
 		this._internalStore._conductor.emit(key, { key, value })
@@ -36,7 +36,7 @@ export class RuntimeInstance {
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
 	 */
-	subscribe<Value = PlexusStateType>(_key: string, _callback: Fn<Value>, options?: { type?: SubscriptionTypes }) {
+	subscribe<Value = PlexusStateType>(_key: string, _callback: Fn<Value>, from?: string) {
 		// const type = typeof typeOrCallback === "string" ? typeOrCallback : "state"
 		// if (typeof typeOrCallback === "function" && _callback === undefined) {
 		// 	_callback = typeOrCallback
@@ -47,9 +47,9 @@ export class RuntimeInstance {
 		// }
 
 		this.log("info", `Subscribing to changes of ${_key}`)
-		function callback(data: { key: string; value: Value }) {
+		const callback = (data: { key: string; value: Value }) => {
 			const { key, value } = data
-
+			this.log("debug", `${_key}`)
 			if (_key === key) {
 				_callback?.(value)
 			}
@@ -57,7 +57,7 @@ export class RuntimeInstance {
 
 		//
 		// const unsub = _internalStore._conductor.on(genEventName(type, _key), callback)
-		const unsub = this._internalStore._conductor.on(_key, callback)
+		const unsub = this._internalStore._conductor.on(_key, callback, from)
 
 		// return the watcher unsubscribe function
 		return () => {

@@ -27,7 +27,7 @@ export type PlexusStateInstance<Value extends PlexusStateType = any> = StateInst
  */
 export class StateInstance<StateValue extends PlexusStateType> extends WatchableMutable<StateValue> {
 	private _internalStore: StateStore<StateValue>
-	private instance: () => PlexusInstance
+	// private instance: () => PlexusInstance
 	/**
 	 * The internal id of the state
 	 */
@@ -134,7 +134,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<StateValue>): () => void {
+	watch(callback: PlexusWatcher<StateValue>, from?: string): () => void {
 		// add to internal list of named watchers
 		// const destroyer = this.instance().runtime.subscribe(this.id, callback, { type: "state" })
 		// this._internalStore._watchers.add(destroyer)
@@ -146,7 +146,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		// 	// this.watcherRemovers.value
 		// }
 
-		const destroyer = super.watch(callback)
+		const destroyer = super.watch(callback, from)
 		return () => {
 			this.instance().runtime.log("info", `Killing a watcher from state ${this.instanceId}`)
 			destroyer()

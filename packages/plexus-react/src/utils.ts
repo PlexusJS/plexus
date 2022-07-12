@@ -20,7 +20,7 @@ export const concurrentWatch = (onChange: () => void, depsArray: Watchable[]) =>
 			// console.log("concurrentWatch", v)
 			onChange()
 		})
-		depUnsubs.push(unsubscribe)
+		depUnsubs.push(() => unsubscribe())
 	}
 
 	// unsubscribe on component destroy

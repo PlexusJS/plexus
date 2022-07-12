@@ -13,7 +13,7 @@ interface WatchableStore<Value = any> {
 }
 export class Watchable<ValueType = any> {
 	protected _watchableStore: WatchableStore<ValueType>
-	protected _instance: () => PlexusInstance
+	protected instance: () => PlexusInstance
 	/**
 	 * The internal id of the computed state
 	 */
@@ -21,7 +21,7 @@ export class Watchable<ValueType = any> {
 		return `${this._watchableStore._internalId}`
 	}
 	constructor(instance: () => PlexusInstance, init: ValueType) {
-		this._instance = instance
+		this.instance = instance
 		this._watchableStore = {
 			_internalId: instance().genId(),
 			_nextValue: init,
@@ -33,9 +33,9 @@ export class Watchable<ValueType = any> {
 		}
 	}
 
-	watch<Value extends ValueType = ValueType>(callback: PlexusWatcher<ValueType>): () => void {
-		this._instance().runtime.log("debug", `Watching Instance ${this._watchableStore._internalId}`)
-		const destroyer = this._instance().runtime.subscribe(this._watchableStore._internalId, callback)
+	watch<Value extends ValueType = ValueType>(callback: PlexusWatcher<ValueType>, from?: string): () => void {
+		this.instance().runtime.log("debug", `Watching Instance ${this.id}`)
+		const destroyer = this.instance().runtime.subscribe(this.id, callback, from)
 		this._watchableStore._watchers.add(destroyer)
 
 		return () => {
@@ -74,7 +74,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 
 		// update the runtime conductor
 		// this.mount()
-		this._instance().runtime.log("debug", `Broadcasting to Instance ${this._watchableStore._internalId}`)
-		this._instance().runtime.broadcast(this._watchableStore._internalId, value)
+		this.instance().runtime.log("debug", `Broadcasting to Instance ${this.id}`)
+		this.instance().runtime.broadcast(this.id, value)
 	}
 }

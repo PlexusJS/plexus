@@ -22,7 +22,7 @@ interface CollectionGroupStore<DataType = any> {
 export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	private _internalStore: CollectionGroupStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>
-	private instance: () => PlexusInstance
+	// private instance: () => PlexusInstance
 	config: PlexusCollectionGroupConfig<DataType>
 
 	/**
@@ -47,7 +47,7 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	) {
 		super(instance, [])
 		this.collection = collection
-		this.instance = instance
+		// this.instance = instance
 		this.config = config ?? {}
 
 		this._internalStore = {
@@ -80,7 +80,7 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 				.getItem(key)
 				?.watch(() => {
 					this.runWatchers()
-				})
+				}, this.id)
 			if (destroyer) this._internalStore._dataWatcherDestroyers.add(destroyer)
 		})
 
@@ -146,13 +146,13 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<DataType[]>) {
+	watch(callback: PlexusWatcher<DataType[]>, from?: string) {
 		// this._internalStore._groupWatchers.add(callback)
 		// const destroyer = () => {
 		// 	this._internalStore._groupWatchers.delete(callback)
 		// }
 		// return destroyer
-		return this.instance().runtime.subscribe(this.id, callback)
+		return this.instance().runtime.subscribe(this.id, callback, from)
 	}
 }
 

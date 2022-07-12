@@ -17,7 +17,7 @@ export type PlexusCollectionSelector<ValueType extends Record<string, any> = Rec
 export class CollectionSelector<ValueType extends Record<string, any>> extends WatchableMutable<ValueType> {
 	private _internalStore: CollectionSelectorStore<ValueType>
 	private collection: () => PlexusCollectionInstance<ValueType>
-	private instance: () => PlexusInstance
+	// private instance: () => PlexusInstance
 
 	/**
 	 * The internal ID of the Selector
@@ -42,7 +42,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			_watchers: new Set(),
 		}
 		this.collection = collection
-		this.instance = instance
+		// this.instance = instance
 	}
 	private runWatchers() {
 		this._internalStore._watchers.forEach((callback) => {
@@ -72,7 +72,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		const dataWatcherDestroyer =
 			this.data?.watch((value) => {
 				this.runWatchers()
-			}) || null
+			}, this.id) || null
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer
 
 		// broadcast the change

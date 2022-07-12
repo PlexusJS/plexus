@@ -40,7 +40,7 @@ export class EventInstance<PayloadType = any> {
 			return () => {}
 		}
 		// subscribe to the event on the runtime
-		const cleanup = this.instance().runtime.subscribe(`${this._internalStore._name}`, callback, { type: "event" })
+		const cleanup = this.instance().runtime.subscribe(`${this._internalStore._name}`, callback)
 		this._internalStore._once_destroyers.set(this._internalStore._name, cleanup)
 		return () => cleanup()
 	}
@@ -54,7 +54,7 @@ export class EventInstance<PayloadType = any> {
 			return () => {}
 		}
 		// subscribe to the event on the runtime
-		const cleanup = this.instance().runtime.subscribe(`${this._internalStore._name}`, callback, { type: "event" })
+		const cleanup = this.instance().runtime.subscribe(`${this._internalStore._name}`, callback)
 		this._internalStore._destroyers.set(callback.toString(), cleanup)
 		return () => cleanup()
 	}
@@ -70,7 +70,7 @@ export class EventInstance<PayloadType = any> {
 		// increase internal use count
 		this._internalStore._uses += 1
 		// broadcast the event
-		this.instance().runtime.broadcast(`${this._internalStore._name}`, payload, { type: "event" })
+		this.instance().runtime.broadcast(`${this._internalStore._name}`, payload)
 		// if there are dwestoryers for the once event, remove them
 		if (this._internalStore._once_destroyers.size > 0) {
 			this._internalStore._once_destroyers.forEach((cleanup) => cleanup())
