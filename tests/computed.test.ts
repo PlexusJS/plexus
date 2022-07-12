@@ -2,15 +2,20 @@ import { beforeEach, afterEach, describe, test, expect } from "vitest"
 
 import { computed, PlexusComputedStateInstance, PlexusStateInstance, state } from "@plexusjs/core/src"
 // import { PlexusState, PlexusStateInstance } from '../src/interfaces';
+const states = {
+	stringState: state<string>("Hello Plexus!"),
+	numberState: state(-1),
+}
+const core = {
+	state: states,
+	computedState: computed(() => {
+		// console.log(`Looking at ${stringState.value}`)
+		states.numberState.set(states.stringState.value.length)
+		// console.log(`computed to: ${booleanState.value}`)
+		return states.stringState.value.length
+	}, [states.stringState]),
+}
 
-const stringState = state<string>("Hello Plexus!")
-const numberState = state(-1)
-const computedState = computed(() => {
-	// console.log(`Looking at ${stringState.value}`)
-	numberState.set(stringState.value.length)
-	// console.log(`computed to: ${booleanState.value}`)
-	return stringState.value.length
-}, [stringState])
 const initialValue = {
 	boolean: false,
 	string: "Hello Plexus!",
@@ -25,40 +30,40 @@ const initialValue = {
 }
 
 beforeEach(() => {
-	stringState.set("Hello Plexus! (initialized)")
-	numberState.set(1)
+	core.state.stringState.set("Hello Plexus! (initialized)")
+	core.state.numberState.set(1)
 })
 afterEach(() => {
-	stringState.reset()
-	numberState.reset()
+	core.state.stringState.reset()
+	core.state.numberState.reset()
 })
 
 describe("Testing Computed State Function", () => {
 	test("Can INITIALIZE a computed state value", () => {
-		expect(computedState.value).toBe("Hello Plexus! (initialized)".length)
+		expect(core.computedState.value).toBe("Hello Plexus! (initialized)".length)
 	})
 	test("Can UPDATE a computed state value", () => {
-		// console.log(`Looking at ${stringState.value}`)
-		stringState.set("daasw")
-		expect(stringState.value).toBe("daasw")
+		console.log(`Looking at stringState ${core.state.stringState.value}`)
+		core.state.stringState.set("daasw")
+		expect(core.state.stringState.value).toBe("daasw")
 
-		expect(computedState.value).toBe(5)
-		stringState.set("")
-		expect(numberState.value).toBe(0)
-		expect(computedState.value).toBe(0)
+		expect(core.computedState.value).toBe(5)
+		core.state.stringState.set("")
+		expect(core.state.numberState.value).toBe(0)
+		expect(core.computedState.value).toBe(0)
 	})
 	test("Can WATCH a computed state value", () => {
 		// console.log(`Looking at ${stringState.value}`)
-		computedState.watch((v) => {
+		core.computedState.watch((v) => {
 			console.log("computedState.value changed to: ", v)
 		})
-		stringState.set("daasw")
+		core.state.stringState.set("daasw")
 
-		expect(stringState.value).toBe("daasw")
+		expect(core.state.stringState.value).toBe("daasw")
 
-		expect(computedState.value).toBe(5)
-		stringState.set("")
-		expect(numberState.value).toBe(0)
-		expect(computedState.value).toBe(0)
+		expect(core.computedState.value).toBe(5)
+		core.state.stringState.set("")
+		expect(core.state.numberState.value).toBe(0)
+		expect(core.computedState.value).toBe(0)
 	})
 })

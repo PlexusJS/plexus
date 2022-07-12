@@ -5,7 +5,8 @@
 		"types": ["vitest/globals"],
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
-		"sourceMap": true
+		"sourceMap": true,
+		"noImplicitThis": true
 	},
 	"include": ["./test"]
 }

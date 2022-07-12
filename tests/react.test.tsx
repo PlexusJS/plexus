@@ -25,8 +25,8 @@ const objectState = state<Partial<{ name: string }>>({ name: "test" })
 instance({ logLevel: "debug" })
 const computedState = computed(() => {
 	console.log("RUNNING THE COMP StATE VALUE")
-	return numberState.value * 2
-}, [numberState])
+	return stringState.value.length * 2
+}, [stringState])
 instance({ logLevel: "silent" })
 const myCollection = collection<{ id: string; a: number }>().createGroup("test").createSelector("MAIN")
 
@@ -81,9 +81,10 @@ describe("Test react integration (usePlexus)", () => {
 
 		// instance({ logLevel: "debug" })
 		instance({ logLevel: "debug", instanceId: "react" })
+		expect(screen.getByTestId("compu").innerHTML).toBe("6")
 		await renderer.act(async () => {
 			// test computed render
-			numberState.set(4)
+			stringState.set("comp")
 			await waitFor(() => screen.getByTestId("compu"))
 		})
 		expect(screen.getByTestId("compu").innerHTML).toBe("8")
@@ -93,6 +94,7 @@ describe("Test react integration (usePlexus)", () => {
 			stringState.set("no")
 			await waitFor(() => screen.getByTestId("str"))
 		})
+		expect(screen.getByTestId("compu").innerHTML).toBe("4")
 		instance({ logLevel: "silent", instanceId: "react" })
 		expect(screen.getByTestId("str").innerHTML).toBe("no")
 		// const component = render(<RandomComponent />)

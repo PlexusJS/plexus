@@ -77,7 +77,7 @@ export class RuntimeInstance {
 		// } else {
 		// 	return _internalStore._conductor.events
 		// }
-		return key && this._internalStore._conductor.events.has(`${key}`) ? this._internalStore._conductor.events : {}
+		return key && this._internalStore._conductor.events.has(`${key}`) ? this._internalStore._conductor.events.get(`${key}`) : {}
 	}
 	/**
 	 * remove a watcher from the runtime given a type and a key
