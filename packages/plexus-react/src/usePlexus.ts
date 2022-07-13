@@ -29,7 +29,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	// const depsArray = useMemo(() => normalizeDeps(deps), [deps])
 	// console.log("usePlexus", id.current, "holding", holding.current)
 	const returnArray = useRef<PlexusValueArray<V>>()
-	const returnVal = useRef<PlexusValue<V>>()
+	// const returnVal = useRef<PlexusValue<V>>()
 	const snapshot = useRef<string>()
 
 	// TODO: Consider using unstable_batchedUpdates for batching updates to prevent unnecessary rerenders
@@ -56,24 +56,24 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		const depsArray = normalizeDeps(deps)
 		instance({ instanceId: "react" }).runtime.log("info", `${id.current} Fetching (${snapshot.current})`)
 		// If this is the single argument syntax...
-		if (!Array.isArray(deps) && depsArray.length === 1) {
-			if (!returnVal.current) {
-				returnVal.current = deps.value as PlexusValue<V>
-			}
-			const compSnapshot = convertThingToString(deps.value)
-			// if we do't have a stored snapshot, take one
-			if (!snapshot.current) {
-				snapshot.current = compSnapshot
-			}
+		// if (!Array.isArray(deps) && depsArray.length === 1) {
+		// 	if (!returnVal.current) {
+		// 		returnVal.current = deps.value as PlexusValue<V>
+		// 	}
+		// 	const compSnapshot = convertThingToString(deps.value)
+		// 	// if we do't have a stored snapshot, take one
+		// 	if (!snapshot.current) {
+		// 		snapshot.current = compSnapshot
+		// 	}
 
-			// instance({ instanceId: "react" }).runtime.log("debug", id.current, "fetchValues", snapshot.current, compSnapshot)
-			// if the snapshot is the same, return the value
-			if (snapshot.current === compSnapshot) {
-				return deps.value! as PlexusValue<V>
-			}
-			snapshot.current = compSnapshot
-			return deepClone(deps.value!) as PlexusValue<V>
-		}
+		// 	// instance({ instanceId: "react" }).runtime.log("debug", id.current, "fetchValues", snapshot.current, compSnapshot)
+		// 	// if the snapshot is the same, return the value
+		// 	if (snapshot.current === compSnapshot) {
+		// 		return deps.value! as PlexusValue<V>
+		// 	}
+		// 	snapshot.current = compSnapshot
+		// 	return deepClone(deps.value!) as PlexusValue<V>
+		// }
 		// If this is the array syntax...
 		const values = depsArray.map((dep) => dep.value!)
 		const compSnapshot = convertThingToString(values)
@@ -133,7 +133,9 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		fetchValues,
 		() => fetchValues(),
 		(v) => {
-			return v
+			v
+			const val = v[0] as PlexusValue<V>
+			return val
 		},
 		(a, b) => {
 			console.log("usePlexus", id.current, "comparing", a, b)
