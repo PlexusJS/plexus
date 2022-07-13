@@ -31,7 +31,7 @@ export const concurrentWatch = (onChange: () => void, depsArray: Watchable[]) =>
 		depUnsubs.length = 0
 	}
 }
-export const convertThingToString = (input: any) =>
+export const convertThingToString = (input: any): string =>
 	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)
 export const hash = function (input: string) {
 	/* Simple hash function. */
