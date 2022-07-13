@@ -72,7 +72,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 				return returnVal! as PlexusValue<V>
 			}
 			snapshot.current = compSnapshot
-			return deepClone(returnVal!) as PlexusValue<V>
+			return deepClone(deps.value!) as PlexusValue<V>
 		}
 		// If this is the array syntax...
 		const values = depsArray.map((dep) => dep.value!)
