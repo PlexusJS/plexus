@@ -59,12 +59,12 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		}
 	}
 
-	private checkIfHasKey(value) {
-		const v = value[this._internalStore.primaryKey as PK]
+	private checkIfHasKey(value: Partial<DataType>) {
 		// Check if the value has the primary key, and verify the key is the same as the data instance
-		const valid =
-			value[this._internalStore.primaryKey] !== undefined &&
-			value[this._internalStore.primaryKey as PK].toString() === this._internalStore._key.toString()
+		const isCurrentKey = value[this._internalStore.primaryKey as PK].toString().trim() === this._internalStore._key.toString().trim()
+		console.log(`${value[this._internalStore.primaryKey as PK].toString()} \nvs\n ${this._internalStore._key.toString()}, ${isCurrentKey}`)
+		// if the ket is not the same, then we can't use this value
+		const valid = value[this._internalStore.primaryKey] !== undefined && isCurrentKey
 		this.instance().runtime.log(
 			"warn",
 			`The new data value ${valid ? "WILL" : "WILL NOT"} be set in "replace" mode...`,
@@ -95,12 +95,19 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 				// this._internalStore._state.set(value as DataType)
 				super.set(value as DataType)
 			}
+			// give the id to the new value if it's missing
+			super.set({ ...value, [this.primaryKey]: this.value[this.primaryKey] } as DataType)
 			// if (config.mode === "replace") {
 			// } else {
 			// 	if (checkIfHasKey()) {
 			// 		this._internalStore._state.patch(value as DataType)
 			// 	}
 			// }
+		} else {
+			this.instance().runtime.log(
+				"warn",
+				`Tried applying the same value to data "${this.value[this.primaryKey]}" in collection ${this.collection().id}...`
+			)
 		}
 		this.collection().lastUpdatedKey = this._internalStore._key
 		return this
@@ -110,14 +117,11 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * @param value A value of the state to merge with the current value
 	 */
 	patch(value: Partial<DataType>) {
-		if (this.checkIfHasKey(value)) {
-			// this._internalStore._state.patch(value as DataType)
-			if (isObject(value) && isObject(this._watchableStore._value)) {
-				this.set(deepMerge(this._watchableStore._value, value))
-			}
-		} else {
-			this.instance().runtime.log("warn", `Can't find key "${value[this.primaryKey]}" in collection ${this.collection().id}...`)
-		}
+		// if (this.checkIfHasKey(value)) {
+		// 	// this._internalStore._state.patch(value as DataType)
+		// }
+		this.set(deepMerge(this._watchableStore._value, value))
+
 		this.collection().lastUpdatedKey = this._internalStore._key
 		return this
 	}

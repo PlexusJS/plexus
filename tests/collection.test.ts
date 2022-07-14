@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
-import { collection, PlexusCollectionInstance } from "@plexusjs/core/src"
+import { collection, PlexusCollectionInstance } from "@plexusjs/core"
 
 let myCollection = collection<{ thing: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
 
@@ -199,7 +199,7 @@ describe("Testing Collection", () => {
 
 		let watcherCalled = false
 		// watch for any change on group1
-		myCollection.getSelector("main").data.watch((value) => {
+		myCollection.selectors.main.data?.watch((value) => {
 			console.log("selector changed\n%o\n%o", value, myCollection.getSelector("main").value)
 			expect(value).toBeDefined()
 			watcherCalled = true
@@ -322,5 +322,22 @@ describe("Testing Collection", () => {
 		myCollection.update(1, { thing: "lol5" })
 		expect(myCollection.lastUpdatedKey).toBe(1)
 		expect(myCollection.value.length).toBe(3)
+	})
+
+	test("Checking if you can patch a data item", () => {
+		myCollection.collect(
+			[
+				{ thing: "lol", id: 0 },
+				{ thing: "lol3", id: 2 },
+				{ thing: "lols", id: 1 },
+			],
+			"group1"
+		)
+
+		expect(myCollection.value.length).toBe(3)
+		myCollection.selectors.main.select(1)
+		myCollection.selectors.main.data?.patch({ thing: "lol2" })
+		expect(myCollection.value.length).toBe(3)
+		expect(myCollection.getSelector("main").value.thing).toBe("lol2")
 	})
 })
