@@ -4,7 +4,7 @@ import { PlexusInstance } from "../instance"
 import { PlexusWatcher } from "../interfaces"
 import { StateInstance } from "../state"
 import { PlexusCollectionInstance } from "./collection"
-import { deepMerge, isEqual, isObject } from "../helpers"
+import { deepClone, deepMerge, isEqual, isObject } from "../helpers"
 interface PlexusDataStore<DataType extends Record<string, any>> {
 	_key: string | number
 	primaryKey: string
@@ -78,6 +78,18 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	get value() {
 		// return this._internalStore._state.value
 		return super.value
+	}
+	/**
+	 * The previous (reactive) value of the state
+	 */
+	get lastValue() {
+		return deepClone(this._watchableStore._lastValue)
+	}
+	/**
+	 * The initial (default) value of the state
+	 */
+	get initialValue() {
+		return deepClone(this._watchableStore._initialValue)
 	}
 	/**
 	 * Set the value of the data instance
