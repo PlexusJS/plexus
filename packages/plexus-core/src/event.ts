@@ -71,7 +71,7 @@ export class EventInstance<PayloadType = any> {
 		this._internalStore._uses += 1
 		// broadcast the event
 		this.instance().runtime.broadcast(`${this._internalStore._name}`, payload)
-		// if there are dwestoryers for the once event, remove them
+		// if there are destoryers for the once event, remove them
 		if (this._internalStore._once_destroyers.size > 0) {
 			this._internalStore._once_destroyers.forEach((cleanup) => cleanup())
 		}

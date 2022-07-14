@@ -26,10 +26,9 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	// if (typeof window === "undefined") throw new Error("usePlexus is not supported on server-side yet.")
 	const [_, set] = useState({})
 	const id = useRef(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15))
-	// const depsArray = useMemo(() => normalizeDeps(deps), [deps])
-	// console.log("usePlexus", id.current, "holding", holding.current)
+
 	const returnArray = useRef<PlexusValueArray<V>>()
-	// const returnVal = useRef<PlexusValue<V>>()
+
 	const snapshot = useRef<string>()
 
 	// TODO: Consider using unstable_batchedUpdates for batching updates to prevent unnecessary rerenders
@@ -37,7 +36,6 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	const subscribe = useCallback(
 		(onChange: () => void) => {
 			instance({ instanceId: "react" }).runtime.log("info", `Component subscribing to ${id.current}`)
-			// console.log("usePlexus", id.current, "subscribe", deps)
 			const depsArray = normalizeDeps(deps)
 			return concurrentWatch(() => {
 				instance({ instanceId: "react" }).runtime.log(
@@ -55,25 +53,7 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	const fetchValues = useCallback(() => {
 		const depsArray = normalizeDeps(deps)
 		instance({ instanceId: "react" }).runtime.log("info", `${id.current} Fetching (${snapshot.current})`)
-		// If this is the single argument syntax...
-		// if (!Array.isArray(deps) && depsArray.length === 1) {
-		// 	if (!returnVal.current) {
-		// 		returnVal.current = deps.value as PlexusValue<V>
-		// 	}
-		// 	const compSnapshot = convertThingToString(deps.value)
-		// 	// if we do't have a stored snapshot, take one
-		// 	if (!snapshot.current) {
-		// 		snapshot.current = compSnapshot
-		// 	}
 
-		// 	// instance({ instanceId: "react" }).runtime.log("debug", id.current, "fetchValues", snapshot.current, compSnapshot)
-		// 	// if the snapshot is the same, return the value
-		// 	if (snapshot.current === compSnapshot) {
-		// 		return deps.value! as PlexusValue<V>
-		// 	}
-		// 	snapshot.current = compSnapshot
-		// 	return deepClone(deps.value!) as PlexusValue<V>
-		// }
 		// If this is the array syntax...
 		const values = depsArray.map((dep) => dep.value!)
 		const compSnapshot = convertThingToString(values)
@@ -89,21 +69,14 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 		else {
 			// fill the array with the values
 			if (snapshot.current === compSnapshot) {
-				// console.log(id.current, "same values so just resetting the array reference", values, deps[0].value)
-
 				// reset the array
 				returnArray.current.length = 0
 				returnArray.current.push(...(values as PlexusValueArray<V>))
-				// returnArray.current = values as PlexusValueArray<V>
 			} else {
-				// console.log(id.current, values)
-				// returnArray.current.push(...(values as PlexusValueArray<V>))
 				returnArray.current = [...values] as PlexusValueArray<V>
 			}
 		}
 		snapshot.current = compSnapshot
-
-		// returnArray.current = returnArray.current.length !== depsArray.length ? [] : returnArray.current)
 
 		// return the array and give it the correct type
 		return returnArray.current
@@ -116,14 +89,6 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			// GetValue callback
 			fetchValues,
 			() => fetchValues()
-
-			// (v) => {
-			// 	return v
-			// },
-			// (a, b) => {
-			// 	console.log("usePlexus", id.current, "comparing", a, b)
-			// 	return isEqual(a as any, b as any)
-			// }
 		)
 	}
 	return useSyncExternalStoreWithSelector(
@@ -138,7 +103,6 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 			return val
 		},
 		(a, b) => {
-			console.log("usePlexus", id.current, "comparing", a, b)
 			return isEqual(a as any, b as any)
 		}
 	)

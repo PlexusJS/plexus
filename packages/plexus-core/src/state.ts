@@ -9,16 +9,9 @@ export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, i
 type DestroyFn = () => void
 
 export interface StateStore<Value> {
-	// _initialValue: Value
-	// _lastValue: Value
-	// _value: Value
-	// _publicValue: Value
-	// _nextValue: Value
-	// _watchers: Set<DestroyFn>
 	_name: string
 	_persist: boolean
 	_interval: NodeJS.Timer | null
-	// _internalId: string
 	_ready: boolean
 }
 export type PlexusStateInstance<Value extends PlexusStateType = any> = StateInstance<Value>
@@ -46,13 +39,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
-			// _internalId: this._watchableStore._internalId,
-			// _nextValue: init,
-			// _value: init,
-			// _publicValue: init,
-			// _initialValue: init,
-			// _lastValue: init,
-			// _watchers: new Set<DestroyFn>(),
 			_name: "",
 			_persist: false,
 			_interval: null,
@@ -82,32 +68,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @param value A value of the state to merge with the current value
 	 */
 	set(value?: StateValue) {
-		// this._internalStore._lastValue = this._internalStore._value
-		// if (isObject(value) && isObject(this._internalStore._value)) {
-		// 	this._internalStore._lastValue = deepClone(this._internalStore._value)
-		// } else if (Array.isArray(value) && Array.isArray(this._internalStore._value)) {
-		// 	const obj = deepMerge(this._internalStore._value, value)
-		// 	this._internalStore._lastValue = Object.values(obj) as StateValue
-		// } else {
-		// 	this._internalStore._lastValue = this._internalStore._value
-		// }
-		// // apply the next value
-		// if (value === undefined) {
-		// 	this._internalStore._value = this._internalStore._nextValue
-		// } else {
-		// 	this._internalStore._value = value
-		// }
-		// this._internalStore._publicValue = deepClone(this._internalStore._value)
-		// this._internalStore._nextValue = deepClone(this._internalStore._value)
-
-		// update the runtime conductor
-		// if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._internalStore._value)
-		// this.instance().runtime.broadcast(this._internalStore._internalId, value)
 		super.set(value)
 		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._watchableStore._value)
-		// if (!this._internalStore._ready) this.mount()
-		// this.instance().runtime.broadcast(this.id, value)
-
 		return this
 	}
 	/**
@@ -135,17 +97,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<StateValue>, from?: string): () => void {
-		// add to internal list of named watchers
-		// const destroyer = this.instance().runtime.subscribe(this.id, callback, { type: "state" })
-		// this._internalStore._watchers.add(destroyer)
-		// // return keyOrCallback
-		// return () => {
-		// 	this.instance().runtime.log("info", `Killing a watcher from state ${this.id}`)
-		// 	destroyer()
-		// 	this._internalStore._watchers.delete(destroyer)
-		// 	// this.watcherRemovers.value
-		// }
-
 		const destroyer = super.watch(callback, from)
 		return () => {
 			this.instance().runtime.log("info", `Killing a watcher from state ${this.instanceId}`)
@@ -239,26 +190,12 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	get value() {
 		this.instance().runtime.log("debug", `Accessing Stateful value ${this.instanceId}${this._internalStore._persist ? "; Persist Enabled" : ""}`)
 		this.mount()
-
-		// if (this._internalStore._persist) {
-		// 	const val = this.instance().storage?.get(this._internalStore._name)
-		// 	if (super.value && isEqual(val, super.value)) {
-		// 		this.instance().runtime.log("debug", `Stateful value ${this.instanceId} is equal to persisted value`)
-		// 	} else {
-		// 		this.instance().runtime.log("debug", `Stateful value ${this.instanceId} is not equal to persisted value`)
-		// 		this.set(val)
-		// 	}
-		// }
-
-		// return deepClone(this._internalStore._value)
-		// return this._internalStore._publicValue
 		return super.value
 	}
 	/**
 	 * The previous (reactive) value of the state
 	 */
 	get lastValue() {
-		// return deepClone(this._internalStore._lastValue)
 		return deepClone(this._watchableStore._lastValue)
 	}
 	/**

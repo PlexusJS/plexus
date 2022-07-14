@@ -123,13 +123,6 @@ export class StorageInstance {
 		if (!storedValue) {
 			this.instance().storage?.set(key, object.value)
 		}
-
-		// instance().runtime.log("info", `Trying to apply persisted value ${storedValue}`)
-
-		// if (storedValue !== undefined && storedValue !== null) {
-		// 	instance().runtime.log("info", "Applying persisted value")
-		// 	object.set(storedValue)
-		// }
 	}
 	sync() {
 		this.instance().runtime.log("info", "Syncing storage storage...")

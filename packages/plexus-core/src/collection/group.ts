@@ -60,9 +60,6 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	}
 	private runWatchers() {
 		this.instance().runtime.log("info", `Running watchers on group ${this._internalStore._name}(${this.instanceId})...`)
-		// this._internalStore._groupWatchers.forEach((callback) => {
-		// 	callback(this.value)
-		// })
 		const keys = Array.from(this._internalStore._includedKeys)
 		// memoization: this updates the groups stored value! This reduces computation as the state of the group is only updated when the data changes
 		this._watchableStore._publicValue = keys.map((key) => this.collection().getItemValue(key)).filter((v) => v !== undefined) as DataType[]
@@ -130,9 +127,6 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	 * The data values of the items in the group
 	 */
 	get value() {
-		// return Array.from(this._internalStore._includedKeys)
-		// 	.map((key) => this.collection().getItemValue(key))
-		// 	.filter((v) => v !== undefined) as DataType[]
 		return super.value
 	}
 	/**
@@ -147,11 +141,6 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<DataType[]>, from?: string) {
-		// this._internalStore._groupWatchers.add(callback)
-		// const destroyer = () => {
-		// 	this._internalStore._groupWatchers.delete(callback)
-		// }
-		// return destroyer
 		return this.instance().runtime.subscribe(this.id, callback, from)
 	}
 }

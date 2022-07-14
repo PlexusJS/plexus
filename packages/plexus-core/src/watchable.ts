@@ -74,7 +74,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
 
 		// update the runtime conductor
-		// this.mount()
+
 		this.instance().runtime.log("debug", `Broadcasting to Instance ${this.id}`)
 		this.instance().runtime.broadcast(this.id, value)
 	}

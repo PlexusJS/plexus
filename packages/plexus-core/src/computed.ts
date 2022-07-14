@@ -6,12 +6,11 @@ import { PlexusWatcher, Watchable, WatchableMutable } from "./watchable"
 
 export type PlexusComputedStateInstance<ValueType extends PlexusStateType = any> = ComputedStateInstance<ValueType>
 
+// TODO: here temp; only for testing
 export const concurrentWatch = (onChange: (from?: string) => void, depsArray: Watchable[], from?: string) => {
 	const depUnsubs: Array<() => void> = []
-	// console.log("concurrentWatch", depsArray)
 
 	for (let dep of depsArray) {
-		// ++index
 		// if not a watchable, then we can't watch it, skip to next iteration
 		if (!(dep instanceof Watchable)) continue
 
@@ -90,20 +89,6 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * @internal
 	 * */
 	private refreshDeps() {
-		// this._internalStore._depsDestroyers.forEach((destroyer) => destroyer())
-		// this._internalStore._depsDestroyers.clear()
-		// this.instance().runtime.log("info", `Mounting Dependencies for Computed state ${this.instanceId}`)
-		// this._internalStore._deps.forEach((dep) => {
-		// 	this.instance().runtime.log("debug", `Mounting Dependency(${dep.id}) to Computed state ${this.instanceId}`)
-		// 	const destroyer = dep.watch(() => {
-		// 		this.instance().runtime.log("info", `Computed state ${this.instanceId} dependency ${dep.id} changed`)
-		// 		const value = this.computeFn()
-
-		// 		this.set(value)
-		// 		this.refreshDeps()
-		// 	}, this.id)
-		// 	this._internalStore._depsDestroyers.set(dep, destroyer)
-		// })
 		this._internalStore._depUnsubscribe()
 		this.instance().runtime.log("info", `Mounting Dependencies (${this.deps.map((v) => v.id).join(", ")}) to Computed state ${this.instanceId}`)
 		const unsubscribe = concurrentWatch(
@@ -160,7 +145,6 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
 
 		// update the runtime conductor
-		// this.mount()
 		this.instance().runtime.broadcast(this.id, value)
 	}
 	/**
@@ -183,8 +167,6 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * The value (reactive) of the state
 	 */
 	get value(): ValueType {
-		// this.mount()
-		// return this._internalStore._state.value
 		return super.value
 	}
 	/**

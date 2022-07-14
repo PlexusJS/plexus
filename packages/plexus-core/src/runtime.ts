@@ -37,15 +37,6 @@ export class RuntimeInstance {
 	 * @returns A function to remove the watcher
 	 */
 	subscribe<Value = PlexusStateType>(_key: string, _callback: Fn<Value>, from?: string) {
-		// const type = typeof typeOrCallback === "string" ? typeOrCallback : "state"
-		// if (typeof typeOrCallback === "function" && _callback === undefined) {
-		// 	_callback = typeOrCallback
-		// }
-		// if (_callback === undefined && typeof typeOrCallback === "string") {
-		// 	this.log("warn", `Missing a subscription function; skipping assignment`)
-		// 	return
-		// }
-
 		this.log("info", `Subscribing to changes of ${_key}`)
 		const callback = (data: { key: string; value: Value }) => {
 			const { key, value } = data
@@ -55,15 +46,11 @@ export class RuntimeInstance {
 			}
 		}
 
-		//
-		// const unsub = _internalStore._conductor.on(genEventName(type, _key), callback)
 		const unsub = this._internalStore._conductor.on(_key, callback, from)
 
 		// return the watcher unsubscribe function
 		return () => {
 			unsub()
-			// we also need to remove the watcher from the conductor
-			// _internalStore._watchers.get(type).delete(_key)
 		}
 	}
 
@@ -72,11 +59,6 @@ export class RuntimeInstance {
 	 * @param key (optional) The event key
 	 */
 	getWatchers(key?: string) {
-		// if (key && _internalStore._conductor.events.has(`${key}`)) {
-		// 	return _internalStore._conductor.events.get(`${key}`).value
-		// } else {
-		// 	return _internalStore._conductor.events
-		// }
 		return key && this._internalStore._conductor.events.has(`${key}`) ? this._internalStore._conductor.events.get(`${key}`) : {}
 	}
 	/**

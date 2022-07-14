@@ -30,7 +30,6 @@ export class EventEngine {
 		}
 		const idx = this.events.get(eventId)?.indexOf(eventWatcher) ?? -1
 		const eventWatchers = this.events.get(eventId)
-		// console.log(`found index ${idx}; with ${eventWatchers?.[0].listener}`)
 		if (eventWatchers && idx === 0) {
 			this.events.set(eventId, [...eventWatchers.splice(idx + 1)])
 		} else if (eventWatchers && idx > -1) {

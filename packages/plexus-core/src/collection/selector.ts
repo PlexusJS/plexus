@@ -29,7 +29,6 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * The internal id of the Selector with an instance prefix
 	 */
 	get instanceId(): string {
-		// return this._internalStore._internalId
 		return `sel_${this._watchableStore._internalId}`
 	}
 	constructor(instance: () => PlexusInstance, collection: () => PlexusCollectionInstance<ValueType>, name: string) {
@@ -42,7 +41,6 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			_watchers: new Set(),
 		}
 		this.collection = collection
-		// this.instance = instance
 	}
 	private runWatchers() {
 		this._internalStore._watchers.forEach((callback) => {
