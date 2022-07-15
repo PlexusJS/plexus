@@ -25,6 +25,27 @@ describe("Testing Api Function", () => {
 		const res = await myApi.get("https://google.com")
 		expect(res?.status).toBeGreaterThan(0)
 	})
+	test("Set a onResponse", async () => {
+		// const value = state(1)
+		const apiUsingOnResponse = api("", {
+			onResponse: (req, res) => {
+				expect(res?.status).toBeGreaterThan(0)
+				console.log("status: ", res?.status)
+			},
+		})
+		apiUsingOnResponse.options({
+			headers: {
+				custom: "header",
+			},
+		})
+		// console.log(myApi.config)
+		expect(apiUsingOnResponse.config).toBeDefined()
+		expect(apiUsingOnResponse.config.headers).toBeDefined()
+		expect(apiUsingOnResponse.config.headers["custom"]).toBe("header")
+
+		const res = await apiUsingOnResponse.get("https://google.com")
+		expect(res?.status).toBeGreaterThan(0)
+	})
 })
 describe("Test the API's baseURL capabilities", () => {
 	const myApi2 = api("https://google.com")

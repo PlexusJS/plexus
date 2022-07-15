@@ -1,10 +1,5 @@
 import { deepClone, deepMerge } from "@plexusjs/utils/dist/shared"
 // import { instance } from "./ "
-export interface PlexusApiConfig {
-	defaultOptions?: PlexusAPIReq
-	timeout?: number
-	silentFail?: boolean
-}
 export interface PlexusApiRes<DataType = any> {
 	status: number
 	response: ResponseInit
@@ -13,7 +8,22 @@ export interface PlexusApiRes<DataType = any> {
 	ok: boolean
 	hasCookie: (cookieName: string) => boolean
 }
-export interface PlexusAPIReq {
+export interface PlexusApiConfig {
+	defaultOptions?: PlexusApiOptions
+	timeout?: number
+	silentFail?: boolean
+	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
+}
+export interface PlexusApiReq<BodyType = any> {
+	path: string
+	baseURL: string
+	fullURL: string
+	method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH"
+	headers: Record<string, string>
+	body: BodyType
+	options: PlexusApiOptions
+}
+export interface PlexusApiOptions {
 	cache?: RequestInit["cache"]
 	credentials?: RequestInit["credentials"]
 	integrity?: RequestInit["integrity"]
@@ -27,13 +37,14 @@ export interface PlexusAPIReq {
 
 export type PlexusApi = ApiInstance
 interface ApiStore {
-	_options: PlexusAPIReq
-	_optionsInit: PlexusAPIReq
+	_options: PlexusApiOptions
+	_optionsInit: PlexusApiOptions
 	_timeout: number | undefined
 	_baseURL: string
 	_noFetch: boolean
 	_authToken: string
 	_silentFail: boolean
+	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
 }
 /**
  *
@@ -50,7 +61,8 @@ export class ApiInstance {
 			_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
 			_noFetch: false,
 			_authToken: "",
-			_silentFail: config.silentFail || false,
+			_silentFail: config.silentFail ?? false,
+			onResponse: config.onResponse,
 		}
 		try {
 			fetch
@@ -63,7 +75,7 @@ export class ApiInstance {
 	private async send<ResponseDataType>(
 		path: string,
 		options: {
-			method: RequestInit["method"]
+			method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH"
 			body?: RequestInit["body"]
 		}
 	): Promise<PlexusApiRes<ResponseDataType>> {
@@ -86,9 +98,8 @@ export class ApiInstance {
 			const matches = path.match(/^http(s)?/g)
 			const uri = matches && matches?.length > 0 ? path : `${this._internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
 			const requestObject = { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers), ...options }
-			// if we have a timeout set
+			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
 			if (this._internalStore._timeout) {
-				// res = await
 				let to: any
 				const timeout = new Promise<void>((resolve, reject) => {
 					to = setTimeout(() => {
@@ -128,6 +139,7 @@ export class ApiInstance {
 		if (res === undefined) {
 			return ApiInstance.createEmptyRes<ResponseDataType>(500)
 		}
+
 		const hasCookie = (cName: string): boolean => {
 			return res?.headers?.get("set-cookie")?.includes(cName) ?? false
 		}
@@ -159,6 +171,27 @@ export class ApiInstance {
 				hasCookie,
 			}
 		}
+	}
+	private async preSend<ResponseDataType>(
+		path: string,
+		options: {
+			method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH"
+			body?: RequestInit["body"]
+		}
+	) {
+		const res = await this.send<ResponseDataType>(path, options)
+		this._internalStore.onResponse?.(
+			{
+				path,
+				baseURL: this._internalStore._baseURL,
+				options: this._internalStore._options,
+				headers: ApiInstance.parseHeaders(this._headers),
+				body: options.body,
+				method: options.method,
+			} as PlexusApiReq<typeof options.body>,
+			res
+		)
+		return res
 	}
 
 	private static parseHeaders = (_headers: Map<string, string>) => {
@@ -194,7 +227,7 @@ export class ApiInstance {
 	get<ResponseType = any>(path: string, query?: Record<string, any>) {
 		const params = new URLSearchParams(query)
 
-		return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, {
+		return this.preSend<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, {
 			method: "GET",
 		})
 	}
@@ -210,12 +243,12 @@ export class ApiInstance {
 		const options = {
 			method: "POST",
 			body,
-		}
+		} as const
 		if (this._headers && this._headers.get("Content-Type") === "application/x-www-form-urlencoded") {
 			const params = new URLSearchParams(body)
-			return this.send<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, options)
+			return this.preSend<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, options)
 		} else {
-			return this.send<ResponseType>(path, options)
+			return this.preSend<ResponseType>(path, options)
 		}
 	}
 	/**
@@ -227,7 +260,7 @@ export class ApiInstance {
 		if (typeof body !== "string") {
 			body = JSON.stringify(body)
 		}
-		return this.send<ResponseType>(path, {
+		return this.preSend<ResponseType>(path, {
 			method: "PUT",
 			body,
 		})
@@ -237,7 +270,7 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 */
 	delete<ResponseType = any>(path: string) {
-		return this.send<ResponseType>(path, {
+		return this.preSend<ResponseType>(path, {
 			method: "DELETE",
 		})
 	}
@@ -250,7 +283,7 @@ export class ApiInstance {
 		if (typeof body !== "string") {
 			body = JSON.stringify(body)
 		}
-		return this.send<ResponseType>(path, {
+		return this.preSend<ResponseType>(path, {
 			method: "PATCH",
 			body,
 		})
@@ -263,7 +296,7 @@ export class ApiInstance {
 	gql<ResponseType = any>(query: string, variables?: Record<string, any>) {
 		this._headers.set("Content-Type", "application/json")
 
-		return this.send<ResponseType>("", {
+		return this.preSend<ResponseType>("", {
 			method: "POST",
 			body: JSON.stringify({
 				query,
