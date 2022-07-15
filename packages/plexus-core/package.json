@@ -28,7 +28,7 @@
 		"isomorphic-fetch": "^3.0.0"
 	},
 	"dependencies": {
-		"@plexusjs/utils": "~1",
-		"@plexusjs/api": "~1"
+		"@plexusjs/utils": "^1",
+		"@plexusjs/api": "^1"
 	}
 }

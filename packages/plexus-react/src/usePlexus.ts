@@ -26,13 +26,10 @@ export function usePlexus<V extends Watchable[]>(deps: V | [] | Watchable): Plex
 	// if (typeof window === "undefined") throw new Error("usePlexus is not supported on server-side yet.")
 	const [_, set] = useState({})
 	const id = useRef(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15))
-
 	const returnArray = useRef<PlexusValueArray<V>>()
-
 	const snapshot = useRef<string>()
 
 	// TODO: Consider using unstable_batchedUpdates for batching updates to prevent unnecessary rerenders
-	// In reality, this should be done in the runtime. I'll investigate this later.
 	const subscribe = useCallback(
 		(onChange: () => void) => {
 			instance({ instanceId: "react" }).runtime.log("info", `Component subscribing to ${id.current}`)
