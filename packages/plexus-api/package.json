@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/api",
-	"version": "1.2.1-canary.2+97f087f",
+	"version": "1.3.0",
 	"description": "A library for building modular interconnected applications",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -28,6 +28,6 @@
 		"isomorphic-fetch": "^3.0.0"
 	},
 	"dependencies": {
-		"@plexusjs/utils": "1.2.1-canary.2+97f087f"
+		"@plexusjs/utils": "1.3.0"
 	}
 }
