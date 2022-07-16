@@ -120,6 +120,7 @@ export function useDeposit<T = any>(
 					if (original[key] !== value[key]) newChanges[key] = value[key]
 				}
 				setChanges(newChanges)
+				settings?.onEdit?.(key, v)
 				if (settings.autoSave) setTo(setTimeout(() => save(newChanges), settings.autoSave) as unknown as number)
 			} catch (error) {}
 			return value
