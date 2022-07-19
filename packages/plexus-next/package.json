@@ -36,5 +36,5 @@
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "97f087f29dc9bcdabd327bd1691dc02558e598f3"
+	"gitHead": "6b66bb834f6b85c49e988454337bde7de91ddc50"
 }

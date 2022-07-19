@@ -272,6 +272,7 @@ export class ApiInstance {
 	delete<ResponseType = any>(path: string) {
 		return this.preSend<ResponseType>(path, {
 			method: "DELETE",
+			body: JSON.stringify({})
 		})
 	}
 	/**
