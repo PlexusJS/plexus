@@ -80,7 +80,7 @@ export function useDeposit<T = any>(
 	// The current value of the deposit
 	const [value, setValue] = useState<any>({ ...original })
 	// snapshot of the last saved value
-	const [snapshot, setSnapshot] = useState<string>("")
+	const [snapshot, setSnapshot] = useState<string>("{}")
 	const [pendingChanges, setPC] = useState(false)
 	const [saving, setSaving] = useState(false)
 	// the changes made to the deposit (Excludes any unchanged values)

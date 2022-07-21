@@ -14,8 +14,9 @@ type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin
 export class RuntimeInstance {
 	private _internalStore: { _conductor: EventEngine }
 	private instance: () => PlexusInstance
-	private static initializing = false
+	private initializing = false
 	private initsCompleted = 0
+	
 	constructor(instance: () => PlexusInstance, protected config: Partial<RuntimeConfig> = {}) {
 		this.instance = instance
 		this._internalStore = {
@@ -134,12 +135,12 @@ export class RuntimeInstance {
 				return
 			}
 			// if we are already initializing, wait for it to finish
-			if (RuntimeInstance.initializing) {
+			if (this.initializing) {
 				return
 			}
 
 			// set the initializing flag
-			RuntimeInstance.initializing = true
+			this.initializing = true
 			this.log("info", "Initializing Instance...")
 			const size = inits.length
 			// create an array of init action instances, and run them in parallel
@@ -150,7 +151,7 @@ export class RuntimeInstance {
 				// set the ready flag
 				this.instance().ready = true
 				// reset the initializing flag
-				RuntimeInstance.initializing = false
+				this.initializing = false
 				// run the callback if there is one
 				callback?.()
 				//set the number of initsCompleted
