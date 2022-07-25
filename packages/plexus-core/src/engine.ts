@@ -8,6 +8,7 @@ export class EventEngine {
 	constructor() {
 		this.events = new Map()
 	}
+
 	on(eventId: string | number, listener: PlexusWatcher, origin?: string) {
 		if (!eventId || eventId === "") {
 			console.warn("Event Engine: Missing an eventId")
@@ -25,16 +26,26 @@ export class EventEngine {
 		return () => this.removeListener(eventId, eventWatcher)
 	}
 	removeListener(eventId: string | number, eventWatcher: EngineEventReceiver) {
+		// If this eventId is not tracked in the event engine
 		if (!this.events.has(eventId)) {
 			return
 		}
-		const idx = this.events.get(eventId)?.indexOf(eventWatcher) ?? -1
+
+		// find the item event tracker given the tracking ID
 		const eventWatchers = this.events.get(eventId)
-		if (eventWatchers && idx === 0) {
-			this.events.set(eventId, [...eventWatchers.splice(idx + 1)])
-		} else if (eventWatchers && idx > -1) {
-			this.events.set(eventId, [...eventWatchers.splice(0, idx - 1), ...eventWatchers.splice(idx + 1)])
+		// if it exists...
+		if (eventWatchers) {
+			// get the watcher index within the tracker's array
+			const idx = eventWatchers.indexOf(eventWatcher) ?? -1
+
+			if (idx === 0) {
+				this.events.set(eventId, [...eventWatchers.splice(idx + 1)])
+			} else if (idx > -1) {
+				this.events.set(eventId, [...eventWatchers.slice(0, idx), ...eventWatchers.slice(idx + 1)])
+			}
 		}
+
+		// if this id no longer has any items, delete the record
 		if (this.events.get(eventId)?.length === 0) {
 			this.events.delete(eventId)
 		}

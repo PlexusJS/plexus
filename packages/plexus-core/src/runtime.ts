@@ -12,16 +12,14 @@ type LogLevels = Exclude<RuntimeConfig["logLevel"], "silent"> | "info"
 type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin_${string}` | "*"
 
 export class RuntimeInstance {
-	private _internalStore: { _conductor: EventEngine }
 	private instance: () => PlexusInstance
+	private _engine: EventEngine
 	private initializing = false
 	private initsCompleted = 0
-	
+
 	constructor(instance: () => PlexusInstance, protected config: Partial<RuntimeConfig> = {}) {
 		this.instance = instance
-		this._internalStore = {
-			_conductor: new EventEngine(),
-		}
+		this._engine = new EventEngine()
 	}
 	/**
 	 * track a change and propagate to all listening children in instance
@@ -29,7 +27,7 @@ export class RuntimeInstance {
 	broadcast<Value = PlexusStateType>(key: string, value: Value) {
 		this.log("info", `Broadcasting a change to ${key}`)
 		// _internalStore._conductor.emit(genEventName(type, key), { key, value })
-		this._internalStore._conductor.emit(key, { key, value })
+		this.engine.emit(key, { key, value })
 	}
 	/**
 	 *
@@ -47,7 +45,7 @@ export class RuntimeInstance {
 			}
 		}
 
-		const unsub = this._internalStore._conductor.on(_key, callback, from)
+		const unsub = this.engine.on(_key, callback, from)
 
 		// return the watcher unsubscribe function
 		return () => {
@@ -60,7 +58,7 @@ export class RuntimeInstance {
 	 * @param key (optional) The event key
 	 */
 	getWatchers(key?: string) {
-		return key && this._internalStore._conductor.events.has(`${key}`) ? this._internalStore._conductor.events.get(`${key}`) : {}
+		return key && this.engine.events.has(`${key}`) ? this.engine.events.get(`${key}`) : {}
 	}
 	/**
 	 * remove a watcher from the runtime given a type and a key
@@ -68,7 +66,7 @@ export class RuntimeInstance {
 	 * @param key The key of the watcher to remove
 	 */
 	removeWatchers(type: SubscriptionTypes, key: string) {
-		this._internalStore._conductor.events.get(key)
+		this.engine.events.get(key)
 	}
 	/**
 	 * Runtime logger function
@@ -119,7 +117,7 @@ export class RuntimeInstance {
 	 * Runtime Conductor Engine
 	 */
 	get engine() {
-		return this._internalStore._conductor
+		return this._engine
 	}
 
 	/**
