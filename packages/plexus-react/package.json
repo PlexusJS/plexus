@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/react",
-	"version": "1.3.1-canary.0+dcd18e7",
+	"version": "1.3.1-canary.1+b72a01e",
 	"description": "React Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -34,9 +34,9 @@
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "dcd18e778840ea2b7283e521ca6dece6aec0f3a8",
+	"gitHead": "b72a01ef2eeafeb5747c233573815a3772c06f14",
 	"dependencies": {
-		"@plexusjs/utils": "1.3.1-canary.0+dcd18e7",
+		"@plexusjs/utils": "1.3.1-canary.1+b72a01e",
 		"use-sync-external-store": "^1.2.0"
 	}
 }
