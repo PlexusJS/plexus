@@ -293,7 +293,45 @@ describe("Test react integration (useDeposit)", () => {
 		// expect().toEqual()
 		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
 	})
+	test("test useDeposit edit", () => {
+		const def: { name?: string } = {}
+		function RandomComponent() {
+			const [val, setVal] = useState("")
+			const { value, save, edit } = useDeposit(
+				{ ...def },
+				{
+					onEdit(k, v) {},
+					onSave(payload) {
+						setVal(payload.name ?? "")
+					},
+				}
+			)
 
+			useEffect(() => {
+				edit("name", "billy")
+			}, [])
+
+			// const [groupValue] = usePlexus([myCollection.groups.test])
+			return (
+				<div>
+					<p id="data">{JSON.stringify(value)}</p>
+				</div>
+			)
+		}
+		let component = renderer.create(<RandomComponent />)
+
+		renderer.act(() => {
+			component.update(<RandomComponent />)
+		})
+		let tree = toJson(component)
+		renderer.act(() => {
+			component.update(<RandomComponent />)
+		})
+		expect(component.root.findByProps({ id: "data" }).children).toEqual(['{"name":"billy"}'])
+		expect(tree).toMatchSnapshot()
+		// expect().toEqual()
+		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
+	})
 	test("testing types of useDeposit", () => {
 		function RandomComponent() {
 			const [val, setVal] = useState("")

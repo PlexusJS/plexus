@@ -1,4 +1,4 @@
-import { Watchable } from "@plexusjs/core"
+import { instance, Watchable } from "@plexusjs/core"
 export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object
 
 export const normalizeDeps = (deps: Watchable | Watchable[]) => (Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable])
@@ -11,7 +11,10 @@ export const concurrentWatch = (onChange: () => void, depsArray: Watchable[]) =>
 
 	for (let dep of depsArray) {
 		// if not a watchable, then we can't watch it, skip to next iteration
-		if (!(dep instanceof Watchable)) continue
+		if (!(dep instanceof Watchable) || !dep.watch) {
+			instance({ instanceId: "react" }).runtime.log("debug", `Skipping watch because the dependency isn't watchable`, dep)
+			continue
+		}
 		const unsubscribe = dep.watch(function (v) {
 			onChange()
 		})

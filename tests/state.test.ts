@@ -3,11 +3,6 @@ import { beforeEach, afterEach, describe, test, expect } from "vitest"
 import { instance, PlexusStateInstance, state } from "@plexusjs/core"
 // import { PlexusState, PlexusStateInstance } from '../src/interfaces';
 type ObjectStateExample = Partial<{ a: { a?: boolean; b?: boolean }; b: boolean; c: { b?: boolean } }>
-let booleanState: PlexusStateInstance<boolean>,
-	stringState: PlexusStateInstance<string>,
-	objectState: PlexusStateInstance<ObjectStateExample>,
-	arrayState: PlexusStateInstance<{ item?: string; item2?: { subitem?: string } }[]>,
-	nullState: PlexusStateInstance<null>
 
 const initialValue = {
 	boolean: true,
@@ -19,13 +14,18 @@ const initialValue = {
 	],
 	null: null,
 }
+const booleanState = state(initialValue.boolean)
+const stringState = state(initialValue.string)
+const objectState = state<ObjectStateExample>(initialValue.object)
+const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(initialValue.array)
+const nullState = state(initialValue.null)
 
 beforeEach(() => {
-	booleanState = state(initialValue.boolean)
-	stringState = state(initialValue.string)
-	objectState = state<ObjectStateExample>(initialValue.object)
-	arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(initialValue.array)
-	nullState = state(initialValue.null)
+	booleanState.reset()
+	stringState.reset()
+	objectState.reset()
+	arrayState.reset()
+	nullState.reset()
 })
 describe("Testing State Function", () => {
 	test("Can save a value", () => {
