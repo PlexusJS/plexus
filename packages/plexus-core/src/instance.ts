@@ -19,6 +19,7 @@ interface PlexusInstanceStore {
 	_selectedStorage: string | undefined
 	_settings: Partial<PlexusInstanceConfig>
 	_ready: boolean
+	_onReadyCallbacks: ((instance: PlexusInstance) => void)[]
 }
 export class PlexusInstance {
 	private _internalStore: PlexusInstanceStore
@@ -47,6 +48,7 @@ export class PlexusInstance {
 			_selectedStorage: undefined,
 			_settings: { ...config },
 			_ready: false,
+			_onReadyCallbacks: [],
 		}
 		this.runtime = _runtime(() => instance(this._internalStore._settings), { logLevel: this._internalStore._settings?.logLevel })
 	}
@@ -60,8 +62,12 @@ export class PlexusInstance {
 	get ready() {
 		return this._internalStore._ready
 	}
+	onReady(callback: (instance: PlexusInstance) => void) {
+		this._internalStore._onReadyCallbacks.push(callback)
+	}
 	set ready(isReady: boolean) {
 		this._internalStore._ready = isReady
+		this._internalStore._onReadyCallbacks.forEach((callback) => callback(this)) // Call all the callbacks
 	}
 	get settings() {
 		return this._internalStore._settings

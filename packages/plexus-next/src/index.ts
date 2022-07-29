@@ -1,25 +1,22 @@
 import { instance, PlexusCollectionSelector, PlexusInstance, PlexusPlugin, usePlugin } from "@plexusjs/core"
 
 interface PlexusNextData {
-	state: {
-		[key: string]: any
-	}
-	collections: {
-		[key: string]: {
+	state: Record<string, any>
+
+	collections: Record<
+		string,
+		{
 			name: string
 			data: Array<Object>
-			groups: {
-				[key: string]: Array<Object>
-			}
-			selectors: {
-				[key: string]: any
-			}
+			groups: Record<string, Array<Object>>
+			selectors: Record<string, any>
 		}
-	}
+	>
 }
 
 export function preserveServerState(
 	nextData: {
+		props?: Record<string, any>
 		[key: string]: any
 	} = {}
 ) {
@@ -31,13 +28,13 @@ export function preserveServerState(
 			collections: {},
 			state: {},
 		}
-
+		// parse the states
 		for (const state of states.values()) {
 			if (state.name && state.value !== state.initialValue) {
 				data.state[state.name] = state.value
 			}
 		}
-
+		// parse the collections
 		for (const collection of collections.values()) {
 			if (collection.value.length > 0 && collection.name) {
 				data.collections[collection.name] = {
@@ -48,7 +45,11 @@ export function preserveServerState(
 				}
 			}
 		}
-
+		// ensure the incoming next data is valid
+		if (!nextData.props) {
+			nextData.props = {}
+		}
+		// inject plexus data into props object
 		nextData.props.PLEXUS_DATA = JSON.parse(JSON.stringify(data))
 	} catch (e) {
 		console.warn(e)
@@ -61,7 +62,7 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 	try {
 		if (!plexus) plexus = instance()
 
-		if (isServer()) return plexus.runtime.log("debug", `not running loadServerState as we are on the server`)
+		if (isServer()) return plexus.runtime.log("warn", `Not running loadServerState; Client-Side Only.`)
 
 		const collections = plexus._collections
 		const states = plexus._states
@@ -70,11 +71,19 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 
 		if (data) {
 			for (const state of states.values()) {
+				// if the state does not have a name
+				if (!state.name) {
+					continue
+				}
 				const v = data.state[state.name]
 				if (state.name && v && !state.name.includes("state_collection_date")) state.set(v)
 			}
 
 			for (const collection of collections.values()) {
+				// if the collection does not have a name
+				if (!collection.name) {
+					continue
+				}
 				const fromSSR = data.collections[collection.name]
 				if (fromSSR) {
 					if (fromSSR.data?.length > 0) collection.collect(fromSSR.data)
