@@ -39,7 +39,7 @@ export class EventEngine {
 			const idx = eventWatchers.indexOf(eventWatcher) ?? -1
 
 			if (idx === 0) {
-				this.events.set(eventId, [...eventWatchers.splice(idx + 1)])
+				this.events.set(eventId, [...eventWatchers.slice(idx + 1)])
 			} else if (idx > -1) {
 				this.events.set(eventId, [...eventWatchers.slice(0, idx), ...eventWatchers.slice(idx + 1)])
 			}
