@@ -25,8 +25,8 @@ const TypescriptInfo = () => {
 		hidden: { translateX: 100, opacity: 0 },
 	}
 	return (
-		<div>
-			<div className="flex items-end justify-center h-screen text-center">
+		<div className="py-[25vh]">
+			<div className="flex items-end justify-center text-center">
 				<motion.h1
 					ref={ref}
 					initial={"hidden"}
@@ -40,7 +40,7 @@ const TypescriptInfo = () => {
 					LOL, duh! We Wrote it <i>Completely</i> in TypeScript!
 				</motion.h1>
 			</div>
-			<div className="flex items-center justify-center h-screen">
+			<div className="flex items-center justify-center pt-8">
 				<motion.p
 					ref={refp}
 					initial={{ translateX: 100, opacity: 0 }}

@@ -36,116 +36,112 @@ myCoolCollection.value //=> [{ id: "1", name: "John Doe", age: 30 }]
 
 ## Collection Properties
 
-### collecton `.id`
+##### collecton `.id`
 
 The internal ID of the collection
 
-### collecton `.config`
+##### collecton `.config`
 
 The config of the collection
 
-### collecton `.value`
+##### collecton `.value`
 
 Get all of the collection data values as an array
 
-### collecton `.groups`
+##### collecton `.groups`
 
 Get all the groups in the collection as an object
 
-### collecton `.groupsValue`
+##### collecton `.groupsValue`
 
 Get all the groups and their children's data values as an object
 
-### collecton `.selectors`
+##### collecton `.selectors`
 
 Get all the groups in the collection as an object
 
-### collecton `.selectorsValue`
+##### collecton `.selectorsValue`
 
 Get all the groups and their childrens data values as an object
 
-### collecton `.name`
+##### collecton `.name`
 
 Get the name (generated or custom) of the collection store
 
-### collecton `.lastUpdatedKey`
+##### collecton `.lastUpdatedKey`
 
 The primary key of the last updated item in the collection
 
 ## Collection Methods
 
-### collecton `.collect()`
+##### collecton `.collect()`
 
 Collect An item of data (or many items of data using an array) into the collection.
 
-### collecton `.update()`
+##### collecton `.update()`
 
 Update the collection with data;
 This is like collect but will not add new items, and can can be used to patch existing items
 
-### collecton `.getItem()`
+##### collecton `.getItem()`
 
 Get the Value of the data item with the provided key (the raw data).
 
-### collecton `.getItemValue()`
+##### collecton `.getItemValue()`
 
 Get the value of an item in the collection
 
-### collecton `.delete()`
+##### collecton `.delete()`
 
 Delete a data item completely from the collection.
 
-### collecton `.remove()`
+##### collecton `.remove()`
 
 Remove a data item from a set of groups
 
-### collecton `.clear()`
+##### collecton `.clear()`
 
 Delete all data in the collection
 
-### collecton `.key()`
+##### collecton `.key()`
 
 Set the key of the collection for enhanced internal tracking
 
-### collecton `.createSelector()`
+##### collecton `.createSelector()`
 
 Create a Selector instance for a given selector name
 
-### collecton `.createSelectors()`
+##### collecton `.createSelectors()`
 
 Create Selector instances for a given set of selector names
 
-### collecton `.getSelector()`
+##### collecton `.getSelector()`
 
 Get A Group instance of a given group name
 
-### collecton `.createGroup()`
+##### collecton `.createGroup()`
 
 Create a group with a name and a configuration
 
-### collecton `.createGroups()`
+##### collecton `.createGroups()`
 
 Create multiple groups with a name (no configuration)
 
-### collecton `.getGroup()`
+##### collecton `.getGroup()`
 
 Get A Group instance of a given group name
 
-### collecton `.getGroupsOf()`
+##### collecton `.getGroupsOf()`
 
 Given a key, get all Group names that the key is in
 
-### collecton `.addToGroups()`
+##### collecton `.addToGroups()`
 
 Add a data item to a group or groups
 
-### collecton `.watchGroup()`
+##### collecton `.watchGroup()`
 
 Create a Watcher for a given group name
-
-
-
-
 
 Compare a thing to the current value, if they are equal, returns true
 

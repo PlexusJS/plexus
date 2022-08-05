@@ -21,15 +21,15 @@ myCoolAgeState.value // Output: 42
 
 ## Properties
 
-### state `.value`
+##### state `.value`
 
 <CollapseContainer miniTitle="Returns" data={[{ type: "any", description: "The value (reactive) of the state." }]} />
 
-### state `.lastValue`
+##### state `.lastValue`
 
 <CollapseContainer miniTitle="Returns" data={[{ type: "any", description: "The previous value (reactive) of the state." }]} />
 
-### state `.nextValue`
+##### state `.nextValue`
 
 <CollapseContainer miniTitle="Returns" data={[{ type: "any", description: "The next value of the state." }]} />
 
@@ -45,11 +45,11 @@ state.value //=> { foo: "bar" }
 
 :::
 
-### state `.initialValue`
+##### state `.initialValue`
 
 <CollapseContainer miniTitle="Returns" data={[{ type: "any", description: "The initial (default) value of the state." }]} />
 
-### state `.name`
+##### state `.name`
 
 <CollapseContainer
 	miniTitle="Returns"
@@ -63,14 +63,14 @@ state.value //=> { foo: "bar" }
 
 ## Methods
 
-### state `.set()`
+##### state `.set()`
 
 Set the value of the state
 
 <CollapseContainer title="Arguments" data={[{ key: "initialValue", type: "any", description: "The new value of the state." }]} />
 <CollapseContainer miniTitle="Returns" data={[{ type: "this", description: "This state." }]} />
 
-### state `.patch()`
+##### state `.patch()`
 
 Patch the current value of the state
 
@@ -80,21 +80,21 @@ Patch the current value of the state
 />
 <CollapseContainer miniTitle="Returns" data={[{ type: "this", description: "This state." }]} />
 
-### state `.watch()`
+##### state `.watch()`
 
 Watch for changes on this state
 
 <CollapseContainer title="Arguments" data={[{ key: "callback", type: "any", description: "The callback to run when the state changes." }]} />
 <CollapseContainer miniTitle="Returns" data={[{ type: "() => void", description: "The remove function to stop watching." }]} />
 
-### state `.isEqual()`
+##### state `.isEqual()`
 
 Compare a thing to the current value, if they are equal, returns true
 
 <CollapseContainer title="Arguments" data={[{ key: "value", type: "any", description: "The thing to compare the current value to." }]} />
 <CollapseContainer miniTitle="Returns" data={[{ type: "boolean", description: "A boolean representing if they are equal." }]} />
 
-### state `.interval()`
+##### state `.interval()`
 
 On a set interval, run a function to update the state
 
@@ -114,32 +114,32 @@ On a set interval, run a function to update the state
 	]}
 />
 
-### state `.clearInterval()`
+##### state `.clearInterval()`
 
 Stop the state interval
 
 <CollapseContainer miniTitle="Returns" data={[{ type: "this", description: "This state." }]} />
 
-### state `.persist()`
+##### state `.persist()`
 
 Persist the state to selected storage
 
 <CollapseContainer title="Arguments" data={[{ key: "key", type: "string", description: "The storage prefix to use." }]} />
 <CollapseContainer miniTitle="Returns" data={[{ type: "this", description: "This state." }]} />
 
-### state `.undo()`
+##### state `.undo()`
 
 Reset the state to the previous value
 
 <CollapseContainer miniTitle="Returns" data={[{ type: "this", description: "This state." }]} />
 
-### state `.reset()`
+##### state `.reset()`
 
 Reset the state to the initial value
 
 <CollapseContainer miniTitle="Returns" data={[{ type: "this", description: "This state." }]} />
 
-### state `.key()`
+##### state `.key()`
 
 Set the key of the state for internal tracking
 

@@ -21,7 +21,7 @@ const users = await fetchUsers() //=> [{id: 1, name: "John"}, {id: 2, name: "Jan
 
 ## Properties
 
-### api `.config`
+##### api `.config`
 
 The current base configuration of this api
 
@@ -107,7 +107,7 @@ The current base configuration of this api
 
 ## Methods
 
-### api `.get()`
+##### api `.get()`
 
 Send a get request
 
@@ -119,7 +119,7 @@ Send a get request
 	]}
 />
 
-### api `.post()`
+##### api `.post()`
 
 Send a post request
 
@@ -131,7 +131,7 @@ Send a post request
 	]}
 />
 
-### api `.put()`
+##### api `.put()`
 
 Send a put request
 
@@ -143,13 +143,13 @@ Send a put request
 	]}
 />
 
-### api `.delete()`
+##### api `.delete()`
 
 Send a delete request
 
 <CollapseContainer title="Arguments" data={[{ key: "Path", type: "string", description: "The path to call on the api." }]} />
 
-### api `.patch()`
+##### api `.patch()`
 
 Send a patch request
 
@@ -161,7 +161,7 @@ Send a patch request
 	]}
 />
 
-### api `.options()`
+##### api `.options()`
 
 Set the configuration options for fetch
 
@@ -173,7 +173,7 @@ Set the configuration options for fetch
 	]}
 />
 
-### api `.auth()`
+##### api `.auth()`
 
 Set the the Authorization header for the request
 
@@ -193,7 +193,7 @@ This is stored seprately from other headers. If there is another value for the A
 	]}
 />
 
-### api `.headers()`
+##### api `.headers()`
 
 Set headers for the requests of this API Instance
 
@@ -208,7 +208,7 @@ Set headers for the requests of this API Instance
 	]}
 />
 
-### api `.reset()`
+##### api `.reset()`
 
 Reset this routes configuration
 
@@ -224,19 +224,19 @@ Reset this routes configuration
 
 ## Response
 
-### apiResponse `.data`
+##### apiResponse `.data`
 
 The data returned from the request in JSON format. If the data is not supposed to be JSON, use [apiResponse`.rawData`](#apiresponse-rawdata)
 
 <CollapseContainer showingReturnType data={[{ type: "string", description: "The internal id of the PreAction." }]} />
 
-### apiResponse `.status`
+##### apiResponse `.status`
 
 The HTTP status of the request
 
 <CollapseContainer showingReturnType data={[{ type: "number", description: "The HTTP status code of the response." }]} />
 
-### apiResponse `.ok`
+##### apiResponse `.ok`
 
 Is the status code between 200 to 299?
 
@@ -245,13 +245,13 @@ Is the status code between 200 to 299?
 	data={[{ type: "boolean", description: "True if the response status was between 200 and 299. False if otherwise." }]}
 />
 
-### apiResponse `.rawData`
+##### apiResponse `.rawData`
 
 The raw string of the response data
 
 <CollapseContainer showingReturnType data={[{ type: "string", description: "The internal id of the PreAction." }]} />
 
-### apiResponse `.response`
+##### apiResponse `.response`
 
 The HTTP response object ([ResponseInit](https://developer.mozilla.org/en-US/docs/Web/API/Response/Response))
 
