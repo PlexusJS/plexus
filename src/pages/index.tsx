@@ -55,7 +55,7 @@ function HomepageHeader() {
 					</motion.svg>
 				</svg>
 				<div className=" h-72 flex justify-center">
-					Data Orchestration <mark> at it's Finest ✨</mark>. <i>Fully TypeSafe. Instantly Reactive.</i>
+					<mark>Data Orchestration at it's Finest ✨</mark>. <i>Fully TypeSafe. Instantly Reactive.</i>
 				</div>
 				<div className={styles.buttons}>
 					<Link className="button button--secondary button--lg" to="/docs">
