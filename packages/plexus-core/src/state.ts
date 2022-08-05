@@ -133,12 +133,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		}
 		return this
 	}
-	/**
-	 * Reset the state to the previous value
-	 */
-	undo() {
-		this.set(this._watchableStore._lastValue)
-	}
+	
+	
 	/**
 	 * Reset the state to the initial value
 	 */

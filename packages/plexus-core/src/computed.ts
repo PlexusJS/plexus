@@ -172,7 +172,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	/**
 	 * The previous value of the state
 	 */
-	get lastValue(): ValueType {
+	get lastValue(): ValueType | null {
 		return deepClone(this._watchableStore._lastValue)
 	}
 	/**
@@ -192,7 +192,14 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * Reset the state to the previous value
 	 */
 	undo(): void {
-		this.set(this._watchableStore._lastValue)
+		if (this._watchableStore._lastValue !== null) {
+			this.set(this._watchableStore._lastValue)
+			// last value should now be the current value BEFORE the undo, so set this to next value
+			this._watchableStore._nextValue = this._watchableStore._lastValue
+		} else {
+			this.set(this._watchableStore._initialValue)
+		}
+		this._watchableStore._lastValue = null
 	}
 	/**
 	 * Reset the state to the initial value
