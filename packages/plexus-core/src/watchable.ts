@@ -14,8 +14,8 @@ interface WatchableStore<Value = any> {
 
 type HistorySeed<ValueType = any> = {
 	maxLength: number
-	archive_front: Array<ValueType>
-	archive_back: Array<ValueType>
+	archive_head: Array<ValueType>
+	archive_tail: Array<ValueType>
 }
 
 export class Watchable<ValueType = any> {
@@ -62,11 +62,27 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 	}
 
 	/**
-	 * Undo the last state change. If history is enabled, we traverse the history archive. if not, we try to go to the last set value. If no previous value (either `.set()` was never called or we previously used `.undo()`), reset to initial value
+	 * Undo the last state change.
+	 * If history is enabled, we traverse the history archive.
+	 * if not, we try to go to the last set value.
+	 * If no previous value (either `.set()` was never called or we previously used `.undo()`), reset to initial value.
+	 * @returns this
 	 */
 	undo() {
-		if (this._history) {
-			
+		if (this._history && this._history.maxLength > 0) {
+			// if we have any previous history, undo the last set value
+			if (this._history.archive_head.length > 0) {
+				const currentValue = this.value
+				const newValue = this._history.archive_head.pop()
+				this.set(newValue)
+				this._history.archive_tail.push(currentValue)
+			} else {
+				this.instance().runtime.log("warn", `No history to undo for ${this.id}; setting to initial value.`)
+				this.set(this._watchableStore._initialValue)
+			}
+
+			// After using set, archive head has the last set value which is not what we want. So we pop to remove it from the archive head
+			this._history.archive_head.pop()
 		}
 		// no history, so just try to reset to last value; if null, reset to initial value
 		else {
@@ -82,25 +98,66 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 		return this
 	}
 	/**
-	 * Redo the last state change. If history is enabled, we traverse the history archive. if not, we try to go to the next set value. If no previous value (either `.set()` was never called or we previously used `.redo()`), reset to initial value
-	 * @returns
+	 * Redo the last state change.
+	 * If history is enabled, we traverse the history archive.
+	 * If not, we try to go to the next set value.
+	 * If no next value (`.undo()` was never called), reset to current value.
+	 * @returns this
 	 */
 	redo() {
-		if (this._history) {
+		if (this._history && this._history.maxLength > 0) {
+			//  if we hae any upcoming history, redo the next set value
+			if (this._history.archive_tail.length > 0) {
+				const newValue = this._history.archive_tail.shift()
+				this.set(newValue)
+			} else {
+				this.instance().runtime.log("warn", `No history to redo for ${this.id}; setting to current/next value.`)
+				this.set(this._watchableStore._nextValue)
+			}
+
+			// After using set, archive head has the last set value which is not what we want. So we pop to remove it from the archive head
+			this._history.archive_head.pop()
+		}
+		// no upcoming history, so just try to reset to current/value;
+		else {
+			this.set()
 		}
 		return this
 	}
+	get canUndo(): boolean {
+		return this._history ? this._history.archive_head.length > 0 : false
+	}
+	get canRedo(): boolean {
+		return this._history ? this._history.archive_tail.length > 0 : false
+	}
 
-	history(maxLength: number = 20): this {
+	/**
+	 * Enable/Disable history tracker for this watchable by setting the history length.
+	 * @param maxLength - the maximum number of history states to keep. If 0, history is disabled. If undefined, history is enabled with a default length of 10
+	 * @returns this
+	 */
+	history(maxLength: number = 10): this {
+		// disable history if maxLength is 0 (can be done at any time)
+		if (maxLength <= 0) {
+			this.instance().runtime.log("debug", `Disabling history for ${this.id}`)
+			this._history = undefined
+			return this
+		}
+		// enable history if maxLength is > 0 (can be done at any time)
 		this._history = {
 			maxLength,
-			archive_front: [],
-			archive_back: [],
+			archive_head: [],
+			archive_tail: [],
 		}
+		this.instance().runtime.log("debug", `Enabling history for ${this.id}`)
 
 		return this
 	}
 
+	/**
+	 * Set the value of the state
+	 * @param newValue The new value of this state
+	 */
 	set(newValue?: ValueType) {
 		const value = deepClone(newValue)
 		this._watchableStore._lastValue = this._watchableStore._value
@@ -127,14 +184,20 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 		this.instance().runtime.broadcast(this.id, value)
 
 		// if history, add to archive
-		if (this._history) {
+		if (this._history && this._history.maxLength > 0) {
+			this._history.archive_head.push(this._watchableStore._lastValue)
+			// if we are setting a new value and the tail has any values, remove them
+			// NOTE: this is needed because if we set new value, but are in the middle of the history somewhere, we need to remove the subsequent values
+			if (this._history.archive_tail.length) {
+				this._history.archive_tail.length = 0
+			}
 			// if archive is too long, remove oldest
-			const archiveLength = this._history.archive_front.length + this._history.archive_back.length
+			const archiveLength = this._history.archive_head.length + this._history.archive_tail.length
 			if (archiveLength > this._history.maxLength) {
-				if (this._history.archive_front.length > 0) {
-					this._history.archive_front.shift()
+				if (this._history.archive_head.length > 0) {
+					this._history.archive_head.shift()
 				} else {
-					this._history.archive_back.shift()
+					this._history.archive_tail.shift()
 				}
 			}
 		}

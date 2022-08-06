@@ -121,4 +121,53 @@ describe("Testing State Function", () => {
 		console.log(objectState.value, objectState.nextValue)
 		expect(objectState.nextValue).toStrictEqual(objectState.value)
 	})
+
+	test("Checking state.reset()", () => {
+		// check .set(value: object)
+		objectState.set({ a: { b: false } })
+		objectState.reset()
+		// check if the object is actually merged and children props do get overwritten
+		expect(objectState.value.a?.b).toBe(true)
+	})
+	test("Checking state.undo() & state.redo()", () => {
+		objectState.set({ a: { b: false } })
+		objectState.undo()
+		expect(objectState.value).toStrictEqual(initialValue.object)
+		objectState.redo()
+		expect(objectState.value).toStrictEqual({ a: { b: false } })
+	})
+
+	test("Checking state history functionality", () => {
+		objectState.history()
+		objectState.set({ a: { b: false } })
+		console.log("1: checking", objectState.value, "vs.", { a: { b: false } })
+		expect(objectState.value).toStrictEqual({ a: { b: false } })
+		objectState.undo()
+		console.log("2: checking", objectState.value, "vs.", initialValue.object)
+		expect(objectState.value).toStrictEqual(initialValue.object)
+		objectState.redo()
+		console.log("3: checking", objectState.value, "vs.", { a: { b: false } })
+		expect(objectState.value).toStrictEqual({ a: { b: false } })
+
+		// checking if the history is working for primitives
+		stringState.history()
+		new Array(10).fill(null).forEach((_, i) => {
+			const nv = `Hello World${i}`
+			stringState.set(nv)
+			console.log("1: checking", stringState.value, "vs.", nv)
+			expect(stringState.value).toBe(nv)
+		})
+		expect(stringState.value).toBe("Hello World9")
+
+		new Array(9).fill(null).forEach((_, i) => {
+			const nv = `Hello World${8 - i}`
+			stringState.undo()
+			expect(stringState.value).toBe(nv)
+		})
+		stringState.undo()
+		expect(stringState.value).toBe("Hello Plexus!")
+
+		stringState.redo()
+		expect(stringState.value).toBe("Hello World0")
+	})
 })

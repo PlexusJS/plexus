@@ -76,7 +76,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * Get the value of the data instance
 	 */
 	get value() {
-		// return this._internalStore._state.value
 		return super.value
 	}
 	/**
@@ -94,8 +93,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	/**
 	 * Set the value of the data instance
 	 * @param value The value to set
-	 * @param config The config to use when setting the value
-	 * @param config.mode should we 'patch' or 'replace' the value
 	 */
 	set(value?: Partial<DataType>) {
 		if (!value) return this
@@ -131,12 +128,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		return this
 	}
 
-	// /**
-	//  * The state that powers this data instance
-	//  */
-	// get state() {
-	// 	return this._internalStore._state
-	// }
 	/**
 	 * Compare a thing to the current value, if they are equal, returns true
 	 * @param value The thing to compare the current value to

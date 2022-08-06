@@ -65,7 +65,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	}
 	/**
 	 * Set the value of the state
-	 * @param value A value of the state to merge with the current value
+	 * @param value The new value of this state
 	 */
 	set(value?: StateValue) {
 		super.set(value)
@@ -133,13 +133,14 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		}
 		return this
 	}
-	
-	
+
 	/**
 	 * Reset the state to the initial value
 	 */
 	reset() {
 		this.set(this._watchableStore._initialValue)
+		// disable history if enabled
+		super.history(0)
 	}
 	/**
 	 * On a set interval, run a function to update the state
