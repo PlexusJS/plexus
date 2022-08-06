@@ -154,7 +154,7 @@ describe("Testing State Function", () => {
 		new Array(10).fill(null).forEach((_, i) => {
 			const nv = `Hello World${i}`
 			stringState.set(nv)
-			console.log("1: checking", stringState.value, "vs.", nv)
+			console.log(`${i + 1}: checking`, stringState.value, "vs.", nv)
 			expect(stringState.value).toBe(nv)
 		})
 		expect(stringState.value).toBe("Hello World9")
