@@ -156,18 +156,22 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 						this._internalStore._data.set(dataKey, dataInstance)
 					}
 				}
+				if (this.config.defaultGroup) {
+					// if default groups is enabled, add to the default group...
+					this.addToGroups(dataKey, "default" as any)
+				}
 				// if a group (or groups) is provided, add the item to the group
 				if (groups) {
+					const groupsNormalized = Array.isArray(groups) ? new Set(groups) : new Set([groups])
 					if (this.config.defaultGroup) {
 						// if "groups" var is array...
-						Array.isArray(groups)
-							? // push default into the array
-							  !groups.includes("default" as any) && groups.push("default" as any)
-							: // if it is not (undefined or some other string), add to group
-							  groups !== "default" && this.addToGroups(dataKey, "default" as any)
+						if (groupsNormalized.has("default" as any)) {
+							groupsNormalized.delete("default" as any)
+						}
+						this.addToGroups(dataKey, "default" as any)
 					}
-
-					this.addToGroups(dataKey, groups)
+					// convert the set back to an array
+					this.addToGroups(dataKey, Array.from(groupsNormalized) as typeof groups)
 				}
 			}
 		}
@@ -178,7 +182,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		} else {
 			collectItem(data)
 		}
-		this.mount()
+		// this.mount()
 		return this
 	}
 	/**
@@ -191,20 +195,16 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	update(key: DataKey, data: Partial<DataType>, config: { deep: boolean } = { deep: true }) {
 		key = key
-		if (config.deep) {
-			if (this._internalStore._data.has(key)) {
+		if (this._internalStore._data.has(key)) {
+			if (config.deep) {
 				this._internalStore._data.get(key)?.patch({ ...data, [this._internalStore._key]: key } as Partial<DataType>)
 			} else {
-				console.warn("no data found for key", key)
+				this._internalStore._data.get(key)?.set(data as DataType)
 			}
 		} else {
-			if (this._internalStore._data.has(key)) {
-				this._internalStore._data.get(key)?.set(data as DataType)
-			} else {
-				console.warn("no data found for key", key)
-			}
+			console.warn("no data found for key", key)
 		}
-		this.mount()
+		// this.mount()
 		return this
 	}
 	/**
@@ -506,6 +506,14 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	get keys() {
 		return Array.from(this._internalStore._data.keys())
+	}
+	/**
+	 * Get the number of data items in the collection
+	 * @returns The number of data items collection data values
+	 */
+
+	get size() {
+		return this.keys.length
 	}
 	/**
 	 * Get all the groups in the collection as an object

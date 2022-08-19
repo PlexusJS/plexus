@@ -1,7 +1,7 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
-import { collection, PlexusCollectionInstance } from "@plexusjs/core"
+import { collection, PlexusCollectionInstance, instance } from "@plexusjs/core"
 
-let myCollection = collection<{ thing: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
+let myCollection = collection<{ thing?: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
 
 beforeEach(() => {
 	myCollection.clear()
@@ -33,6 +33,7 @@ describe("Testing Collection", () => {
 		expect(myCollection.getItem(0).value?.thing).toBe("xqcL")
 	})
 	test("Do Groups Work?", () => {
+		console.log(JSON.stringify(myCollection, null, 2))
 		expect(myCollection.value.length).toBe(0)
 		// can properly collect objects with the same keys
 		myCollection.collect([
@@ -45,6 +46,7 @@ describe("Testing Collection", () => {
 			{ thing: "lol3", id: 2 },
 			{ thing: "lols", id: 1 },
 		])
+		console.log(JSON.stringify(myCollection, null, 2))
 
 		expect(myCollection.value.length).toBe(3)
 
@@ -339,5 +341,24 @@ describe("Testing Collection", () => {
 		myCollection.selectors.main.data?.patch({ thing: "lol2" })
 		expect(myCollection.value.length).toBe(3)
 		expect(myCollection.getSelector("main").value.thing).toBe("lol2")
+	})
+})
+
+// describe("Selectors", () => {})
+describe("Groups", () => {
+	test("Ensure only one Data item is Unique", () => {
+		myCollection.collect({ id: 5 }, "group1")
+		myCollection.collect({ thing: "lol2", id: 5 })
+		myCollection.collect({ thing: "lol3", id: 5 })
+		myCollection.collect({ thing: "lol4", id: 5 }, "group1")
+
+		instance()._collections.forEach((item) => {
+			if (item.id === myCollection.id) {
+				expect(item.size).toBe(1)
+				expect(instance()._collectionData.size).toBe(1)
+				console.log(instance()._collectionData)
+				console.log(JSON.stringify(item, null, 2), JSON.stringify(myCollection, null, 2))
+			}
+		})
 	})
 })
