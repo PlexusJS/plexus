@@ -25,6 +25,11 @@ export interface PlexusCollectionConfig<DataType> {
 	 * Create a group called "default"
 	 */
 	defaultGroup?: boolean
+	/**
+	 * When this value is true, using getValue will return undefined rather than an object with only the key. When using get item, you receive a provisional data instance with a value of undefined.
+	 * @warning The type of the returned value WILL NOT change to undefined. Only the literal value will be undefined as this is _technically_ an override. Please beware and plan accordingly.
+	 */
+	unfoundKeyReturnsUndefined?: boolean
 }
 interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	_internalId: string
@@ -92,11 +97,11 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				this._persist = value
 			},
 		}
+		this.mount()
 		if (_config.defaultGroup) {
 			// this ensured default shows up as a group name option
 			return this.createGroup("default")
 		}
-		this.mount()
 	}
 	/**
 	 * Helper function; Checks to see if the provided name is a group name
@@ -219,8 +224,10 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				() => this.instance(),
 				() => this,
 				this._internalStore._key,
-				{ [this._internalStore._key]: dataKey } as any as DataType,
-				{ prov: true }
+				this.config.unfoundKeyReturnsUndefined
+					? (undefined as any as DataType)
+					: ({ [this._internalStore._key]: dataKey } as any as DataType),
+				{ prov: true, unfoundKeyIsUndefined: this.config.unfoundKeyReturnsUndefined }
 			)
 			// if we get a valid data instance, add it to the collection
 			// if (dataInstance) {

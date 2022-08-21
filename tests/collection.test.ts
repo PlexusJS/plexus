@@ -1,7 +1,10 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
 import { collection, instance, PlexusCollectionInstance } from "@plexusjs/core"
 
-let myCollection = collection<{ thing: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
+const myCollection = collection<{ thing: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
+const myCollectionUndefined = collection<{ thing: string; id: number }>({ defaultGroup: true, unfoundKeyReturnsUndefined: true })
+	.createGroups(["group1", "group2"])
+	.createSelector("main")
 // instance({ logLevel: "debug" })
 beforeEach(() => {
 	myCollection.clear()
@@ -27,6 +30,9 @@ describe("Testing Collection", () => {
 		expect(myCollection.getItemValue(0)?.thing).toBe("lol")
 		expect(myCollection.getItemValue(2)?.thing).toBe("lol3")
 		expect(myCollection.getItemValue(1)?.thing).toBe("lols")
+
+		// does the unfoundKeyReturnsUndefined configuration work
+		expect(myCollectionUndefined.getItemValue(0)).toBeUndefined()
 	})
 	test("Does it pass the vibe check ?", () => {
 		myCollection.collect({ thing: "xqcL", id: 0 })

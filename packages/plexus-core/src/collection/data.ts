@@ -5,11 +5,16 @@ import { PlexusWatcher } from "../interfaces"
 import { StateInstance } from "../state"
 import { PlexusCollectionInstance } from "./collection"
 import { deepClone, deepMerge, isEqual, isObject } from "../helpers"
+
+interface CollectionDataConfig {
+	prov: boolean
+	unfoundKeyIsUndefined?: boolean
+}
 interface PlexusDataStore<DataType extends Record<string, any>> {
 	_key: string | number
 	primaryKey: string
-	// _state: StateInstance<DataType>
 	_wDestroyers: Set<() => void>
+	_config: CollectionDataConfig
 }
 
 export type PlexusDataInstance<DataType extends Record<string, any> = Record<string, any>> = CollectionDataInstance<DataType>
@@ -21,18 +26,29 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	// private instance: () => PlexusInstance
 	primaryKey: PK
 	private _internalStore: PlexusDataStore<DataType>
-	constructor(instance: () => PlexusInstance, public collection: () => PlexusCollectionInstance<DataType>, primaryKey: PK, value: DataType) {
+	constructor(
+		instance: () => PlexusInstance,
+		public collection: () => PlexusCollectionInstance<DataType>,
+		primaryKey: PK,
+		value: DataType,
+		config: CollectionDataConfig = { prov: false }
+	) {
 		super(instance, value)
 		// this.instance = instance
 		this.primaryKey = primaryKey
 		this._internalStore = {
-			_key: value[primaryKey],
+			_key: value ? value[primaryKey] : value,
 			primaryKey,
-			// _state: state<DataType>(value).key(`collection_data_${collection().id}_${value[primaryKey]}`),
 			_wDestroyers: new Set<() => void>(),
+			_config: config,
 		}
 		// this.value = value
-		this.mount()
+		if (!config.prov) {
+			this.mount()
+		}
+
+		if (config.unfoundKeyIsUndefined) {
+		}
 	}
 	/**
 	 * The internal id of the state with an instance prefix
@@ -61,14 +77,14 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 
 	private checkIfHasKey(value: Partial<DataType>) {
 		// Check if the value has the primary key, and verify the key is the same as the data instance
-		const isCurrentKey = value[this._internalStore.primaryKey as PK].toString().trim() === this._internalStore._key.toString().trim()
-		// if the ket is not the same, then we can't use this value
-		const valid = value[this._internalStore.primaryKey] !== undefined && isCurrentKey
+		const isCurrentKey = value?.[this._internalStore.primaryKey as PK].toString().trim() === this._internalStore._key.toString().trim()
+		// if the key is not the same, then we can't use this value
+		const valid = value?.[this._internalStore.primaryKey] !== undefined && isCurrentKey
 		this.instance().runtime.log(
 			"warn",
-			`The new data value ${valid ? "WILL" : "WILL NOT"} be set in "replace" mode...`,
+			`The incoming value key does ${valid ? "" : "NOT"} match the stored key...`,
 			this._internalStore._key,
-			value[this._internalStore.primaryKey] === this._internalStore._key
+			value?.[this._internalStore.primaryKey] === this._internalStore._key
 		)
 		return valid
 	}
@@ -171,10 +187,10 @@ export function _data<DataType extends Record<string, any>>(
 	collection: () => PlexusCollectionInstance<DataType>,
 	primaryKey: string,
 	value: DataType,
-	config: { prov: boolean } = { prov: false }
+	config: CollectionDataConfig = { prov: false }
 ) {
-	if ((value[primaryKey] !== undefined && value[primaryKey] !== null) || config.prov) {
-		return new CollectionDataInstance(instance, collection, primaryKey, value)
+	if ((value?.[primaryKey] !== undefined && value?.[primaryKey] !== null) || config.prov) {
+		return new CollectionDataInstance(instance, collection, primaryKey, value, config)
 	}
 	return null
 }
