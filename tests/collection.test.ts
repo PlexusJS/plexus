@@ -1,8 +1,8 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
-import { collection, PlexusCollectionInstance } from "@plexusjs/core"
+import { collection, instance, PlexusCollectionInstance } from "@plexusjs/core"
 
 let myCollection = collection<{ thing: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
-
+// instance({ logLevel: "debug" })
 beforeEach(() => {
 	myCollection.clear()
 })
@@ -106,6 +106,7 @@ describe("Testing Collection", () => {
 		expect(myCollection.getSelector("main").value?.id).toBe(0)
 		expect(myCollection.getSelector("main").value?.thing).toBe("haha")
 	})
+
 	test("Watching Groups", () => {
 		myCollection.collect(
 			[

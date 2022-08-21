@@ -10,7 +10,6 @@ interface CollectionSelectorStore<ValueType = any> {
 	_key: DataKey | null
 	_collectionId: string
 	_dataWatcherDestroyer: (() => void) | null
-	_watchers: Set<PlexusWatcher<ValueType>>
 }
 
 export type PlexusCollectionSelector<ValueType extends Record<string, any> = Record<string, any>> = CollectionSelector<ValueType>
@@ -38,15 +37,15 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			_key: null as DataKey | null,
 			_collectionId: collection().id,
 			_dataWatcherDestroyer: null,
-			_watchers: new Set(),
 		}
 		this.collection = collection
 	}
 	private runWatchers() {
-		this._internalStore._watchers.forEach((callback) => {
-			this.instance().runtime.log("info", `Running watchers on selector ${this.instanceId}...`)
-			callback(this.value)
-		})
+		this.instance().runtime.log("info", `Running watchers on selector ${this.instanceId}...`)
+		// this._internalStore._watchers.forEach((callback) => {
+		// 	callback(this.value)
+		// })
+		super.set({} as any)
 	}
 	/**
 	 * The key of a data item assigned to this selector
@@ -63,15 +62,15 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.instanceId}...`)
 			return
 		}
+		this._internalStore._key = key
+
 		this._internalStore._dataWatcherDestroyer?.()
 
-		this._internalStore._key = key
 		// this.set(this.value)
-		const dataWatcherDestroyer =
-			this.data?.watch((value) => {
-				this.runWatchers()
-			}, this.id) || null
-		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer
+		const dataWatcherDestroyer = this.data?.watch((value) => {
+			this.runWatchers()
+		}, this.id)
+		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
 
 		// broadcast the change
 		this.runWatchers()
@@ -106,18 +105,15 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		return this.collection().getItem(this._internalStore._key) || null
 	}
 	/**
-	 * Watch for changes on this group
+	 * Watch for changes on this selector
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<ValueType>) {
-		this._internalStore._watchers.add(callback)
-
-		// const destroyer = this.data?.watch(callback)
-		const destroyer = () => {
-			this._internalStore._watchers.delete(callback)
-		}
-		return destroyer
+		return super.watch((v) => {
+			this.instance().runtime.log("debug", `Watching selector ${this.instanceId} with a new callback`)
+			callback(this.data?.value || v)
+		})
 	}
 }
 
