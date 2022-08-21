@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/utils",
-	"version": "1.3.5-canary.1+dcfda51",
+	"version": "1.3.5-canary.2+c6aee6a",
 	"description": "Useful utils by the PlexusJS Team.",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -23,5 +23,5 @@
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "dcfda51ead4ee66edbf9da6ab14c1f5458548d35"
+	"gitHead": "c6aee6a72ad83abbfb32bd7fbbc3ff632a693f02"
 }
