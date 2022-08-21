@@ -20,7 +20,7 @@
 		"publish-stable": "lerna publish --yes --force-publish",
 		"publish": "lerna publish --preid canary",
 		"postpublish": "pinst --enable",
-		"postinstall": "husky install",
+		"_postinstall": "husky install",
 		"test": "vitest",
 		"test-ui": "vitest --ui"
 	},
