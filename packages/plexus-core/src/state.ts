@@ -46,6 +46,10 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		}
 
 		this.mount()
+		this.persistSync()
+	}
+
+	private persistSync() {
 		if (this._internalStore._persist) {
 			this.instance().storage?.sync()
 		}
@@ -186,7 +190,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	get value() {
 		this.instance().runtime.log("debug", `Accessing Stateful value ${this.instanceId}${this._internalStore._persist ? "; Persist Enabled" : ""}`)
-		this.mount()
+		// this.mount()
+		this.persistSync()
 		return super.value
 	}
 	/**
