@@ -69,9 +69,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		if (!this.instance()._collectionData.has(this)) {
 			this.instance()._collectionData.add(this)
 			this.instance().runtime.log("info", `Hoisting collection data ${this.instanceId} with value`, this._watchableStore._value, `to instance`)
-			// if (this._internalStore._persist) {
-			// 	this.instance().storage?.sync()
-			// }
 		}
 	}
 

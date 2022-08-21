@@ -124,8 +124,8 @@ export class StorageInstance {
 			this.instance().storage?.set(key, object.value)
 		}
 	}
-	sync() {
-		this.instance().runtime.log("info", "Syncing storage storage...")
+	sync(checkValue?: any) {
+		this.instance().runtime.log("info", "Syncing storage...")
 		this._internalStore.tracking.forEach((object) => {
 			let key: string | null = null
 			if (typeof object?.key === "string") {
@@ -143,7 +143,7 @@ export class StorageInstance {
 			let storedValue = this.get(key)
 
 			if (storedValue) {
-				const val = object.value
+				const val = checkValue ?? object.value
 				if (!isEqual(val, storedValue)) {
 					this.instance().runtime.log(
 						"info",
@@ -158,6 +158,8 @@ export class StorageInstance {
 						)}"] storage["${convertThingToString(storedValue)}"])`
 					)
 				}
+			} else {
+				this.instance().runtime.log("warn", `Can't sync with storage; No Stored Value found`)
 			}
 		})
 	}

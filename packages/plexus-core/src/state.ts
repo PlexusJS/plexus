@@ -51,16 +51,14 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 
 	private persistSync() {
 		if (this._internalStore._persist) {
-			this.instance().storage?.sync()
+			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
 	private mount() {
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
 			this.instance().runtime.log("debug", `Hoisting state ${this.instanceId} with value`, this._watchableStore._value, `to instance`)
-			if (this._internalStore._persist) {
-				this.instance().storage?.sync()
-			}
+			this.persistSync()
 		}
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
