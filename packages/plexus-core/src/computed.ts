@@ -51,7 +51,6 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * The internal id of the computed state with an instance prefix
 	 */
 	get instanceId(): string {
-		// return this._internalStore._internalId
 		return `comp_${this._watchableStore._internalId}`
 	}
 
