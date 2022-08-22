@@ -154,6 +154,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 						() => this.instance(),
 						() => this,
 						this._internalStore._key,
+						dataKey,
 						item
 					)
 					// if we get a valid data instance, add it to the collection
@@ -213,7 +214,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		return this
 	}
 	/**
-	 * Get the Value of the data item with the provided key (the raw data).
+	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
 	 * @param key
 	 * @returns
 	 */
@@ -224,18 +225,19 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				() => this.instance(),
 				() => this,
 				this._internalStore._key,
+				dataKey,
 				this.config.unfoundKeyReturnsUndefined
 					? (undefined as any as DataType)
 					: ({ [this._internalStore._key]: dataKey } as any as DataType),
 				{ prov: true, unfoundKeyIsUndefined: this.config.unfoundKeyReturnsUndefined }
 			)
 			// if we get a valid data instance, add it to the collection
-			// if (dataInstance) {
-			// 	this._internalStore._data.set(dataKey, dataInstance)
-			// }
+			if (dataInstance) {
+				this._internalStore._data.set(dataKey, dataInstance)
+			}
 			return dataInstance as PlexusDataInstance<DataType>
 		}
-		this.mount()
+		// this.mount()
 		return data
 	}
 	/**

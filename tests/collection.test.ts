@@ -347,4 +347,17 @@ describe("Testing Collection", () => {
 		expect(myCollection.value.length).toBe(3)
 		expect(myCollection.getSelector("main").value.thing).toBe("lol2")
 	})
+
+	test("Can a provisional Data item stay reactive", () => {
+		console.log("Check...")
+		instance({ logLevel: "debug" })
+		myCollection.getItem(15).watch((v) => {
+			console.log(`new data`, v)
+		})
+		console.log(myCollection.getItem(15).value)
+		myCollection.getItem(15).set({ thing: "provisional no more" })
+		console.log("wtf")
+		console.log(myCollection.getItem(15).value)
+		instance({ logLevel: undefined })
+	})
 })
