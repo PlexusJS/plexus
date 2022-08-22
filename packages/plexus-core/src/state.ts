@@ -133,7 +133,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 			// }
 			this.instance().storage?.monitor(this._internalStore._name, this)
 			const storedValue = this.instance().storage?.get(this._internalStore._name) as StateValue
-			this.set(storedValue)
+			storedValue && this.set(storedValue)
 			this._internalStore._persist = true
 		}
 		return this
