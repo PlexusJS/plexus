@@ -115,6 +115,25 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			callback(this.data?.value || v)
 		})
 	}
+
+	history(maxLength?: number): this {
+		this.data?.history(maxLength)
+		return this
+	}
+	get canRedo(): boolean {
+		return !!this.data?.canRedo
+	}
+	get canUndo(): boolean {
+		return !!this.data?.canUndo
+	}
+	undo(): this {
+		this.data?.undo()
+		return this
+	}
+	redo(): this {
+		this.data?.redo()
+		return this
+	}
 }
 
 export function _selector<ValueType extends Record<string, any> = Record<string, any>>(
