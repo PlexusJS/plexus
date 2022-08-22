@@ -51,6 +51,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 
 	private persistSync() {
 		if (this._internalStore._persist) {
+			// this.instance().storage?.get()
 			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
@@ -131,6 +132,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 			// 	this.set(storedValue)
 			// }
 			this.instance().storage?.monitor(this._internalStore._name, this)
+			const storedValue = this.instance().storage?.get(this._internalStore._name) as StateValue
+			this.set(storedValue)
 			this._internalStore._persist = true
 		}
 		return this
@@ -143,6 +146,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this.set(this._watchableStore._initialValue)
 		// disable history if enabled
 		super.history(0)
+		return this
 	}
 	/**
 	 * On a set interval, run a function to update the state
@@ -188,8 +192,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	get value() {
 		this.instance().runtime.log("debug", `Accessing Stateful value ${this.instanceId}${this._internalStore._persist ? "; Persist Enabled" : ""}`)
-		// this.mount()
-		this.persistSync()
+		this.mount()
+		// this.persistSync()
 		return super.value
 	}
 	/**

@@ -15,7 +15,7 @@ interface StorageStore {
 	_name: string
 	_storage: Storage | null
 	_prefix: string
-	tracking: Set<ExtendedWatchable>
+	tracking: Map<string, ExtendedWatchable>
 }
 export type PlexusStorageInstance = StorageInstance
 
@@ -29,7 +29,7 @@ export class StorageInstance {
 			_name: name || "localStorage",
 			_storage: StorageInstance.getLocalStorage(),
 			_prefix: override?.prefix || "plexus-",
-			tracking: new Set<ExtendedWatchable>(),
+			tracking: new Map(),
 		}
 		this.instance()._storages.set(this._internalStore._name, this)
 	}
@@ -37,14 +37,14 @@ export class StorageInstance {
 		return `${this._internalStore._prefix}${key}`
 	}
 
-	get(key: string): any {
+	get<T extends any>(key: string): T | null {
 		if (this.override?.get) {
-			return this.override?.get(key)
+			return this.override?.get(key) as T
 		}
 		// try to run with localstorage
 		if (StorageInstance.getLocalStorage() === null) {
 			this.instance().runtime.log("warn", "No localstorage available, cannot get persisted value")
-			return
+			return null
 		}
 		this.instance().runtime.log("info", `Retrieving value for key ${this.getKey(key)}`)
 		const val = StorageInstance.getLocalStorage()?.getItem(this.getKey(key))
@@ -111,19 +111,22 @@ export class StorageInstance {
 	get watching() {
 		return Array.from(this._internalStore.tracking)
 	}
-	monitor(key: string, object: Watchable<any>) {
+	monitor<O extends Watchable, Type = O extends Watchable<infer T> ? T : never>(key: string, object: O) {
 		if (key === "" || key === undefined) {
 			this.instance().runtime.log("warn", `Can't monitor an object with no key`)
 			return
 		}
 
-		this._internalStore.tracking.add(object)
-		let storedValue = this.get(key)
+		this._internalStore.tracking.set(key, object)
+		let storedValue = this.get<Type>(key)
 		this.instance().runtime.log("info", `Persisting new key ${key}` /*, JSON.stringify(this.watching)*/)
 		if (!storedValue) {
 			this.instance().storage?.set(key, object.value)
+			storedValue = object.value
 		}
+		// return storedValue
 	}
+
 	sync(checkValue?: any) {
 		this.instance().runtime.log("info", "Syncing storage...")
 		this._internalStore.tracking.forEach((object) => {
@@ -144,7 +147,7 @@ export class StorageInstance {
 
 			if (storedValue) {
 				const val = checkValue ?? object.value
-				if (!isEqual(val, storedValue)) {
+				if (!isEqual(val, storedValue as any)) {
 					this.instance().runtime.log(
 						"info",
 						`Syncing "${key}" with storage value "${convertThingToString(val)}" to "${convertThingToString(storedValue)}"`

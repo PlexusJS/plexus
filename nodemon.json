@@ -1,5 +1,0 @@
-{
-  "watch": ["packages/**/src"],
-  "ext": ".ts",
-  "exec": "lerna run build --parallel"
-}
