@@ -135,6 +135,10 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	get data() {
 		return Array.from(this._internalStore._includedKeys).map((key) => this.collection().getItem(key))
 	}
+
+	get size() {
+		return this._internalStore._includedKeys.size;
+	}
 	/**
 	 * Watch for changes on this group
 	 * @param callback The callback to run when the state changes
