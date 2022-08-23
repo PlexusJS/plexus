@@ -26,7 +26,6 @@ export class RuntimeInstance {
 	 *  */
 	broadcast<Value = PlexusStateType>(key: string, value: Value) {
 		this.log("info", `Broadcasting a change to ${key}`)
-		// _internalStore._conductor.emit(genEventName(type, key), { key, value })
 		this.engine.emit(key, { key, value })
 	}
 	/**

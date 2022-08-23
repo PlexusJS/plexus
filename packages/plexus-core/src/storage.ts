@@ -124,7 +124,6 @@ export class StorageInstance {
 			this.instance().storage?.set(key, object.value)
 			storedValue = object.value
 		}
-		// return storedValue
 	}
 
 	sync(checkValue?: any) {

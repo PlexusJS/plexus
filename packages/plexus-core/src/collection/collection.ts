@@ -507,7 +507,6 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	get value() {
 		this.mount()
-		// return Array.from(this._internalStore._data.values()).map((item) => item.value)
 		const keys: DataType[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {

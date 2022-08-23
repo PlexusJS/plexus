@@ -45,7 +45,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 			_wDestroyers: new Set<() => void>(),
 			_config: config,
 		}
-		// this.value = value
 		if (!this.provisional) {
 			this.mount()
 		}
@@ -54,14 +53,12 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * The internal id of the state with an instance prefix
 	 */
 	get id(): string {
-		// return this._internalStore._internalId
 		return `${this._watchableStore._internalId}`
 	}
 	/**
 	 * The internal id of the state with an instance prefix
 	 */
 	get instanceId(): string {
-		// return this._internalStore._internalId
 		return `dat_${this._watchableStore._internalId}`
 	}
 
@@ -122,7 +119,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		}
 		if (!isEqual(value as DataType, this.value)) {
 			if (this.checkIfHasKey(value)) {
-				// this._internalStore._state.set(value as DataType)
 				super.set(value as DataType)
 			}
 			// give the id to the new value if it's missing
@@ -139,9 +135,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * @param value A value of the state to merge with the current value
 	 */
 	patch(value: Partial<DataType>) {
-		// if (this.checkIfHasKey(value)) {
-		// 	// this._internalStore._state.patch(value as DataType)
-		// }
 		this.set(deepMerge(this._watchableStore._value, value))
 
 		this.collection().lastUpdatedKey = this.key
@@ -160,7 +153,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * Delete the data instance
 	 */
 	delete() {
-		// this.instance().runtime.removeWatchers("state", this._internalStore._state.name)
 		this.collection().delete(this.key)
 
 		// delete _internalStore._state
@@ -171,7 +163,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	clean() {
 		this._internalStore._wDestroyers.forEach((destroyer) => destroyer())
 		this._internalStore._wDestroyers.clear()
-		// this.instance()._states.delete(this._internalStore._state)
 		this.instance()._collectionData.delete(this)
 	}
 	/**

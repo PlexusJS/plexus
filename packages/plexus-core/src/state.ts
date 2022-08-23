@@ -20,19 +20,16 @@ export type PlexusStateInstance<Value extends PlexusStateType = any> = StateInst
  */
 export class StateInstance<StateValue extends PlexusStateType> extends WatchableMutable<StateValue> {
 	private _internalStore: StateStore<StateValue>
-	// private instance: () => PlexusInstance
 	/**
 	 * The internal id of the state
 	 */
 	get id(): string {
-		// return this._internalStore._internalId
 		return `${this._watchableStore._internalId}`
 	}
 	/**
 	 * The internal id of the state with an instance prefix
 	 */
 	get instanceId(): string {
-		// return this._internalStore._internalId
 		return `ste_${this._watchableStore._internalId}`
 	}
 	constructor(instance: () => PlexusInstance, init: StateValue) {
@@ -51,7 +48,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 
 	private persistSync() {
 		if (this._internalStore._persist) {
-			// this.instance().storage?.get()
 			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
@@ -64,7 +60,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
 		this.instance().runtime.log("info", `State ${this.id} is ready`)
-		// this.instance().runtime.broadcast(this.id, this._watchableStore._value)
 	}
 	/**
 	 * Set the value of the state
@@ -107,14 +102,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		}
 	}
 
-	// removeAllWatchers(){
-	// 	// instance().runtime.unsubscribe(_internalStore._name, key)
-	// 	_internalStore._watchers.forEach(destroy => {
-	// 		if(destroy) destroy()
-	// 	})
-	// 	return _internalStore._watchers.clear()
-	// },
-
 	/**
 	 * Persist the state to selected storage
 	 * @param name The storage prefix to use
@@ -126,11 +113,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		if (this.instance().storage) {
 			// this should only run on initial load of the state when this function is called
 			this.instance().runtime.log("info", `Persisting ${this._internalStore._name}`)
-
-			// if (storedValue !== undefined && storedValue !== null) {
-			// 	instance().runtime.log("info", "apply persisted value")
-			// 	this.set(storedValue)
-			// }
 			this.instance().storage?.monitor(this._internalStore._name, this)
 			const storedValue = this.instance().storage?.get(this._internalStore._name) as StateValue
 			storedValue && this.set(storedValue)
@@ -193,7 +175,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	get value() {
 		this.instance().runtime.log("debug", `Accessing Stateful value ${this.instanceId}${this._internalStore._persist ? "; Persist Enabled" : ""}`)
 		this.mount()
-		// this.persistSync()
 		return super.value
 	}
 	/**

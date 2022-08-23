@@ -4,12 +4,12 @@ export interface EngineEventReceiver {
 	listener: PlexusWatcher
 }
 export class EventEngine {
-	events: Map<string | number, Array<EngineEventReceiver>>
+	events: Map<string, Array<EngineEventReceiver>>
 	constructor() {
 		this.events = new Map()
 	}
 
-	on(eventId: string | number, listener: PlexusWatcher, origin?: string) {
+	on(eventId: string, listener: PlexusWatcher, origin?: string) {
 		if (!eventId || eventId === "") {
 			console.warn("Event Engine: Missing an eventId")
 			return () => null
@@ -25,7 +25,7 @@ export class EventEngine {
 		this.events.get(eventId)?.push(eventWatcher)
 		return () => this.removeListener(eventId, eventWatcher)
 	}
-	removeListener(eventId: string | number, eventWatcher: EngineEventReceiver) {
+	removeListener(eventId: string, eventWatcher: EngineEventReceiver) {
 		// If this eventId is not tracked in the event engine
 		if (!this.events.has(eventId)) {
 			return
@@ -50,13 +50,13 @@ export class EventEngine {
 			this.events.delete(eventId)
 		}
 	}
-	emit(eventId: string | number, args: any) {
+	emit(eventId: string, args: any) {
 		if (!this.events.has(eventId)) {
 			return
 		}
 		this.events.get(eventId)?.forEach((callbackObj) => callbackObj.listener(args))
 	}
-	once(eventId: string | number, eventWatcher: EngineEventReceiver) {
+	once(eventId: string, eventWatcher: EngineEventReceiver) {
 		const remove = this.on(eventId, (...args) => {
 			remove()
 			eventWatcher.listener(...args)
