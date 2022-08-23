@@ -507,14 +507,27 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	get value() {
 		this.mount()
-		return Array.from(this._internalStore._data.values()).map((item) => item.value)
+		// return Array.from(this._internalStore._data.values()).map((item) => item.value)
+		const keys: DataType[] = []
+		for (let item of this._internalStore._data.values()) {
+			if (!item.provisional) {
+				keys.push(item.value)
+			}
+		}
+		return keys
 	}
 	/**
 	 * Get all of the collection data keys as an array
 	 * @returns The collection data values as an array
 	 */
 	get keys() {
-		return Array.from(this._internalStore._data.keys())
+		const keys: (string | number)[] = []
+		for (let item of this._internalStore._data.values()) {
+			if (!item.provisional) {
+				keys.push(item.key)
+			}
+		}
+		return keys
 	}
 	/**
 	 * Get all the groups in the collection as an object
