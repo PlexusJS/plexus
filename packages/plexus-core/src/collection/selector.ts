@@ -58,6 +58,9 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * @param key The key to select
 	 */
 	select(key: DataKey) {
+		if (this.historyLength) {
+			this.data?.history(0)
+		}
 		if (key === this._internalStore._key) {
 			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.instanceId}...`)
 			return
@@ -73,6 +76,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
 		this.instance().runtime.log("info", `Selected data ${this.data?.instanceId} on selector ${this.instanceId}...`)
 		// broadcast the change
+		this.data?.history(this.historyLength)
 		this.runWatchers()
 	}
 	/**
@@ -127,8 +131,10 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			callback(this.data?.value || v)
 		})
 	}
+	private historyLength: number = 0
 
-	history(maxLength?: number): this {
+	history(maxLength: number = 10): this {
+		this.historyLength = maxLength
 		this.data?.history(maxLength)
 		return this
 	}
