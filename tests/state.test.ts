@@ -138,6 +138,9 @@ describe("Testing State Function", () => {
 	})
 
 	test("Checking state history functionality", () => {
+		objectState.watch((v) => {
+			console.log("Got an update from history change!")
+		})
 		objectState.history()
 		objectState.set({ a: { b: false } })
 		console.log("1: checking", objectState.value, "vs.", { a: { b: false } })
@@ -158,12 +161,19 @@ describe("Testing State Function", () => {
 			expect(stringState.value).toBe(nv)
 		})
 		expect(stringState.value).toBe("Hello World9")
-
+		stringState.watch((v) => {
+			console.log("Got an update from history change (string state)!")
+		})
 		new Array(9).fill(null).forEach((_, i) => {
 			const nv = `Hello World${8 - i}`
 			stringState.undo()
 			expect(stringState.value).toBe(nv)
 		})
+		stringState.undo()
+		expect(stringState.value).toBe("Hello Plexus!")
+
+		stringState.redo()
+		expect(stringState.value).toBe("Hello World0")
 		stringState.undo()
 		expect(stringState.value).toBe("Hello Plexus!")
 

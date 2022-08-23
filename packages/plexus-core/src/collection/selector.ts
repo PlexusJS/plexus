@@ -71,7 +71,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			this.runWatchers()
 		}, this.id)
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
-
+		this.instance().runtime.log("info", `Selected data ${this.data?.instanceId} on selector ${this.instanceId}...`)
 		// broadcast the change
 		this.runWatchers()
 	}
@@ -81,11 +81,23 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * @param config The config to use when setting the value
 	 * @param config.mode should we 'patch' or 'replace' the value
 	 */
-	set(value: ValueType, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
+	set(value: ValueType) {
 		// TODO add a warning here if the key is not set
-		config.mode === "replace" ? this.data?.set(value) : this.data?.patch(value)
+		this.data?.set(value)
 		this.runWatchers()
 	}
+	/**
+	 * Patch the value of the selected data instance
+	 * @param value The value to set
+	 * @param config The config to use when setting the value
+	 * @param config.mode should we 'patch' or 'replace' the value
+	 */
+	patch(value: Partial<ValueType>) {
+		// TODO add a warning here if the key is not set
+		this.data?.patch(value)
+		this.runWatchers()
+	}
+
 	/**
 	 * Return the data value of the selected item
 	 */

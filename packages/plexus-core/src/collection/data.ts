@@ -77,7 +77,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		if (!value || !value[this._internalStore.primaryKey as PK]) {
 			return false
 		}
-		console.log(value)
 		// Check if the value has the primary key, and verify the key is the same as the data instance
 		const isCurrentKey = value[this._internalStore.primaryKey as PK].toString().trim() === this.key.toString().trim()
 		// if the key is not the same, then we can't use this value
