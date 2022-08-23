@@ -1,5 +1,5 @@
 import { PlexusInstance } from "."
-import { deepClone, deepMerge, genUID, isObject } from "./helpers"
+import { deepClone, deepMerge, genUID, isObject, isEqual } from "./helpers"
 import { AlmostAnything } from "./interfaces"
 export type PlexusWatcher<V extends any = any> = (value: V) => void
 interface WatchableStore<Value = any> {
@@ -190,6 +190,9 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 
 		// if history, add to archive
 		if (this._history && this._history.maxLength > 0 && !this._history.skipArchiveUpdate) {
+			if (isEqual(this._watchableStore._lastValue, this._watchableStore._value)) {
+				return
+			}
 			this.instance().runtime.log("debug", `Watchable set caused its History to shift ${this.id}`)
 			this._history.archive_head.push(this._watchableStore._lastValue)
 			// if we are setting a new value and the tail has any values, remove them
