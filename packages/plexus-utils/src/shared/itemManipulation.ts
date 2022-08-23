@@ -101,9 +101,6 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 	return thing
 }
 export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
-	if (a === b) {
-		return true
-	}
 	if (a instanceof Date && b instanceof Date) {
 		return a.getTime() === b.getTime()
 	}
@@ -132,6 +129,9 @@ export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
 				return false
 			}
 		}
+		return true
+	}
+	if (a === b) {
 		return true
 	}
 	return false
