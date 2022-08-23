@@ -120,9 +120,10 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		if (!isEqual(value as DataType, this.value)) {
 			if (this.checkIfHasKey(value)) {
 				super.set(value as DataType)
+			} else {
+				// give the id to the new value if it's missing
+				super.set({ ...value, [this.primaryKey]: this.key } as DataType)
 			}
-			// give the id to the new value if it's missing
-			super.set({ ...value, [this.primaryKey]: this.key } as DataType)
 		} else {
 			this.instance().runtime.log("warn", `Tried applying the same value to data "${this.key}" in collection ${this.collection().id}...`)
 		}

@@ -58,12 +58,12 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * @param key The key to select
 	 */
 	select(key: DataKey) {
-		if (this.historyLength) {
-			this.data?.history(0)
-		}
 		if (key === this._internalStore._key) {
 			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.instanceId}...`)
 			return
+		}
+		if (this.historyLength) {
+			this.data?.history(0)
 		}
 		this._internalStore._key = key
 
