@@ -155,29 +155,37 @@ describe("Testing State Function", () => {
 		// checking if the history is working for primitives
 		stringState.history()
 		new Array(10).fill(null).forEach((_, i) => {
-			const nv = `Hello World${i}`
+			const nv = `Hello World${i + 1}`
 			stringState.set(nv)
 			console.log(`${i + 1}: checking`, stringState.value, "vs.", nv)
 			expect(stringState.value).toBe(nv)
 		})
-		expect(stringState.value).toBe("Hello World9")
+		expect(stringState.value).toBe("Hello World10")
+
 		stringState.watch((v) => {
 			console.log("Got an update from history change (string state)!")
 		})
-		new Array(9).fill(null).forEach((_, i) => {
-			const nv = `Hello World${8 - i}`
-			stringState.undo()
+		new Array(10).fill(null).forEach((_, i, arr) => {
+			const nv = `Hello World${arr.length - i}`
+			console.log(`${i + 1}: checking`, stringState.value, "vs.", nv)
 			expect(stringState.value).toBe(nv)
+			stringState.undo()
 		})
+
+		console.log(`undo`)
 		stringState.undo()
 		expect(stringState.value).toBe("Hello Plexus!")
 
+		console.log(`redo`)
 		stringState.redo()
-		expect(stringState.value).toBe("Hello World0")
+		expect(stringState.value).toBe("Hello World1")
+
+		console.log(`undo`)
 		stringState.undo()
 		expect(stringState.value).toBe("Hello Plexus!")
 
+		console.log(`redo`)
 		stringState.redo()
-		expect(stringState.value).toBe("Hello World0")
+		expect(stringState.value).toBe("Hello World1")
 	})
 })

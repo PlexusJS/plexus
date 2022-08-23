@@ -80,13 +80,9 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 				this.set(newValue)
 				this._history.archive_tail.unshift(currentValue)
 			} else {
-				this.instance().runtime.log("warn", `No history to undo for ${this.id}; setting to initial value.`)
-				// this.set(this._watchableStore._initialValue)
-				this.set(this._history.start)
+				this.instance().runtime.log("warn", `No history to undo for ${this.id}`)
 			}
 
-			// After using set, archive head has the last set value which is not what we want. So we pop to remove it from the archive head
-			// this._history.archive_head.pop()
 			this._history.skipArchiveUpdate = false
 		}
 		// no history, so just try to reset to last value; if null, reset to initial value
@@ -119,16 +115,13 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 				this.set(newValue)
 				this._history.archive_head.push(currentValue)
 			} else {
-				this.instance().runtime.log("warn", `No history to redo for ${this.id}; setting to current/next value.`)
-				this.set(this._watchableStore._nextValue)
+				this.instance().runtime.log("warn", `No history to redo for ${this.id}`)
+				// this.set(this._watchableStore._nextValue)
 			}
-
-			// After using set, archive head has the last set value which is not what we want. So we pop to remove it from the archive head
-			// this._history.archive_head.pop()
 
 			this._history.skipArchiveUpdate = false
 		}
-		// no upcoming history, so just try to reset to current/value;
+		// no upcoming history, so just try to reset to current/next value;
 		else {
 			this.set()
 		}
@@ -206,12 +199,9 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 				this._history.archive_tail.length = 0
 			}
 			// if archive is too long, remove oldest
-			const archiveLength = this._history.archive_head.length + this._history.archive_tail.length
-			if (archiveLength > this._history.maxLength) {
+			if (this._history.archive_head.length > this._history.maxLength) {
 				if (this._history.archive_head.length > 0) {
 					this._history.archive_head.shift()
-				} else {
-					this._history.archive_tail.shift()
 				}
 			}
 		}
