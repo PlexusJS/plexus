@@ -118,7 +118,7 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 			this.provisional = false
 		}
 
-		if (!isEqual(value as DataType, this.value)) {
+		if (!isEqual(value as DataType, this._watchableStore._value)) {
 			if (this.checkIfHasKey(value)) {
 				super.set(value as DataType)
 			} else {

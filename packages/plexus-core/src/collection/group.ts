@@ -62,7 +62,7 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 		this.instance().runtime.log("info", `Running watchers on group ${this._internalStore._name}(${this.instanceId})...`)
 		const keys = Array.from(this._internalStore._includedKeys)
 		// memoization: this updates the groups stored value! This reduces computation as the state of the group is only updated when the data changes
-		this._watchableStore._value = keys.map((key) => this.collection().getItemValue(key)).filter((v) => v !== undefined) as DataType[]
+		this._watchableStore._publicValue = keys.map((key) => this.collection().getItemValue(key)).filter((v) => v !== undefined) as DataType[]
 		this.instance().runtime.broadcast(this.id, this.value)
 	}
 	private rebuildDataWatchers() {
@@ -137,7 +137,7 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	}
 
 	get size() {
-		return this._internalStore._includedKeys.size;
+		return this._internalStore._includedKeys.size
 	}
 	/**
 	 * Watch for changes on this group
