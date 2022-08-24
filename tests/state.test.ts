@@ -187,5 +187,41 @@ describe("Testing State Function", () => {
 		console.log(`redo`)
 		stringState.redo()
 		expect(stringState.value).toBe("Hello World1")
+
+		console.log("")
+		console.log("")
+
+		const complexObj = state({
+			obj: {
+				arr: [
+					{
+						item1: "initial",
+					},
+				],
+			},
+		}).history()
+
+		instance({ logLevel: "debug" })
+
+		expect(complexObj.value.obj.arr[0].item1).toBe("initial")
+		complexObj.patch({
+			obj: {
+				arr: [
+					{
+						item1: "2",
+					},
+				],
+			},
+		})
+		expect(complexObj.value.obj.arr[0].item1).toBe("2")
+
+		console.log(`undo`)
+		complexObj.undo()
+		expect(complexObj.value.obj.arr[0].item1).toBe("initial")
+
+		console.log(`redo`)
+		complexObj.redo()
+		expect(complexObj.value.obj.arr[0].item1).toBe("2")
+		instance({ logLevel: undefined })
 	})
 })

@@ -1,7 +1,17 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
 import { collection, instance, PlexusCollectionInstance } from "@plexusjs/core"
 
-const myCollection = collection<{ thing: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
+const myCollection = collection<{
+	thing: string
+	id: number
+	obj?: {
+		arr: {
+			item1: string
+		}[]
+	}
+}>({ defaultGroup: true })
+	.createGroups(["group1", "group2"])
+	.createSelector("main")
 const myCollectionUndefined = collection<{ thing: string; id: number }>({ defaultGroup: true, unfoundKeyReturnsUndefined: true })
 	.createGroups(["group1", "group2"])
 	.createSelector("main")
@@ -402,6 +412,44 @@ describe("Testing Collection", () => {
 		console.log("redo complete...")
 
 		expect(myCollection.selectors.main.value).toStrictEqual({ thing: "new", id: 0 })
+		instance({ logLevel: undefined })
+
+		instance({ logLevel: "debug" })
+		myCollection.selectors.main.patch({
+			thing: "new",
+			obj: {
+				arr: [
+					{
+						item1: "1",
+					},
+				],
+			},
+		})
+		expect(myCollection.selectors.main.value.obj?.arr[0].item1).toBe("1")
+		const changedVal = myCollection.selectors.main.value
+		changedVal.obj && (changedVal.obj.arr[0].item1 = "2")
+		myCollection.selectors.main.patch({
+			...changedVal,
+		})
+		expect(myCollection.selectors.main.value.obj?.arr[0].item1).toBe("2")
+		// complexObj.patch({
+		// obj: {
+		// 	arr: [
+		// 		{
+		// 			item1: "2",
+		// 		},
+		// 	],
+		// },
+		// })
+		// expect(complexObj.value.obj.arr[0].item1).toBe("2")
+
+		// console.log(`undo`)
+		// complexObj.undo()
+		// expect(complexObj.value.obj.arr[0].item1).toBe("initial")
+
+		// console.log(`redo`)
+		// complexObj.redo()
+		// expect(complexObj.value.obj.arr[0].item1).toBe("2")
 		instance({ logLevel: undefined })
 
 		// // checking if the history is working for primitives

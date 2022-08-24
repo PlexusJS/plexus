@@ -62,6 +62,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.instanceId}...`)
 			return
 		}
+		// reset the history if there was one
 		if (this.historyLength) {
 			this.data?.history(0)
 		}
@@ -75,8 +76,9 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		}, this.id)
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
 		this.instance().runtime.log("info", `Selected data ${this.data?.instanceId} on selector ${this.instanceId}...`)
-		// broadcast the change
+		// reinitialize history with the same stored length
 		this.data?.history(this.historyLength)
+		// broadcast the change
 		this.runWatchers()
 	}
 	/**

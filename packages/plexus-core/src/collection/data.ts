@@ -24,7 +24,7 @@ type DataObjectType<PK extends string = "id"> = Record<string, any> & { [Key in 
 export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> extends WatchableMutable<DataType> {
 	private primaryKey: PK
 	readonly key: string | number
-	provisional: boolean | undefined
+	provisional: boolean
 	private _internalStore: PlexusDataStore<DataType>
 
 	constructor(
@@ -112,11 +112,12 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		if (!value) return this
 
 		// if this is provisional, mount to the collection & instance
-		if (!!this.provisional) {
+		if (this.provisional) {
 			this.instance().runtime.log("debug", `Mounting provisional data instance "${this.key}" to instance...`)
 			this.mount()
-			this.provisional = undefined
+			this.provisional = false
 		}
+
 		if (!isEqual(value as DataType, this.value)) {
 			if (this.checkIfHasKey(value)) {
 				super.set(value as DataType)

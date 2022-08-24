@@ -140,7 +140,7 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		} else {
 			this._watchableStore._value = value
 		}
-		this._watchableStore._publicValue = deepClone(this._watchableStore._value)
+		// this._watchableStore._publicValue = deepClone(this._watchableStore._value)
 		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
 
 		// update the runtime conductor
