@@ -84,8 +84,14 @@ export function setGlobalCatch(catcher: (err: any) => unknown) {
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
 function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
 
-export function usePlugin(plugin: PlexusPlugin) {
-	plugin.init((name?: string) => instance({ instanceId: name }))
+export function usePlugin(instance: PlexusInstance, plugin: PlexusPlugin): void
+export function usePlugin(instanceId: string, plugin: PlexusPlugin): void
+export function usePlugin(instanceOrInstanceId: PlexusInstance | string, plugin: PlexusPlugin) {
+
+	if (typeof instanceOrInstanceId === 'string') {
+
+		plugin.init((name?: string) => instance({ instanceId: name }))
+	}
 	instance()._plugins.set(plugin.name, plugin)
 }
 

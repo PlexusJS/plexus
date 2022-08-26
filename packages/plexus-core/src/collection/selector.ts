@@ -62,6 +62,10 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.instanceId}...`)
 			return
 		}
+		// reset the history if there was one
+		if (this.historyLength) {
+			this.data?.history(0)
+		}
 		this._internalStore._key = key
 
 		this._internalStore._dataWatcherDestroyer?.()
@@ -71,7 +75,9 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			this.runWatchers()
 		}, this.id)
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
-
+		this.instance().runtime.log("info", `Selected data ${this.data?.instanceId} on selector ${this.instanceId}...`)
+		// reinitialize history with the same stored length
+		this.data?.history(this.historyLength)
 		// broadcast the change
 		this.runWatchers()
 	}
@@ -81,11 +87,23 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * @param config The config to use when setting the value
 	 * @param config.mode should we 'patch' or 'replace' the value
 	 */
-	set(value: ValueType, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
+	set(value: ValueType) {
 		// TODO add a warning here if the key is not set
-		config.mode === "replace" ? this.data?.set(value) : this.data?.patch(value)
+		this.data?.set(value)
 		this.runWatchers()
 	}
+	/**
+	 * Patch the value of the selected data instance
+	 * @param value The value to set
+	 * @param config The config to use when setting the value
+	 * @param config.mode should we 'patch' or 'replace' the value
+	 */
+	patch(value: Partial<ValueType>) {
+		// TODO add a warning here if the key is not set
+		this.data?.patch(value)
+		this.runWatchers()
+	}
+
 	/**
 	 * Return the data value of the selected item
 	 */
@@ -114,6 +132,27 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			this.instance().runtime.log("debug", `Watching selector ${this.instanceId} with a new callback`)
 			callback(this.data?.value || v)
 		})
+	}
+	private historyLength: number = 0
+
+	history(maxLength: number = 10): this {
+		this.historyLength = maxLength
+		this.data?.history(maxLength)
+		return this
+	}
+	get canRedo(): boolean {
+		return !!this.data?.canRedo
+	}
+	get canUndo(): boolean {
+		return !!this.data?.canUndo
+	}
+	undo(): this {
+		this.data?.undo()
+		return this
+	}
+	redo(): this {
+		this.data?.redo()
+		return this
 	}
 }
 

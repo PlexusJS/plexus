@@ -81,15 +81,12 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 		return new RegExp(thing) as any as Type
 	}
 	// must be an object
-	if (isObject(thing)) {
-		const cloned: Type = Object.create(thing as Object)
+	if (typeof thing === "object" && thing && thing !== null) {
+		const cloned: Type = Array.isArray(thing) ? (Array.from(thing) as unknown as Type) : ({ ...thing } as unknown as Type)
 		for (const key in thing) {
 			if ((thing as Object).hasOwnProperty(key)) {
 				cloned[key] = deepClone(thing[key])
 			}
-		}
-		if (Array.isArray(thing)) {
-			return Object.values(cloned) as any as Type
 		}
 		// if it was originally an array, return an array
 		if (Array.isArray(thing)) {
@@ -101,9 +98,6 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 	return thing
 }
 export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
-	if (a === b) {
-		return true
-	}
 	if (a instanceof Date && b instanceof Date) {
 		return a.getTime() === b.getTime()
 	}
@@ -132,6 +126,9 @@ export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
 				return false
 			}
 		}
+		return true
+	}
+	if (a === b) {
 		return true
 	}
 	return false

@@ -5,11 +5,15 @@ import { PlexusWatcher } from "../interfaces"
 import { StateInstance } from "../state"
 import { PlexusCollectionInstance } from "./collection"
 import { deepClone, deepMerge, isEqual, isObject } from "../helpers"
+
+interface CollectionDataConfig {
+	prov: boolean
+	unfoundKeyIsUndefined?: boolean
+}
 interface PlexusDataStore<DataType extends Record<string, any>> {
-	_key: string | number
 	primaryKey: string
-	// _state: StateInstance<DataType>
 	_wDestroyers: Set<() => void>
+	_config: CollectionDataConfig
 }
 
 export type PlexusDataInstance<DataType extends Record<string, any> = Record<string, any>> = CollectionDataInstance<DataType>
@@ -18,34 +22,43 @@ export type DataKey = string | number
 // TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
 type DataObjectType<PK extends string = "id"> = Record<string, any> & { [Key in PK]: DataKey }
 export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, PK extends string = string> extends WatchableMutable<DataType> {
-	// private instance: () => PlexusInstance
-	primaryKey: PK
+	private primaryKey: PK
+	readonly key: string | number
+	provisional: boolean
 	private _internalStore: PlexusDataStore<DataType>
-	constructor(instance: () => PlexusInstance, public collection: () => PlexusCollectionInstance<DataType>, primaryKey: PK, value: DataType) {
+
+	constructor(
+		instance: () => PlexusInstance,
+		public collection: () => PlexusCollectionInstance<DataType>,
+		primaryKey: PK,
+		keyValue: string | number,
+		value: DataType,
+		config: CollectionDataConfig = { prov: false }
+	) {
 		super(instance, value)
-		// this.instance = instance
+		this.provisional = config.prov
 		this.primaryKey = primaryKey
+		this.key = keyValue
+
 		this._internalStore = {
-			_key: value[primaryKey],
 			primaryKey,
-			// _state: state<DataType>(value).key(`collection_data_${collection().id}_${value[primaryKey]}`),
 			_wDestroyers: new Set<() => void>(),
+			_config: config,
 		}
-		// this.value = value
-		this.mount()
+		if (!this.provisional) {
+			this.mount()
+		}
 	}
 	/**
 	 * The internal id of the state with an instance prefix
 	 */
 	get id(): string {
-		// return this._internalStore._internalId
 		return `${this._watchableStore._internalId}`
 	}
 	/**
 	 * The internal id of the state with an instance prefix
 	 */
 	get instanceId(): string {
-		// return this._internalStore._internalId
 		return `dat_${this._watchableStore._internalId}`
 	}
 
@@ -53,22 +66,23 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 		if (!this.instance()._collectionData.has(this)) {
 			this.instance()._collectionData.add(this)
 			this.instance().runtime.log("info", `Hoisting collection data ${this.instanceId} with value`, this._watchableStore._value, `to instance`)
-			// if (this._internalStore._persist) {
-			// 	this.instance().storage?.sync()
-			// }
 		}
 	}
 
-	private checkIfHasKey(value: Partial<DataType>) {
+	private checkIfHasKey(value?: Partial<DataType>): boolean {
+		// if the value is undefined/null
+		if (!value || !value[this._internalStore.primaryKey as PK]) {
+			return false
+		}
 		// Check if the value has the primary key, and verify the key is the same as the data instance
-		const isCurrentKey = value[this._internalStore.primaryKey as PK].toString().trim() === this._internalStore._key.toString().trim()
-		// if the ket is not the same, then we can't use this value
+		const isCurrentKey = value[this._internalStore.primaryKey as PK].toString().trim() === this.key.toString().trim()
+		// if the key is not the same, then we can't use this value
 		const valid = value[this._internalStore.primaryKey] !== undefined && isCurrentKey
 		this.instance().runtime.log(
 			"warn",
-			`The new data value ${valid ? "WILL" : "WILL NOT"} be set in "replace" mode...`,
-			this._internalStore._key,
-			value[this._internalStore.primaryKey] === this._internalStore._key
+			`The incoming value key does ${valid ? "" : "NOT"} match the stored key...`,
+			this.key,
+			value[this._internalStore.primaryKey] === this.key
 		)
 		return valid
 	}
@@ -97,21 +111,25 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	set(value?: Partial<DataType>) {
 		if (!value) return this
 
-		// maybe this check should be done inside of the state?
-		if (!isEqual(value as DataType, this.value)) {
-			if (this.checkIfHasKey(value)) {
-				// this._internalStore._state.set(value as DataType)
-				super.set(value as DataType)
-			}
-			// give the id to the new value if it's missing
-			super.set({ ...value, [this.primaryKey]: this.value[this.primaryKey] } as DataType)
-		} else {
-			this.instance().runtime.log(
-				"warn",
-				`Tried applying the same value to data "${this.value[this.primaryKey]}" in collection ${this.collection().id}...`
-			)
+		// if this is provisional, mount to the collection & instance
+		if (this.provisional) {
+			this.instance().runtime.log("debug", `Mounting provisional data instance "${this.key}" to instance...`)
+			this.mount()
+			this.provisional = false
 		}
-		this.collection().lastUpdatedKey = this._internalStore._key
+
+		if (!isEqual(value as DataType, this._watchableStore._value)) {
+			if (this.checkIfHasKey(value)) {
+				super.set(value as DataType)
+			} else {
+				// give the id to the new value if it's missing
+				super.set({ ...value, [this.primaryKey]: this.key } as DataType)
+			}
+		} else {
+			this.instance().runtime.log("warn", `Tried applying the same value to data "${this.key}" in collection ${this.collection().id}...`)
+		}
+		this.collection().lastUpdatedKey = this.key
+
 		return this
 	}
 	/**
@@ -119,12 +137,9 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * @param value A value of the state to merge with the current value
 	 */
 	patch(value: Partial<DataType>) {
-		// if (this.checkIfHasKey(value)) {
-		// 	// this._internalStore._state.patch(value as DataType)
-		// }
 		this.set(deepMerge(this._watchableStore._value, value))
 
-		this.collection().lastUpdatedKey = this._internalStore._key
+		this.collection().lastUpdatedKey = this.key
 		return this
 	}
 
@@ -140,8 +155,7 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * Delete the data instance
 	 */
 	delete() {
-		// this.instance().runtime.removeWatchers("state", this._internalStore._state.name)
-		this.collection().delete(this._internalStore._key)
+		this.collection().delete(this.key)
 
 		// delete _internalStore._state
 	}
@@ -151,7 +165,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	clean() {
 		this._internalStore._wDestroyers.forEach((destroyer) => destroyer())
 		this._internalStore._wDestroyers.clear()
-		// this.instance()._states.delete(this._internalStore._state)
 		this.instance()._collectionData.delete(this)
 	}
 	/**
@@ -160,7 +173,6 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<DataType>, from?: string) {
-		// const destroyer = this._internalStore._state.watch(callback)
 		const destroyer = super.watch(callback, from)
 		return destroyer
 	}
@@ -170,11 +182,12 @@ export function _data<DataType extends Record<string, any>>(
 	instance: () => PlexusInstance,
 	collection: () => PlexusCollectionInstance<DataType>,
 	primaryKey: string,
+	keyValue: number | string,
 	value: DataType,
-	config: { prov: boolean } = { prov: false }
+	config: CollectionDataConfig = { prov: false }
 ) {
-	if ((value[primaryKey] !== undefined && value[primaryKey] !== null) || config.prov) {
-		return new CollectionDataInstance(instance, collection, primaryKey, value)
+	if ((value?.[primaryKey] !== undefined && value?.[primaryKey] !== null) || config.prov) {
+		return new CollectionDataInstance(instance, collection, primaryKey, keyValue, value, config)
 	}
 	return null
 }

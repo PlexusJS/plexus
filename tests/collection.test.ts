@@ -1,7 +1,20 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
 import { collection, instance, PlexusCollectionInstance } from "@plexusjs/core"
 
-let myCollection = collection<{ thing: string; id: number }>({ defaultGroup: true }).createGroups(["group1", "group2"]).createSelector("main")
+const myCollection = collection<{
+	thing: string
+	id: number
+	obj?: {
+		arr: {
+			item1: string
+		}[]
+	}
+}>({ defaultGroup: true })
+	.createGroups(["group1", "group2"])
+	.createSelector("main")
+const myCollectionUndefined = collection<{ thing: string; id: number }>({ defaultGroup: true, unfoundKeyReturnsUndefined: true })
+	.createGroups(["group1", "group2"])
+	.createSelector("main")
 // instance({ logLevel: "debug" })
 beforeEach(() => {
 	myCollection.clear()
@@ -27,6 +40,9 @@ describe("Testing Collection", () => {
 		expect(myCollection.getItemValue(0)?.thing).toBe("lol")
 		expect(myCollection.getItemValue(2)?.thing).toBe("lol3")
 		expect(myCollection.getItemValue(1)?.thing).toBe("lols")
+
+		// does the unfoundKeyReturnsUndefined configuration work
+		expect(myCollectionUndefined.getItemValue(0)).toBeUndefined()
 	})
 	test("Does it pass the vibe check ?", () => {
 		myCollection.collect({ thing: "xqcL", id: 0 })
@@ -167,7 +183,7 @@ describe("Testing Collection", () => {
 
 		let watcherCalled = false
 		// watch for any change on selector main
-		myCollection.getSelector("main").watch((value) => {
+		const kill = myCollection.getSelector("main").watch((value) => {
 			console.log("selector changed\n%o\n%o", value, myCollection.getSelector("main").value)
 			expect(value).toBeDefined()
 			watcherCalled = true
@@ -185,6 +201,7 @@ describe("Testing Collection", () => {
 		// myCollection.collect({ thing: "lol2", id: 9 }, "group1")
 
 		// expect(watcherCalled).toBe(true)
+		kill()
 	})
 	test("Watching Data", () => {
 		myCollection.collect([
@@ -340,5 +357,122 @@ describe("Testing Collection", () => {
 		myCollection.selectors.main.data?.patch({ thing: "lol2" })
 		expect(myCollection.value.length).toBe(3)
 		expect(myCollection.getSelector("main").value.thing).toBe("lol2")
+	})
+
+	test("Can a provisional Data item stay reactive", () => {
+		console.log("Check...")
+		instance({ logLevel: "debug" })
+		myCollection.getItem(15).watch((v) => {
+			console.log(`new data`, v)
+		})
+		console.log(myCollection.getItem(15).value)
+		myCollection.getItem(15).set({ thing: "provisional no more" })
+		console.log("wtf")
+		console.log(myCollection.getItem(15).value)
+		instance({ logLevel: undefined })
+	})
+
+	test("Checking selector history functionality", () => {
+		instance({ logLevel: "debug" })
+		myCollection.collect([
+			{ thing: "lol", id: 0 },
+			{ thing: "lol3", id: 2 },
+			{ thing: "lols", id: 1 },
+		])
+
+		myCollection.selectors.main.select(0)
+		myCollection.selectors.main.history()
+
+		myCollection.selectors.main.watch((v) => {
+			console.log("Got an update from history change!", v)
+		})
+		console.log("setting the data...")
+		myCollection.selectors.main.patch({ thing: "new" })
+
+		// console.log("1: checking", objectState.value, "vs.", { a: { b: false } })
+		expect(myCollection.selectors.main.value).toStrictEqual({ thing: "new", id: 0 })
+		console.log("undoing...")
+		myCollection.selectors.main.undo()
+		console.log("undo complete...")
+		// console.log("2: checking", objectState.value, "vs.", initialValue.object)
+		expect(myCollection.selectors.main.value).toStrictEqual({ thing: "lol", id: 0 })
+		console.log("redoing...")
+		myCollection.selectors.main.redo()
+		console.log("redo complete...")
+
+		expect(myCollection.selectors.main.value).toStrictEqual({ thing: "new", id: 0 })
+
+		console.log("undoing...")
+		myCollection.selectors.main.undo()
+		console.log("undo complete...")
+		// console.log("2: checking", objectState.value, "vs.", initialValue.object)
+		expect(myCollection.selectors.main.value).toStrictEqual({ thing: "lol", id: 0 })
+		console.log("redoing...")
+		myCollection.selectors.main.redo()
+		console.log("redo complete...")
+
+		expect(myCollection.selectors.main.value).toStrictEqual({ thing: "new", id: 0 })
+		instance({ logLevel: undefined })
+
+		instance({ logLevel: "debug" })
+		myCollection.selectors.main.patch({
+			thing: "new",
+			obj: {
+				arr: [
+					{
+						item1: "1",
+					},
+				],
+			},
+		})
+		expect(myCollection.selectors.main.value.obj?.arr[0].item1).toBe("1")
+		const changedVal = myCollection.selectors.main.value
+		changedVal.obj && (changedVal.obj.arr[0].item1 = "2")
+		myCollection.selectors.main.patch({
+			...changedVal,
+		})
+		expect(myCollection.selectors.main.value.obj?.arr[0].item1).toBe("2")
+		// complexObj.patch({
+		// obj: {
+		// 	arr: [
+		// 		{
+		// 			item1: "2",
+		// 		},
+		// 	],
+		// },
+		// })
+		// expect(complexObj.value.obj.arr[0].item1).toBe("2")
+
+		// console.log(`undo`)
+		// complexObj.undo()
+		// expect(complexObj.value.obj.arr[0].item1).toBe("initial")
+
+		// console.log(`redo`)
+		// complexObj.redo()
+		// expect(complexObj.value.obj.arr[0].item1).toBe("2")
+		instance({ logLevel: undefined })
+
+		// // checking if the history is working for primitives
+		// stringState.history()
+		// new Array(10).fill(null).forEach((_, i) => {
+		// 	const nv = `Hello World${i}`
+		// 	stringState.set(nv)
+		// 	console.log(`${i + 1}: checking`, stringState.value, "vs.", nv)
+		// 	expect(stringState.value).toBe(nv)
+		// })
+		// expect(stringState.value).toBe("Hello World9")
+		// stringState.watch((v) => {
+		// 	console.log("Got an update from history change (string state)!")
+		// })
+		// new Array(9).fill(null).forEach((_, i) => {
+		// 	const nv = `Hello World${8 - i}`
+		// 	stringState.undo()
+		// 	expect(stringState.value).toBe(nv)
+		// })
+		// stringState.undo()
+		// expect(stringState.value).toBe("Hello Plexus!")
+
+		// stringState.redo()
+		// expect(stringState.value).toBe("Hello World0")
 	})
 })
