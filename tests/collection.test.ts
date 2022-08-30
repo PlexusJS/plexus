@@ -278,6 +278,24 @@ describe("Testing Collection", () => {
 		myCollection.delete(1)
 		expect(myCollection.getGroup("default").value.length).toBe(2)
 	})
+	
+
+	test(`Do computed functions work ?`, () => {
+		const computedCollection = collection<{
+			id: string;
+			name: string;
+			backwards?: string;
+		}>().compute((data) => {
+			data.backwards = data.name.split('').reverse().join('');
+			return data;
+		});
+		computedCollection.collect({
+			id: 'x',
+			name: 'jack'
+		});
+		expect(computedCollection.getItemValue('x').backwards).toBe('kcaj');
+	})
+
 	test("Collecting into a group, then ensuring the group is up to date", () => {
 		let collected = false
 		let deleted = false
