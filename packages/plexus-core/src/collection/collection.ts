@@ -497,6 +497,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	compute(fn: (v: DataType) => DataType) {
 		this._internalStore._computeFn = fn;
+		return this;
 	}
 	/**
 	 * Set the key of the collection for enhanced internal tracking
