@@ -44,6 +44,7 @@ interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	set externalName(value: string)
 	_persist: boolean
 	set persist(value: boolean)
+	_computeFn?: (data: DataType) => DataType;
 }
 
 export type PlexusCollectionInstance<
@@ -142,6 +143,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		const collectItem = (item: DataType) => {
 			if (!item) return
 			if (item[this._internalStore._key] !== undefined && item[this._internalStore._key] !== null) {
+				// Compute item before setting/storing
+				if (typeof this._internalStore._computeFn === 'function') item = this._internalStore._computeFn(item);
 				// normalizing the key type to string
 				const dataKey = item[this._internalStore._key]
 				// if there is already a state for that key, update it
@@ -492,7 +495,9 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * Run this function when data is collected to format it in a particular way; useful for converting one datatype into another
 	 * @param fn
 	 */
-	compute(fn: (v: DataType) => DataType) {}
+	compute(fn: (v: DataType) => DataType) {
+		this._internalStore._computeFn = fn;
+	}
 	/**
 	 * Set the key of the collection for enhanced internal tracking
 	 */
