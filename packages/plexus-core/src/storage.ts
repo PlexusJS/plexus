@@ -128,7 +128,7 @@ export class StorageInstance {
 
 	sync(checkValue?: any) {
 		this.instance().runtime.log("info", "Syncing storage...")
-		this._internalStore.tracking.forEach((object) => {
+		this._internalStore.tracking.forEach(async (object) => {
 			let key: string | null = null
 			if (typeof object?.key === "string") {
 				key = object?.key
@@ -142,7 +142,7 @@ export class StorageInstance {
 			}
 
 			// instance().storage.monitor(key, object)
-			let storedValue = this.get(key)
+			let storedValue = await this.get(key)
 
 			if (storedValue) {
 				const val = checkValue ?? object.value
