@@ -111,12 +111,15 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		if (name) this._internalStore._name = `state_${name}`
 
 		if (this.instance().storage) {
-			// this should only run on initial load of the state when this function is called
-			this.instance().runtime.log("info", `Persisting ${this._internalStore._name}`)
-			this.instance().storage?.monitor(this._internalStore._name, this)
-			const storedValue = this.instance().storage?.get(this._internalStore._name) as StateValue
-			storedValue && this.set(storedValue)
-			this._internalStore._persist = true
+			// Bandaid
+			(async () => {
+				// this should only run on initial load of the state when this function is called
+				this.instance().runtime.log("info", `Persisting ${this._internalStore._name}`)
+				this.instance().storage?.monitor(this._internalStore._name, this)
+				const storedValue = await this.instance().storage?.get(this._internalStore._name) as StateValue
+				storedValue && this.set(storedValue)
+				this._internalStore._persist = true
+			})();
 		}
 		return this
 	}
