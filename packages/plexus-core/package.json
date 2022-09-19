@@ -30,5 +30,5 @@
 	"dependencies": {
 		"@plexusjs/api": "1.4.0",
 		"@plexusjs/utils": "1.4.0"
-	}
+ 	}
 }

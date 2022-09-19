@@ -30,6 +30,16 @@ export interface PlexusCollectionConfig<DataType> {
 	 * @warning The type of the returned value WILL NOT change to undefined. Only the literal value will be undefined as this is _technically_ an override. Please beware and plan accordingly.
 	 */
 	unfoundKeyReturnsUndefined?: boolean
+
+	foreignKeys?: Partial<
+		Record<
+			keyof DataType,
+			{
+				newKey: string
+				reference: () => PlexusCollectionInstance
+			}
+		>
+	>
 }
 interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	_internalId: string

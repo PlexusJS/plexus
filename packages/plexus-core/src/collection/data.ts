@@ -90,6 +90,27 @@ export class CollectionDataInstance<DataType extends DataObjectType<PK> = any, P
 	 * Get the value of the data instance
 	 */
 	get value() {
+		const foreignKeys = this.collection().config.foreignKeys
+		if (foreignKeys) {
+			type ForeignRecords = Record<
+				keyof typeof foreignKeys[keyof typeof foreignKeys]["newKey"],
+				ReturnType<typeof foreignKeys[keyof typeof foreignKeys]["reference"]>
+			>
+
+			const value = { ...super.value } as Partial<ForeignRecords> & DataType
+			let oldKey: keyof DataType
+
+			for (oldKey of Object.keys(foreignKeys ?? {})) {
+				const newKey: keyof Partial<ForeignRecords> = foreignKeys[oldKey]?.newKey as keyof Partial<ForeignRecords>
+				Object.defineProperty(value, newKey, {
+					get() {
+						return foreignKeys[oldKey]?.reference().value
+					},
+				})
+			}
+
+			return value
+		}
 		return super.value
 	}
 	/**

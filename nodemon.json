@@ -1,0 +1,4 @@
+{
+	"verbose": true,
+	"ignore": ["*.test.ts", "*.test.tsx", "**/dist/**"]
+}
