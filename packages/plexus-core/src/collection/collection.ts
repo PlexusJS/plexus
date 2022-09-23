@@ -5,8 +5,8 @@ import { _data, PlexusDataInstance, DataKey } from "./data"
 import { _group, PlexusCollectionGroup, PlexusCollectionGroupConfig, GroupName } from "./group"
 import { PlexusCollectionSelector, SelectorName, _selector } from "./selector"
 
-type GroupMap<DataType> = Map<GroupName, PlexusCollectionGroup<DataType>>
-type SelectorMap<DataType> = Map<SelectorName, PlexusCollectionSelector<DataType>>
+type GroupMap<DataType extends Record<string, any>> = Map<GroupName, PlexusCollectionGroup<DataType>>
+type SelectorMap<DataType extends Record<string, any>> = Map<SelectorName, PlexusCollectionSelector<DataType>>
 type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<infer K, unknown> ? K : never
 
 // type valuesOfArray =
@@ -31,7 +31,7 @@ export interface PlexusCollectionConfig<DataType> {
 	 */
 	unfoundKeyReturnsUndefined?: boolean
 }
-interface PlexusCollectionStore<DataType, Groups, Selectors> {
+interface PlexusCollectionStore<DataType extends Record<string, any>, Groups, Selectors> {
 	_internalId: string
 	_lastChanged: number | string
 	_lookup: Map<string, string>
@@ -47,14 +47,14 @@ interface PlexusCollectionStore<DataType, Groups, Selectors> {
 }
 
 export type PlexusCollectionInstance<
-	DataType = Record<string, any>,
+	DataType extends Record<string, any> = Record<string, any>,
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * @description A Collection Instance
  */
-export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Selectors extends SelectorMap<DataType>> {
+export class CollectionInstance<DataType extends Record<string, any>, Groups extends GroupMap<DataType>, Selectors extends SelectorMap<DataType>> {
 	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
 	private instance: () => PlexusInstance
 	/**

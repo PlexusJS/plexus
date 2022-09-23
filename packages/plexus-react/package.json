@@ -19,13 +19,13 @@
 	"license": "MIT",
 	"peerDependencies": {
 		"@plexusjs/core": "~1",
-		"react": "^17"
+		"react": ">=17"
 	},
 	"devDependencies": {
 		"@types/react": "^16.9.49",
 		"@types/react-test-renderer": "^18.0.0",
 		"@types/use-sync-external-store": "^0.0.3",
-		"react": "^17",
+		"react": ">=17",
 		"react-test-renderer": "^18.2.0"
 	},
 	"scripts": {
