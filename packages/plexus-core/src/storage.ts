@@ -56,6 +56,7 @@ export class StorageInstance {
 	set(key: string, value: any): void {
 		if (this.override?.set) {
 			this.override?.set(key, value)
+			return;
 		}
 		// try to run with localstorage
 		const ls = StorageInstance.getLocalStorage()
@@ -76,6 +77,7 @@ export class StorageInstance {
 	patch(key: string, value: any): void {
 		if (this.override?.patch) {
 			this.override?.patch(key, value)
+			return;
 		}
 		// try to run with localstorage
 		const ls = StorageInstance.getLocalStorage()
@@ -97,8 +99,9 @@ export class StorageInstance {
 		}
 	}
 	remove(key: string): void {
-		if (this.override?.get) {
+		if (this.override?.remove) {
 			this.override?.remove(key)
+			return;
 		}
 		// try to run with localstorage
 		const ls = StorageInstance.getLocalStorage()
@@ -128,7 +131,7 @@ export class StorageInstance {
 
 	sync(checkValue?: any) {
 		this.instance().runtime.log("info", "Syncing storage...")
-		this._internalStore.tracking.forEach((object) => {
+		this._internalStore.tracking.forEach(async (object) => {
 			let key: string | null = null
 			if (typeof object?.key === "string") {
 				key = object?.key
@@ -142,7 +145,7 @@ export class StorageInstance {
 			}
 
 			// instance().storage.monitor(key, object)
-			let storedValue = this.get(key)
+			let storedValue = await this.get(key)
 
 			if (storedValue) {
 				const val = checkValue ?? object.value
@@ -180,5 +183,5 @@ export class StorageInstance {
 }
 // storage func -> called from instance OR by integration -> hooks up to the instance
 export function storage(instance: () => PlexusInstance, name?: string, override?: StorageOverride): PlexusStorageInstance {
-	return new StorageInstance(instance, name)
+	return new StorageInstance(instance, name, override)
 }

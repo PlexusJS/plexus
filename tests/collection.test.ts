@@ -290,6 +290,38 @@ describe("testing collection groups", () => {
 		expect(myCollection.getGroup("group1").value.length).toBe(2)
 	})
 
+	test("Using default group", () => {
+		myCollection.collect(
+			[
+				{ thing: "lol", id: 0 },
+				{ thing: "lol3", id: 2 },
+				{ thing: "lols", id: 1 },
+			],
+			"group1"
+		)
+		expect(myCollection.getGroup("default").index.size).toBe(3)
+
+		expect(myCollection.value.length).toBe(3)
+		myCollection.delete(1)
+		expect(myCollection.getGroup("default").value.length).toBe(2)
+	})
+
+	test(`Do computed functions work ?`, () => {
+		const computedCollection = collection<{
+			id: string
+			name: string
+			backwards?: string
+		}>().compute((data) => {
+			data.backwards = data.name.split("").reverse().join("")
+			return data
+		})
+		computedCollection.collect({
+			id: "x",
+			name: "jack",
+		})
+		expect(computedCollection.getItemValue("x").backwards).toBe("kcaj")
+	})
+
 	test("Collecting into a group, then ensuring the group is up to date", () => {
 		let collected = false
 		let deleted = false
@@ -469,8 +501,5 @@ const users = collection<User>({
 })
 
 describe("testing collection relations", () => {
-	test("", () => {
-
-
-	})
+	test("", () => {})
 })

@@ -80,6 +80,7 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		this.data?.history(this.historyLength)
 		// broadcast the change
 		this.runWatchers()
+		return this
 	}
 	/**
 	 * Set the value of the selected data instance
