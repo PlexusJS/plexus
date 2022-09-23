@@ -5,8 +5,8 @@ import { _data, PlexusDataInstance, DataKey } from "./data"
 import { _group, PlexusCollectionGroup, PlexusCollectionGroupConfig, GroupName } from "./group"
 import { PlexusCollectionSelector, SelectorName, _selector } from "./selector"
 
-type GroupMap<DataType> = Map<GroupName, PlexusCollectionGroup<DataType>>
-type SelectorMap<DataType> = Map<SelectorName, PlexusCollectionSelector<DataType>>
+type GroupMap<DataType extends Record<string, any>> = Map<GroupName, PlexusCollectionGroup<DataType>>
+type SelectorMap<DataType extends Record<string, any>> = Map<SelectorName, PlexusCollectionSelector<DataType>>
 type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<infer K, unknown> ? K : never
 
 // type valuesOfArray =
@@ -40,9 +40,9 @@ export interface PlexusCollectionConfig<DataType> {
 			}
 		>
 	>
-	computeLocations?: Array<('collect' | 'getValue')>
+	computeLocations?: Array<"collect" | "getValue">
 }
-interface PlexusCollectionStore<DataType, Groups, Selectors> {
+interface PlexusCollectionStore<DataType extends Record<string, any>, Groups, Selectors> {
 	_internalId: string
 	_lastChanged: number | string
 	_lookup: Map<string, string>
@@ -55,18 +55,18 @@ interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	set externalName(value: string)
 	_persist: boolean
 	set persist(value: boolean)
-	_computeFn?: (data: DataType) => DataType;
+	_computeFn?: (data: DataType) => DataType
 }
 
 export type PlexusCollectionInstance<
-	DataType = Record<string, any>,
+	DataType extends Record<string, any> = Record<string, any>,
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * @description A Collection Instance
  */
-export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Selectors extends SelectorMap<DataType>> {
+export class CollectionInstance<DataType extends Record<string, any>, Groups extends GroupMap<DataType>, Selectors extends SelectorMap<DataType>> {
 	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
 	private instance: () => PlexusInstance
 	/**
@@ -90,8 +90,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	constructor(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType> = { primaryKey: "id", defaultGroup: false } as const) {
 		this.instance = instance
 		this.config = {
-			computeLocations: ['collect', 'getValue'],
-			..._config
+			computeLocations: ["collect", "getValue"],
+			..._config,
 		}
 		this._internalStore = {
 			_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
@@ -158,7 +158,8 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 			if (!item) return
 			if (item[this._internalStore._key] !== undefined && item[this._internalStore._key] !== null) {
 				// Compute item before setting/storing
-				if (typeof this._internalStore._computeFn === 'function' && this.config.computeLocations?.includes('collect')) item = this._internalStore._computeFn(item);
+				if (typeof this._internalStore._computeFn === "function" && this.config.computeLocations?.includes("collect"))
+					item = this._internalStore._computeFn(item)
 				// normalizing the key type to string
 				const dataKey = item[this._internalStore._key]
 				// if there is already a state for that key, update it
@@ -263,9 +264,10 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The value of the item
 	 */
 	getItemValue(key: DataKey) {
-		const value = this.getItem(key).value;
-		if (typeof this._internalStore._computeFn === 'function' && this.config.computeLocations?.includes('getValue') && value) return this._internalStore._computeFn(value);
-		return value;
+		const value = this.getItem(key).value
+		if (typeof this._internalStore._computeFn === "function" && this.config.computeLocations?.includes("getValue") && value)
+			return this._internalStore._computeFn(value)
+		return value
 	}
 
 	/// SELECTORS
@@ -512,34 +514,34 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @param fn
 	 */
 	compute(fn: (v: DataType) => DataType) {
-		this._internalStore._computeFn = fn;
-		return this;
+		this._internalStore._computeFn = fn
+		return this
 	}
 	/**
 	 * Re-runs the compute function on select IDs (or all the collection if none provided)
 	 */
-	reCompute (ids?: string | string[]) {
-		if (typeof this._internalStore._computeFn !== 'function') {
-			this.instance().runtime.log('warn', `Attempted to recompute ${this.name} without a compute fn set`);
-			return this;
+	reCompute(ids?: string | string[]) {
+		if (typeof this._internalStore._computeFn !== "function") {
+			this.instance().runtime.log("warn", `Attempted to recompute ${this.name} without a compute fn set`)
+			return this
 		}
 		if (ids) {
-			if (!Array.isArray(ids)) ids = [ids as string];
-		} else ids = this.keys.map((v) => (v.toString()));
+			if (!Array.isArray(ids)) ids = [ids as string]
+		} else ids = this.keys.map((v) => v.toString())
 		ids.forEach((id) => {
-			const data = this._internalStore._data.get(id);
+			const data = this._internalStore._data.get(id)
 			if (data) {
-				data.patch({ ...this._internalStore._computeFn?.(data.value) ?? {}, [this._internalStore._key]: id } as Partial<DataType>)
+				data.patch({ ...(this._internalStore._computeFn?.(data.value) ?? {}), [this._internalStore._key]: id } as Partial<DataType>)
 			}
-		});
+		})
 	}
 	/**
 	 * Same as reCompute, but for groups
 	 */
-	reComputeGroups (groupNames: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
-		if (!Array.isArray(groupNames)) groupNames = [groupNames];
-		groupNames.forEach((groupName) => this.reCompute(this.getGroup(groupName).value.map((d) => (d[this._internalStore._key]))));
-		return this;
+	reComputeGroups(groupNames: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+		if (!Array.isArray(groupNames)) groupNames = [groupNames]
+		groupNames.forEach((groupName) => this.reCompute(this.getGroup(groupName).value.map((d) => d[this._internalStore._key])))
+		return this
 	}
 	/**
 	 * Set the key of the collection for enhanced internal tracking
