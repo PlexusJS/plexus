@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/next",
-	"version": "1.4.1-canary.2+583332e",
+	"version": "1.4.1-canary.0",
 	"description": "Next Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
