@@ -10,7 +10,7 @@ export interface PlexusCollectionGroupConfig<DataType> {
 }
 export type GroupName = string
 
-export type PlexusCollectionGroup<DataType = any> = CollectionGroup<DataType>
+export type PlexusCollectionGroup<DataType extends Record<string, any> = any> = CollectionGroup<DataType>
 
 interface CollectionGroupStore<DataType = any> {
 	addWhen: (value: DataType) => boolean
@@ -19,7 +19,7 @@ interface CollectionGroupStore<DataType = any> {
 	_includedKeys: Set<string | number>
 	_dataWatcherDestroyers: Set<() => void>
 }
-export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
+export class CollectionGroup<DataType extends Record<string, any> = any> extends Watchable<DataType[]> {
 	private _internalStore: CollectionGroupStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>
 	// private instance: () => PlexusInstance
@@ -135,6 +135,10 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	get data() {
 		return Array.from(this._internalStore._includedKeys).map((key) => this.collection().getItem(key))
 	}
+
+	get size() {
+		return this._internalStore._includedKeys.size
+	}
 	/**
 	 * Watch for changes on this group
 	 * @param callback The callback to run when the state changes
@@ -145,7 +149,7 @@ export class CollectionGroup<DataType = any> extends Watchable<DataType[]> {
 	}
 }
 
-export function _group<DataType = any>(
+export function _group<DataType extends Record<string, any> = any>(
 	instance: () => PlexusInstance,
 	collection: () => PlexusCollectionInstance<DataType>,
 	name: string,

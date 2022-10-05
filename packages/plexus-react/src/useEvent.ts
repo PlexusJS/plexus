@@ -11,5 +11,5 @@ export function useEvent<Payload = any>(event: PlexusEventInstance<Payload>, cal
 		return () => {
 			unsubscribe()
 		}
-	}, [])
+	})
 }

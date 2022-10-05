@@ -20,19 +20,16 @@ export type PlexusStateInstance<Value extends PlexusStateType = any> = StateInst
  */
 export class StateInstance<StateValue extends PlexusStateType> extends WatchableMutable<StateValue> {
 	private _internalStore: StateStore<StateValue>
-	// private instance: () => PlexusInstance
 	/**
 	 * The internal id of the state
 	 */
 	get id(): string {
-		// return this._internalStore._internalId
 		return `${this._watchableStore._internalId}`
 	}
 	/**
 	 * The internal id of the state with an instance prefix
 	 */
 	get instanceId(): string {
-		// return this._internalStore._internalId
 		return `ste_${this._watchableStore._internalId}`
 	}
 	constructor(instance: () => PlexusInstance, init: StateValue) {
@@ -46,22 +43,23 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		}
 
 		this.mount()
+		this.persistSync()
+	}
+
+	private persistSync() {
 		if (this._internalStore._persist) {
-			this.instance().storage?.sync()
+			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
 	private mount() {
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
 			this.instance().runtime.log("debug", `Hoisting state ${this.instanceId} with value`, this._watchableStore._value, `to instance`)
-			if (this._internalStore._persist) {
-				this.instance().storage?.sync()
-			}
+			this.persistSync()
 		}
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
 		this.instance().runtime.log("info", `State ${this.id} is ready`)
-		// this.instance().runtime.broadcast(this.id, this._watchableStore._value)
 	}
 	/**
 	 * Set the value of the state
@@ -104,14 +102,6 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		}
 	}
 
-	// removeAllWatchers(){
-	// 	// instance().runtime.unsubscribe(_internalStore._name, key)
-	// 	_internalStore._watchers.forEach(destroy => {
-	// 		if(destroy) destroy()
-	// 	})
-	// 	return _internalStore._watchers.clear()
-	// },
-
 	/**
 	 * Persist the state to selected storage
 	 * @param name The storage prefix to use
@@ -121,15 +111,15 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		if (name) this._internalStore._name = `state_${name}`
 
 		if (this.instance().storage) {
-			// this should only run on initial load of the state when this function is called
-			this.instance().runtime.log("info", `Persisting ${this._internalStore._name}`)
-
-			// if (storedValue !== undefined && storedValue !== null) {
-			// 	instance().runtime.log("info", "apply persisted value")
-			// 	this.set(storedValue)
-			// }
-			this.instance().storage?.monitor(this._internalStore._name, this)
-			this._internalStore._persist = true
+			// Bandaid
+			(async () => {
+				// this should only run on initial load of the state when this function is called
+				this.instance().runtime.log("info", `Persisting ${this._internalStore._name}`)
+				this.instance().storage?.monitor(this._internalStore._name, this)
+				const storedValue = await this.instance().storage?.get(this._internalStore._name) as StateValue
+				storedValue && this.set(storedValue)
+				this._internalStore._persist = true
+			})();
 		}
 		return this
 	}
@@ -141,6 +131,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		this.set(this._watchableStore._initialValue)
 		// disable history if enabled
 		super.history(0)
+		return this
 	}
 	/**
 	 * On a set interval, run a function to update the state

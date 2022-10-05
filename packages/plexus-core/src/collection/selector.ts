@@ -10,7 +10,6 @@ interface CollectionSelectorStore<ValueType = any> {
 	_key: DataKey | null
 	_collectionId: string
 	_dataWatcherDestroyer: (() => void) | null
-	_watchers: Set<PlexusWatcher<ValueType>>
 }
 
 export type PlexusCollectionSelector<ValueType extends Record<string, any> = Record<string, any>> = CollectionSelector<ValueType>
@@ -38,15 +37,15 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			_key: null as DataKey | null,
 			_collectionId: collection().id,
 			_dataWatcherDestroyer: null,
-			_watchers: new Set(),
 		}
 		this.collection = collection
 	}
 	private runWatchers() {
-		this._internalStore._watchers.forEach((callback) => {
-			this.instance().runtime.log("info", `Running watchers on selector ${this.instanceId}...`)
-			callback(this.value)
-		})
+		this.instance().runtime.log("info", `Running watchers on selector ${this.instanceId}...`)
+		// this._internalStore._watchers.forEach((callback) => {
+		// 	callback(this.value)
+		// })
+		super.set({} as any)
 	}
 	/**
 	 * The key of a data item assigned to this selector
@@ -63,18 +62,25 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.instanceId}...`)
 			return
 		}
+		// reset the history if there was one
+		if (this.historyLength) {
+			this.data?.history(0)
+		}
+		this._internalStore._key = key
+
 		this._internalStore._dataWatcherDestroyer?.()
 
-		this._internalStore._key = key
 		// this.set(this.value)
-		const dataWatcherDestroyer =
-			this.data?.watch((value) => {
-				this.runWatchers()
-			}, this.id) || null
-		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer
-
+		const dataWatcherDestroyer = this.data?.watch((value) => {
+			this.runWatchers()
+		}, this.id)
+		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
+		this.instance().runtime.log("info", `Selected data ${this.data?.instanceId} on selector ${this.instanceId}...`)
+		// reinitialize history with the same stored length
+		this.data?.history(this.historyLength)
 		// broadcast the change
 		this.runWatchers()
+		return this
 	}
 	/**
 	 * Set the value of the selected data instance
@@ -82,11 +88,23 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 * @param config The config to use when setting the value
 	 * @param config.mode should we 'patch' or 'replace' the value
 	 */
-	set(value: ValueType, config: { mode: "replace" | "patch" } = { mode: "replace" }) {
+	set(value: ValueType) {
 		// TODO add a warning here if the key is not set
-		config.mode === "replace" ? this.data?.set(value) : this.data?.patch(value)
+		this.data?.set(value)
 		this.runWatchers()
 	}
+	/**
+	 * Patch the value of the selected data instance
+	 * @param value The value to set
+	 * @param config The config to use when setting the value
+	 * @param config.mode should we 'patch' or 'replace' the value
+	 */
+	patch(value: Partial<ValueType>) {
+		// TODO add a warning here if the key is not set
+		this.data?.patch(value)
+		this.runWatchers()
+	}
+
 	/**
 	 * Return the data value of the selected item
 	 */
@@ -106,18 +124,36 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		return this.collection().getItem(this._internalStore._key) || null
 	}
 	/**
-	 * Watch for changes on this group
+	 * Watch for changes on this selector
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<ValueType>) {
-		this._internalStore._watchers.add(callback)
+		return super.watch((v) => {
+			this.instance().runtime.log("debug", `Watching selector ${this.instanceId} with a new callback`)
+			callback(this.data?.value || v)
+		})
+	}
+	private historyLength: number = 0
 
-		// const destroyer = this.data?.watch(callback)
-		const destroyer = () => {
-			this._internalStore._watchers.delete(callback)
-		}
-		return destroyer
+	history(maxLength: number = 10): this {
+		this.historyLength = maxLength
+		this.data?.history(maxLength)
+		return this
+	}
+	get canRedo(): boolean {
+		return !!this.data?.canRedo
+	}
+	get canUndo(): boolean {
+		return !!this.data?.canUndo
+	}
+	undo(): this {
+		this.data?.undo()
+		return this
+	}
+	redo(): this {
+		this.data?.redo()
+		return this
 	}
 }
 

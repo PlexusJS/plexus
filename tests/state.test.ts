@@ -138,6 +138,9 @@ describe("Testing State Function", () => {
 	})
 
 	test("Checking state history functionality", () => {
+		objectState.watch((v) => {
+			console.log("Got an update from history change!")
+		})
 		objectState.history()
 		objectState.set({ a: { b: false } })
 		console.log("1: checking", objectState.value, "vs.", { a: { b: false } })
@@ -152,22 +155,73 @@ describe("Testing State Function", () => {
 		// checking if the history is working for primitives
 		stringState.history()
 		new Array(10).fill(null).forEach((_, i) => {
-			const nv = `Hello World${i}`
+			const nv = `Hello World${i + 1}`
 			stringState.set(nv)
 			console.log(`${i + 1}: checking`, stringState.value, "vs.", nv)
 			expect(stringState.value).toBe(nv)
 		})
-		expect(stringState.value).toBe("Hello World9")
+		expect(stringState.value).toBe("Hello World10")
 
-		new Array(9).fill(null).forEach((_, i) => {
-			const nv = `Hello World${8 - i}`
-			stringState.undo()
-			expect(stringState.value).toBe(nv)
+		stringState.watch((v) => {
+			console.log("Got an update from history change (string state)!")
 		})
+		new Array(10).fill(null).forEach((_, i, arr) => {
+			const nv = `Hello World${arr.length - i}`
+			console.log(`${i + 1}: checking`, stringState.value, "vs.", nv)
+			expect(stringState.value).toBe(nv)
+			stringState.undo()
+		})
+
+		console.log(`undo`)
 		stringState.undo()
 		expect(stringState.value).toBe("Hello Plexus!")
 
+		console.log(`redo`)
 		stringState.redo()
-		expect(stringState.value).toBe("Hello World0")
+		expect(stringState.value).toBe("Hello World1")
+
+		console.log(`undo`)
+		stringState.undo()
+		expect(stringState.value).toBe("Hello Plexus!")
+
+		console.log(`redo`)
+		stringState.redo()
+		expect(stringState.value).toBe("Hello World1")
+
+		console.log("")
+		console.log("")
+
+		const complexObj = state({
+			obj: {
+				arr: [
+					{
+						item1: "initial",
+					},
+				],
+			},
+		}).history()
+
+		instance({ logLevel: "debug" })
+
+		expect(complexObj.value.obj.arr[0].item1).toBe("initial")
+		complexObj.patch({
+			obj: {
+				arr: [
+					{
+						item1: "2",
+					},
+				],
+			},
+		})
+		expect(complexObj.value.obj.arr[0].item1).toBe("2")
+
+		console.log(`undo`)
+		complexObj.undo()
+		expect(complexObj.value.obj.arr[0].item1).toBe("initial")
+
+		console.log(`redo`)
+		complexObj.redo()
+		expect(complexObj.value.obj.arr[0].item1).toBe("2")
+		instance({ logLevel: undefined })
 	})
 })

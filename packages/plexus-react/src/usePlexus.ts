@@ -2,7 +2,7 @@ import { instance, Watchable } from "@plexusjs/core"
 import { isEqual, deepMerge } from "@plexusjs/utils/dist/shared"
 import { useCallback, useMemo, useRef, useState } from "react"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector"
 import { concurrentWatch, convertThingToString, deepClone } from "./utils"
 
 const normalizeDeps = (deps: Watchable | Watchable[]) => (Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable])

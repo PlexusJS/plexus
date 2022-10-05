@@ -1,17 +1,17 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
 import { screen, waitFor, within } from "@testing-library/react"
-import { render } from "./test-utils"
-import { collection, computed, instance, state, event } from "../packages/plexus-core"
-import React, { useEffect, useState } from "react"
-import { useDeposit, useEvent, usePlexus } from "../packages/plexus-react/src"
-import * as renderer from "react-test-renderer"
+import { render, act } from "./test-utils"
+import { collection, computed, instance, state, event } from "@plexusjs/core"
+import React, { FC, useEffect, useState } from "react"
+import { useDeposit, useEvent, usePlexus } from "@plexusjs/react"
+// import * as renderer from "react-test-renderer"
 
-function toJson(component: renderer.ReactTestRenderer) {
-	const result = component.toJSON()
-	expect(result).toBeDefined()
-	expect(result).not.toBeInstanceOf(Array)
-	return result as renderer.ReactTestRendererJSON
-}
+// function toJson(component: renderer.ReactTestRenderer) {
+// 	const result = component.toJSON()
+// 	expect(result).toBeDefined()
+// 	expect(result).not.toBeInstanceOf(Array)
+// 	return result as renderer.ReactTestRendererJSON
+// }
 
 type Payload = {
 	name: string
@@ -42,7 +42,7 @@ afterEach(() => {
 
 	myCollection.clear()
 })
-function RandomComponent() {
+const RandomComponent: FC = () => {
 	const str = usePlexus(stringState)
 	const [compu, num] = usePlexus([computedState, numberState])
 	const [groupValue, stateItem] = usePlexus([myCollection.getGroup("test"), numberState])
@@ -67,12 +67,12 @@ describe("Test react integration (usePlexus)", () => {
 	test("usePlexus hook w/ Watchables", async () => {
 		// console.log(Array.from(instance()._states).map((v) => v.id))
 		render(<RandomComponent />)
-		await renderer.act(async () => {
+		await act(async () => {
 			await waitFor(() => screen.getByTestId("str"))
 		})
 		expect(screen.getByTestId("str").innerHTML).toBe("yes")
 		expect(screen.getByTestId("group-test").innerHTML).toBe(`[{"id":"poggers","a":2},{"id":"pog","a":1}]`)
-		await renderer.act(async () => {
+		await act(async () => {
 			myCollection.collect({ id: "pog", a: 2 }, "test")
 			myCollection.collect({ id: "3", a: 2 }, "test")
 			await waitFor(() => screen.getByTestId("group-test"))
@@ -82,7 +82,7 @@ describe("Test react integration (usePlexus)", () => {
 		// instance({ logLevel: "debug" })
 		instance({ logLevel: "debug", instanceId: "react" })
 		expect(screen.getByTestId("compu").innerHTML).toBe("6")
-		await renderer.act(async () => {
+		await act(async () => {
 			// test computed render
 			stringState.set("comp")
 			await waitFor(() => screen.getByTestId("compu"))
@@ -90,7 +90,7 @@ describe("Test react integration (usePlexus)", () => {
 		expect(screen.getByTestId("compu").innerHTML).toBe("8")
 
 		expect(Array.from(instance()._computedStates.entries()).find((obj) => obj[1].id === computedState.id)?.[1].value).toBe(8)
-		await renderer.act(async () => {
+		await act(async () => {
 			stringState.set("no")
 			await waitFor(() => screen.getByTestId("str"))
 		})
@@ -102,7 +102,7 @@ describe("Test react integration (usePlexus)", () => {
 
 describe("Test react integration (useEvent)", () => {
 	test("test useEvent", () => {
-		function RandomComponent() {
+		const RandomComponent: FC = () => {
 			const [val, setVal] = useState("")
 			useEvent(myEvents, (payload) => {
 				setVal(payload.name)
@@ -118,23 +118,23 @@ describe("Test react integration (useEvent)", () => {
 				</div>
 			)
 		}
-		let component = renderer.create(<RandomComponent />)
-		renderer.act(() => {
-			component.update(<RandomComponent />)
-		})
-		let tree = toJson(component)
-		renderer.act(() => {
-			component.update(<RandomComponent />)
-		})
-		expect(component.root.findByProps({ id: "data" }).children).toEqual(["test"])
-		expect(tree).toMatchSnapshot()
+		let component = render(<RandomComponent />)
+		// act(() => {
+		// 	component.ch(<RandomComponent />)
+		// })
+
+		// act(() => {
+		// 	component.update(<RandomComponent />)
+		// })
+		expect(component.findByTestId("data")).toEqual("test")
+		// expect(tree).toMatchSnapshot()
 	})
 })
 
 describe("Test react integration (useDeposit)", () => {
 	test("test useDeposit", () => {
 		// lol idk how to test this without user input
-		function RandomComponent() {
+		const RandomComponent: FC = () => {
 			const [val, setVal] = useState("")
 			const { save, edit } = useDeposit(
 				{ name: "string" },
@@ -156,16 +156,15 @@ describe("Test react integration (useDeposit)", () => {
 			)
 		}
 		let tree: any
-		renderer.act(() => {
-			tree = renderer.create(<RandomComponent />)
-		})
-		expect(tree.toJSON()).toMatchSnapshot()
+		const component = render(<RandomComponent />)
+
+		// expect(tree.toJSON()).toMatchSnapshot()
 		// expect().toEqual()
 		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
 	})
 	test("test useDeposit edit", () => {
 		const def: { name?: string } = {}
-		function RandomComponent() {
+		const RandomComponent: FC = () => {
 			const [val, setVal] = useState("")
 			const { value, save, edit } = useDeposit(
 				{ ...def },
@@ -188,17 +187,18 @@ describe("Test react integration (useDeposit)", () => {
 				</div>
 			)
 		}
-		let component = renderer.create(<RandomComponent />)
+		let component = render(<RandomComponent />)
 
-		renderer.act(() => {
-			component.update(<RandomComponent />)
-		})
-		let tree = toJson(component)
-		renderer.act(() => {
-			component.update(<RandomComponent />)
-		})
-		expect(component.root.findByProps({ id: "data" }).children).toEqual(['{"name":"billy"}'])
-		expect(tree).toMatchSnapshot()
+		// act(() => {
+		// 	component.update(<RandomComponent />)
+		// })
+		// let tree = toJson(component)
+		// act(() => {
+		// 	component.update(<RandomComponent />)
+		// })
+
+		expect(component.findByTestId("data")).toEqual(['{"name":"billy"}'])
+		// expect(tree).toMatchSnapshot()
 		// expect().toEqual()
 		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
 	})

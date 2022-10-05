@@ -5,8 +5,8 @@ import { _data, PlexusDataInstance, DataKey } from "./data"
 import { _group, PlexusCollectionGroup, PlexusCollectionGroupConfig, GroupName } from "./group"
 import { PlexusCollectionSelector, SelectorName, _selector } from "./selector"
 
-type GroupMap<DataType> = Map<GroupName, PlexusCollectionGroup<DataType>>
-type SelectorMap<DataType> = Map<SelectorName, PlexusCollectionSelector<DataType>>
+type GroupMap<DataType extends Record<string, any>> = Map<GroupName, PlexusCollectionGroup<DataType>>
+type SelectorMap<DataType extends Record<string, any>> = Map<SelectorName, PlexusCollectionSelector<DataType>>
 type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<infer K, unknown> ? K : never
 
 // type valuesOfArray =
@@ -25,8 +25,24 @@ export interface PlexusCollectionConfig<DataType> {
 	 * Create a group called "default"
 	 */
 	defaultGroup?: boolean
+	/**
+	 * When this value is true, using getValue will return undefined rather than an object with only the key. When using get item, you receive a provisional data instance with a value of undefined.
+	 * @warning The type of the returned value WILL NOT change to undefined. Only the literal value will be undefined as this is _technically_ an override. Please beware and plan accordingly.
+	 */
+	unfoundKeyReturnsUndefined?: boolean
+
+	foreignKeys?: Partial<
+		Record<
+			keyof DataType,
+			{
+				newKey: string
+				reference: () => PlexusCollectionInstance
+			}
+		>
+	>
+	computeLocations?: Array<"collect" | "getValue">
 }
-interface PlexusCollectionStore<DataType, Groups, Selectors> {
+interface PlexusCollectionStore<DataType extends Record<string, any>, Groups, Selectors> {
 	_internalId: string
 	_lastChanged: number | string
 	_lookup: Map<string, string>
@@ -39,17 +55,18 @@ interface PlexusCollectionStore<DataType, Groups, Selectors> {
 	set externalName(value: string)
 	_persist: boolean
 	set persist(value: boolean)
+	_computeFn?: (data: DataType) => DataType
 }
 
 export type PlexusCollectionInstance<
-	DataType = Record<string, any>,
+	DataType extends Record<string, any> = Record<string, any>,
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * @description A Collection Instance
  */
-export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Selectors extends SelectorMap<DataType>> {
+export class CollectionInstance<DataType extends Record<string, any>, Groups extends GroupMap<DataType>, Selectors extends SelectorMap<DataType>> {
 	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
 	private instance: () => PlexusInstance
 	/**
@@ -72,7 +89,10 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 
 	constructor(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType> = { primaryKey: "id", defaultGroup: false } as const) {
 		this.instance = instance
-		this.config = _config
+		this.config = {
+			computeLocations: ["collect", "getValue"],
+			..._config,
+		}
 		this._internalStore = {
 			_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
 			_lookup: new Map<string, string>(),
@@ -92,11 +112,11 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				this._persist = value
 			},
 		}
+		this.mount()
 		if (_config.defaultGroup) {
 			// this ensured default shows up as a group name option
 			return this.createGroup("default")
 		}
-		this.mount()
 	}
 	/**
 	 * Helper function; Checks to see if the provided name is a group name
@@ -137,6 +157,9 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		const collectItem = (item: DataType) => {
 			if (!item) return
 			if (item[this._internalStore._key] !== undefined && item[this._internalStore._key] !== null) {
+				// Compute item before setting/storing
+				if (typeof this._internalStore._computeFn === "function" && this.config.computeLocations?.includes("collect"))
+					item = this._internalStore._computeFn(item)
 				// normalizing the key type to string
 				const dataKey = item[this._internalStore._key]
 				// if there is already a state for that key, update it
@@ -149,6 +172,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 						() => this.instance(),
 						() => this,
 						this._internalStore._key,
+						dataKey,
 						item
 					)
 					// if we get a valid data instance, add it to the collection
@@ -208,7 +232,7 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 		return this
 	}
 	/**
-	 * Get the Value of the data item with the provided key (the raw data).
+	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
 	 * @param key
 	 * @returns
 	 */
@@ -219,16 +243,19 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 				() => this.instance(),
 				() => this,
 				this._internalStore._key,
-				{ [this._internalStore._key]: dataKey } as any as DataType,
-				{ prov: true }
+				dataKey,
+				this.config.unfoundKeyReturnsUndefined
+					? (undefined as any as DataType)
+					: ({ [this._internalStore._key]: dataKey } as any as DataType),
+				{ prov: true, unfoundKeyIsUndefined: this.config.unfoundKeyReturnsUndefined }
 			)
 			// if we get a valid data instance, add it to the collection
-			// if (dataInstance) {
-			// 	this._internalStore._data.set(dataKey, dataInstance)
-			// }
+			if (dataInstance) {
+				this._internalStore._data.set(dataKey, dataInstance)
+			}
 			return dataInstance as PlexusDataInstance<DataType>
 		}
-		this.mount()
+		// this.mount()
 		return data
 	}
 	/**
@@ -237,7 +264,10 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * @returns The value of the item
 	 */
 	getItemValue(key: DataKey) {
-		return this.getItem(key).value
+		const value = this.getItem(key).value
+		if (typeof this._internalStore._computeFn === "function" && this.config.computeLocations?.includes("getValue") && value)
+			return this._internalStore._computeFn(value)
+		return value
 	}
 
 	/// SELECTORS
@@ -483,7 +513,36 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 * Run this function when data is collected to format it in a particular way; useful for converting one datatype into another
 	 * @param fn
 	 */
-	compute(fn: (v: DataType) => DataType) {}
+	compute(fn: (v: DataType) => DataType) {
+		this._internalStore._computeFn = fn
+		return this
+	}
+	/**
+	 * Re-runs the compute function on select IDs (or all the collection if none provided)
+	 */
+	reCompute(ids?: string | string[]) {
+		if (typeof this._internalStore._computeFn !== "function") {
+			this.instance().runtime.log("warn", `Attempted to recompute ${this.name} without a compute fn set`)
+			return this
+		}
+		if (ids) {
+			if (!Array.isArray(ids)) ids = [ids as string]
+		} else ids = this.keys.map((v) => v.toString())
+		ids.forEach((id) => {
+			const data = this._internalStore._data.get(id)
+			if (data) {
+				data.patch({ ...(this._internalStore._computeFn?.(data.value) ?? {}), [this._internalStore._key]: id } as Partial<DataType>)
+			}
+		})
+	}
+	/**
+	 * Same as reCompute, but for groups
+	 */
+	reComputeGroups(groupNames: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+		if (!Array.isArray(groupNames)) groupNames = [groupNames]
+		groupNames.forEach((groupName) => this.reCompute(this.getGroup(groupName).value.map((d) => d[this._internalStore._key])))
+		return this
+	}
 	/**
 	 * Set the key of the collection for enhanced internal tracking
 	 */
@@ -498,14 +557,26 @@ export class CollectionInstance<DataType, Groups extends GroupMap<DataType>, Sel
 	 */
 	get value() {
 		this.mount()
-		return Array.from(this._internalStore._data.values()).map((item) => item.value)
+		const keys: DataType[] = []
+		for (let item of this._internalStore._data.values()) {
+			if (!item.provisional) {
+				keys.push(item.value)
+			}
+		}
+		return keys
 	}
 	/**
 	 * Get all of the collection data keys as an array
 	 * @returns The collection data values as an array
 	 */
 	get keys() {
-		return Array.from(this._internalStore._data.keys())
+		const keys: (string | number)[] = []
+		for (let item of this._internalStore._data.values()) {
+			if (!item.provisional) {
+				keys.push(item.key)
+			}
+		}
+		return keys
 	}
 	/**
 	 * Get the number of data items in the collection

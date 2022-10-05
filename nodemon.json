@@ -1,5 +1,4 @@
 {
-  "watch": ["packages/**/src"],
-  "ext": ".ts",
-  "exec": "lerna run build --parallel"
+	"verbose": true,
+	"ignore": ["*.test.ts", "*.test.tsx", "**/dist/**"]
 }
