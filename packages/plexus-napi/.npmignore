@@ -1,0 +1,10 @@
+node_modules
+coverage/*
+.turbo/*
+*.tsbuildinfo
+__snapshots__
+*.tgz
+*.log
+tests/
+*.test.*
+src/

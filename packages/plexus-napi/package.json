@@ -1,0 +1,34 @@
+{
+	"name": "@plexusjs/napi",
+	"version": "1.4.1-canary.2+583332e",
+	"description": "A library for building modular interconnected applications",
+	"main": "./dist/index.js",
+	"types": "dist/index.d.ts",
+	"publishConfig": {
+		"access": "public"
+	},
+	"keywords": [
+		"plexusjs",
+		"plexus",
+		"plexus-core",
+		"react",
+		"reactjs",
+		"global state",
+		"plugin"
+	],
+	"license": "MIT",
+	"scripts": {
+		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
+		"build": "tsc --build --force && echo \"Build complete.\"",
+		"prepublish": "yarn build",
+		"dev": "tsc --watch"
+	},
+	"gitHead": "583332e11a006836db31ad1c3cd0e9b251f4cb7e",
+	"devDependencies": {
+		"isomorphic-fetch": "^3.0.0"
+	},
+	"dependencies": {
+		"@plexusjs/api": "1.4.1-canary.2+583332e",
+		"cross-fetch": "^3.1.5"
+	}
+}

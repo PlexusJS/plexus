@@ -2452,6 +2452,18 @@
     node-addon-api "^3.2.1"
     node-gyp-build "^4.3.0"
 
+"@plexusjs/api@1.4.1-canary.2+583332e":
+  version "1.4.1-canary.2"
+  resolved "https://registry.yarnpkg.com/@plexusjs/api/-/api-1.4.1-canary.2.tgz#eea5c35d6ab0d81eae5719e089fc6b6ad10b302e"
+  integrity sha512-GuCqhGB8cIX2bm3ZmO/bmYqQSmzAc7VAXoNRGXLryNzDHfpysl1vqEjvYbbfVDKpIWkpqWgUNb25gwp9TLQVzw==
+  dependencies:
+    "@plexusjs/utils" "1.4.1-canary.2+583332e"
+
+"@plexusjs/utils@1.4.1-canary.2+583332e":
+  version "1.4.1-canary.2"
+  resolved "https://registry.yarnpkg.com/@plexusjs/utils/-/utils-1.4.1-canary.2.tgz#614fddcec796c03bc72ad6e74a7d3f63954c35ad"
+  integrity sha512-qQm60QQCbeoLxsr6AxEfdwF2CRx7GYG2XcGDQf8IlLuAQOS+nPnEhJgXsfYVIBJukrG1CVGEys675JC6Etvy8g==
+
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
@@ -3719,6 +3731,13 @@ create-require@^1.1.0:
   version "1.1.1"
   resolved "https://registry.npmjs.org/create-require/-/create-require-1.1.1.tgz"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
+
+cross-fetch@^3.1.5:
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
+  integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
+  dependencies:
+    node-fetch "2.6.7"
 
 cross-spawn@^7.0.3:
   version "7.0.3"
@@ -6444,7 +6463,7 @@ node-fetch@2, node-fetch@^2.6.1:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-fetch@^2.6.7, node-fetch@^2.x.x:
+node-fetch@2.6.7, node-fetch@^2.6.7, node-fetch@^2.x.x:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
@@ -7332,7 +7351,14 @@ react-test-renderer@^18.2.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.23.0"
 
-react@^17, react@^17.0.2:
+react@>=17:
+  version "18.2.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
+  integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
+  dependencies:
+    loose-envify "^1.1.0"
+
+react@^17.0.2:
   version "17.0.2"
   resolved "https://registry.npmjs.org/react/-/react-17.0.2.tgz"
   integrity sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==
