@@ -57,7 +57,7 @@ export class PlexusActionHelpers {
 	}
 
 	batch(fn: () => void){
-		this.instance.batch()
+		// this.instance.batch()
 		
 	}
 
