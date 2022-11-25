@@ -1,5 +1,6 @@
 import { beforeEach, afterEach, describe, test, expect } from "vitest"
 import { screen, waitFor, within } from "@testing-library/react"
+import "@testing-library/react"
 import { render, act } from "./test-utils"
 import { collection, computed, instance, state, event } from "@plexusjs/core"
 import React, { FC, useEffect, useState } from "react"
@@ -24,7 +25,7 @@ const numberState = state(1)
 const objectState = state<Partial<{ name: string }>>({ name: "test" })
 instance({ logLevel: "debug" })
 const computedState = computed(() => {
-	console.log("RUNNING THE COMP StATE VALUE")
+	console.log("RUNNING THE COMP STATE VALUE")
 	return stringState.value.length * 2
 }, [stringState])
 instance({ logLevel: "silent" })
@@ -126,7 +127,9 @@ describe("Test react integration (useEvent)", () => {
 		// act(() => {
 		// 	component.update(<RandomComponent />)
 		// })
-		expect(component.findByTestId("data")).toEqual("test")
+		component.findByTestId("data").then((v) => {
+			expect(v.innerHTML).toEqual("test")
+		})
 		// expect(tree).toMatchSnapshot()
 	})
 })
@@ -196,8 +199,9 @@ describe("Test react integration (useDeposit)", () => {
 		// act(() => {
 		// 	component.update(<RandomComponent />)
 		// })
-
-		expect(component.findByTestId("data")).toEqual(['{"name":"billy"}'])
+		component.findByTestId("data").then((v) => {
+			expect(v.innerHTML).toEqual(['{"name":"billy"}'])
+		})
 		// expect(tree).toMatchSnapshot()
 		// expect().toEqual()
 		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])

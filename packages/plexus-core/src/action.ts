@@ -12,6 +12,7 @@ export interface PlexusActionHooks {
 	 * Ignore the default hault preActions
 	 */
 	ignoreInit(): void
+	batch(fn: () => void): void
 }
 export class PlexusActionHelpers {
 	private _internalStore = {
@@ -55,6 +56,12 @@ export class PlexusActionHelpers {
 		this._skipInit = true
 	}
 
+	batch(fn: () => void){
+		this.instance.batch()
+		
+	}
+
+
 	/**
 	 * @internal
 	 * Eject the external functions object returned to the user in the first argument of the action function
@@ -66,6 +73,9 @@ export class PlexusActionHelpers {
 		const ignoreInit = (): void => {
 			return this.ignoreInit()
 		}
+		const batch = () => {
+
+		}
 		return {
 			/**
 			 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
@@ -74,6 +84,7 @@ export class PlexusActionHelpers {
 			 */
 			onCatch,
 			ignoreInit,
+			batch
 		}
 	}
 }

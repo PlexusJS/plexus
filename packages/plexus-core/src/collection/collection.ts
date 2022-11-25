@@ -404,6 +404,7 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 	addToGroups(key: DataKey, groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
 		const addToGroup = (group: GroupName) => {
 			let g = this._internalStore._groups.get(group as GroupName)
+			// if the group does not exist, create it
 			if (!g) {
 				g = _group(
 					() => this.instance(),
