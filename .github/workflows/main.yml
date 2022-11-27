@@ -1,0 +1,13 @@
+on:
+ - pull_request
+ 
+jobs:
+  publish:
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: NPM Publish
+        uses: JS-DevTools/npm-publish@v1
