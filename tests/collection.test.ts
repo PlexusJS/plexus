@@ -143,6 +143,7 @@ describe("Testing Collection", () => {
 })
 describe("testing collection groups", () => {
 	test("Do Groups Work?", () => {
+		console.log(JSON.stringify(myCollection, null, 2))
 		expect(myCollection.value.length).toBe(0)
 		// can properly collect objects with the same keys
 		myCollection.collect([
@@ -155,6 +156,7 @@ describe("testing collection groups", () => {
 			{ thing: "lol3", id: 2 },
 			{ thing: "lols", id: 1 },
 		])
+		console.log(JSON.stringify(myCollection, null, 2))
 
 		expect(myCollection.value.length).toBe(3)
 
