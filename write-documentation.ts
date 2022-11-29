@@ -12,7 +12,7 @@ const docTemplate = fs.readFileSync(
     `${__dirname}/scripts/templates/ref.hbs`,
     'utf8'
 )
-console.log('input', inputFiles)
+console.log(`Matched ${inputFiles.length} files...`)
 
 const packageMap: Record<string, { absolute: string; relative: string }[]> = {}
 
