@@ -1,0 +1,139 @@
+---
+title: Introduction
+sidebar_position: 1
+slug: /
+---
+
+import { Badges } from "../src/components/Badges.tsx"
+import MenuOption from "../src/components/MenuOption.tsx"
+import emoji from "node-emoji"
+
+# Welcome to Plexus
+
+###### The ultimate toolkit for orchestrating data in reactive web applications
+
+:::caution Docs are still a work in progress.
+
+Forgive the current state of the documentation; we're still working on it. Join [our Discord](https://discord.gg/kWJ2kVnykH) for additional help & updates in the meantime.
+:::
+
+<hr className="hr" />
+
+<div className="pb-5">
+	<Badges />
+</div>
+
+## Features
+
+<ul className="list">
+	<li>⚡️ SSOT-Based State Orchestration </li>
+	<li>📕 Full Type Safety and Autocomplete</li>
+	<li>📡 Powerful Built in HTTP Client </li>
+	<li>🚌 Custom Event Engine </li>
+	<li>📜 Awesome DX - Easy to Read, Write, and Understand </li>
+	<li>
+		🪶 Lightweight (Only 40kb) with <strong>0 External Dependancies</strong>
+	</li>
+	<li>🔌 Extendable </li>
+</ul>
+
+## What is it?
+
+<mark>Plexus is a toolkit for orchestrating data in scalable reactive applications</mark>. In other words, we make state management, api
+communication, event management, & data manipulation significantly easier. The word "<mark>plexus</mark>" is defined as <i>
+	"a network of nerves or vessels in the body"
+</i>. The name is a metaphor for how plexus works. The tools in this package span the entire project and each one is intelligently interconnected behind
+the scenes like nerves in the body!
+
+Plexus can be adopted incrementally, over time, scales with your application, and incredibly performant.
+
+## Motivation
+
+We designed Plexus to be highly modular, unopinionated, and flexible, providing not only the tools needed to create scalable applications, but the flexibility to build it however you want. No ContextAPI needed to ensure all of the components using your data are in sync.
+
+## Should you addopt Plexus?
+
+Absolutely! You can <em>easily incrementally adopt</em> it into to your project <strong>no matter the stage or size</strong>.
+
+Here are a couple of use cases to get you started. Your app can utilize some of these, or all of these. Totally up to you. And it's all treeshakable so production builds only use what's needed.
+
+## Use Cases
+
+---
+
+#### SSOT
+
+<MenuOption
+	left={
+		<div>
+			Plexus can be used to manage and <mark>orchestrate global state</mark> in your application. This is a great way to manage data that is
+			shared across the entire application.
+		</div>
+	}
+	href="/docs/use-cases/ssot"
+	linkText="Read More"
+/>
+
+#### Data Orchestration
+
+<MenuOption
+	left={
+		<div>
+			When you edit a{" "}
+			<a className="" href="/docs/getting-started/concepts#internal-terms">
+				Stateful value
+			</a>
+			, it will <mark>update everything that is watching</mark> it.
+		</div>
+	}
+	href="/docs/use-cases/data-orchestration"
+	linkText="Read More"
+/>
+
+#### Data Persistence
+
+<MenuOption
+	left={
+		<div>
+			You can <mark>easily persist data</mark> to a user's browser Session Storage and <i>soon any other long term storage</i>.
+		</div>
+	}
+	href="/docs/use-cases/data-persistence"
+	linkText="Read More"
+/>
+
+#### API Requests
+
+<MenuOption
+	left={
+		<div>
+			You can use Plexus's powerful yet simple <mark>built in http client</mark> using the <code>api()</code> Instance!
+		</div>
+	}
+	href="/docs/use-cases/api-requests"
+	linkText="Read More"
+/>
+
+#### Event Engines
+
+<MenuOption
+	left={
+		<div>
+			You can emit and recieve over custom events using the <code>event()</code> Instance from PlexusJS. This is connected to the Plexus Network
+			for some cool superpowers!
+		</div>
+	}
+	href="/docs/use-cases/events"
+	linkText="Read More"
+/>
+
+## Community & Contributions
+
+This package was made with hard work from [Philippe Clesca](https://twitter.com/philippec_me) &
+[Nicolas Theck](https://twitter.com/RemsItIs).
+
+<strong>We hope it helps you build awesome things!</strong> 🚀
+
+## Made With Love
+
+This project is made with ❤️ Consider [giving us a star](https://github.com/PlexusJS/plexus) if you enjoy it!

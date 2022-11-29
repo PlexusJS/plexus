@@ -90,11 +90,11 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 			}
 		}
 		if (Array.isArray(thing)) {
-			return Object.values(cloned) as any as Type
+			return Object.values(cloned as any) as any as Type
 		}
 		// if it was originally an array, return an array
 		if (Array.isArray(thing)) {
-			return Object.values(cloned) as any as Type
+			return Object.values(cloned as any) as any as Type
 		}
 		// if it was originally an object, return an object
 		return cloned

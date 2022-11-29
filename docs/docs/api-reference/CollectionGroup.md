@@ -1,0 +1,108 @@
+--- 
+	title: CollectionGroup 
+--- 
+
+[![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
+
+
+<a name="CollectionGroup"></a>
+
+## CollectionGroup
+<p>A group of data</p>
+
+**Kind**: global class  
+
+* [CollectionGroup](#CollectionGroup)
+    * [.id](#CollectionGroup+id)
+    * [.instanceId](#CollectionGroup+instanceId)
+    * [.index](#CollectionGroup+index)
+    * [.value](#CollectionGroup+value)
+    * [.data](#CollectionGroup+data)
+    * [.has(key)](#CollectionGroup+has)
+    * [.add(key)](#CollectionGroup+add)
+    * [.remove(key)](#CollectionGroup+remove)
+    * [.clear()](#CollectionGroup+clear) ⇒ <code>this</code>
+    * [.watch(callback)](#CollectionGroup+watch) ⇒
+
+<a name="CollectionGroup+id"></a>
+
+### collectionGroup.id
+<p>The internal ID of the Group</p>
+
+**Kind**: instance property of [<code>CollectionGroup</code>](#CollectionGroup)  
+<a name="CollectionGroup+instanceId"></a>
+
+### collectionGroup.instanceId
+<p>The internal id of the group with an instance prefix</p>
+
+**Kind**: instance property of [<code>CollectionGroup</code>](#CollectionGroup)  
+<a name="CollectionGroup+index"></a>
+
+### collectionGroup.index
+<p>Peek at the index of the group (get all of the lookup keys for the group)</p>
+
+**Kind**: instance property of [<code>CollectionGroup</code>](#CollectionGroup)  
+<a name="CollectionGroup+value"></a>
+
+### collectionGroup.value
+<p>The data values of the items in the group</p>
+
+**Kind**: instance property of [<code>CollectionGroup</code>](#CollectionGroup)  
+<a name="CollectionGroup+data"></a>
+
+### collectionGroup.data
+<p>The data Items in the group</p>
+
+**Kind**: instance property of [<code>CollectionGroup</code>](#CollectionGroup)  
+<a name="CollectionGroup+has"></a>
+
+### collectionGroup.has(key)
+<p>Check if the group contains the given item</p>
+
+**Kind**: instance method of [<code>CollectionGroup</code>](#CollectionGroup)  
+
+| Param | Description |
+| --- | --- |
+| key | <p>The key of the item to look for</p> |
+
+<a name="CollectionGroup+add"></a>
+
+### collectionGroup.add(key)
+<p>Add an item to the group</p>
+
+**Kind**: instance method of [<code>CollectionGroup</code>](#CollectionGroup)  
+
+| Param | Description |
+| --- | --- |
+| key | <p>The key of the item to look for</p> |
+
+<a name="CollectionGroup+remove"></a>
+
+### collectionGroup.remove(key)
+<p>Remove an item from the group</p>
+
+**Kind**: instance method of [<code>CollectionGroup</code>](#CollectionGroup)  
+
+| Param | Description |
+| --- | --- |
+| key | <p>The key of the item to look for</p> |
+
+<a name="CollectionGroup+clear"></a>
+
+### collectionGroup.clear() ⇒ <code>this</code>
+<p>Clears the group of all items</p>
+
+**Kind**: instance method of [<code>CollectionGroup</code>](#CollectionGroup)  
+**Returns**: <code>this</code> - <p>This Group instance</p>  
+<a name="CollectionGroup+watch"></a>
+
+### collectionGroup.watch(callback) ⇒
+<p>Watch for changes on this group</p>
+
+**Kind**: instance method of [<code>CollectionGroup</code>](#CollectionGroup)  
+**Returns**: <p>The remove function to stop watching</p>  
+
+| Param | Description |
+| --- | --- |
+| callback | <p>The callback to run when the state changes</p> |
+

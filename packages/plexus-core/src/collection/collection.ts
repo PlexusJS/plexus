@@ -30,6 +30,17 @@ export interface PlexusCollectionConfig<DataType> {
 	 * @warning The type of the returned value WILL NOT change to undefined. Only the literal value will be undefined as this is _technically_ an override. Please beware and plan accordingly.
 	 */
 	unfoundKeyReturnsUndefined?: boolean
+
+	foreignKeys?: Partial<
+		Record<
+			keyof DataType,
+			{
+				newKey: string
+				reference: () => PlexusCollectionInstance
+			}
+		>
+	>
+	computeLocations?: Array<"collect" | "getValue">
 }
 interface PlexusCollectionStore<DataType extends Record<string, any>, Groups, Selectors> {
 	_internalId: string
@@ -44,6 +55,7 @@ interface PlexusCollectionStore<DataType extends Record<string, any>, Groups, Se
 	set externalName(value: string)
 	_persist: boolean
 	set persist(value: boolean)
+	_computeFn?: (data: DataType) => DataType
 }
 
 export type PlexusCollectionInstance<
@@ -52,7 +64,7 @@ export type PlexusCollectionInstance<
 	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
- * @description A Collection Instance
+ * A Collection Instance
  */
 export class CollectionInstance<DataType extends Record<string, any>, Groups extends GroupMap<DataType>, Selectors extends SelectorMap<DataType>> {
 	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
@@ -77,7 +89,10 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 
 	constructor(instance: () => PlexusInstance, _config: PlexusCollectionConfig<DataType> = { primaryKey: "id", defaultGroup: false } as const) {
 		this.instance = instance
-		this.config = _config
+		this.config = {
+			computeLocations: ["collect", "getValue"],
+			..._config,
+		}
 		this._internalStore = {
 			_internalId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
 			_lookup: new Map<string, string>(),
@@ -131,8 +146,8 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 	/**
 	 * Collect An item of data (or many items of data using an array) into the collection.
 	 * @requires: Each data item must have the primary key as a property
-	 * @param data Object[] | Object ::
-	 * @param groups string | string[] :: The groups to add the items to
+	 * @param data {Object[]|Object} The data to collect
+	 * @param groups {string|string[]} The groups to add the items to
 	 */
 	collect(data: DataType[], groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
 	collect(data: DataType, groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
@@ -142,6 +157,9 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 		const collectItem = (item: DataType) => {
 			if (!item) return
 			if (item[this._internalStore._key] !== undefined && item[this._internalStore._key] !== null) {
+				// Compute item before setting/storing
+				if (typeof this._internalStore._computeFn === "function" && this.config.computeLocations?.includes("collect"))
+					item = this._internalStore._computeFn(item)
 				// normalizing the key type to string
 				const dataKey = item[this._internalStore._key]
 				// if there is already a state for that key, update it
@@ -216,7 +234,7 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 	/**
 	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
 	 * @param key
-	 * @returns
+	 * @returns The data item with the provided key
 	 */
 	getItem(dataKey: DataKey): PlexusDataInstance<DataType> {
 		const data = this._internalStore._data.get(dataKey)
@@ -246,7 +264,10 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 	 * @returns The value of the item
 	 */
 	getItemValue(key: DataKey) {
-		return this.getItem(key).value
+		const value = this.getItem(key).value
+		if (typeof this._internalStore._computeFn === "function" && this.config.computeLocations?.includes("getValue") && value)
+			return this._internalStore._computeFn(value)
+		return value
 	}
 
 	/// SELECTORS
@@ -383,6 +404,7 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 	addToGroups(key: DataKey, groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
 		const addToGroup = (group: GroupName) => {
 			let g = this._internalStore._groups.get(group as GroupName)
+			// if the group does not exist, create it
 			if (!g) {
 				g = _group(
 					() => this.instance(),
@@ -492,7 +514,36 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 	 * Run this function when data is collected to format it in a particular way; useful for converting one datatype into another
 	 * @param fn
 	 */
-	compute(fn: (v: DataType) => DataType) {}
+	compute(fn: (v: DataType) => DataType) {
+		this._internalStore._computeFn = fn
+		return this
+	}
+	/**
+	 * Re-runs the compute function on select IDs (or all the collection if none provided)
+	 */
+	reCompute(ids?: string | string[]) {
+		if (typeof this._internalStore._computeFn !== "function") {
+			this.instance().runtime.log("warn", `Attempted to recompute ${this.name} without a compute fn set`)
+			return this
+		}
+		if (ids) {
+			if (!Array.isArray(ids)) ids = [ids as string]
+		} else ids = this.keys.map((v) => v.toString())
+		ids.forEach((id) => {
+			const data = this._internalStore._data.get(id)
+			if (data) {
+				data.patch({ ...(this._internalStore._computeFn?.(data.value) ?? {}), [this._internalStore._key]: id } as Partial<DataType>)
+			}
+		})
+	}
+	/**
+	 * Same as reCompute, but for groups
+	 */
+	reComputeGroups(groupNames: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+		if (!Array.isArray(groupNames)) groupNames = [groupNames]
+		groupNames.forEach((groupName) => this.reCompute(this.getGroup(groupName).value.map((d) => d[this._internalStore._key])))
+		return this
+	}
 	/**
 	 * Set the key of the collection for enhanced internal tracking
 	 */
