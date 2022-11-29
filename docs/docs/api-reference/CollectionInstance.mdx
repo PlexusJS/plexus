@@ -4,13 +4,8 @@
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
-
-		<a name="CollectionInstance"></a>
-
-## CollectionInstance
 <p>A Collection Instance</p>
 
-**Kind**: global class  
 
 * [CollectionInstance](#CollectionInstance)
     * [.id](#CollectionInstance+id)
@@ -49,67 +44,57 @@
 ### collectionInstance.id
 <p>The internal ID of the collection</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 <a name="CollectionInstance+instanceId"></a>
 
 ### collectionInstance.instanceId
 <p>The internal id of the collection with an instance prefix</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 <a name="CollectionInstance+value"></a>
 
 ### collectionInstance.value ⇒
 <p>Get all of the collection data values as an array</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The collection data values as an array</p>  
 <a name="CollectionInstance+keys"></a>
 
 ### collectionInstance.keys ⇒
 <p>Get all of the collection data keys as an array</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The collection data values as an array</p>  
 <a name="CollectionInstance+groups"></a>
 
 ### collectionInstance.groups ⇒
 <p>Get all the groups in the collection as an object</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The groups in the collection</p>  
 <a name="CollectionInstance+groupsValue"></a>
 
 ### collectionInstance.groupsValue ⇒
 <p>Get all the groups and their children's data values as an object</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The groups paired with their children's data values as an object</p>  
 <a name="CollectionInstance+selectors"></a>
 
 ### collectionInstance.selectors ⇒
 <p>Get all the groups in the collection as an object</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The groups in the collection</p>  
 <a name="CollectionInstance+selectorsValue"></a>
 
 ### collectionInstance.selectorsValue ⇒
 <p>Get all the groups and their childrens data values as an object</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The groups paired with their childrens data values as an object</p>  
 <a name="CollectionInstance+name"></a>
 
 ### collectionInstance.name
 <p>Get the name (generated or custom) of the collection store</p>
 
-**Kind**: instance property of [<code>CollectionInstance</code>](#CollectionInstance)  
 <a name="CollectionInstance+isCreatedGroup"></a>
 
 ### collectionInstance.isCreatedGroup(name) ⇒
 <p>Helper function; Checks to see if the provided name is a group name</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>boolean: if the name is a specific name of a group</p>  
 
 | Param | Description |
@@ -121,7 +106,6 @@
 ### collectionInstance.isCreatedSelector(name) ⇒
 <p>Helper function; Checks to see if the provided name is a selector name</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>boolean: if the name is a specific name of a selector</p>  
 
 | Param | Description |
@@ -133,7 +117,6 @@
 ### collectionInstance.collect(data, groups)
 <p>Collect An item of data (or many items of data using an array) into the collection.</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Requires:**: Each data item must have the primary key as a property  
 
 | Param | Type | Description |
@@ -147,7 +130,6 @@
 <p>Update the collection with data;
 This is like collect but will not add new items, and can can be used to patch existing items</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 
 | Param | Description |
 | --- | --- |
@@ -161,7 +143,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getItem(key) ⇒
 <p>Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a <em>provisional</em> one</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The data item with the provided key</p>  
 
 | Param |
@@ -173,7 +154,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getItemValue(key) ⇒
 <p>Get the value of an item in the collection</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The value of the item</p>  
 
 | Param | Description |
@@ -185,7 +165,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.createSelector(name) ⇒
 <p>Create a Selector instance for a given selector name</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The new Collection Instance</p>  
 
 | Param | Description |
@@ -197,7 +176,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.createSelectors(names) ⇒
 <p>Create Selector instances for a given set of selector names</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The new Collection Instance</p>  
 
 | Param | Description |
@@ -209,7 +187,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getSelector(name) ⇒
 <p>Get A Group instance of a given group name</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>Either a Group Instance or undefined</p>  
 
 | Param | Description |
@@ -221,7 +198,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.createGroup(groupName, config) ⇒
 <p>Create a group with a name and a configuration</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The new Collection Instance</p>  
 
 | Param | Description |
@@ -234,7 +210,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.createGroups(groupNames) ⇒
 <p>Create multiple groups with a name (no configuration)</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The new Collection Instance</p>  
 
 | Param | Description |
@@ -246,7 +221,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getGroup(name) ⇒
 <p>Get A Group instance of a given group name</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>Group Instance</p>  
 
 | Param | Description |
@@ -258,7 +232,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getGroupsOf(key) ⇒
 <p>Given a key, get all Group names that the key is in</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 **Returns**: <p>The Group names that the key is in</p>  
 
 | Param | Description |
@@ -270,7 +243,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.addToGroups(key, groups)
 <p>Add a data item to a group or groups</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 
 | Param | Description |
 | --- | --- |
@@ -282,7 +254,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.delete(keys)
 <p>Delete a data item completely from the collection.</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 
 | Param | Description |
 | --- | --- |
@@ -293,7 +264,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.removeFromGroup(keys, groups)
 <p>Remove a data item from a set of groups</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 
 | Param | Description |
 | --- | --- |
@@ -305,7 +275,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.clear([GroupName])
 <p>Delete all data in the collection</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -316,7 +285,6 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.compute(fn)
 <p>Run this function when data is collected to format it in a particular way; useful for converting one datatype into another</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 
 | Param |
 | --- |
@@ -327,16 +295,13 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.reCompute()
 <p>Re-runs the compute function on select IDs (or all the collection if none provided)</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 <a name="CollectionInstance+reComputeGroups"></a>
 
 ### collectionInstance.reComputeGroups()
 <p>Same as reCompute, but for groups</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  
 <a name="CollectionInstance+key"></a>
 
 ### collectionInstance.key()
 <p>Set the key of the collection for enhanced internal tracking</p>
 
-**Kind**: instance method of [<code>CollectionInstance</code>](#CollectionInstance)  

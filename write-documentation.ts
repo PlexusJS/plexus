@@ -5,19 +5,50 @@ import fs from 'fs'
 import path from 'path'
 import c from 'chalk'
 
+const SETTINGS = {
+    VERBOSE: false,
+}
+interface Identifier {
+    id: string
+    longname: string
+    name: string
+    kind: 'function' | 'class' | 'method'
+    scope: 'instance' | 'global'
+    description: string
+    memberof: string
+    thisvalue: undefined
+    order: number
+    params: {
+        description: string
+        name: string
+    }[]
+    meta: {
+        lineno: number
+        filename: string
+        path: string
+    }
+}
+type PackageMap = Record<string, { absolute: string; relative: string }[]>
+type TokenMap = Record<string, string> & {
+    name: string
+    classKey: string
+    description: string
+}
+
 const outputDir = path.join(__dirname, 'docs/docs/api-reference')
 const docTemplate = fs.readFileSync(
     `${__dirname}/scripts/templates/ref.hbs`,
     'utf8'
 )
-
 const genDocs = async () => {
+    console.log(c.blue('\n\n- Initialization 🚩\n'))
     /* input and output paths */
+    const foundTokens = docTemplate.match(/\$\{(\w|\d|-|_)*\}/g)
     const inputFiles = read(path.join(__dirname, './packages'))
-    console.log(`Matched ${inputFiles.length} files...`)
-
-    const packageMap: Record<string, { absolute: string; relative: string }[]> =
-        {}
+    const packageMap: PackageMap = {}
+    SETTINGS.VERBOSE &&
+        console.log(c.yellow(inputFiles.length), `files in core packages...`)
+    console.log(c.yellow(`Found top-level Template Tokens:`), foundTokens)
 
     inputFiles.forEach((filePath) => {
         if (/.*\/src\/(?!index.ts($|\s))/g.test(filePath)) {
@@ -39,61 +70,98 @@ const genDocs = async () => {
             packagePaths.map((packagePath) => packagePath.absolute)
         )
         .flat()
+
     console.log(
-        `Found ${absoluteInputFiles.length} files in these packages:`,
+        `Found`,
+        c.yellowBright(`${absoluteInputFiles.length} files`),
+        `in these packages:`,
         Object.keys(packageMap)
     )
-    const templateData = jsdoc2md.getTemplateDataSync({
+
+    console.log(c.blue('\n\n- Start Processing ⚙️\n'))
+    // casting required due to poor typing on this package
+    const templateData: Identifier[] = jsdoc2md.getTemplateDataSync({
         files: absoluteInputFiles,
         configure: './jsdoc2md.json',
-    })
-    const classNames = templateData.reduce(
-        (classNames: string[], identifier: any) => {
-            if (identifier.kind === 'class') classNames.push(identifier.name)
-            return classNames
+    }) as any[]
+
+    // extract all identifiers from the template data
+    const classIdentifiers = templateData.reduce(
+        (classData: Identifier[], identifier: Identifier) => {
+            if (identifier.kind === 'class') classData.push(identifier)
+            return classData
         },
-        []
+        [] as Identifier[]
     )
-    console.log('Found these classes:', classNames)
-    for (let className of classNames) {
-        console.log(`Generating docs for "${className}"`)
-        let formattedDocTemplate = docTemplate
-        /* reduce templateData to an array of class names */
-        const tokenMap: Record<string, string> = {
-            name: className,
-        }
-        const foundTokens = formattedDocTemplate.match(/\$\{.*\}/g)
-        foundTokens?.forEach((token) => {
-            formattedDocTemplate = formattedDocTemplate.replace(
-                token,
-                tokenMap[token.substring(2, token.length - 1)] || ''
-            )
-        })
 
-        console.log(foundTokens)
-        const template = `${formattedDocTemplate}
-		{{#class name="${className}"}}
-		{{>docs}}
-		{{/class}}`
-        const fileData = jsdoc2md.renderSync({
-            files: absoluteInputFiles,
-            template: template,
-            data: templateData,
-        })
-
-        // console.log("fileData", fileData)
-        fs.writeFileSync(
-            path.resolve(outputDir, `${className || new Date().getTime()}.md`),
-            fileData
+    SETTINGS.VERBOSE &&
+        console.log(
+            c.yellow('Found these classes:'),
+            classIdentifiers.map((data) => data.name)
         )
+
+    // generate docs for each class
+    for (let identifier of classIdentifiers) {
+        try {
+            console.log(
+                `Generating docs for`,
+                c.yellow(identifier.name),
+                `\n🔃`
+            )
+            let formattedDocTemplate = docTemplate
+
+            // A map to store all the identifiers that are used in the template
+            const tokenMap: TokenMap = {
+                name: identifier.name,
+                classKey: identifier.name,
+                description: identifier.description,
+            }
+
+            // generate the md file data
+            let fileData = jsdoc2md.renderSync({
+                files: absoluteInputFiles,
+                template: formattedDocTemplate.replace(
+                    '${classKey}',
+                    tokenMap.classKey || ''
+                ),
+                data: templateData,
+                partial: `${__dirname}/scripts/templates/**/*.hbs`,
+            })
+
+            // replace all tokens in the returned data
+            foundTokens?.forEach((token) => {
+                fileData = fileData.replace(
+                    token,
+                    tokenMap[token.substring(2, token.length - 1)] || ''
+                )
+            })
+
+            // Write the file
+            fs.writeFileSync(
+                path.resolve(
+                    outputDir,
+                    `${identifier.name || new Date().getTime()}.mdx`
+                ),
+                fileData
+            )
+            process.stdout.moveCursor(0, -1)
+            process.stdout.write('✅\n')
+        } catch (err) {
+            process.stdout.moveCursor(0, -1)
+            process.stdout.write('❌\n')
+        }
     }
 }
 
+// run the script
 genDocs()
     .then(() => {
-        console.log(c.bgGreen(`Documentation Generated in ${outputDir}`))
+        console.log(
+            c.green(`\n\n- Documentation Generated 🚀`),
+            `(in "${outputDir}")\n`
+        )
     })
     .catch((err) => {
-        console.error(err)
+        console.error(c.red(`\n\n- Documentation Generation Failed ❌`), err)
         process.exit(1)
     })
