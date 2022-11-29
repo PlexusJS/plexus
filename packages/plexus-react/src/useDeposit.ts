@@ -66,7 +66,7 @@ type DepositControls<T = any> = {
  * @param settings.onEdit{Function} - A callback function that will be called when the edit function is called.
  * @param settings.Discard{Function} - A callback function that will be called when the discard function is called.
  * @param settings.autoSave{number} - The number of milliseconds to wait before saving.
- * @returns
+ * @returns DepositControls - The controls of the deposit
  */
 export function useDeposit<T = any>(
 	original: Partial<T>,

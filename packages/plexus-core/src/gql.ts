@@ -1,12 +1,8 @@
 /**
  * Simple GraphQL query builder.
- * @param chunks 
- * @param variables 
- * @returns 
+ * @param chunks
+ * @param variables
  */
-export function gql (chunks: TemplateStringsArray, ...variables: any[]): string {
-  return chunks.reduce(
-    (accumulator, chunk, index) => `${accumulator}${chunk}${index in variables ? variables[index] : ''}`,
-    ''
-  )
+export function gql(chunks: TemplateStringsArray, ...variables: any[]): string {
+	return chunks.reduce((accumulator, chunk, index) => `${accumulator}${chunk}${index in variables ? variables[index] : ""}`, "")
 }

@@ -2,11 +2,6 @@ import { PlexusInstance } from "./instance"
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusActionHooks {
-	/**
-	 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
-	 * @param handler? A function that will be called when an error occurs; omit to fail silently.
-	 *
-	 */
 	onCatch(handler?: ErrorHandler): void
 	/**
 	 * Ignore the default hault preActions
@@ -14,7 +9,10 @@ export interface PlexusActionHooks {
 	ignoreInit(): void
 	batch(fn: () => void): void
 }
-export class PlexusActionHelpers {
+/**
+ * The action helpers for a defined plexus action
+ */
+class PlexusActionHelpers {
 	private _internalStore = {
 		_errorHandlers: new Set<ErrorHandler>(),
 	}
@@ -56,11 +54,9 @@ export class PlexusActionHelpers {
 		this._skipInit = true
 	}
 
-	batch(fn: () => void){
+	batch(fn: () => void) {
 		// this.instance.batch()
-		
 	}
-
 
 	/**
 	 * @internal
@@ -73,9 +69,7 @@ export class PlexusActionHelpers {
 		const ignoreInit = (): void => {
 			return this.ignoreInit()
 		}
-		const batch = () => {
-
-		}
+		const batch = () => {}
 		return {
 			/**
 			 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
@@ -84,7 +78,7 @@ export class PlexusActionHelpers {
 			 */
 			onCatch,
 			ignoreInit,
-			batch
+			batch,
 		}
 	}
 }

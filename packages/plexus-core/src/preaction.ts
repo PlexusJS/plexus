@@ -40,7 +40,7 @@ export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 
 	/**
 	 *
-	 * @returns
+	 * @returns The result of the action
 	 */
 	async run() {
 		let result: any

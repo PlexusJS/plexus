@@ -7,7 +7,7 @@
 	"scripts": {
 		"docusaurus": "docusaurus",
 		"start": "docusaurus start",
-		"build": "docusaurus build",
+		"docs:build": "docusaurus build",
 		"swizzle": "docusaurus swizzle",
 		"deploy": "docusaurus deploy",
 		"clear": "docusaurus clear",
@@ -17,9 +17,9 @@
 		"typecheck": "tsc"
 	},
 	"dependencies": {
-		"@docusaurus/core": "^2.0.0-beta.21",
-		"@docusaurus/preset-classic": "^2.0.0-beta.21",
-		"@docusaurus/theme-live-codeblock": "^2.0.0-beta.21",
+		"@docusaurus/core": "^2.2.0",
+		"@docusaurus/preset-classic": "^2.2.0",
+		"@docusaurus/theme-live-codeblock": "^2.2.0",
 		"@mdx-js/react": "^1.6.22",
 		"@plexusjs/core": "^1.1.0",
 		"@plexusjs/react": "^1.1.0",
@@ -34,7 +34,11 @@
 		"tailwindcss": "^3.0.24"
 	},
 	"devDependencies": {
-		"@docusaurus/module-type-aliases": "^2.0.0-beta.21",
+		"@babel/cli": "^7.19.3",
+		"@babel/core": "^7.20.5",
+		"@babel/preset-env": "^7.20.2",
+		"@babel/preset-typescript": "^7.18.6",
+		"@docusaurus/module-type-aliases": "^2.2.0",
 		"@tsconfig/docusaurus": "^1.0.5",
 		"@types/node": "^17.0.30",
 		"@types/react": "^18.0.8",
