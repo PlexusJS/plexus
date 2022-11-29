@@ -8,3 +8,5 @@ __snapshots__
 *.tsbuildinfo
 *.tgz
 *.log
+
+plex*
