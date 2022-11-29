@@ -29,28 +29,6 @@ inputFiles.forEach((filePath) => {
         })
     }
 })
-/* reduce templateData to an array of class names */
-// for (let file of packageMap) {
-// 	const templateData = jsdoc2md.getTemplateDataSync({
-// 		files: Array.from(file[1].values()),
-// 		configure: "./jsdoc2md.json",
-// 	})
-// 	/* reduce templateData to an array of class names */
-// 	const classNames = templateData.reduce((classNames: string[], identifier: any) => {
-// 		if (identifier.kind === "class") classNames.push(identifier.name)
-// 		return classNames
-// 	}, [])
-// 	console.log("templateData", templateData)
-// 	const fileData = jsdoc2md
-// 		.renderSync({
-// 			files: Array.from(file[1].values()),
-// 			template: template,
-// 			data: templateData,
-// 		})
-// 		.replace("${name}", file[0])
-// 	console.log("fileData", fileData)
-// 	fs.writeFileSync(path.resolve(outputDir, `${file[0] || new Date().getTime()}.md`), fileData)
-// }
 
 // ! this is sooo inefficient lmao
 const absoluteInputFiles = Object.values(packageMap)
@@ -65,24 +43,37 @@ const templateData = jsdoc2md.getTemplateDataSync({
 })
 const classNames = templateData.reduce(
     (classNames: string[], identifier: any) => {
-        console.log('identifier', identifier)
         if (identifier.kind === 'class') classNames.push(identifier.name)
         return classNames
     },
     []
 )
 for (let className of classNames) {
-    console.log('className', className)
+    console.log(`Generating docs for "${className}"`)
+    let formattedDocTemplate = docTemplate
     /* reduce templateData to an array of class names */
-    // console.log("templateData", templateData)
-    const template = `${docTemplate}\n{{#class name="${className}"}}{{>docs}}{{/class}}`
-    const fileData = jsdoc2md
-        .renderSync({
-            files: absoluteInputFiles,
-            template: template,
-            data: templateData,
-        })
-        .replace('${name}', className)
+    const tokenMap: Record<string, string> = {
+        name: className,
+    }
+    const foundTokens = formattedDocTemplate.match(/\$\{.*\}/g)
+    foundTokens?.forEach((token) => {
+        formattedDocTemplate = formattedDocTemplate.replace(
+            token,
+            tokenMap[token.substring(2, token.length - 1)] || ''
+        )
+    })
+
+    console.log(foundTokens)
+    const template = `${formattedDocTemplate}
+	{{#class name="${className}"}}
+	{{>docs}}
+	{{/class}}`
+    const fileData = jsdoc2md.renderSync({
+        files: absoluteInputFiles,
+        template: template,
+        data: templateData,
+    })
+
     // console.log("fileData", fileData)
     fs.writeFileSync(
         path.resolve(outputDir, `${className || new Date().getTime()}.md`),

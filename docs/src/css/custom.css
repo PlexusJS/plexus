@@ -64,7 +64,7 @@ h2 {
     /* font-size 2.5rem; */
     @apply text-4xl;
     font-weight: bold;
-    text-transform: lowercase;
+    /* text-transform: lowercase; */
     @apply pt-3;
     /* letter-spacing: 2px; */
     /* font-family: "silka" !important; */
@@ -115,7 +115,7 @@ em {
     background-color: rgba(0, 0, 0, 0);
 }
 button {
-    @apply border-blue-400 border px-5 py-2 rounded-md hover:border-blue-500;
+    @apply border-blue-400 outline outline-transparent px-5 py-2 rounded-md hover:outline-blue-500;
 }
 .hr {
     border-width: 0;

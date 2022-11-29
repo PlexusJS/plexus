@@ -1,10 +1,8 @@
-import { state } from '..'
 import { WatchableMutable } from './../watchable'
 import { PlexusInstance } from '../instance'
 import { PlexusWatcher } from '../interfaces'
-import { StateInstance } from '../state'
 import { PlexusCollectionInstance } from './collection'
-import { deepClone, deepMerge, isEqual, isObject } from '../helpers'
+import { deepClone, deepMerge, isEqual } from '@plexusjs/utils'
 
 interface CollectionDataConfig {
     prov: boolean

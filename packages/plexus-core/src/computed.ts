@@ -1,5 +1,5 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
-import { deepClone, deepMerge, isObject } from './helpers'
+import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance'
 import { PlexusStateType, StateInstance } from './state'
 import { PlexusWatcher, Watchable, WatchableMutable } from './watchable'
