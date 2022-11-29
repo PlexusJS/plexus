@@ -1,0 +1,149 @@
+---
+title: Collection
+sidebar_position: 3
+---
+
+import CollapseContainer from "../../src/components/Collapse.tsx"
+
+## Basic Use
+
+```ts
+import { collection } from "@plexusjs/core"
+interface MyData {
+	name: string
+	age: number
+	id: string
+}
+
+const myCoolCollection = collection<MyData>({
+	primaryKey: "id", // default is "id"; This is the key that will be used to identify the item in the collection; it's required to be in every item
+})
+
+myCoolCollection.collect({
+	id: "1",
+	name: "John",
+	age: 30,
+})
+
+myCoolCollection.value //=> [{ id: "1", name: "John", age: 30 }]
+
+myCoolCollection.update("1", {
+	name: "John Doe",
+})
+
+myCoolCollection.value //=> [{ id: "1", name: "John Doe", age: 30 }]
+```
+
+## Collection Properties
+
+##### collecton `.id`
+
+The internal ID of the collection
+
+##### collecton `.config`
+
+The config of the collection
+
+##### collecton `.value`
+
+Get all of the collection data values as an array
+
+##### collecton `.groups`
+
+Get all the groups in the collection as an object
+
+##### collecton `.groupsValue`
+
+Get all the groups and their children's data values as an object
+
+##### collecton `.selectors`
+
+Get all the groups in the collection as an object
+
+##### collecton `.selectorsValue`
+
+Get all the groups and their childrens data values as an object
+
+##### collecton `.name`
+
+Get the name (generated or custom) of the collection store
+
+##### collecton `.lastUpdatedKey`
+
+The primary key of the last updated item in the collection
+
+## Collection Methods
+
+##### collecton `.collect()`
+
+Collect An item of data (or many items of data using an array) into the collection.
+
+##### collecton `.update()`
+
+Update the collection with data;
+This is like collect but will not add new items, and can can be used to patch existing items
+
+##### collecton `.getItem()`
+
+Get the Value of the data item with the provided key (the raw data).
+
+##### collecton `.getItemValue()`
+
+Get the value of an item in the collection
+
+##### collecton `.delete()`
+
+Delete a data item completely from the collection.
+
+##### collecton `.remove()`
+
+Remove a data item from a set of groups
+
+##### collecton `.clear()`
+
+Delete all data in the collection
+
+##### collecton `.key()`
+
+Set the key of the collection for enhanced internal tracking
+
+##### collecton `.createSelector()`
+
+Create a Selector instance for a given selector name
+
+##### collecton `.createSelectors()`
+
+Create Selector instances for a given set of selector names
+
+##### collecton `.getSelector()`
+
+Get A Group instance of a given group name
+
+##### collecton `.createGroup()`
+
+Create a group with a name and a configuration
+
+##### collecton `.createGroups()`
+
+Create multiple groups with a name (no configuration)
+
+##### collecton `.getGroup()`
+
+Get A Group instance of a given group name
+
+##### collecton `.getGroupsOf()`
+
+Given a key, get all Group names that the key is in
+
+##### collecton `.addToGroups()`
+
+Add a data item to a group or groups
+
+##### collecton `.watchGroup()`
+
+Create a Watcher for a given group name
+
+Compare a thing to the current value, if they are equal, returns true
+
+<CollapseContainer title="Arguments" data={[{ key: "value", type: "any", description: "The thing to compare the current value to." }]} />
+<CollapseContainer miniTitle="Returns" data={[{ type: "boolean", description: "A boolean representing if they are equal." }]} />
