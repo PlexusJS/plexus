@@ -1,6 +1,6 @@
 import { StateInstance } from './state'
 import { PlexusPlugin } from './plugin'
-import { PlexusRuntime, RuntimeInstance, _runtime } from './runtime'
+import { RuntimeInstance, _runtime } from './runtime'
 import { PlexusStorageInstance, storage } from './storage'
 import { CollectionInstance } from './collection/collection'
 import { deepMerge, genUID, isEqual } from '@plexusjs/utils'

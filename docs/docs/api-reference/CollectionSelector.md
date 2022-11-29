@@ -5,7 +5,7 @@
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 
-<a name="CollectionSelector"></a>
+		<a name="CollectionSelector"></a>
 
 ## CollectionSelector
 <p>A selector for data</p>

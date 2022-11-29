@@ -5,7 +5,7 @@
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 
-<a name="CollectionInstance"></a>
+		<a name="CollectionInstance"></a>
 
 ## CollectionInstance
 <p>A Collection Instance</p>

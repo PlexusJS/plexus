@@ -5,7 +5,7 @@
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 
-<a name="CollectionGroup"></a>
+		<a name="CollectionGroup"></a>
 
 ## CollectionGroup
 <p>A group of data</p>

@@ -5,7 +5,7 @@
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 
-<a name="StateInstance"></a>
+		<a name="StateInstance"></a>
 
 ## StateInstance
 <p>A trackable State</p>

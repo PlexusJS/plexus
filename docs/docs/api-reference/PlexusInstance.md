@@ -5,7 +5,7 @@
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 
-<a name="PlexusInstance"></a>
+		<a name="PlexusInstance"></a>
 
 ## PlexusInstance
 **Kind**: global class  
