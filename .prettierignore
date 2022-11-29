@@ -1,1 +1,5 @@
 *.hbs
+*/node_modules
+.docusaurus
+out
+dist
