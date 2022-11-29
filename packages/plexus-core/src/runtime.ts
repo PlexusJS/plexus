@@ -122,7 +122,7 @@ export class RuntimeInstance {
 	/**
 	 * You can use either the callback, or the promise to know when the instance runtime is ready
 	 * @param callback
-	 * @returns
+	 * @returns Promise that resolves when the runtime is ready
 	 */
 	runInit(callback?: (...args: any[]) => any) {
 		return new Promise<void>((resolve, reject) => {
@@ -163,7 +163,7 @@ export class RuntimeInstance {
 /**
  * Create a runtime for an instance NOTE: NOT FOR PUBLIC USE
  * @param instance the instance the runtime is running on
- * @returns
+ * @returns A new runtime (or the currently existing runtime) for a given instance
  * @private
  */
 export function _runtime(instance: () => PlexusInstance, config?: Partial<RuntimeConfig>) {

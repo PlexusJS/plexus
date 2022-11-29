@@ -47,7 +47,7 @@ interface ApiStore {
 	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
 }
 /**
- *
+ * An API instance is used to make requests to a server. Interact with this by using `api()`
  */
 export class ApiInstance {
 	// private

@@ -3,8 +3,8 @@ import { PlexusInstance } from "./instance"
 import { PlexusWatcher } from "./interfaces"
 import { WatchableMutable } from "./watchable"
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
-export type PlexusStateType = AlmostAnything | null
-export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, input: PxStateValue) => StateInstance<PxStateValue>
+export type PlexusStateType = AlmostAnything
+export type PlexusState = <Value extends PlexusStateType = any>(instance: () => PlexusInstance, input: Value) => StateInstance<Value>
 
 type DestroyFn = () => void
 
@@ -76,7 +76,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	patch(value: StateValue) {
 		if (isObject(value) && isObject(this._watchableStore._value)) {
-			this.set(deepMerge(this._watchableStore._value, value))
+			// ! Shitty type casting, should be fixed
+			this.set(deepMerge(this._watchableStore._value as any, value) as StateValue)
 		}
 		// if the deep merge is on an array type, we need to convert the merged object back to an array
 		else if (Array.isArray(value) && Array.isArray(this._watchableStore._value)) {
@@ -112,14 +113,14 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 
 		if (this.instance().storage) {
 			// Bandaid
-			(async () => {
+			;(async () => {
 				// this should only run on initial load of the state when this function is called
 				this.instance().runtime.log("info", `Persisting ${this._internalStore._name}`)
 				this.instance().storage?.monitor(this._internalStore._name, this)
-				const storedValue = await this.instance().storage?.get(this._internalStore._name) as StateValue
+				const storedValue = (await this.instance().storage?.get(this._internalStore._name)) as StateValue
 				storedValue && this.set(storedValue)
 				this._internalStore._persist = true
-			})();
+			})()
 		}
 		return this
 	}

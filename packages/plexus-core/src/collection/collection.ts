@@ -64,7 +64,7 @@ export type PlexusCollectionInstance<
 	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
- * @description A Collection Instance
+ * A Collection Instance
  */
 export class CollectionInstance<DataType extends Record<string, any>, Groups extends GroupMap<DataType>, Selectors extends SelectorMap<DataType>> {
 	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
@@ -146,8 +146,8 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 	/**
 	 * Collect An item of data (or many items of data using an array) into the collection.
 	 * @requires: Each data item must have the primary key as a property
-	 * @param data Object[] | Object ::
-	 * @param groups string | string[] :: The groups to add the items to
+	 * @param data {Object[]|Object} The data to collect
+	 * @param groups {string|string[]} The groups to add the items to
 	 */
 	collect(data: DataType[], groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
 	collect(data: DataType, groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
@@ -234,7 +234,7 @@ export class CollectionInstance<DataType extends Record<string, any>, Groups ext
 	/**
 	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
 	 * @param key
-	 * @returns
+	 * @returns The data item with the provided key
 	 */
 	getItem(dataKey: DataKey): PlexusDataInstance<DataType> {
 		const data = this._internalStore._data.get(dataKey)

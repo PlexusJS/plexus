@@ -1,0 +1,167 @@
+--- 
+	title: StateInstance 
+--- 
+
+[![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
+
+${description}
+<a name="StateInstance"></a>
+
+## StateInstance
+<p>A trackable State</p>
+
+**Kind**: global class  
+
+* [StateInstance](#StateInstance)
+    * [.id](#StateInstance+id)
+    * [.instanceId](#StateInstance+instanceId)
+    * [.value](#StateInstance+value)
+    * [.lastValue](#StateInstance+lastValue)
+    * [.name](#StateInstance+name)
+    * [.nextValue](#StateInstance+nextValue)
+    * [.initialValue](#StateInstance+initialValue)
+    * [.set(value)](#StateInstance+set)
+    * [.patch(value)](#StateInstance+patch)
+    * [.watch(callback)](#StateInstance+watch) ⇒
+    * [.persist(name)](#StateInstance+persist)
+    * [.reset()](#StateInstance+reset)
+    * [.interval(setterFunction, ms)](#StateInstance+interval)
+    * [.isEqual(value)](#StateInstance+isEqual) ⇒ <code>boolean</code>
+    * [.clearInterval()](#StateInstance+clearInterval)
+    * [.key()](#StateInstance+key)
+
+<a name="StateInstance+id"></a>
+
+### stateInstance.id
+<p>The internal id of the state</p>
+
+**Kind**: instance property of [<code>StateInstance</code>](#StateInstance)  
+<a name="StateInstance+instanceId"></a>
+
+### stateInstance.instanceId
+<p>The internal id of the state with an instance prefix</p>
+
+**Kind**: instance property of [<code>StateInstance</code>](#StateInstance)  
+<a name="StateInstance+value"></a>
+
+### stateInstance.value
+<p>The value of the state</p>
+
+**Kind**: instance property of [<code>StateInstance</code>](#StateInstance)  
+<a name="StateInstance+lastValue"></a>
+
+### stateInstance.lastValue
+<p>The previous (reactive) value of the state</p>
+
+**Kind**: instance property of [<code>StateInstance</code>](#StateInstance)  
+<a name="StateInstance+name"></a>
+
+### stateInstance.name
+<p>The name of the state (NOTE: set with the <code>.key()</code> function)</p>
+
+**Kind**: instance property of [<code>StateInstance</code>](#StateInstance)  
+<a name="StateInstance+nextValue"></a>
+
+### stateInstance.nextValue
+<p>The next value to apply to the state
+This is normally managed internally, but you can use it to &quot;prepare&quot; the state before applying the value.</p>
+
+**Kind**: instance property of [<code>StateInstance</code>](#StateInstance)  
+**Example**  
+```js
+state.nextValue = { foo: "bar" };
+state.set(); // The state will be { foo: "bar" }
+```
+<a name="StateInstance+initialValue"></a>
+
+### stateInstance.initialValue
+<p>The initial (default) value of the state</p>
+
+**Kind**: instance property of [<code>StateInstance</code>](#StateInstance)  
+<a name="StateInstance+set"></a>
+
+### stateInstance.set(value)
+<p>Set the value of the state</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  
+
+| Param | Description |
+| --- | --- |
+| value | <p>The new value of this state</p> |
+
+<a name="StateInstance+patch"></a>
+
+### stateInstance.patch(value)
+<p>Patch the current value of the state</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  
+
+| Param | Description |
+| --- | --- |
+| value | <p>A value of the state to merge with the current value</p> |
+
+<a name="StateInstance+watch"></a>
+
+### stateInstance.watch(callback) ⇒
+<p>Watch for changes on this state</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  
+**Returns**: <p>The remove function to stop watching</p>  
+
+| Param | Description |
+| --- | --- |
+| callback | <p>The callback to run when the state changes</p> |
+
+<a name="StateInstance+persist"></a>
+
+### stateInstance.persist(name)
+<p>Persist the state to selected storage</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  
+
+| Param | Description |
+| --- | --- |
+| name | <p>The storage prefix to use</p> |
+
+<a name="StateInstance+reset"></a>
+
+### stateInstance.reset()
+<p>Reset the state to the initial value</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  
+<a name="StateInstance+interval"></a>
+
+### stateInstance.interval(setterFunction, ms)
+<p>On a set interval, run a function to update the state</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  
+
+| Param | Description |
+| --- | --- |
+| setterFunction | <p>The function used to update the state on the interval; returns the new value</p> |
+| ms | <p>The interval duration (in milliseconds)</p> |
+
+<a name="StateInstance+isEqual"></a>
+
+### stateInstance.isEqual(value) ⇒ <code>boolean</code>
+<p>Compare a thing to the current value, if they are equal, returns true</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  
+**Returns**: <code>boolean</code> - <p>A boolean representing if they are equal</p>  
+
+| Param | Description |
+| --- | --- |
+| value | <p>The thing to compare the current value to</p> |
+
+<a name="StateInstance+clearInterval"></a>
+
+### stateInstance.clearInterval()
+<p>Stop the state interval</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  
+<a name="StateInstance+key"></a>
+
+### stateInstance.key()
+<p>Set the key of the state for internal tracking</p>
+
+**Kind**: instance method of [<code>StateInstance</code>](#StateInstance)  

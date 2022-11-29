@@ -1,0 +1,35 @@
+---
+title: PreAction Use Case
+sidebar_position: 4
+---
+
+```ts
+import { preaction, state, action, api, collection } from "@plexusjs/core"
+const authData = state<{ token?: string; refresh?: string }>({})
+
+const users = collection<{ name: string; id: string }>()
+
+// create your api instances
+const apiUsers = api({ baseURL: "http://example.com/api/users" })
+const authApi = api({ baseURL: "http://example.com/api/auth" })
+
+// create your preaction(s)
+// a preaction can be async or syncronous!
+preaction(async () => {
+	const res = await authApi.post<{ token?: string; refresh?: string }>("/refresh", { refresh_token: authData.value.refresh })
+	if (res.ok) {
+		res.data
+	}
+	// do something before other actions
+})
+
+// create your action(s)
+const getUsers = action(async ({ onCatch }) => {
+	onCatch(console.error)
+
+	const res = await apiUsers.get("/retrieve", { $limit: 10 })
+
+	users.collect(res.data)
+	return users.value
+})
+```

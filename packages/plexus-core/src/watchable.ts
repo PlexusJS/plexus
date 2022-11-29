@@ -56,7 +56,7 @@ export class Watchable<ValueType = any> {
 	}
 }
 
-export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
+export class WatchableMutable<ValueType extends AlmostAnything = any> extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		super(instance, init)

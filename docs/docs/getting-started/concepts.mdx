@@ -1,0 +1,43 @@
+---
+title: Concepts
+sidebar_position: 1
+---
+
+## Strategy
+
+We designed Plexus to take the business logic away from the components; this essentially turns your components into puppets for Plexus to orchestrate. Keeping business log seprate has many benifits, including versitility.
+
+## Structure
+
+Plexus was designed to be completely unopinionated on how to structure your app. You can technically place our functions anywhere, but we have several style guides you can follow if you don't know where to start. We are also working on an NPX script to set up and edit a Plexus core, update to newer versionsof Plexus, and get lists of files/components using a core module!
+
+## Internal Terms
+
+<ul>
+	<li>
+		<code>Constructor Function (CF):</code> The <mark>functions you import</mark> from our package. You use these to{" "}
+		<mark>
+			create <i>Instances</i>.
+		</mark>
+	</li>
+	<li>
+		<code>Stateful:</code> A <mark>reactive variable</mark> that can be subscribed to and updated.
+	</li>
+	<li>
+		<code>Instance:</code> Something that is <mark>connected to the plexus "network"</mark>.
+	</li>
+	<li>
+		<code>Module:</code> The <mark>optional objects</mark> where you{" "}
+		<mark>
+			merge all your <i>instances</i> together
+		</mark>
+		, structured however you want!
+	</li>
+	<li>
+		<code>Core:</code> The <mark>optional object</mark> where you{" "}
+		<mark>
+			merge all your <i>instances</i> and/or <i>modules</i> together
+		</mark>
+		, structured however you want!
+	</li>
+</ul>

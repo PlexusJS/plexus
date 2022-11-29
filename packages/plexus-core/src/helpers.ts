@@ -4,7 +4,7 @@ export function isObject(item: any): item is Object {
 	return item && item !== null && typeof item === "object" && !Array.isArray(item)
 }
 
-export function deepMerge<Thing extends Object>(target: Thing, source: Thing): Thing {
+export function deepMerge<Thing extends object>(target: Thing, source: Thing): Thing {
 	let output = Object.assign({}, target)
 	if ((isObject(target) && isObject(source)) || (Array.isArray(target) && Array.isArray(source))) {
 		for (const key in source) {
@@ -12,7 +12,7 @@ export function deepMerge<Thing extends Object>(target: Thing, source: Thing): T
 				if (!(key in target)) {
 					Object.assign(output, { [key]: source[key] })
 				} else {
-					output[key] = deepMerge(target[key], source[key])
+					output[key] = deepMerge(target[key] as any, source[key]) as any
 				}
 			} else {
 				Object.assign(output, { [key]: source[key] })
@@ -45,7 +45,7 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 		}
 		// if it was originally an array, return an array
 		if (Array.isArray(thing)) {
-			return Object.values(cloned) as any as Type
+			return Object.values(cloned as any) as Type
 		}
 		// if it was originally an object, return an object
 		return cloned

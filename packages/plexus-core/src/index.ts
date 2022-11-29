@@ -1,9 +1,9 @@
 import { instance } from "./instance"
 import { PlexusInstance } from "./instance"
 import { WatchableMutable, Watchable } from "./watchable"
-import { _state, PlexusStateInstance } from "./state"
+import { _state, PlexusStateInstance, PlexusStateType } from "./state"
 import { _computed, PlexusComputedStateInstance } from "./computed"
-import { _action, FunctionType, PlexusAction, PlexusActionHelpers, PlexusActionHooks } from "./action"
+import { _action, FunctionType, PlexusAction, PlexusActionHooks } from "./action"
 import {
 	_collection,
 	PlexusCollectionConfig,
@@ -21,7 +21,7 @@ import { PlexusPreActionConfig, _preaction } from "./preaction"
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function state<Value = any>(item: Value) {
+export function state<Value extends PlexusStateType = any>(item: Value) {
 	return _state(() => instance(), item)
 }
 /**
@@ -29,7 +29,10 @@ export function state<Value = any>(item: Value) {
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function computed<Value = any>(item: (value?: Value) => Value, dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>) {
+export function computed<Value extends PlexusStateType = any>(
+	item: (value?: Value) => Value,
+	dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>
+) {
 	if (!Array.isArray(dependencies)) {
 		return _computed(() => instance(), item, [dependencies])
 	}
@@ -87,9 +90,7 @@ function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
 export function usePlugin(instance: PlexusInstance, plugin: PlexusPlugin): void
 export function usePlugin(instanceId: string, plugin: PlexusPlugin): void
 export function usePlugin(instanceOrInstanceId: PlexusInstance | string, plugin: PlexusPlugin) {
-
-	if (typeof instanceOrInstanceId === 'string') {
-
+	if (typeof instanceOrInstanceId === "string") {
 		plugin.init((name?: string) => instance({ instanceId: name }))
 	}
 	instance()._plugins.set(plugin.name, plugin)
@@ -103,7 +104,6 @@ export {
 	instance,
 	PlexusAction,
 	PlexusPlugin,
-	PlexusActionHelpers,
 	PlexusActionHooks,
 	PlexusPluginConfig,
 	PlexusCollectionConfig,
