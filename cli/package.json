@@ -1,11 +1,32 @@
 {
 	"name": "plexus-cli",
-	"version": "1.0.0",
-	"repository": "https://github.com/PlexusJS/plexus-cli.git",
 	"author": "Philippe Clesca <hello@philippec.me>",
 	"license": "MIT",
-	"private": true,
-	"workspaces": [
-		"packages/*"
-	]
+	"version": "1.5.1",
+	"bin": "./out/bin.js",
+	"main": "./out/bin.js",
+	"type": "module",
+	"dependencies": {
+		"@plexusjs/core": "^1.0.6",
+		"chalk": "^5.0.1",
+		"yargs": "^17.4.1"
+	},
+	"scripts": {
+		"prebuild": "rm -rf ./out/bin.js",
+		"build": "rollup --config ./rollup.config.js",
+		"postbuild": "node ./lib/postbuild.js",
+		"preexecute": "yarn build",
+		"execute": "npx .",
+		"prepublish": "yarn build",
+		"publish-stable": "yarn publish"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/PlexusJS/plexus.git",
+		"directory": "cli"
+	},
+	"private": false,
+	"devDependencies": {
+		"rollup": "^2.72.1"
+	}
 }
