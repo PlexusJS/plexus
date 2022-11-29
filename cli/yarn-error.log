@@ -1,0 +1,31 @@
+Arguments: 
+  /usr/local/bin/node /home/philippe/.yarn/bin/yarn.js init
+
+PATH: 
+  /home/philippe/.yarn/bin:/home/philippe/.config/yarn/global/node_modules/.bin:/home/philippe/.vscode-server/bin/dfd34e8260c270da74b5c2d86d61aee4b6d56977/bin/remote-cli:/home/philippe/.local/bin:/home/philippe/.cargo/bin:/home/philippe/.yarn/bin:/home/philippe/.config/yarn/global/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/Oculus/Support/oculus-runtime:/mnt/b/Program Files (x86)/java/openjdk-11/bin:/mnt/c/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/intel64/compiler:/mnt/c/Python39/Scripts/:/mnt/c/Python39/:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/nodejs/:/mnt/c/ProgramData/chocolatey/bin:/mnt/b/Program Files (x86)/java/jmc-7.1.2_windows-x64/bin:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Users/hello/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/hello/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/hello/AppData/Roaming/npm:/snap/bin
+
+Yarn version: 
+  1.22.15
+
+Node version: 
+  16.13.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  SyntaxError: /home/philippe/projects/contrib/create-plexus-core/package.json: Unexpected end of JSON input
+      at JSON.parse (<anonymous>)
+      at /home/philippe/.yarn/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/home/philippe/.yarn/lib/cli.js:310:30)
+      at /home/philippe/.yarn/lib/cli.js:321:13
+
+npm manifest: 
+  
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

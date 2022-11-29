@@ -1,0 +1,11 @@
+{
+	"name": "plexus-cli",
+	"version": "1.0.0",
+	"repository": "https://github.com/PlexusJS/plexus-cli.git",
+	"author": "Philippe Clesca <hello@philippec.me>",
+	"license": "MIT",
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	]
+}
