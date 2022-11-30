@@ -12,8 +12,8 @@
 
 ## Getting Started 🚀
 
--   [Documentation](https://plexusjs.org)
--   [Official Discord Server](https://discord.gg/m2VmArU6WP)
+- [Documentation](https://plexusjs.org)
+- [Official Discord Server](https://discord.gg/m2VmArU6WP)
 
 ## Sponsors 🫀
 
@@ -28,9 +28,9 @@
 
 ## Links & Socials 🔗
 
--   [Npm Org](https://www.npmjs.com/org/plexusjs)
--   [Official Discord Server](https://discord.gg/m2VmArU6WP)
--   [Twitter](https://twitter.com/plexusjs)
+- [Npm Org](https://www.npmjs.com/org/plexusjs)
+- [Official Discord Server](https://discord.gg/m2VmArU6WP)
+- [Twitter](https://twitter.com/plexusjs)
 
 # Core
 

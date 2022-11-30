@@ -1,103 +1,123 @@
-import { instance, Watchable } from "@plexusjs/core"
-export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object
+import { instance, Watchable } from '@plexusjs/core'
+export type AlmostAnything =
+  | string
+  | number
+  | symbol
+  | Record<any, any>
+  | Array<any>
+  | Object
 
-export const normalizeDeps = (deps: Watchable | Watchable[]) => (Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable])
+export const normalizeDeps = (deps: Watchable | Watchable[]) =>
+  Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable]
 export function isObject(item: any): item is Object {
-	return item && item !== null && typeof item === "object" && !Array.isArray(item)
+  return (
+    item && item !== null && typeof item === 'object' && !Array.isArray(item)
+  )
 }
 
-export const concurrentWatch = (onChange: () => void, depsArray: Watchable[]) => {
-	const depUnsubs: Array<() => void> = []
+export const concurrentWatch = (
+  onChange: () => void,
+  depsArray: Watchable[]
+) => {
+  const depUnsubs: Array<() => void> = []
 
-	for (let dep of depsArray) {
-		// if not a watchable, then we can't watch it, skip to next iteration
-		if (!(dep instanceof Watchable) || !dep.watch) {
-			instance({ instanceId: "react" }).runtime.log("debug", `Skipping watch because the dependency isn't watchable`, dep)
-			continue
-		}
-		const unsubscribe = dep.watch(function (v) {
-			onChange()
-		})
-		depUnsubs.push(() => unsubscribe())
-	}
+  for (let dep of depsArray) {
+    // if not a watchable, then we can't watch it, skip to next iteration
+    if (!(dep instanceof Watchable) || !dep.watch) {
+      instance({ instanceId: 'react' }).runtime.log(
+        'debug',
+        `Skipping watch because the dependency isn't watchable`,
+        dep
+      )
+      continue
+    }
+    const unsubscribe = dep.watch(function (v) {
+      onChange()
+    })
+    depUnsubs.push(() => unsubscribe())
+  }
 
-	// unsubscribe on component destroy
-	return () => {
-		for (let unsub of depUnsubs) {
-			unsub()
-		}
-		depUnsubs.length = 0
-	}
+  // unsubscribe on component destroy
+  return () => {
+    for (let unsub of depUnsubs) {
+      unsub()
+    }
+    depUnsubs.length = 0
+  }
 }
 export const convertThingToString = (input: any): string =>
-	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)
+  typeof input === 'object'
+    ? JSON.stringify(input)
+    : typeof input === 'function'
+    ? input.toString()
+    : String(input)
 export const hash = function (input: string) {
-	/* Simple hash function. */
-	let a = 1,
-		c = 0,
-		h,
-		o
-	if (input) {
-		a = 0
-		/*jshint plusplus:false bitwise:false*/
-		for (h = input.length - 1; h >= 0; h--) {
-			o = input.charCodeAt(h)
-			a = ((a << 6) & 268435455) + o + (o << 14)
-			c = a & 266338304
-			a = c !== 0 ? a ^ (c >> 21) : a
-		}
-	}
-	return String(a)
+  /* Simple hash function. */
+  let a = 1,
+    c = 0,
+    h,
+    o
+  if (input) {
+    a = 0
+    /*jshint plusplus:false bitwise:false*/
+    for (h = input.length - 1; h >= 0; h--) {
+      o = input.charCodeAt(h)
+      a = ((a << 6) & 268435455) + o + (o << 14)
+      c = a & 266338304
+      a = c !== 0 ? a ^ (c >> 21) : a
+    }
+  }
+  return String(a)
 }
 
 export const convertStringToThing = (inp: string) => {
-	try {
-		// try to parse it as JSON (array or object)
-		return JSON.parse(inp)
-	} catch (e) {
-		// if that fails, try...
+  try {
+    // try to parse it as JSON (array or object)
+    return JSON.parse(inp)
+  } catch (e) {
+    // if that fails, try...
 
-		// ...as a number
-		const num = Number(inp)
-		if (!isNaN(num)) {
-			return num
-		}
-		// ...as a boolean
-		if (inp === "true") {
-			return true
-		}
-		if (inp === "false") {
-			return false
-		}
-		// ...as a string
-		return inp
-	}
+    // ...as a number
+    const num = Number(inp)
+    if (!isNaN(num)) {
+      return num
+    }
+    // ...as a boolean
+    if (inp === 'true') {
+      return true
+    }
+    if (inp === 'false') {
+      return false
+    }
+    // ...as a string
+    return inp
+  }
 }
 // a deep clone of anything
 export function deepClone<Type = AlmostAnything>(thing: Type): Type {
-	if (thing instanceof Date) {
-		return new Date(thing.getTime()) as any as Type
-	}
-	if (thing instanceof RegExp) {
-		return new RegExp(thing) as any as Type
-	}
-	// must be an object
-	if (isObject(thing)) {
-		const cloned: Type = Object.create(thing as Object)
-		for (const key in thing) {
-			if ((thing as Object).hasOwnProperty(key)) {
-				cloned[key] = deepClone(thing[key])
-			}
-		}
-		if (Array.isArray(thing)) {
-			return Object.values(cloned as any) as any as Type
-		}
-		// if it was originally an array, return an array
-		if (Array.isArray(thing)) {
-			return Object.values(cloned as any) as any as Type
-		}
-		// if it was originally an object, return an object
-		return cloned
-	}
-	return thing
+  if (thing instanceof Date) {
+    return new Date(thing.getTime()) as any as Type
+  }
+  if (thing instanceof RegExp) {
+    return new RegExp(thing) as any as Type
+  }
+  // must be an object
+  if (isObject(thing)) {
+    const cloned: Type = Object.create(thing as Object)
+    for (const key in thing) {
+      if ((thing as Object).hasOwnProperty(key)) {
+        cloned[key] = deepClone(thing[key])
+      }
+    }
+    if (Array.isArray(thing)) {
+      return Object.values(cloned as any) as any as Type
+    }
+    // if it was originally an array, return an array
+    if (Array.isArray(thing)) {
+      return Object.values(cloned as any) as any as Type
+    }
+    // if it was originally an object, return an object
+    return cloned
+  }
+  return thing
 }

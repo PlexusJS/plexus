@@ -1,0 +1,190 @@
+---
+title: Scalable
+sidebar_position: 2
+---
+
+## Quick Setup
+
+<small>With Yarn</small>
+
+```bash prefix="$"
+yarn create plexus-core --typescript --template=scalable
+```
+
+<small>With NPX</small>
+
+```bash
+npx create-plexus-core --typescript --template=scalable
+```
+
+## Ideology
+
+The focus of this style is to be extendable, scalable, and intuative to navigate. Some boilerplate, very well organized. This style works best for:
+
+<ul className="list">
+	<li>Enterprise level projects</li>
+	<li>Long term open source packages</li>
+	<li>School projects</li>
+</ul>
+
+## File Structure Suggestion
+
+```ts
+/project-root
+├─ core/
+│ ├─ modules/
+│ │ ├─ user/
+│ │ │ ├─ actions.ts // The actions for the user module
+│ │ │ ├─ api.ts // The api for the user module
+│ │ │ ├─ states.ts // The stateful instances for the user module
+│ │ │ ├─ types.ts // The types for the user module
+│ │ │ └─ index.ts // Combine all instances in this user module into one file
+│ │ ├─ channels/
+│ │ │ ├─ actions.ts // The actions for the channels module
+│ │ │ ├─ api.ts // The api for the channels module
+│ │ │ ├─ states.ts // The stateful instances for the channels module
+│ │ │ ├─ types.ts // The types for the channels module
+│ │ │ └─ index.ts // Combine all instances in this channel module into one file
+├─ index.ts
+```
+
+## File Content Examples
+
+### `/core/user/types.ts`
+
+We can create our types and interfaces in this file and export it for the rest of our core (or the rest of our app if we want).
+
+```ts title="/core/user/types.ts"
+export interface UserData {
+	uuid: string
+	first_name: string
+	last_name: string
+	email: string
+	status: "online" | "offline"
+}
+export type SendMessageRes = {
+	success: boolean
+	message: string
+	ts: number
+}
+
+export type RetrieveFriendsRes = {
+	friends: UserData[]
+}
+```
+
+### `/core/user/states.ts`
+
+This is where we define [stateful instances](/docs/getting-started/concepts#internal-terms) things like states, computed, and collections.
+
+```ts title="/core/user/states.ts"
+import { state, collection, computed } from "@plexusjs/core"
+import { UserData } from "./types"
+
+// Create a state instance
+export const userData = state<UserData>({
+	first_name: "",
+	last_name: "",
+	email: "",
+	uuid: "",
+	online: "offline",
+})
+
+// This collection is used to store the channels, the objects should be of type ChannelData defined above
+export const friends = collection<UserData>({
+	primaryKey: "uuid", // default value is "id"
+})
+	.createGroups(["online", "offline"])
+	.createSelector("messaging")
+```
+
+### `/core/user/api.ts`
+
+This is where we can create our API [instances](/docs/getting-started/concepts#internal-terms). we can interract with this elsewhere to interract with data from the server.
+
+```ts title="/core/user/api.ts"
+import { api } from "@plexusjs/core"
+
+// You can use the api to make requests to the server at a specific endpoint
+export const userBroker = api("https://api.example.com/users").auth("MySeCrEtToKeN", "bearer")
+```
+
+### `/core/user/actions.ts`
+
+Here is where we define our <i>actions</i>. An <i>action</i> is a function that is called to preform business logic. Technically, an <i>action</i> is just a buffed up function, so you can just use it as a function wrapper to gain the benifits of the <i>action hooks</i>.
+
+```ts title="/core/user/actions.ts"
+import { action } from "@plexusjs/core"
+
+// Import your module's resources
+import { friends, userData } from "./states"
+import { userBroker } from "./api"
+import { RetrieveFriendsRes, SendMessageRes } from "./types"
+
+// This action is used to message a friend. It takes in a user id and an optional message. We can take that and proccess
+export const startMessageSession = action(async ({ onCatch }, uuid: string, message?: string) => {
+	// If any part of this action throws an error, it will be caught here
+	onCatch(console.error)
+
+	// Retrieve the full friend object from the collection
+	const friendToMessage = friends.getItemValue(uuid)
+
+	// Call the api with a post request to send the message; the second param sent as a request body
+	const { data } = await userBroker.post<SendMessageRes>("/message/send", {
+		to: friendToMessage.uuid,
+		message,
+	})
+	return data
+})
+
+// this action is used to populate the friends collection
+export const getFriends = action(async ({ onCatch }) => {
+	// If any part of this action throws an error, it will be caught here
+	onCatch(console.error)
+
+	// Call the api with a post request to send the message; the second param sent as a url query
+	const { data, status } = await userBroker.get<RetrieveFriendsRes>("/friends/of", {
+		uuid: userData.value.uuid, // The uuid of the current user
+	})
+
+	// if the request was successful, we can add the friends to the collection
+	if (status === 200) {
+		friends.collect(data.friends)
+	}
+	// if the request was not successful, we can handle the error
+	else if (status > 200) {
+		console.error(data)
+	}
+})
+```
+
+### `/core/user/index.ts`
+
+Here is the final file we make for this module; the index file takes all of your [instances](/docs/getting-started/concepts#internal-terms) from the other files and exports them into single point.
+
+```ts title="/core/user/index.ts"
+// Import your module instances
+import * as actions from "./actions"
+import * as states from "./states"
+import * as api from "./api"
+
+// Export your instances as a module
+const user = { actions, states, api }
+
+export default user
+```
+
+### `/core/index.ts`
+
+Here is the final file we make; the index file takes all of your [instances](/docs/getting-started/concepts#internal-terms) from the other files and exports them into single point.
+
+```ts title="/core/index.ts"
+// Import your module instances
+import { users } from "./modules/users"
+import { channels } from "./modules/channels"
+
+// Export your modules from a single index.ts file
+const core = { users, channels }
+
+export default core
+```

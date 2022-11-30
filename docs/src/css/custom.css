@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('../../static/font/silka/stylesheet.css');
+@import url('../../static/font/strawford/stylesheet.css');
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+    --ifm-color-primary: #140e57;
+    --ifm-color-primary-dark: #100c46;
+    --ifm-color-primary-darker: #0c0934;
+    --ifm-color-primary-darkest: #080623;
+    --ifm-color-primary-light: #181169;
+    --ifm-color-primary-lighter: #1d147b;
+    --ifm-color-primary-lightest: #251a9e;
+    --ifm-code-font-size: 95%;
+    --ifm-font-family-base: 'strawfordmedium', sans-serif;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+    --ifm-color-primary: #1fb2f7;
+    --ifm-color-primary-dark: #09a4ec;
+    --ifm-color-primary-darker: #0789c5;
+    --ifm-color-primary-darkest: ##067bb1;
+    --ifm-color-primary-light: #3abcf8;
+    --ifm-color-primary-lighter: #62c9f9;
+    --ifm-color-primary-lightest: #89d7fb;
+}
+
+.docusaurus-highlight-code-line {
+    background-color: rgba(0, 0, 0, 0.1);
+    display: block;
+    margin: 0 calc(-1 * var(--ifm-pre-padding));
+    padding: 0 var(--ifm-pre-padding);
+}
+
+[data-theme='dark'] .docusaurus-highlight-code-line {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+.main-wrapper {
+    align-items: stretch;
+    display: flex;
+}
+html,
+body {
+    font-family: 'silka' !important;
+}
+h1 {
+    @apply text-5xl;
+    /* font-size: 3.5rem; */
+    font-weight: bold;
+    @apply pb-8;
+    /* font-family: "silka" !important; */
+}
+
+h2 {
+    /* font-size 2.5rem; */
+    @apply text-4xl;
+    font-weight: bold;
+    /* text-transform: lowercase; */
+    @apply pt-3;
+    /* letter-spacing: 2px; */
+    /* font-family: "silka" !important; */
+}
+h3 {
+    /* font-size: 1.85rem; */
+    @apply text-3xl;
+    font-weight: 500;
+    @apply text-stone-500;
+}
+h4 {
+    /* font-size: 1.2rem; */
+    @apply text-2xl text-opacity-70 text-white;
+    font-style: normal;
+    font-weight: thin;
+    text-decoration: underline;
+
+    /* color: var(--ifm-color-primary-dark); */
+}
+h5 {
+    /* font-size: 1.2rem; */
+    @apply text-xl;
+    font-style: normal;
+    font-weight: 500;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+h6 {
+    @apply text-lg;
+}
+li {
+}
+ul.list {
+    list-style: disc;
+    margin-left: 2rem;
+}
+i {
+    @apply text-slate-400;
+}
+strong {
+    @apply text-orange-500;
+}
+mark,
+em {
+    @apply text-orange-400;
+    background-color: rgba(0, 0, 0, 0);
+}
+button {
+    @apply border-blue-400 outline outline-transparent px-5 py-2 rounded-md hover:outline-blue-500;
+}
+.hr {
+    border-width: 0;
+    height: 1px;
+    background-color: darkgray;
+    margin: 1rem 0;
+}
+
+a {
+    @apply text-blue-400;
+    /* display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	gap: 0.2rem;
+	flex-wrap: nowrap; */
+}
+
+.navbar__item,
+.footer__link-item {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    flex-wrap: nowrap;
+}
+
+/* p {
+	font-family: "silkaregular" !important;
+} */
