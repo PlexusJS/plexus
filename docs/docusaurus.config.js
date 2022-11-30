@@ -1,13 +1,14 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const lightCodeTheme = require('prism-react-renderer/themes/github')
+const darkCodeTheme = require('prism-react-renderer/themes/dracula')
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'PlexusJS Docs',
-  tagline: 'The ultimate toolkit for orchestrating data in reactive web applications!',
+  tagline:
+    'The ultimate toolkit for orchestrating data in reactive web applications!',
   url: 'https://plexusjs.org',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -29,8 +30,7 @@ const config = {
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
-          editUrl:
-            'https://github.com/PlexusJS/plexus/tree/master/',
+          editUrl: 'https://github.com/PlexusJS/plexus/tree/master/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -42,7 +42,13 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      metadata: [{ name: 'keywords', content: 'plexusjs, plexus, state management, state, management, npm, node, nodejs, http-client, http, client' }],
+      metadata: [
+        {
+          name: 'keywords',
+          content:
+            'plexusjs, plexus, state management, state, management, npm, node, nodejs, http-client, http, client',
+        },
+      ],
       image: 'img/OriginalLogo.png',
       colorMode: {
         defaultMode: 'dark',
@@ -80,8 +86,8 @@ const config = {
         style: 'dark',
         logo: {
           alt: 'Powered By Vercel',
-          src: "https://www.datocms-assets.com/31049/1618983297-powered-by-vercel.svg",
-          href: "https://vercel.com?utm_source=plexusjs&utm_campaign=oss"
+          src: 'https://www.datocms-assets.com/31049/1618983297-powered-by-vercel.svg',
+          href: 'https://vercel.com?utm_source=plexusjs&utm_campaign=oss',
         },
         links: [
           {
@@ -99,7 +105,6 @@ const config = {
                 label: 'GitHub',
                 href: 'https://github.com/PlexusJS/plexus',
               },
-
             ],
           },
           {
@@ -125,6 +130,6 @@ const config = {
         additionalLanguages: ['powershell', 'bash'],
       },
     }),
-};
+}
 
-module.exports = config;
+module.exports = config

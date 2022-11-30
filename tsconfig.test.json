@@ -1,12 +1,12 @@
 {
-	"extends": "./packages/tsconfig.shared.json",
-	"compilerOptions": {
-		"jsx": "react",
-		"types": ["vitest/globals"],
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"sourceMap": true,
-		"noImplicitThis": true
-	},
-	"include": ["./test"]
+  "extends": "./packages/tsconfig.shared.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "types": ["vitest/globals"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "noImplicitThis": true
+  },
+  "include": ["./test"]
 }
