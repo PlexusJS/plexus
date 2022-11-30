@@ -188,7 +188,7 @@ export class CollectionInstance<
      * Collect An item of data (or many items of data using an array) into the collection.
      * @requires: Each data item must have the primary key as a property
      * @param data {Array<Object>|Object} The data to collect
-     * @param groups string | string[] The groups to add the items to
+     * @param groups {string | Array<string>} The groups to add the items to
      */
     collect(
         data: DataType[],
@@ -570,7 +570,7 @@ export class CollectionInstance<
     /**
      * Remove a data item from a set of groups
      * @param keys The data key(s) to use for lookup
-     * @param groups Either a single group or an array of groups to remove the data from
+     * @param groups {Array<string>|string} Either a single group or an array of groups to remove the data from
      */
     removeFromGroup(
         keys: DataKey | DataKey[],

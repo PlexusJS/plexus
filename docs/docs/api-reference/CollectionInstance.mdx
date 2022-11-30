@@ -11,7 +11,7 @@
     * [.id](#CollectionInstance+id)
     * [.instanceId](#CollectionInstance+instanceId)
     * [.value](#CollectionInstance+value) ⇒ <code>Array.&lt;Object&gt;</code>
-    * [.keys](#CollectionInstance+keys) ⇒ <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+    * [.keys](#CollectionInstance+keys) ⇒ <code>Array.&lt;(string\|number)&gt;</code>
     * [.groups](#CollectionInstance+groups) ⇒ <code>Record.&lt;string, GroupInstance&gt;</code>
     * [.groupsValue](#CollectionInstance+groupsValue) ⇒
     * [.selectors](#CollectionInstance+selectors) ⇒
@@ -58,10 +58,10 @@
 **Returns**: <code>Array.&lt;Object&gt;</code> - <p>The collection data values as an array</p>  
 <a name="CollectionInstance+keys"></a>
 
-### collectionInstance.keys ⇒ <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+### collectionInstance.keys ⇒ <code>Array.&lt;(string\|number)&gt;</code>
 <p>Get all of the collection data keys as an array</p>
 
-**Returns**: <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code> - <p>The collection data values as an array</p>  
+**Returns**: <code>Array.&lt;(string\|number)&gt;</code> - <p>The collection data values as an array</p>  
 <a name="CollectionInstance+groups"></a>
 
 ### collectionInstance.groups ⇒ <code>Record.&lt;string, GroupInstance&gt;</code>
@@ -128,7 +128,7 @@
 | Param | Type | Description |
 | --- | --- | --- |
 | data | <code>Array.&lt;Object&gt;</code> \| <code>Object</code> | <p>The data to collect</p> |
-| groups |  | <p>string | string[] The groups to add the items to</p> |
+| groups | <code>string</code> \| <code>Array.&lt;string&gt;</code> | <p>The groups to add the items to</p> |
 
 <a name="CollectionInstance+update"></a>
 
@@ -271,10 +271,10 @@ This is like collect but will not add new items, and can can be used to patch ex
 <p>Remove a data item from a set of groups</p>
 
 
-| Param | Description |
-| --- | --- |
-| keys | <p>The data key(s) to use for lookup</p> |
-| groups | <p>Either a single group or an array of groups to remove the data from</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| keys |  | <p>The data key(s) to use for lookup</p> |
+| groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>Either a single group or an array of groups to remove the data from</p> |
 
 <a name="CollectionInstance+clear"></a>
 
