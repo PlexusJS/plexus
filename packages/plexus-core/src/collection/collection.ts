@@ -189,6 +189,7 @@ export class CollectionInstance<
      * @requires: Each data item must have the primary key as a property
      * @param data {Array<Object>|Object} The data to collect
      * @param groups {string | Array<string>} The groups to add the items to
+     * @returns {this} The collection instance
      */
     collect(
         data: DataType[],
@@ -371,7 +372,7 @@ export class CollectionInstance<
     }
     /**
      * Create Selector instances for a given set of selector names
-     * @param selectorNames {string[]} The names of the selectors to create
+     * @param selectorNames {Array<string>} The names of the selectors to create
      * @returns {this} The new Collection Instance
      */
     createSelectors<Names extends SelectorName>(
@@ -445,7 +446,7 @@ export class CollectionInstance<
 
     /**
      * Create multiple groups with a name (no configuration)
-     * @param groupNames The names of the groups to create
+     * @param groupNames {Array<string>}The names of the groups to create
      * @returns {this} The new Collection Instance
      */
     createGroups<Names extends GroupName>(groupNames: [Names, ...Names[]]) {
@@ -492,7 +493,7 @@ export class CollectionInstance<
     /**
      * Given a key, get all Group names that the key is in
      * @param key {string|number} The data key(s) to use for lookup
-     * @returns {string[]} An array of Group names that the key is in
+     * @returns {Array<string>} An array of Group names that the key is in
      */
     getGroupsOf(key: DataKey) {
         const inGroups: KeyOfMap<Groups>[] = []
@@ -507,6 +508,7 @@ export class CollectionInstance<
      * Add a data item to a group or groups
      * @param key {string|number} The key of the item to add
      * @param groups {Array<string>|string} The group(s) to add the item to
+     * @returns {this} The new Collection Instance
      */
     addToGroups(key: DataKey, groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
         const addToGroup = (group: GroupName) => {
@@ -548,6 +550,7 @@ export class CollectionInstance<
     /**
      * Delete a data item completely from the collection.
      * @param keys The data key(s) to use for lookup
+     * @returns {this} The new Collection Instance
      */
     delete(keys: DataKey | DataKey[]) {
         // the function to remove the data
@@ -566,6 +569,7 @@ export class CollectionInstance<
             rm(keys)
         }
         this.mount()
+        return this
     }
     /**
      * Remove a data item from a set of groups

@@ -20,7 +20,7 @@
     * [.lastUpdatedKey](#CollectionInstance+lastUpdatedKey) : <code>string</code> \| <code>number</code>
     * [.isCreatedGroup(name)](#CollectionInstance+isCreatedGroup) ⇒ <code>boolean</code>
     * [.isCreatedSelector(name)](#CollectionInstance+isCreatedSelector) ⇒ <code>boolean</code>
-    * [.collect(data, groups)](#CollectionInstance+collect)
+    * [.collect(data, groups)](#CollectionInstance+collect) ⇒ <code>this</code>
     * [.update(key, data, config)](#CollectionInstance+update)
     * [.getItem(dataKey)](#CollectionInstance+getItem) ⇒ <code>this</code>
     * [.getItemValue(key)](#CollectionInstance+getItemValue) ⇒ <code>Object</code>
@@ -31,8 +31,8 @@
     * [.createGroups(groupNames)](#CollectionInstance+createGroups) ⇒ <code>this</code>
     * [.getGroup(name)](#CollectionInstance+getGroup) ⇒ <code>this</code>
     * [.getGroupsOf(key)](#CollectionInstance+getGroupsOf) ⇒ <code>Array.&lt;string&gt;</code>
-    * [.addToGroups(key, groups)](#CollectionInstance+addToGroups)
-    * [.delete(keys)](#CollectionInstance+delete)
+    * [.addToGroups(key, groups)](#CollectionInstance+addToGroups) ⇒ <code>this</code>
+    * [.delete(keys)](#CollectionInstance+delete) ⇒ <code>this</code>
     * [.removeFromGroup(keys, groups)](#CollectionInstance+removeFromGroup)
     * [.clear([GroupName])](#CollectionInstance+clear)
     * [.compute(fn)](#CollectionInstance+compute)
@@ -120,9 +120,10 @@
 
 <a name="CollectionInstance+collect"></a>
 
-### collectionInstance.collect(data, groups)
+### collectionInstance.collect(data, groups) ⇒ <code>this</code>
 <p>Collect An item of data (or many items of data using an array) into the collection.</p>
 
+**Returns**: <code>this</code> - <p>The collection instance</p>  
 **Requires:**: Each data item must have the primary key as a property  
 
 | Param | Type | Description |
@@ -218,9 +219,9 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 **Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
-| Param | Description |
-| --- | --- |
-| groupNames | <p>The names of the groups to create</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| groupNames | <code>Array.&lt;string&gt;</code> | <p>The names of the groups to create</p> |
 
 <a name="CollectionInstance+getGroup"></a>
 
@@ -246,9 +247,10 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 <a name="CollectionInstance+addToGroups"></a>
 
-### collectionInstance.addToGroups(key, groups)
+### collectionInstance.addToGroups(key, groups) ⇒ <code>this</code>
 <p>Add a data item to a group or groups</p>
 
+**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -257,9 +259,10 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 <a name="CollectionInstance+delete"></a>
 
-### collectionInstance.delete(keys)
+### collectionInstance.delete(keys) ⇒ <code>this</code>
 <p>Delete a data item completely from the collection.</p>
 
+**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
 | Param | Description |
 | --- | --- |
