@@ -153,9 +153,14 @@ export class CollectionInstance<
             },
         }
         this.mount()
+
         if (_config.defaultGroup) {
             // this ensured default shows up as a group name option
-            return this.createGroup('default')
+            return this.createGroup(
+                typeof _config.defaultGroup === 'string'
+                    ? _config.defaultGroup
+                    : 'default'
+            )
         }
     }
     /**
@@ -241,20 +246,21 @@ export class CollectionInstance<
                         this._internalStore._data.set(dataKey, dataInstance)
                     }
                 }
+                const defaultGroupName =
+                    typeof this.config.defaultGroup === 'string'
+                        ? this.config.defaultGroup
+                        : 'default'
                 // if a group (or groups) is provided, add the item to the group
                 if (groups) {
-                    if (this.config.defaultGroup) {
-                        // if "groups" var is array...
-                        Array.isArray(groups)
-                            ? // push default into the array
-                              !groups.includes('default' as any) &&
-                              groups.push('default' as any)
-                            : // if it is not (undefined or some other string), add to group
-                              groups !== 'default' &&
-                              this.addToGroups(dataKey, 'default' as any)
-                    }
-
-                    this.addToGroups(dataKey, groups)
+                    const groupsNorm = Array.isArray(groups) ? groups : [groups]
+                    this.addToGroups(
+                        dataKey,
+                        groupsNorm.filter((name) => name !== defaultGroupName)
+                    )
+                }
+                if (this.config.defaultGroup) {
+                    // if it is not (undefined or some other string), add to group
+                    this.addToGroups(dataKey, defaultGroupName as any)
                 }
             }
         }
@@ -514,9 +520,12 @@ export class CollectionInstance<
      * @param {string[]|string} groups The group(s) to add the item to
      * @returns {this} The new Collection Instance
      */
-    addToGroups(key: DataKey, groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
+    addToGroups(
+        key: DataKey,
+        groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
+    ): this {
         const addToGroup = (group: GroupName) => {
-            let g = this._internalStore._groups.get(group as GroupName)
+            let g = this.getGroup(group as GroupName)
             // if the group does not exist, create it
             if (!g) {
                 g = _group(
