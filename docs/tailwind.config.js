@@ -1,5 +1,8 @@
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx,mdx}", "./docs/**/*.{js,jsx,ts,tsx,mdx}"],
+  content: [
+    './src/**/*.{js,jsx,ts,tsx,mdx}',
+    './docs/**/*.{js,jsx,ts,tsx,mdx}',
+  ],
   theme: {
     extend: {
       colors: {
@@ -10,9 +13,9 @@ module.exports = {
           800: '##067bb1',
           200: '#3abcf8',
           300: '#62c9f9',
-          400: '#89d7fb'
-        }
-      }
+          400: '#89d7fb',
+        },
+      },
     },
   },
   plugins: [],
