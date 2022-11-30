@@ -8,84 +8,76 @@
 
 
 * [CollectionInstance](#CollectionInstance)
-    * [.id](#CollectionInstance+id)
-    * [.instanceId](#CollectionInstance+instanceId)
-    * [.value](#CollectionInstance+value) ⇒ <code>Array.&lt;Object&gt;</code>
-    * [.keys](#CollectionInstance+keys) ⇒ <code>Array.&lt;(string\|number)&gt;</code>
-    * [.groups](#CollectionInstance+groups) ⇒ <code>Record.&lt;string, GroupInstance&gt;</code>
-    * [.groupsValue](#CollectionInstance+groupsValue) ⇒
-    * [.selectors](#CollectionInstance+selectors) ⇒
-    * [.selectorsValue](#CollectionInstance+selectorsValue) ⇒
+    * [.id](#CollectionInstance+id) : <code>string</code>
+    * [.instanceId](#CollectionInstance+instanceId) : <code>string</code>
+    * [.value](#CollectionInstance+value) : <code>Array.&lt;DataType&gt;</code>
+    * [.keys](#CollectionInstance+keys) : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+    * [.groups](#CollectionInstance+groups) : <code>Record.&lt;string, GroupInstance&gt;</code>
+    * [.groupsValue](#CollectionInstance+groupsValue) : <code>Record.&lt;GroupNames, Array.&lt;DataType&gt;&gt;</code>
+    * [.selectors](#CollectionInstance+selectors) : <code>Record.&lt;SelectorNames, PlexusCollectionSelector&gt;</code>
+    * [.selectorsValue](#CollectionInstance+selectorsValue) : <code>Record.&lt;SelectorNames, Array.&lt;DataType&gt;&gt;</code>
     * [.name](#CollectionInstance+name) : <code>string</code>
     * [.lastUpdatedKey](#CollectionInstance+lastUpdatedKey) : <code>string</code> \| <code>number</code>
-    * [.isCreatedGroup(name)](#CollectionInstance+isCreatedGroup) ⇒ <code>boolean</code>
-    * [.isCreatedSelector(name)](#CollectionInstance+isCreatedSelector) ⇒ <code>boolean</code>
     * [.collect(data, groups)](#CollectionInstance+collect) ⇒ <code>this</code>
     * [.update(key, data, config)](#CollectionInstance+update)
     * [.getItem(dataKey)](#CollectionInstance+getItem) ⇒ <code>this</code>
-    * [.getItemValue(key)](#CollectionInstance+getItemValue) ⇒ <code>Object</code>
+    * [.getItemValue(key)](#CollectionInstance+getItemValue) ⇒ <code>DataType</code>
     * [.createSelector(selectorName)](#CollectionInstance+createSelector) ⇒ <code>this</code>
     * [.createSelectors(selectorNames)](#CollectionInstance+createSelectors) ⇒ <code>this</code>
     * [.getSelector(name)](#CollectionInstance+getSelector) ⇒ <code>this</code> \| <code>undefined</code>
     * [.createGroup(groupName, config)](#CollectionInstance+createGroup) ⇒ <code>this</code>
-    * [.createGroups(groupNames)](#CollectionInstance+createGroups) ⇒ <code>this</code>
+    * [.createGroups(groupNamesThe)](#CollectionInstance+createGroups) ⇒ <code>this</code>
     * [.getGroup(name)](#CollectionInstance+getGroup) ⇒ <code>this</code>
     * [.getGroupsOf(key)](#CollectionInstance+getGroupsOf) ⇒ <code>Array.&lt;string&gt;</code>
     * [.addToGroups(key, groups)](#CollectionInstance+addToGroups) ⇒ <code>this</code>
     * [.delete(keys)](#CollectionInstance+delete) ⇒ <code>this</code>
-    * [.removeFromGroup(keys, groups)](#CollectionInstance+removeFromGroup)
-    * [.clear([GroupName])](#CollectionInstance+clear)
-    * [.compute(fn)](#CollectionInstance+compute)
-    * [.reCompute()](#CollectionInstance+reCompute)
-    * [.reComputeGroups()](#CollectionInstance+reComputeGroups)
-    * [.key()](#CollectionInstance+key)
+    * [.removeFromGroup(keys, groups)](#CollectionInstance+removeFromGroup) ⇒ <code>this</code>
+    * [.clear(groupNames)](#CollectionInstance+clear) ⇒ <code>this</code>
+    * [.compute(fn)](#CollectionInstance+compute) ⇒ <code>this</code>
+    * [.reCompute(ids)](#CollectionInstance+reCompute) ⇒ <code>this</code>
+    * [.reComputeGroups(groupNames)](#CollectionInstance+reComputeGroups) ⇒ <code>this</code>
+    * [.key(key)](#CollectionInstance+key) ⇒ <code>this</code>
 
 <a name="CollectionInstance+id"></a>
 
-### collectionInstance.id
+### collectionInstance.id : <code>string</code>
 <p>The internal ID of the collection</p>
 
 <a name="CollectionInstance+instanceId"></a>
 
-### collectionInstance.instanceId
+### collectionInstance.instanceId : <code>string</code>
 <p>The internal id of the collection with an instance prefix</p>
 
 <a name="CollectionInstance+value"></a>
 
-### collectionInstance.value ⇒ <code>Array.&lt;Object&gt;</code>
+### collectionInstance.value : <code>Array.&lt;DataType&gt;</code>
 <p>Get all of the collection data values as an array</p>
 
-**Returns**: <code>Array.&lt;Object&gt;</code> - <p>The collection data values as an array</p>  
 <a name="CollectionInstance+keys"></a>
 
-### collectionInstance.keys ⇒ <code>Array.&lt;(string\|number)&gt;</code>
+### collectionInstance.keys : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
 <p>Get all of the collection data keys as an array</p>
 
-**Returns**: <code>Array.&lt;(string\|number)&gt;</code> - <p>The collection data values as an array</p>  
 <a name="CollectionInstance+groups"></a>
 
-### collectionInstance.groups ⇒ <code>Record.&lt;string, GroupInstance&gt;</code>
+### collectionInstance.groups : <code>Record.&lt;string, GroupInstance&gt;</code>
 <p>Get all the groups in the collection as an object</p>
 
-**Returns**: <code>Record.&lt;string, GroupInstance&gt;</code> - <p>The groups in the collection</p>  
 <a name="CollectionInstance+groupsValue"></a>
 
-### collectionInstance.groupsValue ⇒
+### collectionInstance.groupsValue : <code>Record.&lt;GroupNames, Array.&lt;DataType&gt;&gt;</code>
 <p>Get all the groups and their children's data values as an object</p>
 
-**Returns**: <p>The groups paired with their children's data values as an object</p>  
 <a name="CollectionInstance+selectors"></a>
 
-### collectionInstance.selectors ⇒
+### collectionInstance.selectors : <code>Record.&lt;SelectorNames, PlexusCollectionSelector&gt;</code>
 <p>Get all the selectors in the collection as an object</p>
 
-**Returns**: <p>The selectors in the collection</p>  
 <a name="CollectionInstance+selectorsValue"></a>
 
-### collectionInstance.selectorsValue ⇒
+### collectionInstance.selectorsValue : <code>Record.&lt;SelectorNames, Array.&lt;DataType&gt;&gt;</code>
 <p>Get all the groups and their children's data values as an object</p>
 
-**Returns**: <p>The groups paired with their children's data values as an object</p>  
 <a name="CollectionInstance+name"></a>
 
 ### collectionInstance.name : <code>string</code>
@@ -95,28 +87,6 @@
 
 ### collectionInstance.lastUpdatedKey : <code>string</code> \| <code>number</code>
 <p>Get the last updated key of the collection</p>
-
-<a name="CollectionInstance+isCreatedGroup"></a>
-
-### collectionInstance.isCreatedGroup(name) ⇒ <code>boolean</code>
-<p>Helper function; Checks to see if the provided name is a group name</p>
-
-**Returns**: <code>boolean</code> - <p>if the name is a specific name of a group</p>  
-
-| Param | Description |
-| --- | --- |
-| name | <p>The name to check</p> |
-
-<a name="CollectionInstance+isCreatedSelector"></a>
-
-### collectionInstance.isCreatedSelector(name) ⇒ <code>boolean</code>
-<p>Helper function; Checks to see if the provided name is a selector name</p>
-
-**Returns**: <code>boolean</code> - <p>if the name is a specific name of a selector</p>  
-
-| Param | Description |
-| --- | --- |
-| name | <p>The name to check</p> |
 
 <a name="CollectionInstance+collect"></a>
 
@@ -128,7 +98,7 @@
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | <code>Array.&lt;Object&gt;</code> \| <code>Object</code> | <p>The data to collect</p> |
+| data | <code>Array.&lt;DataType&gt;</code> \| <code>DataType</code> | <p>The data to collect</p> |
 | groups | <code>string</code> \| <code>Array.&lt;string&gt;</code> | <p>The groups to add the items to</p> |
 
 <a name="CollectionInstance+update"></a>
@@ -138,12 +108,12 @@
 This is like collect but will not add new items, and can can be used to patch existing items</p>
 
 
-| Param | Description |
-| --- | --- |
-| key | <p>The key of the item to update</p> |
-| data | <p>The data to update the item with</p> |
-| config | <p>The configuration to use for the update</p> |
-| config.deep | <p>Should the update be deep or shallow</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> \| <code>number</code> | <p>The key of the item to update</p> |
+| data | <code>DataType</code> | <p>The data to update the item with</p> |
+| config |  | <p>The configuration to use for the update</p> |
+| config.deep | <code>boolean</code> | <p>Should the update be deep or shallow</p> |
 
 <a name="CollectionInstance+getItem"></a>
 
@@ -158,10 +128,10 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 <a name="CollectionInstance+getItemValue"></a>
 
-### collectionInstance.getItemValue(key) ⇒ <code>Object</code>
+### collectionInstance.getItemValue(key) ⇒ <code>DataType</code>
 <p>Get the value of an item in the collection</p>
 
-**Returns**: <code>Object</code> - <p>The value of the item</p>  
+**Returns**: <code>DataType</code> - <p>The value of the item</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -214,14 +184,14 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 <a name="CollectionInstance+createGroups"></a>
 
-### collectionInstance.createGroups(groupNames) ⇒ <code>this</code>
+### collectionInstance.createGroups(groupNamesThe) ⇒ <code>this</code>
 <p>Create multiple groups with a name (no configuration)</p>
 
 **Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| groupNames | <code>Array.&lt;string&gt;</code> | <p>The names of the groups to create</p> |
+| groupNamesThe | <code>Array.&lt;string&gt;</code> | <p>names of the groups to create</p> |
 
 <a name="CollectionInstance+getGroup"></a>
 
@@ -230,9 +200,9 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 **Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
-| Param | Description |
-| --- | --- |
-| name | <p>The Group Name to search for</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | <p>The Group Name to search for</p> |
 
 <a name="CollectionInstance+getGroupsOf"></a>
 
@@ -264,53 +234,74 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 **Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
-| Param | Description |
-| --- | --- |
-| keys | <p>The data key(s) to use for lookup</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| keys | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
 
 <a name="CollectionInstance+removeFromGroup"></a>
 
-### collectionInstance.removeFromGroup(keys, groups)
+### collectionInstance.removeFromGroup(keys, groups) ⇒ <code>this</code>
 <p>Remove a data item from a set of groups</p>
 
+**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| keys |  | <p>The data key(s) to use for lookup</p> |
+| keys | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
 | groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>Either a single group or an array of groups to remove the data from</p> |
 
 <a name="CollectionInstance+clear"></a>
 
-### collectionInstance.clear([GroupName])
+### collectionInstance.clear(groupNames) ⇒ <code>this</code>
 <p>Delete all data in the collection</p>
 
+**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [GroupName] | <code>string</code> | <p>(Optional) Either an array or a single group name to clear data from</p> |
+| groupNames | <code>string</code> | <p>(Optional) Either an array or a single group name to clear data from</p> |
 
 <a name="CollectionInstance+compute"></a>
 
-### collectionInstance.compute(fn)
+### collectionInstance.compute(fn) ⇒ <code>this</code>
 <p>Run this function when data is collected to format it in a particular way; useful for converting one datatype into another</p>
 
+**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
 
-| Param |
-| --- |
-| fn | 
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | <p>A function that takes in the data and returns the formatted data</p> |
 
 <a name="CollectionInstance+reCompute"></a>
 
-### collectionInstance.reCompute()
+### collectionInstance.reCompute(ids) ⇒ <code>this</code>
 <p>Re-runs the compute function on select IDs (or all the collection if none provided)</p>
+
+**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ids | <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;Number&gt;</code> | <p>The data key(s) to use for lookup</p> |
 
 <a name="CollectionInstance+reComputeGroups"></a>
 
-### collectionInstance.reComputeGroups()
+### collectionInstance.reComputeGroups(groupNames) ⇒ <code>this</code>
 <p>Same as reCompute, but for groups</p>
+
+**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| groupNames | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>The data key(s) to use for lookup</p> |
 
 <a name="CollectionInstance+key"></a>
 
-### collectionInstance.key()
+### collectionInstance.key(key) ⇒ <code>this</code>
 <p>Set the key of the collection for enhanced internal tracking</p>
+
+**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> | <p>The key to use for the collection</p> |
 

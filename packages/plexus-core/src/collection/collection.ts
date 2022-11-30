@@ -99,12 +99,14 @@ export class CollectionInstance<
     config: PlexusCollectionConfig<DataType>
     /**
      * The internal ID of the collection
+     * @type {string}
      */
     get id(): string {
         return `${this._internalStore._internalId}`
     }
     /**
      * The internal id of the collection with an instance prefix
+     * @type {string}
      */
     get instanceId(): string {
         // return this._internalStore._internalId
@@ -158,16 +160,18 @@ export class CollectionInstance<
     }
     /**
      * Helper function; Checks to see if the provided name is a group name
-     * @param name The name to check
+     * @param {string} name The name to check
      * @returns {boolean} if the name is a specific name of a group
+     * @private
      */
     private isCreatedGroup(name: string): name is KeyOfMap<Groups> {
         return this._internalStore._groups.has(name)
     }
     /**
      * Helper function; Checks to see if the provided name is a selector name
-     * @param name The name to check
+     * @param {string} name The name to check
      * @returns {boolean} if the name is a specific name of a selector
+     * @private
      */
     private isCreatedSelector(name: string): name is KeyOfMap<Selectors> {
         return this._internalStore._selectors.has(name)
@@ -187,8 +191,8 @@ export class CollectionInstance<
     /**
      * Collect An item of data (or many items of data using an array) into the collection.
      * @requires: Each data item must have the primary key as a property
-     * @param data {Array<Object>|Object} The data to collect
-     * @param groups {string | Array<string>} The groups to add the items to
+     * @param {DataType[]|DataType} data  The data to collect
+     * @param {string | string[]} groups The groups to add the items to
      * @returns {this} The collection instance
      */
     collect(
@@ -267,10 +271,10 @@ export class CollectionInstance<
     /**
      * Update the collection with data;
      * This is like collect but will not add new items, and can can be used to patch existing items
-     * @param key The key of the item to update
-     * @param data The data to update the item with
+     * @param {string|number} key The key of the item to update
+     * @param {DataType} data The data to update the item with
      * @param config The configuration to use for the update
-     * @param config.deep Should the update be deep or shallow
+     * @param {boolean} config.deep Should the update be deep or shallow
      */
     update(
         key: DataKey,
@@ -299,7 +303,7 @@ export class CollectionInstance<
     }
     /**
      * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
-     * @param dataKey {string|number} The key of the data item to get
+     * @param {string|number} dataKey The key of the data item to get
      * @returns {this} The new Collection Instance
      */
     getItem(dataKey: DataKey): PlexusDataInstance<DataType> {
@@ -332,10 +336,10 @@ export class CollectionInstance<
     }
     /**
      * Get the value of an item in the collection
-     * @param key {string|number} The key of the item to get
-     * @returns {Object} The value of the item
+     * @param {string|number} key The key of the item to get
+     * @returns {DataType} The value of the item
      */
-    getItemValue(key: DataKey) {
+    getItemValue(key: DataKey): DataType {
         const value = this.getItem(key).value
         if (
             typeof this._internalStore._computeFn === 'function' &&
@@ -349,7 +353,7 @@ export class CollectionInstance<
     /// SELECTORS
     /**
      * Create a Selector instance for a given selector name
-     * @param selectorName {string} The name of the selector
+     * @param {string} selectorName The name of the selector
      * @returns {this} The new Collection Instance
      */
     createSelector<Name extends SelectorName>(selectorName: Name) {
@@ -446,7 +450,7 @@ export class CollectionInstance<
 
     /**
      * Create multiple groups with a name (no configuration)
-     * @param groupNames {Array<string>}The names of the groups to create
+     * @param {string[]} groupNamesThe names of the groups to create
      * @returns {this} The new Collection Instance
      */
     createGroups<Names extends GroupName>(groupNames: [Names, ...Names[]]) {
@@ -463,7 +467,7 @@ export class CollectionInstance<
     }
     /**
      * Get A Group instance of a given group name
-     * @param name The Group Name to search for
+     * @param {string} name The Group Name to search for
      * @returns {this} The new Collection Instance
      */
     getGroup(name: string): PlexusCollectionGroup<DataType>
@@ -492,8 +496,8 @@ export class CollectionInstance<
     }
     /**
      * Given a key, get all Group names that the key is in
-     * @param key {string|number} The data key(s) to use for lookup
-     * @returns {Array<string>} An array of Group names that the key is in
+     * @param {string|number} key The data key(s) to use for lookup
+     * @returns {string[]} An array of Group names that the key is in
      */
     getGroupsOf(key: DataKey) {
         const inGroups: KeyOfMap<Groups>[] = []
@@ -506,8 +510,8 @@ export class CollectionInstance<
     }
     /**
      * Add a data item to a group or groups
-     * @param key {string|number} The key of the item to add
-     * @param groups {Array<string>|string} The group(s) to add the item to
+     * @param {string|number} key The key of the item to add
+     * @param {string[]|string} groups The group(s) to add the item to
      * @returns {this} The new Collection Instance
      */
     addToGroups(key: DataKey, groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
@@ -531,6 +535,8 @@ export class CollectionInstance<
         } else {
             addToGroup(groups)
         }
+
+        return this
     }
     watchGroup(name: KeyOfMap<Groups>, callback: PlexusWatcher<DataType[]>)
     watchGroup(name: string, callback: PlexusWatcher<DataType[]>)
@@ -549,10 +555,10 @@ export class CollectionInstance<
     }
     /**
      * Delete a data item completely from the collection.
-     * @param keys The data key(s) to use for lookup
+     * @param {string|number} keys The data key(s) to use for lookup
      * @returns {this} The new Collection Instance
      */
-    delete(keys: DataKey | DataKey[]) {
+    delete(keys: DataKey | DataKey[]): this {
         // the function to remove the data
         const rm = (key: DataKey) => {
             this._internalStore._data.get(key)?.clean()
@@ -573,13 +579,14 @@ export class CollectionInstance<
     }
     /**
      * Remove a data item from a set of groups
-     * @param keys The data key(s) to use for lookup
-     * @param groups {Array<string>|string} Either a single group or an array of groups to remove the data from
+     * @param {string|number} keys The data key(s) to use for lookup
+     * @param {string[]|string} groups Either a single group or an array of groups to remove the data from
+     * @returns {this} The new Collection Instance
      */
     removeFromGroup(
         keys: DataKey | DataKey[],
         groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]
-    ) {
+    ): this {
         this.mount()
         const rm = (key) => {
             if (Array.isArray(groups)) {
@@ -603,6 +610,7 @@ export class CollectionInstance<
         } else {
             rm(keys)
         }
+        return this
         // ! This is commented out because the user may still want to keep the data in the collection. If they want to completely delete the data, they should use `.delete()`
         // if it's removed from all groups, delete the data entirely
         // if(this.getGroupsOf(key).length === 0){
@@ -611,9 +619,10 @@ export class CollectionInstance<
     }
     /**
      * Delete all data in the collection
-     * @param {string} [GroupName] - (Optional) Either an array or a single group name to clear data from
+     * @param {string} groupNames - (Optional) Either an array or a single group name to clear data from
+     * @returns {this} The new Collection Instance
      */
-    clear(groupNames?: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+    clear(groupNames?: KeyOfMap<Groups> | KeyOfMap<Groups>[]): this {
         // this means we want to clear a group, not the whole collection
         if (groupNames) {
             if (Array.isArray(groupNames)) {
@@ -634,16 +643,19 @@ export class CollectionInstance<
 
     /**
      * Run this function when data is collected to format it in a particular way; useful for converting one datatype into another
-     * @param fn
+     * @param {function(Object): Object} fn A function that takes in the data and returns the formatted data
+     * @returns {this} The new Collection Instance
      */
-    compute(fn: (v: DataType) => DataType) {
+    compute(fn: (value: DataType) => DataType): this {
         this._internalStore._computeFn = fn
         return this
     }
     /**
      * Re-runs the compute function on select IDs (or all the collection if none provided)
+     * @param {string[]|Number[]} ids The data key(s) to use for lookup
+     * @returns {this} The new Collection Instance
      */
-    reCompute(ids?: string | string[]) {
+    reCompute(ids?: string | string[]): this {
         if (typeof this._internalStore._computeFn !== 'function') {
             this.instance().runtime.log(
                 'warn',
@@ -651,9 +663,11 @@ export class CollectionInstance<
             )
             return this
         }
+
         if (ids) {
             if (!Array.isArray(ids)) ids = [ids as string]
         } else ids = this.keys.map((v) => v.toString())
+
         ids.forEach((id) => {
             const data = this._internalStore._data.get(id)
             if (data) {
@@ -663,11 +677,14 @@ export class CollectionInstance<
                 } as Partial<DataType>)
             }
         })
+        return this
     }
     /**
      * Same as reCompute, but for groups
+     * @param {string[]|string} groupNames The data key(s) to use for lookup
+     * @returns {this} The new Collection Instance
      */
-    reComputeGroups(groupNames: KeyOfMap<Groups> | KeyOfMap<Groups>[]) {
+    reComputeGroups(groupNames: KeyOfMap<Groups> | KeyOfMap<Groups>[]): this {
         if (!Array.isArray(groupNames)) groupNames = [groupNames]
         groupNames.forEach((groupName) =>
             this.reCompute(
@@ -680,17 +697,19 @@ export class CollectionInstance<
     }
     /**
      * Set the key of the collection for enhanced internal tracking
+     * @param {string} key The key to use for the collection
+     * @returns {this} The new Collection Instance
      */
-    key(key: string) {
+    key(key: string): this {
         this._internalStore._name = key
         this.mount()
         return this
     }
     /**
      * Get all of the collection data values as an array
-     * @returns {Array<Object>} The collection data values as an array
+     * @type {DataType[]}
      */
-    get value() {
+    get value(): DataType[] {
         this.mount()
         const keys: DataType[] = []
         for (let item of this._internalStore._data.values()) {
@@ -702,7 +721,7 @@ export class CollectionInstance<
     }
     /**
      * Get all of the collection data keys as an array
-     * @returns {Array<string|number>} The collection data values as an array
+     * @type {string[]|number[]}
      */
     get keys() {
         const keys: (string | number)[] = []
@@ -715,7 +734,7 @@ export class CollectionInstance<
     }
     /**
      * Get all the groups in the collection as an object
-     * @returns {Record<string, GroupInstance>} The groups in the collection
+     * @type {Record<string, GroupInstance>}
      */
     get groups() {
         const groups: Record<
@@ -729,7 +748,7 @@ export class CollectionInstance<
     }
     /**
      * Get all the groups and their children's data values as an object
-     * @returns The groups paired with their children's data values as an object
+     * @type {Record<GroupNames, DataType[]>}
      */
     get groupsValue() {
         // holder for groups values
@@ -752,7 +771,7 @@ export class CollectionInstance<
     }
     /**
      * Get all the selectors in the collection as an object
-     * @returns The selectors in the collection
+     * @type {Record<SelectorNames, PlexusCollectionSelector>}
      */
     get selectors() {
         const selectors: Record<
@@ -769,7 +788,7 @@ export class CollectionInstance<
     }
     /**
      * Get all the groups and their children's data values as an object
-     * @returns The groups paired with their children's data values as an object
+     * @type {Record<SelectorNames, DataType[]>}
      */
     get selectorsValue() {
         const selectors: Record<KeyOfMap<Selectors>, DataType> = {} as Record<
