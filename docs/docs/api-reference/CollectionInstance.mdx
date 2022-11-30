@@ -4,7 +4,7 @@
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
-<p>A Collection Instance</p>
+A Collection Instance
 
 
 * [CollectionInstance](#CollectionInstance)
@@ -93,7 +93,7 @@
 ### collectionInstance.collect(data, groups) ⇒ <code>this</code>
 <p>Collect An item of data (or many items of data using an array) into the collection.</p>
 
-**Returns**: <code>this</code> - <p>The collection instance</p>  
+**Returns**: <code>this</code> <p>The collection instance</p>  
 **Requires:**: Each data item must have the primary key as a property  
 
 | Param | Type | Description |
@@ -120,7 +120,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getItem(dataKey) ⇒ <code>this</code>
 <p>Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a <em>provisional</em> one</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -131,7 +131,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getItemValue(key) ⇒ <code>DataType</code>
 <p>Get the value of an item in the collection</p>
 
-**Returns**: <code>DataType</code> - <p>The value of the item</p>  
+**Returns**: <code>DataType</code> <p>The value of the item</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -142,7 +142,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.createSelector(selectorName) ⇒ <code>this</code>
 <p>Create a Selector instance for a given selector name</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -153,7 +153,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.createSelectors(selectorNames) ⇒ <code>this</code>
 <p>Create Selector instances for a given set of selector names</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -164,7 +164,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getSelector(name) ⇒ <code>this</code> \| <code>undefined</code>
 <p>Get A Selector instance of a given selector name</p>
 
-**Returns**: <code>this</code> \| <code>undefined</code> - <p>Either a Selector Instance or undefined</p>  
+**Returns**: <code>this</code> \| <code>undefined</code> <p>Either a Selector Instance or undefined</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -175,7 +175,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.createGroup(groupName, config) ⇒ <code>this</code>
 <p>Create a group with a name and a configuration</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -187,7 +187,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.createGroups(groupNamesThe) ⇒ <code>this</code>
 <p>Create multiple groups with a name (no configuration)</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -198,7 +198,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getGroup(name) ⇒ <code>this</code>
 <p>Get A Group instance of a given group name</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -209,7 +209,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.getGroupsOf(key) ⇒ <code>Array.&lt;string&gt;</code>
 <p>Given a key, get all Group names that the key is in</p>
 
-**Returns**: <code>Array.&lt;string&gt;</code> - <p>An array of Group names that the key is in</p>  
+**Returns**: <code>Array.&lt;string&gt;</code> <p>An array of Group names that the key is in</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -220,7 +220,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.addToGroups(key, groups) ⇒ <code>this</code>
 <p>Add a data item to a group or groups</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -232,7 +232,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.delete(keys) ⇒ <code>this</code>
 <p>Delete a data item completely from the collection.</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -243,7 +243,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.removeFromGroup(keys, groups) ⇒ <code>this</code>
 <p>Remove a data item from a set of groups</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -255,7 +255,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.clear(groupNames) ⇒ <code>this</code>
 <p>Delete all data in the collection</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -266,7 +266,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.compute(fn) ⇒ <code>this</code>
 <p>Run this function when data is collected to format it in a particular way; useful for converting one datatype into another</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -277,7 +277,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.reCompute(ids) ⇒ <code>this</code>
 <p>Re-runs the compute function on select IDs (or all the collection if none provided)</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -288,7 +288,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.reComputeGroups(groupNames) ⇒ <code>this</code>
 <p>Same as reCompute, but for groups</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -299,7 +299,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 ### collectionInstance.key(key) ⇒ <code>this</code>
 <p>Set the key of the collection for enhanced internal tracking</p>
 
-**Returns**: <code>this</code> - <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
