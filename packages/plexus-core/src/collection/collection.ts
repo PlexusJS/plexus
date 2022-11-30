@@ -187,8 +187,8 @@ export class CollectionInstance<
     /**
      * Collect An item of data (or many items of data using an array) into the collection.
      * @requires: Each data item must have the primary key as a property
-     * @param data Object[] | Object ::
-     * @param groups string | string[] :: The groups to add the items to
+     * @param data {Array<Object>|Object} The data to collect
+     * @param groups string | string[] The groups to add the items to
      */
     collect(
         data: DataType[],
@@ -506,7 +506,7 @@ export class CollectionInstance<
     /**
      * Add a data item to a group or groups
      * @param key {string|number} The key of the item to add
-     * @param groups {string[]|string} The group(s) to add the item to
+     * @param groups {Array<string>|string} The group(s) to add the item to
      */
     addToGroups(key: DataKey, groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>) {
         const addToGroup = (group: GroupName) => {
@@ -684,7 +684,7 @@ export class CollectionInstance<
     }
     /**
      * Get all of the collection data values as an array
-     * @returns {Object[]} The collection data values as an array
+     * @returns {Array<Object>} The collection data values as an array
      */
     get value() {
         this.mount()
@@ -698,7 +698,7 @@ export class CollectionInstance<
     }
     /**
      * Get all of the collection data keys as an array
-     * @returns {string[]|number[]} The collection data values as an array
+     * @returns {Array<string|number>} The collection data values as an array
      */
     get keys() {
         const keys: (string | number)[] = []
