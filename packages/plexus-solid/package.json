@@ -1,34 +1,34 @@
 {
-  "name": "@plexusjs/solid",
-  "version": "1.4.1-canary.0",
-  "description": "SolidJS Plugin for PlexusJS",
-  "main": "./dist/index.js",
-  "types": "dist/index.d.ts",
-  "keywords": [
-    "plexusjs",
-    "plexus",
-    "plexus-solid",
-    "solid",
-    "solidjs",
-    "global state",
-    "plugin"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "license": "MIT",
-  "peerDependencies": {
-    "@plexusjs/core": "~1"
-  },
-  "scripts": {
-    "prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
-    "build": "tsc --build --force",
-    "prepublish": "yarn build",
-    "dev": "tsc --watch"
-  },
-  "gitHead": "583332e11a006836db31ad1c3cd0e9b251f4cb7e",
-  "dependencies": {
-    "@plexusjs/utils": "1.4.1-canary.0",
-    "solid-js": "^1.4.7"
-  }
+	"name": "@plexusjs/solid",
+	"version": "1.4.1-canary.0",
+	"description": "SolidJS Plugin for PlexusJS",
+	"main": "./dist/index.js",
+	"types": "dist/index.d.ts",
+	"keywords": [
+		"plexusjs",
+		"plexus",
+		"plexus-solid",
+		"solid",
+		"solidjs",
+		"global state",
+		"plugin"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"license": "MIT",
+	"peerDependencies": {
+		"@plexusjs/core": "~1"
+	},
+	"scripts": {
+		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
+		"build": "tsc --build --force",
+		"prepublish": "yarn build",
+		"dev": "tsc --watch"
+	},
+	"gitHead": "583332e11a006836db31ad1c3cd0e9b251f4cb7e",
+	"dependencies": {
+		"@plexusjs/utils": "1.4.1-canary.0",
+		"solid-js": "^1.4.7"
+	}
 }

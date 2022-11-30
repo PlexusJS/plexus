@@ -1,32 +1,32 @@
 {
-  "name": "plexus-cli",
-  "author": "Philippe Clesca <hello@philippec.me>",
-  "license": "MIT",
-  "version": "1.5.1",
-  "bin": "./out/bin.js",
-  "main": "./out/bin.js",
-  "type": "module",
-  "dependencies": {
-    "@plexusjs/core": "^1.0.6",
-    "chalk": "^5.0.1",
-    "yargs": "^17.4.1"
-  },
-  "scripts": {
-    "precli:build": "rm -rf ./out/bin.js",
-    "cli:build": "rollup --config ./rollup.config.js",
-    "postcli:build": "node ./lib/postbuild.js",
-    "preexecute": "yarn build",
-    "execute": "npx .",
-    "prepublish": "yarn build",
-    "publish-stable": "yarn publish"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/PlexusJS/plexus.git",
-    "directory": "cli"
-  },
-  "private": false,
-  "devDependencies": {
-    "rollup": "^2.72.1"
-  }
+	"name": "plexus-cli",
+	"author": "Philippe Clesca <hello@philippec.me>",
+	"license": "MIT",
+	"version": "1.5.1",
+	"bin": "./out/bin.js",
+	"main": "./out/bin.js",
+	"type": "module",
+	"dependencies": {
+		"@plexusjs/core": "^1.0.6",
+		"chalk": "^5.0.1",
+		"yargs": "^17.4.1"
+	},
+	"scripts": {
+		"precli:build": "rm -rf ./out/bin.js",
+		"cli:build": "rollup --config ./rollup.config.js",
+		"postcli:build": "node ./lib/postbuild.js",
+		"preexecute": "yarn build",
+		"execute": "npx .",
+		"prepublish": "yarn build",
+		"publish-stable": "yarn publish"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/PlexusJS/plexus.git",
+		"directory": "cli"
+	},
+	"private": false,
+	"devDependencies": {
+		"rollup": "^2.72.1"
+	}
 }

@@ -1,18 +1,18 @@
 export const moduleTemplate = [
-  {
-    name: 'states',
-    ext: 'js',
-    type: 'file',
-    content: `import { state, collection, computed } from "@plexusjs/core"
+	{
+		name: 'states',
+		ext: 'js',
+		type: 'file',
+		content: `import { state, collection, computed } from "@plexusjs/core"
 		// Create your stateful instances here
 		
 		`,
-  },
-  {
-    name: 'index',
-    ext: 'js',
-    type: 'file',
-    content: `// Import your module instances
+	},
+	{
+		name: 'index',
+		ext: 'js',
+		type: 'file',
+		content: `// Import your module instances
 		import * as actions from "./actions"
 		import * as states from "./states"
 		import * as api from "./api"
@@ -23,12 +23,12 @@ export const moduleTemplate = [
 		export default user
 		
 		`,
-  },
-  {
-    name: 'api',
-    ext: 'js',
-    type: 'file',
-    content: `import { api } from "@plexusjs/core"
+	},
+	{
+		name: 'api',
+		ext: 'js',
+		type: 'file',
+		content: `import { api } from "@plexusjs/core"
 		
 		// You can use the api to make requests to the server at a specific endpoint
 		// ex.
@@ -37,12 +37,12 @@ export const moduleTemplate = [
 		 */
 
 		`,
-  },
-  {
-    name: 'actions',
-    ext: 'js',
-    type: 'file',
-    content: `import { action } from "@plexusjs/core"
+	},
+	{
+		name: 'actions',
+		ext: 'js',
+		type: 'file',
+		content: `import { action } from "@plexusjs/core"
 		// Import your module's resources
 		import {  } from "./states"
 		import {  } from "./api"
@@ -58,5 +58,5 @@ export const moduleTemplate = [
 		 *	})
 		 */
 		`,
-  },
+	},
 ]

@@ -7,53 +7,53 @@ import 'isomorphic-fetch'
 let myApi: PlexusApi
 
 beforeEach(() => {
-  myApi = api()
+	myApi = api()
 })
 describe('Testing Api Function', () => {
-  test('Send a get request to google', async () => {
-    // const value = state(1)
-    myApi.options({
-      headers: {
-        custom: 'header',
-      },
-    })
-    // console.log(myApi.config)
-    expect(myApi.config).toBeDefined()
-    expect(myApi.config.headers).toBeDefined()
-    expect(myApi.config.headers['custom']).toBe('header')
+	test('Send a get request to google', async () => {
+		// const value = state(1)
+		myApi.options({
+			headers: {
+				custom: 'header',
+			},
+		})
+		// console.log(myApi.config)
+		expect(myApi.config).toBeDefined()
+		expect(myApi.config.headers).toBeDefined()
+		expect(myApi.config.headers['custom']).toBe('header')
 
-    const res = await myApi.get('https://google.com')
-    expect(res?.status).toBeGreaterThan(0)
-  })
-  test('Set a onResponse', async () => {
-    // const value = state(1)
-    const apiUsingOnResponse = api('', {
-      onResponse: (req, res) => {
-        expect(res?.status).toBeGreaterThan(0)
-        console.log('status: ', res?.status)
-      },
-    })
-    apiUsingOnResponse.options({
-      headers: {
-        custom: 'header',
-      },
-    })
-    // console.log(myApi.config)
-    expect(apiUsingOnResponse.config).toBeDefined()
-    expect(apiUsingOnResponse.config.headers).toBeDefined()
-    expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
+		const res = await myApi.get('https://google.com')
+		expect(res?.status).toBeGreaterThan(0)
+	})
+	test('Set a onResponse', async () => {
+		// const value = state(1)
+		const apiUsingOnResponse = api('', {
+			onResponse: (req, res) => {
+				expect(res?.status).toBeGreaterThan(0)
+				console.log('status: ', res?.status)
+			},
+		})
+		apiUsingOnResponse.options({
+			headers: {
+				custom: 'header',
+			},
+		})
+		// console.log(myApi.config)
+		expect(apiUsingOnResponse.config).toBeDefined()
+		expect(apiUsingOnResponse.config.headers).toBeDefined()
+		expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
 
-    const res = await apiUsingOnResponse.get('https://google.com')
-    expect(res?.status).toBeGreaterThan(0)
-  })
+		const res = await apiUsingOnResponse.get('https://google.com')
+		expect(res?.status).toBeGreaterThan(0)
+	})
 })
 describe("Test the API's baseURL capabilities", () => {
-  const myApi2 = api('https://google.com')
-  test('Can make a request to a sub-path', async () => {
-    const res = await myApi2.post('maps')
+	const myApi2 = api('https://google.com')
+	test('Can make a request to a sub-path', async () => {
+		const res = await myApi2.post('maps')
 
-    expect(myApi2.config.headers['Content-Type']).toBe('application/json')
-    // console.log(JSON.stringify(res, null, 2))
-    expect(res?.status).toBeGreaterThan(0)
-  })
+		expect(myApi2.config.headers['Content-Type']).toBe('application/json')
+		// console.log(JSON.stringify(res, null, 2))
+		expect(res?.status).toBeGreaterThan(0)
+	})
 })

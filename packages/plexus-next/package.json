@@ -1,40 +1,40 @@
 {
-  "name": "@plexusjs/next",
-  "version": "1.4.1-canary.0",
-  "description": "Next Plugin for PlexusJS",
-  "main": "./dist/index.js",
-  "types": "dist/index.d.ts",
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [
-    "plexusjs",
-    "plexus",
-    "plexus-react",
-    "react",
-    "reactjs",
-    "next",
-    "nextjs",
-    "global state",
-    "plugin"
-  ],
-  "license": "MIT",
-  "peerDependencies": {
-    "@plexusjs/core": "~1",
-    "@plexusjs/react": "~1",
-    "react": "^16.8.6"
-  },
-  "devDependencies": {
-    "@types/react": "^16.9.49",
-    "@types/react-test-renderer": "^16.9.3",
-    "react": "^17.0.2",
-    "react-test-renderer": "^16.13.1"
-  },
-  "scripts": {
-    "prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
-    "build": "tsc --build --force",
-    "prepublish": "yarn build",
-    "dev": "tsc --watch"
-  },
-  "gitHead": "583332e11a006836db31ad1c3cd0e9b251f4cb7e"
+	"name": "@plexusjs/next",
+	"version": "1.4.1-canary.0",
+	"description": "Next Plugin for PlexusJS",
+	"main": "./dist/index.js",
+	"types": "dist/index.d.ts",
+	"publishConfig": {
+		"access": "public"
+	},
+	"keywords": [
+		"plexusjs",
+		"plexus",
+		"plexus-react",
+		"react",
+		"reactjs",
+		"next",
+		"nextjs",
+		"global state",
+		"plugin"
+	],
+	"license": "MIT",
+	"peerDependencies": {
+		"@plexusjs/core": "~1",
+		"@plexusjs/react": "~1",
+		"react": "^16.8.6"
+	},
+	"devDependencies": {
+		"@types/react": "^16.9.49",
+		"@types/react-test-renderer": "^16.9.3",
+		"react": "^17.0.2",
+		"react-test-renderer": "^16.13.1"
+	},
+	"scripts": {
+		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
+		"build": "tsc --build --force",
+		"prepublish": "yarn build",
+		"dev": "tsc --watch"
+	},
+	"gitHead": "583332e11a006836db31ad1c3cd0e9b251f4cb7e"
 }

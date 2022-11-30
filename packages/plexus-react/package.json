@@ -1,42 +1,42 @@
 {
-  "name": "@plexusjs/react",
-  "version": "1.4.1-canary.0",
-  "description": "React Plugin for PlexusJS",
-  "main": "./dist/index.js",
-  "types": "dist/index.d.ts",
-  "keywords": [
-    "plexusjs",
-    "plexus",
-    "plexus-react",
-    "react",
-    "reactjs",
-    "global state",
-    "plugin"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "license": "MIT",
-  "peerDependencies": {
-    "@plexusjs/core": "~1",
-    "react": ">=17"
-  },
-  "devDependencies": {
-    "@types/react": "^16.9.49",
-    "@types/react-test-renderer": "^18.0.0",
-    "@types/use-sync-external-store": "^0.0.3",
-    "react": ">=17",
-    "react-test-renderer": "^18.2.0"
-  },
-  "scripts": {
-    "prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
-    "build": "tsc --build --force",
-    "prepublish": "yarn build",
-    "dev": "tsc --watch"
-  },
-  "gitHead": "6c76e68c4b15dec6c2cde7635bd530c8e7508e6e",
-  "dependencies": {
-    "@plexusjs/utils": "1.4.1-canary.0",
-    "use-sync-external-store": "^1.2.0"
-  }
+	"name": "@plexusjs/react",
+	"version": "1.4.1-canary.0",
+	"description": "React Plugin for PlexusJS",
+	"main": "./dist/index.js",
+	"types": "dist/index.d.ts",
+	"keywords": [
+		"plexusjs",
+		"plexus",
+		"plexus-react",
+		"react",
+		"reactjs",
+		"global state",
+		"plugin"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"license": "MIT",
+	"peerDependencies": {
+		"@plexusjs/core": "~1",
+		"react": ">=17"
+	},
+	"devDependencies": {
+		"@types/react": "^16.9.49",
+		"@types/react-test-renderer": "^18.0.0",
+		"@types/use-sync-external-store": "^0.0.3",
+		"react": ">=17",
+		"react-test-renderer": "^18.2.0"
+	},
+	"scripts": {
+		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
+		"build": "tsc --build --force",
+		"prepublish": "yarn build",
+		"dev": "tsc --watch"
+	},
+	"gitHead": "6c76e68c4b15dec6c2cde7635bd530c8e7508e6e",
+	"dependencies": {
+		"@plexusjs/utils": "1.4.1-canary.0",
+		"use-sync-external-store": "^1.2.0"
+	}
 }

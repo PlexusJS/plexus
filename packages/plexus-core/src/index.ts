@@ -4,17 +4,17 @@ import { WatchableMutable, Watchable } from './watchable'
 import { _state, PlexusStateInstance, PlexusStateType } from './state'
 import { _computed, PlexusComputedStateInstance } from './computed'
 import {
-  _action,
-  FunctionType,
-  PlexusAction,
-  PlexusActionHooks,
+	_action,
+	FunctionType,
+	PlexusAction,
+	PlexusActionHooks,
 } from './action'
 import {
-  _collection,
-  PlexusCollectionConfig,
-  PlexusCollectionInstance,
-  PlexusCollectionSelector,
-  PlexusCollectionGroup,
+	_collection,
+	PlexusCollectionConfig,
+	PlexusCollectionInstance,
+	PlexusCollectionSelector,
+	PlexusCollectionGroup,
 } from './collection/collection'
 import { _event, PlexusEventInstance } from './event'
 import { storage as _storage, StorageOverride } from './storage'
@@ -27,7 +27,7 @@ import { PlexusPreActionConfig, _preaction } from './preaction'
  * @returns A Plexus State Instance
  */
 export function state<Value extends PlexusStateType = any>(item: Value) {
-  return _state(() => instance(), item)
+	return _state(() => instance(), item)
 }
 /**
  * Generate a Plexus State
@@ -35,13 +35,13 @@ export function state<Value extends PlexusStateType = any>(item: Value) {
  * @returns A Plexus State Instance
  */
 export function computed<Value extends PlexusStateType = any>(
-  item: (value?: Value) => Value,
-  dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>
+	item: (value?: Value) => Value,
+	dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>
 ) {
-  if (!Array.isArray(dependencies)) {
-    return _computed(() => instance(), item, [dependencies])
-  }
-  return _computed(() => instance(), item, dependencies)
+	if (!Array.isArray(dependencies)) {
+		return _computed(() => instance(), item, [dependencies])
+	}
+	return _computed(() => instance(), item, dependencies)
 }
 /**
  * Create a new Storage Instance
@@ -50,14 +50,14 @@ export function computed<Value extends PlexusStateType = any>(
  * @returns A storage instance
  */
 export function storage(name?: string, override?: StorageOverride) {
-  return _storage(() => instance(), name, override)
+	return _storage(() => instance(), name, override)
 }
 /**
  * Create a new event Engine
  * @returns An Event Instance
  */
 export function event<PayloadType = any>() {
-  return _event<PayloadType>(() => instance())
+	return _event<PayloadType>(() => instance())
 }
 
 /**
@@ -66,9 +66,9 @@ export function event<PayloadType = any>() {
  * @returns A collection Instance
  */
 export function collection<Type extends { [key: string]: any }>(
-  config?: PlexusCollectionConfig<Type>
+	config?: PlexusCollectionConfig<Type>
 ) {
-  return _collection<Type>(() => instance(), config)
+	return _collection<Type>(() => instance(), config)
 }
 /**
  * Generate a Plexus Action
@@ -76,7 +76,7 @@ export function collection<Type extends { [key: string]: any }>(
  * @returns The intended return value of fn, or null if an error is caught
  */
 export function action<Fn extends FunctionType>(fn: Fn) {
-  return _action<Fn>(() => instance(), fn)
+	return _action<Fn>(() => instance(), fn)
 }
 /**
  * Generate a Plexus Action
@@ -84,14 +84,14 @@ export function action<Fn extends FunctionType>(fn: Fn) {
  * @returns The intended return value of fn, or null if an error is caught
  */
 export function preaction<Fn extends FunctionType>(
-  fn: Fn,
-  config?: PlexusPreActionConfig
+	fn: Fn,
+	config?: PlexusPreActionConfig
 ) {
-  return _preaction<Fn>(() => instance(), fn, config)
+	return _preaction<Fn>(() => instance(), fn, config)
 }
 
 export function setGlobalCatch(catcher: (err: any) => unknown) {
-  instance()._globalCatch = catcher
+	instance()._globalCatch = catcher
 }
 
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
@@ -100,13 +100,13 @@ function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
 export function usePlugin(instance: PlexusInstance, plugin: PlexusPlugin): void
 export function usePlugin(instanceId: string, plugin: PlexusPlugin): void
 export function usePlugin(
-  instanceOrInstanceId: PlexusInstance | string,
-  plugin: PlexusPlugin
+	instanceOrInstanceId: PlexusInstance | string,
+	plugin: PlexusPlugin
 ) {
-  if (typeof instanceOrInstanceId === 'string') {
-    plugin.init((name?: string) => instance({ instanceId: name }))
-  }
-  instance()._plugins.set(plugin.name, plugin)
+	if (typeof instanceOrInstanceId === 'string') {
+		plugin.init((name?: string) => instance({ instanceId: name }))
+	}
+	instance()._plugins.set(plugin.name, plugin)
 }
 
 // export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
@@ -114,19 +114,19 @@ export * from './api'
 export { gql } from './gql'
 
 export {
-  instance,
-  PlexusAction,
-  PlexusPlugin,
-  PlexusActionHooks,
-  PlexusPluginConfig,
-  PlexusCollectionConfig,
-  PlexusCollectionInstance,
-  PlexusEventInstance,
-  PlexusStateInstance,
-  PlexusCollectionGroup,
-  PlexusCollectionSelector,
-  PlexusComputedStateInstance,
-  PlexusInstance,
-  WatchableMutable as WatchableValue,
-  Watchable,
+	instance,
+	PlexusAction,
+	PlexusPlugin,
+	PlexusActionHooks,
+	PlexusPluginConfig,
+	PlexusCollectionConfig,
+	PlexusCollectionInstance,
+	PlexusEventInstance,
+	PlexusStateInstance,
+	PlexusCollectionGroup,
+	PlexusCollectionSelector,
+	PlexusComputedStateInstance,
+	PlexusInstance,
+	WatchableMutable as WatchableValue,
+	Watchable,
 }
