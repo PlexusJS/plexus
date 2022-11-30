@@ -1,27 +1,27 @@
 {
-  "name": "@plexusjs/utils",
-  "version": "1.4.1-canary.0",
-  "description": "Useful utils by the PlexusJS Team.",
-  "main": "./dist/index.js",
-  "types": "dist/index.d.ts",
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [
-    "plexusjs",
-    "plexus",
-    "plexus-utils",
-    "react",
-    "reactjs",
-    "global state",
-    "plugin"
-  ],
-  "license": "MIT",
-  "scripts": {
-    "prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
-    "build": "tsc --build --force",
-    "prepublish": "yarn build",
-    "dev": "tsc --watch"
-  },
-  "gitHead": "583332e11a006836db31ad1c3cd0e9b251f4cb7e"
+	"name": "@plexusjs/utils",
+	"version": "1.4.1-canary.0",
+	"description": "Useful utils by the PlexusJS Team.",
+	"main": "./dist/index.js",
+	"types": "dist/index.d.ts",
+	"publishConfig": {
+		"access": "public"
+	},
+	"keywords": [
+		"plexusjs",
+		"plexus",
+		"plexus-utils",
+		"react",
+		"reactjs",
+		"global state",
+		"plugin"
+	],
+	"license": "MIT",
+	"scripts": {
+		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
+		"build": "tsc --build --force",
+		"prepublish": "yarn build",
+		"dev": "tsc --watch"
+	},
+	"gitHead": "583332e11a006836db31ad1c3cd0e9b251f4cb7e"
 }

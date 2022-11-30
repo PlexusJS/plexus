@@ -1,4 +1,4 @@
-import { isServer } from './shared'
+import { isServer } from '../shared'
 import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 

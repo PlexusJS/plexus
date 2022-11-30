@@ -6,8 +6,8 @@ import { PlexusValue, usePlexus } from './usePlexus'
  * @returns [currentValue, Function] The current value and a function to update the value
  */
 export function usePlexusState<V extends WatchableValue>(
-  dep: V
+	dep: V
 ): [PlexusValue<V>, (value: V) => void] {
-  const value = usePlexus(dep)
-  return [value, (nextValue) => dep.set(nextValue)]
+	const value = usePlexus(dep)
+	return [value, (nextValue) => dep.set(nextValue)]
 }

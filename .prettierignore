@@ -1,5 +1,7 @@
+
+public
 *.hbs
-*/node_modules
+node_modules
 .docusaurus
 out
 dist
