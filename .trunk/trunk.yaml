@@ -7,16 +7,23 @@ plugins:
       ref: v0.0.6
       uri: https://github.com/trunk-io/plugins
 lint:
+  threshold:
+    - linters: [ALL]
+      level: high
   enabled:
     - git-diff-check
     - markdownlint@0.32.2
     - gitleaks@8.15.2
     - prettier@2.8.0
-    - svgo@3.0.2
     - actionlint@1.6.22
+  ignore: 
+    - linters: [ALL]
+    paths:
+      - ./**/dist
+      - ./**/node_modules
+      - ./**/.docusaurus/**/*
 runtimes:
   enabled:
-    - go@1.18.3
     - node@16.14.2
 actions:
   enabled:
