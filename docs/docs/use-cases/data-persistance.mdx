@@ -1,15 +1,15 @@
 ---
-title: "Data Persistance"
+title: 'Data Persistance'
 sidebar_position: 5
 ---
 
 You can easily persist your data to a user's browser Session Storage and <em>soon any other long term storage.</em>
 
 ```ts title="/core/index.ts"
-import { state } from "@plexusjs/core"
+import { state } from '@plexusjs/core'
 export const core = {
 	user: {
-		name: state("default_username").persist("username"),
+		name: state('default_username').persist('username'),
 	},
 }
 

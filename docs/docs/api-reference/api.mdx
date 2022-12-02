@@ -3,17 +3,17 @@ title: API
 sidebar_position: 5
 ---
 
-import CollapseContainer from "../../src/components/Collapse.tsx"
+import CollapseContainer from '../../src/components/Collapse.tsx'
 
 ## Basic Use
 
 ```ts
-import { api, action } from "@plexusjs/core"
-const myCoolApi = api("https://api.example.com")
+import { api, action } from '@plexusjs/core'
+const myCoolApi = api('https://api.example.com')
 
 const fetchUsers = action(async ({ onCatch }) => {
 	onCatch(console.error)
-	return myCoolApi.get("/users")
+	return myCoolApi.get('/users')
 })
 
 const users = await fetchUsers() //=> [{id: 1, name: "John"}, {id: 2, name: "Jane"}] or something
@@ -29,64 +29,64 @@ The current base configuration of this api
 	showingReturnType
 	data={[
 		{
-			key: ".headers",
-			type: "Record<string, string>",
-			description: "Refer to Official Documentation.",
+			key: '.headers',
+			type: 'Record<string, string>',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".body",
-			type: "BodyInit | null",
-			description: "Refer to Official Documentation.",
+			key: '.body',
+			type: 'BodyInit | null',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".cache",
-			type: "RequestCache",
-			description: "Refer to Official Documentation.",
+			key: '.cache',
+			type: 'RequestCache',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".credentials",
-			type: "RequestCredentials",
-			description: "Refer to Official Documentation.",
+			key: '.credentials',
+			type: 'RequestCredentials',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".integrity",
-			type: "string",
-			description: "Refer to Official Documentation.",
+			key: '.integrity',
+			type: 'string',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".keepalive",
-			type: "boolean",
-			description: "Refer to Official Documentation.",
+			key: '.keepalive',
+			type: 'boolean',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".mode",
-			type: "RequestMode",
-			description: "Refer to Official Documentation.",
+			key: '.mode',
+			type: 'RequestMode',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".redirect",
-			type: "RequestRedirect",
-			description: "Refer to Official Documentation.",
+			key: '.redirect',
+			type: 'RequestRedirect',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".referrer",
-			type: "string",
-			description: "Refer to Official Documentation.",
+			key: '.referrer',
+			type: 'string',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".referrerPolicy",
-			type: "ReferrerPolicy",
-			description: "Refer to Official Documentation.",
+			key: '.referrerPolicy',
+			type: 'ReferrerPolicy',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".signal",
-			type: "AbortSigna | nulll",
-			description: "Refer to Official Documentation.",
+			key: '.signal',
+			type: 'AbortSigna | nulll',
+			description: 'Refer to Official Documentation.',
 		},
 		{
-			key: ".window",
-			type: "null",
-			description: "Refer to Official Documentation.",
+			key: '.window',
+			type: 'null',
+			description: 'Refer to Official Documentation.',
 		},
 		/**
 		/** A BodyInit object or null to set request's body. */
@@ -112,10 +112,19 @@ The current base configuration of this api
 Send a get request
 
 <CollapseContainer
-	title="Arguments"
+	title='Arguments'
 	data={[
-		{ key: "Path", type: "string", description: "The path to call on the api." },
-		{ key: "Query", optional: true, type: "Record<string, string>", description: "The object to use for the url query string." },
+		{
+			key: 'Path',
+			type: 'string',
+			description: 'The path to call on the api.',
+		},
+		{
+			key: 'Query',
+			optional: true,
+			type: 'Record<string, string>',
+			description: 'The object to use for the url query string.',
+		},
 	]}
 />
 
@@ -124,10 +133,19 @@ Send a get request
 Send a post request
 
 <CollapseContainer
-	title="Arguments"
+	title='Arguments'
 	data={[
-		{ key: "Path", type: "string", description: "The path to call on the api." },
-		{ key: "Body", optional: true, type: "Record<string, string>", description: "The object to use for the request body." },
+		{
+			key: 'Path',
+			type: 'string',
+			description: 'The path to call on the api.',
+		},
+		{
+			key: 'Body',
+			optional: true,
+			type: 'Record<string, string>',
+			description: 'The object to use for the request body.',
+		},
 	]}
 />
 
@@ -136,10 +154,19 @@ Send a post request
 Send a put request
 
 <CollapseContainer
-	title="Arguments"
+	title='Arguments'
 	data={[
-		{ key: "Path", type: "string", description: "The path to call on the api." },
-		{ key: "Body", optional: true, type: "Record<string, string>", description: "The object to use for the request body." },
+		{
+			key: 'Path',
+			type: 'string',
+			description: 'The path to call on the api.',
+		},
+		{
+			key: 'Body',
+			optional: true,
+			type: 'Record<string, string>',
+			description: 'The object to use for the request body.',
+		},
 	]}
 />
 
@@ -147,17 +174,35 @@ Send a put request
 
 Send a delete request
 
-<CollapseContainer title="Arguments" data={[{ key: "Path", type: "string", description: "The path to call on the api." }]} />
+<CollapseContainer
+	title='Arguments'
+	data={[
+		{
+			key: 'Path',
+			type: 'string',
+			description: 'The path to call on the api.',
+		},
+	]}
+/>
 
 ##### api `.patch()`
 
 Send a patch request
 
 <CollapseContainer
-	title="Arguments"
+	title='Arguments'
 	data={[
-		{ key: "Path", type: "string", description: "The path to call on the api." },
-		{ key: "Body", optional: true, type: "Record<string, string>", description: "The object to use for the request body." },
+		{
+			key: 'Path',
+			type: 'string',
+			description: 'The path to call on the api.',
+		},
+		{
+			key: 'Body',
+			optional: true,
+			type: 'Record<string, string>',
+			description: 'The object to use for the request body.',
+		},
 	]}
 />
 
@@ -166,10 +211,19 @@ Send a patch request
 Set the configuration options for fetch
 
 <CollapseContainer
-	title="Arguments"
+	title='Arguments'
 	data={[
-		{ key: "Path", type: "string", description: "The path to call on the api." },
-		{ key: "Query", optional: true, type: "Record<string, string>", description: "The object to use for the url query string" },
+		{
+			key: 'Path',
+			type: 'string',
+			description: 'The path to call on the api.',
+		},
+		{
+			key: 'Query',
+			optional: true,
+			type: 'Record<string, string>',
+			description: 'The object to use for the url query string',
+		},
 	]}
 />
 
@@ -182,14 +236,19 @@ This is stored seprately from other headers. If there is another value for the A
 :::
 
 <CollapseContainer
-	title="Arguments"
+	title='Arguments'
 	data={[
 		{
-			key: "AuthType",
+			key: 'AuthType',
 			type: `"bearer" | "basic" | "jwt"`,
-			description: "The type of API token being used. This determines the prefix of the Authorization header.",
+			description:
+				'The type of API token being used. This determines the prefix of the Authorization header.',
 		},
-		{ key: "TokenValue", type: "string", description: "The object to use for the url query string" },
+		{
+			key: 'TokenValue',
+			type: 'string',
+			description: 'The object to use for the url query string',
+		},
 	]}
 />
 
@@ -198,12 +257,12 @@ This is stored seprately from other headers. If there is another value for the A
 Set headers for the requests of this API Instance
 
 <CollapseContainer
-	title="Arguments"
+	title='Arguments'
 	data={[
 		{
-			key: "HeaderObject",
+			key: 'HeaderObject',
 			type: `Record<string, string>`,
-			description: "An object of headers to set for the request.",
+			description: 'An object of headers to set for the request.',
 		},
 	]}
 />
@@ -217,7 +276,7 @@ Reset this routes configuration
 	data={[
 		{
 			type: `ApiInstance`,
-			description: "Returns the reset API Instance",
+			description: 'Returns the reset API Instance',
 		},
 	]}
 />
@@ -228,13 +287,21 @@ Reset this routes configuration
 
 The data returned from the request in JSON format. If the data is not supposed to be JSON, use [apiResponse`.rawData`](#apiresponse-rawdata)
 
-<CollapseContainer showingReturnType data={[{ type: "string", description: "The internal id of the PreAction." }]} />
+<CollapseContainer
+	showingReturnType
+	data={[{ type: 'string', description: 'The internal id of the PreAction.' }]}
+/>
 
 ##### apiResponse `.status`
 
 The HTTP status of the request
 
-<CollapseContainer showingReturnType data={[{ type: "number", description: "The HTTP status code of the response." }]} />
+<CollapseContainer
+	showingReturnType
+	data={[
+		{ type: 'number', description: 'The HTTP status code of the response.' },
+	]}
+/>
 
 ##### apiResponse `.ok`
 
@@ -242,14 +309,23 @@ Is the status code between 200 to 299?
 
 <CollapseContainer
 	showingReturnType
-	data={[{ type: "boolean", description: "True if the response status was between 200 and 299. False if otherwise." }]}
+	data={[
+		{
+			type: 'boolean',
+			description:
+				'True if the response status was between 200 and 299. False if otherwise.',
+		},
+	]}
 />
 
 ##### apiResponse `.rawData`
 
 The raw string of the response data
 
-<CollapseContainer showingReturnType data={[{ type: "string", description: "The internal id of the PreAction." }]} />
+<CollapseContainer
+	showingReturnType
+	data={[{ type: 'string', description: 'The internal id of the PreAction.' }]}
+/>
 
 ##### apiResponse `.response`
 
@@ -259,8 +335,8 @@ The HTTP response object ([ResponseInit](https://developer.mozilla.org/en-US/doc
 	showingReturnType
 	data={[
 		{
-			type: "ResponseInit",
-			description: "Refer to Official Documentation.",
+			type: 'ResponseInit',
+			description: 'Refer to Official Documentation.',
 		},
 	]}
 />

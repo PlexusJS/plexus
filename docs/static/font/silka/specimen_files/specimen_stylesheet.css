@@ -4,29 +4,107 @@
 	CSS Reset by Eric Meyer - Released under Public Domain
     http://meyerweb.com/eric/tools/css/reset/
 */
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, font, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center, dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend, table, 
-caption, tbody, tfoot, thead, tr, th, td 
-                  {margin: 0;padding: 0;border: 0;outline: 0;
-                  font-size: 100%;vertical-align: baseline;
-                  background: transparent;}
-body              {line-height: 1;}
-ol, ul            {list-style: none;}
-blockquote, q     {quotes: none;}
-blockquote:before, blockquote:after,
-q:before, q:after {content: '';	content: none;}
-:focus            {outline: 0;}
-ins               {text-decoration: none;}
-del               {text-decoration: line-through;}
-table             {border-collapse: collapse;border-spacing: 0;}
-
-
-
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+body {
+	line-height: 1;
+}
+ol,
+ul {
+	list-style: none;
+}
+blockquote,
+q {
+	quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+	content: '';
+	content: none;
+}
+:focus {
+	outline: 0;
+}
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
 
 body {
 	color: #000;
@@ -38,14 +116,14 @@ a {
 	color: #1883ba;
 }
 
-h1{
+h1 {
 	font-size: 32px;
 	font-weight: normal;
 	font-style: normal;
 	margin-bottom: 18px;
 }
 
-h2{
+h2 {
 	font-size: 18px;
 }
 
@@ -53,7 +131,6 @@ h2{
 	width: 865px;
 	margin: 0px auto;
 }
-
 
 #header {
 	padding: 20px;
@@ -70,7 +147,6 @@ h2{
 	padding: 60px 20px 20px;
 }
 
-
 #footer p {
 	margin: 0;
 	padding-top: 10px;
@@ -85,7 +161,7 @@ h2{
 	background-color: #444;
 }
 .tabs li {
-	float:  left;
+	float: left;
 	margin: 0;
 	overflow: hidden;
 	background-color: #444;
@@ -101,23 +177,19 @@ h2{
 }
 
 .tabs li a:hover {
-		background-color: #00b3ff;
-
+	background-color: #00b3ff;
 }
 
 .tabs li.active a {
-	color:  #000;
+	color: #000;
 	background-color: #fff;
 }
 
-
-
 div.huge {
-	
 	font-size: 300px;
 	line-height: 1em;
 	padding: 0;
-	letter-spacing: -.02em;
+	letter-spacing: -0.02em;
 	overflow: hidden;
 }
 div.glyph_range {
@@ -125,28 +197,67 @@ div.glyph_range {
 	line-height: 1.1em;
 }
 
-.size10{ font-size: 10px; }
-.size11{ font-size: 11px; }
-.size12{ font-size: 12px; }
-.size13{ font-size: 13px; }
-.size14{ font-size: 14px; }
-.size16{ font-size: 16px; }
-.size18{ font-size: 18px; }
-.size20{ font-size: 20px; }
-.size24{ font-size: 24px; }
-.size30{ font-size: 30px; }
-.size36{ font-size: 36px; }
-.size48{ font-size: 48px; }
-.size60{ font-size: 60px; }
-.size72{ font-size: 72px; }
-.size90{ font-size: 90px; }
+.size10 {
+	font-size: 10px;
+}
+.size11 {
+	font-size: 11px;
+}
+.size12 {
+	font-size: 12px;
+}
+.size13 {
+	font-size: 13px;
+}
+.size14 {
+	font-size: 14px;
+}
+.size16 {
+	font-size: 16px;
+}
+.size18 {
+	font-size: 18px;
+}
+.size20 {
+	font-size: 20px;
+}
+.size24 {
+	font-size: 24px;
+}
+.size30 {
+	font-size: 30px;
+}
+.size36 {
+	font-size: 36px;
+}
+.size48 {
+	font-size: 48px;
+}
+.size60 {
+	font-size: 60px;
+}
+.size72 {
+	font-size: 72px;
+}
+.size90 {
+	font-size: 90px;
+}
 
-
-.psample_row1 {	height: 120px;}
-.psample_row1 {	height: 120px;}
-.psample_row2 {	height: 160px;}
-.psample_row3 {	height: 160px;}
-.psample_row4 {	height: 160px;}
+.psample_row1 {
+	height: 120px;
+}
+.psample_row1 {
+	height: 120px;
+}
+.psample_row2 {
+	height: 160px;
+}
+.psample_row3 {
+	height: 160px;
+}
+.psample_row4 {
+	height: 160px;
+}
 
 .psample {
 	overflow: hidden;
@@ -160,7 +271,7 @@ div.glyph_range {
 }
 
 .psample span {
-	margin-right: .5em;
+	margin-right: 0.5em;
 }
 
 .white_blend {
@@ -178,20 +289,19 @@ div.glyph_range {
 	bottom: 0;
 }
 .fullreverse {
-	background:  #000 !important;
-	color:  #fff !important;
+	background: #000 !important;
+	color: #fff !important;
 	margin-left: -20px;
 	padding-left: 20px;
 	margin-right: -20px;
 	padding-right: 20px;
 	padding: 20px;
-	margin-bottom:0;
+	margin-bottom: 0;
 }
-
 
 .sample_table td {
 	padding-top: 3px;
-	padding-bottom:5px;
+	padding-bottom: 5px;
 	padding-left: 5px;
 	vertical-align: middle;
 	line-height: 1.2em;
@@ -203,7 +313,7 @@ div.glyph_range {
 	padding-right: 5px;
 	padding-left: 0;
 	padding: 5px;
-	font: 11px/12px "Courier New", Courier, mono;
+	font: 11px/12px 'Courier New', Courier, mono;
 }
 
 code {
@@ -215,16 +325,24 @@ code {
 	overflow: auto;
 }
 
-
-.bottom,.last 	{margin-bottom:0 !important; padding-bottom:0 !important;}
-
-.box  { 
-  padding: 18px; 
-  margin-bottom: 18px; 
-  background: #eee; 
+.bottom,
+.last {
+	margin-bottom: 0 !important;
+	padding-bottom: 0 !important;
 }
 
-.reverse,.reversed { background:  #000 !important;color:  #fff !important; border: none !important;}
+.box {
+	padding: 18px;
+	margin-bottom: 18px;
+	background: #eee;
+}
+
+.reverse,
+.reversed {
+	background: #000 !important;
+	color: #fff !important;
+	border: none !important;
+}
 
 #bodycomparison {
 	position: relative;
@@ -234,7 +352,7 @@ code {
 	white-space: nowrap;
 }
 
-#bodycomparison div{
+#bodycomparison div {
 	font-size: 72px;
 	line-height: 90px;
 	display: inline;
@@ -242,7 +360,7 @@ code {
 	padding: 0;
 }
 
-#bodycomparison div span{
+#bodycomparison div span {
 	font: 10px Arial;
 	position: absolute;
 	left: 0;
@@ -256,17 +374,17 @@ code {
 }
 
 .fontbody {
- position: relative;
+	position: relative;
 }
-.arialbody{
+.arialbody {
 	font-family: Arial;
 	position: relative;
 }
-.verdanabody{
+.verdanabody {
 	font-family: Verdana;
 	position: relative;
 }
-.georgiabody{
+.georgiabody {
 	font-family: Georgia;
 	position: relative;
 }
@@ -296,7 +414,6 @@ code {
 	font-style: normal;
 }
 
-
 #layout p.byline {
 	font-size: 12px;
 	margin-top: 18px;
@@ -306,15 +423,15 @@ code {
 #layout p {
 	font-size: 14px;
 	line-height: 21px;
-	margin-bottom: .5em;
+	margin-bottom: 0.5em;
 }
 
-#layout p.large{
+#layout p.large {
 	font-size: 18px;
 	line-height: 26px;
 }
 
-#layout .sidebar p{
+#layout .sidebar p {
 	font-size: 12px;
 	line-height: 1.4em;
 }
@@ -329,7 +446,7 @@ code {
 
 /* @group Glyphs */
 
-#glyph_chart div{
+#glyph_chart div {
 	background-color: #d9f3ff;
 	color: black;
 	float: left;
@@ -341,7 +458,7 @@ code {
 	text-align: center;
 	width: 1.2em;
 	position: relative;
-	padding: .6em .2em .2em;
+	padding: 0.6em 0.2em 0.2em;
 }
 
 #glyph_chart div p {
@@ -357,7 +474,6 @@ code {
 	padding: 2px 0;
 }
 
-
 #glyphs h1 {
 	font-family: Arial, sans-serif;
 }
@@ -370,15 +486,13 @@ code {
 }
 
 #installing p,
-#glyphs p{
+#glyphs p {
 	line-height: 1.2em;
 	margin-bottom: 18px;
 	font: 13px Arial, sans-serif;
 }
 
-
-
-#installing h3{
+#installing h3 {
 	font-size: 15px;
 	margin-top: 18px;
 }
@@ -389,8 +503,6 @@ code {
 	font-family: Arial, sans-serif;
 }
 .render_table td {
-	font: 11px "Courier New", Courier, mono;
+	font: 11px 'Courier New', Courier, mono;
 	vertical-align: middle;
 }
-
-

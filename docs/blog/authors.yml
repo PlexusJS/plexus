@@ -1,11 +1,11 @@
 phil:
-    name: Philippe Clesca
-    title: Lead Maintainer of Plexus
-    url: https://github.com/Pckool
-    image_url: https://github.com/Pckool.png
+  name: Philippe Clesca
+  title: Lead Maintainer of Plexus
+  url: https://github.com/Pckool
+  image_url: https://github.com/Pckool.png
 
 nico:
-    name: Nico Bellic
-    title: Lead Maintainer of Plexus
-    url: https://github.com/itsRems
-    image_url: https://github.com/itsRems.png
+  name: Nico Bellic
+  title: Lead Maintainer of Plexus
+  url: https://github.com/itsRems
+  image_url: https://github.com/itsRems.png

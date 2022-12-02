@@ -3,20 +3,20 @@ title: PreAction
 sidebar_position: 4
 ---
 
-import CollapseContainer from "../../src/components/Collapse.tsx"
+import CollapseContainer from '../../src/components/Collapse.tsx'
 
 A PreAction is a special type of [action](/docs/api-reference/action) that ensures it has run before any other [action](/docs/api-reference/action) can execute. These will attempt to run on runtime initialization.
 
 _Uses could be:_
 
-<ul className="list">
+<ul className='list'>
 	<li> Ensuring authentication has occured before running any actions.</li>
 </ul>
 
 ## Basic Use
 
 ```ts
-import { preaction } from "@plexusjs/core"
+import { preaction } from '@plexusjs/core'
 
 // ... //
 
@@ -30,17 +30,34 @@ preaction(async () => {
 
 ##### preaction.`id`
 
-<CollapseContainer miniTitle="Returns" data={[{ type: "string", description: "The internal id of the PreAction." }]} />
+<CollapseContainer
+	miniTitle='Returns'
+	data={[{ type: 'string', description: 'The internal id of the PreAction.' }]}
+/>
 
 ##### preaction.`action`
 
-<CollapseContainer miniTitle="Returns" data={[{ type: "string", description: "The action associated with this PreAction." }]} />
+<CollapseContainer
+	miniTitle='Returns'
+	data={[
+		{
+			type: 'string',
+			description: 'The action associated with this PreAction.',
+		},
+	]}
+/>
 
 ##### preaction.`complete`
 
 <CollapseContainer
-	miniTitle="Returns"
-	data={[{ type: "string", description: "False if the state has not been run by the instance runtime. True if it has been run." }]}
+	miniTitle='Returns'
+	data={[
+		{
+			type: 'string',
+			description:
+				'False if the state has not been run by the instance runtime. True if it has been run.',
+		},
+	]}
 />
 
 ## Methods
