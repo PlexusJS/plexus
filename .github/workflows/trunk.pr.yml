@@ -1,15 +1,17 @@
-on:
-  pull_request:
-  workflow_dispatch:
+name: Pull Request
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-  run_tests:
+  trunk_check:
+    name: Trunk Check Runner
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Cache node modules
         id: cache-npm
         uses: actions/cache@v3
@@ -27,11 +29,16 @@ jobs:
         name: List the state of node modules
         continue-on-error: true
         run: npm list
+
       - name: Install Dependencies
         run: yarn install
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@v1
+        with:
+          trunk-token: ${{ secrets.TRUNK_TOKEN }}
 
-      - name: Yarn Build
-        run: yarn build
-
-      - name: Test
-        run: yarn test
+on:
+  [pull_request]
+  # branches:
+  # - main
+  # - dev

@@ -6,13 +6,13 @@ sidebar_position: 2
 ## Basic Use
 
 ```ts
-import { computed, state } from "@plexusjs/core"
+import { computed, state } from '@plexusjs/core'
 // A cool state to watch!
 const myCoolState = state(true)
 
 // A computed that depends on myCoolState
 const myCoolComputedState = computed(() => {
-	return myCoolState.value ? "cool" : "not cool"
+	return myCoolState.value ? 'cool' : 'not cool'
 	// do something
 }, [myCoolState])
 
