@@ -1,19 +1,36 @@
-name: Run Tests
-concurrency:
-  group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: NPM Package Publish - Stable
+
 on:
-  pull_request:
+  release:
+    types: [created]
   workflow_dispatch:
 
 jobs:
-  run_tests:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - run: yarn test
+
+  publish-gpr:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://npm.pkg.github.com/
+
       - name: Cache node modules
         id: cache-yarn
         uses: actions/cache@v3
@@ -31,12 +48,13 @@ jobs:
         name: List the state of node modules
         continue-on-error: true
         run: yarn list
-        
+
       - name: Install Dependencies
         run: yarn install
 
       - name: Yarn Build
         run: yarn build
 
-      - name: Test
-        run: yarn test
+      - run: yarn publish-stable
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_ACCESS_TOKEN}}
