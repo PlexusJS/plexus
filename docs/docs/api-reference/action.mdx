@@ -1,0 +1,20 @@
+---
+title: Action
+sidebar_position: 4
+---
+
+## Basic Use
+
+```ts
+import { action } from '@plexusjs/core'
+const myACoolAction = action(({ onCatch }) => {
+	onCatch(console.error)
+	// do something
+})
+```
+
+## Action Hooks
+
+##### `onCatch()`
+
+Add a new error handler for this action. <mark>This will catch any errors that occur during the execution of this action and prevent a crash.</mark>

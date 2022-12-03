@@ -1,13 +1,19 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
-import { deepClone, deepMerge, isObject } from "./helpers"
-import { PlexusInstance } from "./instance"
-import { PlexusStateType, StateInstance } from "./state"
-import { PlexusWatcher, Watchable, WatchableMutable } from "./watchable"
+import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
+import { PlexusInstance } from './instance'
+import { PlexusStateType, StateInstance } from './state'
+import { PlexusWatcher, Watchable, WatchableMutable } from './watchable'
 
-export type PlexusComputedStateInstance<ValueType extends PlexusStateType = any> = ComputedStateInstance<ValueType>
+export type PlexusComputedStateInstance<
+	ValueType extends PlexusStateType = any
+> = ComputedStateInstance<ValueType>
 
 // TODO: here temp; only for testing
-export const concurrentWatch = (onChange: (from?: string) => void, depsArray: Watchable[], from?: string) => {
+export const concurrentWatch = (
+	onChange: (from?: string) => void,
+	depsArray: Watchable[],
+	from?: string
+) => {
 	const depUnsubs: Array<() => void> = []
 
 	for (let dep of depsArray) {
@@ -29,12 +35,17 @@ export const concurrentWatch = (onChange: (from?: string) => void, depsArray: Wa
 	}
 }
 
-export class ComputedStateInstance<ValueType extends PlexusStateType = any> extends Watchable<ValueType> {
+/**
+ * A computed state is a state that is derived from other states
+ */
+export class ComputedStateInstance<
+	ValueType extends PlexusStateType = any
+> extends Watchable<ValueType> {
 	private _internalStore: {
 		_name: string
 		_persist: boolean
 		// utilizing maps because it allows us to preform a lookup in O(1)
-		_depsDestroyers: Map<Dependency, ReturnType<WatchableMutable<any>["watch"]>>
+		_depsDestroyers: Map<Dependency, ReturnType<WatchableMutable<any>['watch']>>
 		_depUnsubscribe: () => void
 		_deps: Set<WatchableMutable<any>>
 		_ready: boolean
@@ -54,16 +65,23 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		return `comp_${this._watchableStore._internalId}`
 	}
 
-	constructor(instance: () => PlexusInstance, computeFn: () => ValueType, deps: WatchableMutable<any>[]) {
+	constructor(
+		instance: () => PlexusInstance,
+		computeFn: () => ValueType,
+		deps: WatchableMutable<any>[]
+	) {
 		super(instance, computeFn())
 		this.instance = instance
 		this.computeFn = computeFn
 
 		this._internalStore = {
-			_name: "",
+			_name: '',
 			_persist: false,
 			// utilizing maps because it allows us to preform a lookup in O(1)
-			_depsDestroyers: new Map<Dependency, ReturnType<WatchableMutable["watch"]>>(),
+			_depsDestroyers: new Map<
+				Dependency,
+				ReturnType<WatchableMutable['watch']>
+			>(),
 			_depUnsubscribe: () => {},
 			_deps: new Set(deps),
 			_ready: false,
@@ -75,13 +93,18 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	private mount() {
 		// if (isServer()) return
 		if (!this.instance()._computedStates.has(this)) {
-			this.instance().runtime.log("info", `Hoisting computed state ${this.id} with value`, this.value, ` to instance`)
+			this.instance().runtime.log(
+				'info',
+				`Hoisting computed state ${this.id} with value`,
+				this.value,
+				` to instance`
+			)
 			this.instance()._computedStates.add(this)
 			this.instance().storage?.sync()
 		}
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
-		this.instance().runtime.log("info", `Computed state ${this.id} is ready`)
+		this.instance().runtime.log('info', `Computed state ${this.id} is ready`)
 	}
 	/**
 	 *  Internal Helper Function; for each dependency, add a watcher to the state that will update the computed state when a dependency changes
@@ -89,10 +112,20 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	 * */
 	private refreshDeps() {
 		this._internalStore._depUnsubscribe()
-		this.instance().runtime.log("info", `Mounting Dependencies (${this.deps.map((v) => v.id).join(", ")}) to Computed state ${this.instanceId}`)
+		this.instance().runtime.log(
+			'info',
+			`Mounting Dependencies (${this.deps
+				.map((v) => v.id)
+				.join(', ')}) to Computed state ${this.instanceId}`
+		)
 		const unsubscribe = concurrentWatch(
 			(depId) => {
-				this.instance().runtime.log("info", `Computed state ${this.instanceId} dependency ${depId ?? "unknown"} changed`)
+				this.instance().runtime.log(
+					'info',
+					`Computed state ${this.instanceId} dependency ${
+						depId ?? 'unknown'
+					} changed`
+				)
 				const value = this.computeFn()
 
 				this.set(value)
@@ -112,7 +145,10 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 	watch(callback: PlexusWatcher<ValueType>): () => void {
 		const destroyer = super.watch(callback)
 		this.refreshDeps()
-		this.instance().runtime.log("info", `Setting a watcher on computed state ${this.instanceId}`)
+		this.instance().runtime.log(
+			'info',
+			`Setting a watcher on computed state ${this.instanceId}`
+		)
 		return () => {
 			destroyer()
 			this.refreshDeps()
@@ -128,9 +164,14 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 		this._watchableStore._lastValue = this._watchableStore._value
 		if (isObject(value) && isObject(this._watchableStore._value)) {
 			this._watchableStore._lastValue = deepClone(this._watchableStore._value)
-		} else if (Array.isArray(value) && Array.isArray(this._watchableStore._value)) {
+		} else if (
+			Array.isArray(value) &&
+			Array.isArray(this._watchableStore._value)
+		) {
 			const obj = deepMerge(this._watchableStore._value, value)
-			this._watchableStore._lastValue = Object.values(obj) as unknown as ValueType
+			this._watchableStore._lastValue = Object.values(
+				obj
+			) as unknown as ValueType
 		} else {
 			this._watchableStore._lastValue = this._watchableStore._value
 		}
@@ -217,6 +258,10 @@ export class ComputedStateInstance<ValueType extends PlexusStateType = any> exte
 interface Dependency extends WatchableMutable<any> {
 	[key: string]: any
 }
-export function _computed<StateValue extends PlexusStateType>(instance: () => PlexusInstance, computeFn: () => StateValue, deps: Dependency[]) {
+export function _computed<StateValue extends PlexusStateType>(
+	instance: () => PlexusInstance,
+	computeFn: () => StateValue,
+	deps: Dependency[]
+) {
 	return new ComputedStateInstance<StateValue>(instance, computeFn, deps)
 }

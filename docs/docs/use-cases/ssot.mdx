@@ -1,0 +1,66 @@
+---
+title: Single Source of Truth (SSOT)
+sidebar_position: 1
+---
+
+# Single Source of Truth
+
+Here is a simple example of a small utilization of Plexus in a react application. We are creating a core instance (which is a fancy way of saying an object) of our data. We can then export that core and use it and edit it in out components. Every component that uses thes value will be reactive to edits across the DOM.
+
+But we should have some sort of order or structure to this global data. For this, we suggest creating a [Core](/docs/getting-started/concepts#internal-terms).
+
+## Core
+
+```ts title="/core/index.ts"
+import { state, collection } from '@plexusjs/core'
+export const core = {
+	tasks: {
+		collection: collection().createGroups(['completed', 'incomplete']),
+	},
+	user: {
+		name: state('default_username'),
+	},
+}
+
+export default core
+```
+
+Above, we are creating a small <strong>core</strong> where everything Plexus related is defined in a single file. 😰 While you can <em>technically</em> orchestrate your data this way, it's <em>probably</em> not the best idea. Things will get very messy as the number of data points grows.
+
+If you would like to see the core templates we came up with to keep your data structure scalable, check out our [Style Guides Page](/docs/style-guides). We recommend chosing a [Style](/docs/style-guides) that best fit's the application.
+
+```tsx live title="/pages/index.tsx"
+import { state } from '@plexusjs/core'
+import { usePlexus } from '@plexusjs/react'
+import core from '/core'
+
+export default function Home() {
+	const completedTasks = usePlexus(core.tasks.collection.groups.complete)
+	return (
+		<div>
+			{completedTasks.map((v) => (
+				<div>{v.name}</div>
+			))}
+		</div>
+	)
+}
+```
+
+If your application's kinda **thicc** and you expect a lot of datapoints in your core, you should consider bundling your related instances into what we call [modules](/docs/getting-started/concepts#internal-terms).
+
+## Modules
+
+#### Try It!
+
+<div
+	className="rounded-lg overflow-hidden"
+>
+
+<iframe
+	src="https://codesandbox.io/embed/plexusjs-simple-core-example-mvj50r?fontsize=14&hidenavigation=1&theme=dark"
+	style={{ width: "100%", height: "500px", border: 0, borderRadius: "4px", overflow: "hidden" }}
+	title="PlexusJS Simple Core Example"
+	allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+	sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+/>
+</div>

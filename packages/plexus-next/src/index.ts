@@ -1,4 +1,10 @@
-import { instance, PlexusCollectionSelector, PlexusInstance, PlexusPlugin, usePlugin } from "@plexusjs/core"
+import {
+	instance,
+	PlexusCollectionSelector,
+	PlexusInstance,
+	PlexusPlugin,
+	usePlugin,
+} from '@plexusjs/core'
 
 interface PlexusNextData {
 	state: Record<string, any>
@@ -58,16 +64,24 @@ export function preserveServerState(
 	return nextData
 }
 
-export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = globalThis?.__NEXT_DATA__?.props?.pageProps?.PLEXUS_DATA) {
+export function loadServerState(
+	plexus?: PlexusInstance,
+	data: PlexusNextData = globalThis?.__NEXT_DATA__?.props?.pageProps
+		?.PLEXUS_DATA
+) {
 	try {
 		if (!plexus) plexus = instance()
 
-		if (isServer()) return plexus.runtime.log("warn", `Not running loadServerState; Client-Side Only.`)
+		if (isServer())
+			return plexus.runtime.log(
+				'warn',
+				`Not running loadServerState; Client-Side Only.`
+			)
 
 		const collections = plexus._collections
 		const states = plexus._states
 
-		plexus.runtime.log("debug", `Running loadServerState with data`, data)
+		plexus.runtime.log('debug', `Running loadServerState with data`, data)
 
 		if (data) {
 			for (const state of states.values()) {
@@ -76,7 +90,8 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 					continue
 				}
 				const v = data.state[state.name]
-				if (state.name && v && !state.name.includes("state_collection_date")) state.set(v)
+				if (state.name && v && !state.name.includes('state_collection_date'))
+					state.set(v)
 			}
 
 			for (const collection of collections.values()) {
@@ -97,8 +112,11 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 
 					for (const name in fromSSR.selectors) {
 						const selector = collection.selectors[name]
-						const SSRSelector = fromSSR.selectors[name] as PlexusCollectionSelector
-						if (selector.key && SSRSelector && SSRSelector.key) selector.select(SSRSelector.key)
+						const SSRSelector = fromSSR.selectors[
+							name
+						] as PlexusCollectionSelector
+						if (selector.key && SSRSelector && SSRSelector.key)
+							selector.select(SSRSelector.key)
 					}
 				}
 			}
@@ -109,11 +127,11 @@ export function loadServerState(plexus?: PlexusInstance, data: PlexusNextData = 
 }
 
 export function isServer() {
-	return typeof process !== "undefined" && process?.release?.name === "node"
+	return typeof process !== 'undefined' && process?.release?.name === 'node'
 }
 
 const PlexusNext: PlexusPlugin = {
-	name: "NextJS",
+	name: 'NextJS',
 	init: () => {
 		loadServerState()
 	},

@@ -1,10 +1,19 @@
-import { AlmostAnything, convertThingToString, deepClone, deepMerge, hash, isEqual, isObject } from "./helpers"
-import { PlexusInstance } from "./instance"
-import { PlexusWatcher } from "./interfaces"
-import { WatchableMutable } from "./watchable"
+import {
+	AlmostAnything,
+	deepClone,
+	deepMerge,
+	isEqual,
+	isObject,
+} from '@plexusjs/utils'
+import { PlexusInstance } from './instance'
+import { PlexusWatcher } from './interfaces'
+import { WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
-export type PlexusStateType = AlmostAnything | null
-export type PlexusState = <PxStateValue = any>(instance: () => PlexusInstance, input: PxStateValue) => StateInstance<PxStateValue>
+export type PlexusStateType = AlmostAnything
+export type PlexusState = <Value extends PlexusStateType = any>(
+	instance: () => PlexusInstance,
+	input: Value
+) => StateInstance<Value>
 
 type DestroyFn = () => void
 
@@ -14,11 +23,14 @@ export interface StateStore<Value> {
 	_interval: NodeJS.Timer | null
 	_ready: boolean
 }
-export type PlexusStateInstance<Value extends PlexusStateType = any> = StateInstance<Value>
+export type PlexusStateInstance<Value extends PlexusStateType = any> =
+	StateInstance<Value>
 /**
  * A trackable State
  */
-export class StateInstance<StateValue extends PlexusStateType> extends WatchableMutable<StateValue> {
+export class StateInstance<
+	StateValue extends PlexusStateType
+> extends WatchableMutable<StateValue> {
 	private _internalStore: StateStore<StateValue>
 	/**
 	 * The internal id of the state
@@ -36,7 +48,7 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
-			_name: "",
+			_name: '',
 			_persist: false,
 			_interval: null,
 			_ready: false,
@@ -54,12 +66,17 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	private mount() {
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
-			this.instance().runtime.log("debug", `Hoisting state ${this.instanceId} with value`, this._watchableStore._value, `to instance`)
+			this.instance().runtime.log(
+				'debug',
+				`Hoisting state ${this.instanceId} with value`,
+				this._watchableStore._value,
+				`to instance`
+			)
 			this.persistSync()
 		}
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
-		this.instance().runtime.log("info", `State ${this.id} is ready`)
+		this.instance().runtime.log('info', `State ${this.id} is ready`)
 	}
 	/**
 	 * Set the value of the state
@@ -67,7 +84,11 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	set(value?: StateValue) {
 		super.set(value)
-		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._watchableStore._value)
+		if (this._internalStore._persist)
+			this.instance().storage?.set(
+				this._internalStore._name,
+				this._watchableStore._value
+			)
 		return this
 	}
 	/**
@@ -76,16 +97,26 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 */
 	patch(value: StateValue) {
 		if (isObject(value) && isObject(this._watchableStore._value)) {
-			this.set(deepMerge(this._watchableStore._value, value))
+			// ! Shitty type casting, should be fixed
+			this.set(
+				deepMerge(this._watchableStore._value as any, value) as StateValue
+			)
 		}
 		// if the deep merge is on an array type, we need to convert the merged object back to an array
-		else if (Array.isArray(value) && Array.isArray(this._watchableStore._value)) {
+		else if (
+			Array.isArray(value) &&
+			Array.isArray(this._watchableStore._value)
+		) {
 			const obj = deepMerge(this._watchableStore._value, value)
 			this.set(Object.values(obj) as StateValue)
 		} else {
 			this.set(value)
 		}
-		if (this._internalStore._persist) this.instance().storage?.set(this._internalStore._name, this._watchableStore._value)
+		if (this._internalStore._persist)
+			this.instance().storage?.set(
+				this._internalStore._name,
+				this._watchableStore._value
+			)
 
 		return this
 	}
@@ -97,7 +128,10 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	watch(callback: PlexusWatcher<StateValue>, from?: string): () => void {
 		const destroyer = super.watch(callback, from)
 		return () => {
-			this.instance().runtime.log("info", `Killing a watcher from state ${this.instanceId}`)
+			this.instance().runtime.log(
+				'info',
+				`Killing a watcher from state ${this.instanceId}`
+			)
 			destroyer()
 		}
 	}
@@ -111,12 +145,20 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 		if (name) this._internalStore._name = `state_${name}`
 
 		if (this.instance().storage) {
-			// this should only run on initial load of the state when this function is called
-			this.instance().runtime.log("info", `Persisting ${this._internalStore._name}`)
-			this.instance().storage?.monitor(this._internalStore._name, this)
-			const storedValue = this.instance().storage?.get(this._internalStore._name) as StateValue
-			storedValue && this.set(storedValue)
-			this._internalStore._persist = true
+			// Bandaid
+			;(async () => {
+				// this should only run on initial load of the state when this function is called
+				this.instance().runtime.log(
+					'info',
+					`Persisting ${this._internalStore._name}`
+				)
+				this.instance().storage?.monitor(this._internalStore._name, this)
+				const storedValue = (await this.instance().storage?.get(
+					this._internalStore._name
+				)) as StateValue
+				storedValue && this.set(storedValue)
+				this._internalStore._persist = true
+			})()
 		}
 		return this
 	}
@@ -135,8 +177,14 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * @param setterFunction The function used to update the state on the interval; returns the new value
 	 * @param ms The interval duration (in milliseconds)
 	 */
-	interval(intervalCallback: (value: StateValue) => StateValue | Promise<StateValue> | void, ms?: number) {
-		if (this._internalStore._interval) clearInterval(this._internalStore._interval)
+	interval(
+		intervalCallback: (
+			value: StateValue
+		) => StateValue | Promise<StateValue> | void,
+		ms?: number
+	) {
+		if (this._internalStore._interval)
+			clearInterval(this._internalStore._interval)
 		this._internalStore._interval = setInterval(() => {
 			const res = intervalCallback(this.value)
 			if (res instanceof Promise) {
@@ -159,7 +207,8 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * Stop the state interval
 	 */
 	clearInterval() {
-		if (this._internalStore._interval) clearInterval(this._internalStore._interval)
+		if (this._internalStore._interval)
+			clearInterval(this._internalStore._interval)
 		return this
 	}
 	/**
@@ -173,7 +222,12 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	 * The value of the state
 	 */
 	get value() {
-		this.instance().runtime.log("debug", `Accessing Stateful value ${this.instanceId}${this._internalStore._persist ? "; Persist Enabled" : ""}`)
+		this.instance().runtime.log(
+			'debug',
+			`Accessing Stateful value ${this.instanceId}${
+				this._internalStore._persist ? '; Persist Enabled' : ''
+			}`
+		)
 		this.mount()
 		return super.value
 	}
@@ -212,7 +266,10 @@ export class StateInstance<StateValue extends PlexusStateType> extends Watchable
 	}
 }
 
-export function _state<StateValue extends PlexusStateType>(instance: () => PlexusInstance, _init: StateValue) {
+export function _state<StateValue extends PlexusStateType>(
+	instance: () => PlexusInstance,
+	_init: StateValue
+) {
 	// Returned Object //
 
 	return new StateInstance<StateValue>(instance, _init)

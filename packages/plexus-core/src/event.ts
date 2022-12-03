@@ -1,6 +1,6 @@
 // import { PlexusInstance } from "./interfaces"
 
-import { PlexusInstance } from "./instance"
+import { PlexusInstance } from './instance'
 
 type EventHandler = (v: any) => void
 
@@ -15,6 +15,9 @@ interface EventStore {
 	_disabled: boolean
 }
 
+/**
+ * A Plexus Event. This is a trackable event that can be listened to and fired.
+ */
 export class EventInstance<PayloadType = any> {
 	private _internalStore: EventStore
 	private instance: () => PlexusInstance
@@ -40,7 +43,10 @@ export class EventInstance<PayloadType = any> {
 			return () => {}
 		}
 		// subscribe to the event on the runtime
-		const cleanup = this.instance().runtime.subscribe(`${this._internalStore._name}`, callback)
+		const cleanup = this.instance().runtime.subscribe(
+			`${this._internalStore._name}`,
+			callback
+		)
 		this._internalStore._once_destroyers.set(this._internalStore._name, cleanup)
 		return () => cleanup()
 	}
@@ -54,7 +60,10 @@ export class EventInstance<PayloadType = any> {
 			return () => {}
 		}
 		// subscribe to the event on the runtime
-		const cleanup = this.instance().runtime.subscribe(`${this._internalStore._name}`, callback)
+		const cleanup = this.instance().runtime.subscribe(
+			`${this._internalStore._name}`,
+			callback
+		)
 		this._internalStore._destroyers.set(callback.toString(), cleanup)
 		return () => cleanup()
 	}

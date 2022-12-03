@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/next",
-	"version": "1.4.1",
+	"version": "1.4.1-canary.0",
 	"description": "Next Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -36,5 +36,5 @@
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "b65d57b4dcac53a60ace6bac0fa547e8d677431d"
+	"gitHead": "583332e11a006836db31ad1c3cd0e9b251f4cb7e"
 }

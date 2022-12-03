@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from 'react'
 type DepositControls<T = any> = {
 	/**
 	 * Edit the value of a key
@@ -66,7 +66,7 @@ type DepositControls<T = any> = {
  * @param settings.onEdit{Function} - A callback function that will be called when the edit function is called.
  * @param settings.Discard{Function} - A callback function that will be called when the discard function is called.
  * @param settings.autoSave{number} - The number of milliseconds to wait before saving.
- * @returns
+ * @returns DepositControls - The controls of the deposit
  */
 export function useDeposit<T = any>(
 	original: Partial<T>,
@@ -80,7 +80,7 @@ export function useDeposit<T = any>(
 	// The current value of the deposit
 	const [value, setValue] = useState<any>({ ...original })
 	// snapshot of the last saved value
-	const [snapshot, setSnapshot] = useState<string>("{}")
+	const [snapshot, setSnapshot] = useState<string>('{}')
 	const [pendingChanges, setPC] = useState(false)
 	const [saving, setSaving] = useState(false)
 	// the changes made to the deposit (Excludes any unchanged values)
@@ -121,7 +121,13 @@ export function useDeposit<T = any>(
 				}
 				setChanges(newChanges)
 				settings?.onEdit?.(key, v)
-				if (settings.autoSave) setTo(setTimeout(() => save(newChanges), settings.autoSave) as unknown as number)
+				if (settings.autoSave)
+					setTo(
+						setTimeout(
+							() => save(newChanges),
+							settings.autoSave
+						) as unknown as number
+					)
 			} catch (error) {}
 			return value
 		})

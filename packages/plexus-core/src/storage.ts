@@ -1,6 +1,12 @@
-import { convertStringToThing, convertThingToString, deepMerge, isEqual, isObject } from "./helpers"
-import { PlexusInstance } from "./instance"
-import { Watchable, WatchableMutable } from "./watchable"
+import {
+	convertStringToThing,
+	convertThingToString,
+	deepMerge,
+	isEqual,
+	isObject,
+} from '@plexusjs/utils'
+import { PlexusInstance } from './instance'
+import { Watchable, WatchableMutable } from './watchable'
 
 type ExtendedWatchable = Watchable<any> & Record<string, any>
 type AlmostAnything = string | number | symbol | Record<any, any> | Array<any>
@@ -23,12 +29,16 @@ export class StorageInstance {
 	private _internalStore: StorageStore
 	private instance: () => PlexusInstance
 
-	constructor(instance: () => PlexusInstance, name?: string, private override?: StorageOverride) {
+	constructor(
+		instance: () => PlexusInstance,
+		name?: string,
+		private override?: StorageOverride
+	) {
 		this.instance = instance
 		this._internalStore = {
-			_name: name || "localStorage",
+			_name: name || 'localStorage',
 			_storage: StorageInstance.getLocalStorage(),
-			_prefix: override?.prefix || "plexus-",
+			_prefix: override?.prefix || 'plexus-',
 			tracking: new Map(),
 		}
 		this.instance()._storages.set(this._internalStore._name, this)
@@ -43,12 +53,18 @@ export class StorageInstance {
 		}
 		// try to run with localstorage
 		if (StorageInstance.getLocalStorage() === null) {
-			this.instance().runtime.log("warn", "No localstorage available, cannot get persisted value")
+			this.instance().runtime.log(
+				'warn',
+				'No localstorage available, cannot get persisted value'
+			)
 			return null
 		}
-		this.instance().runtime.log("info", `Retrieving value for key ${this.getKey(key)}`)
+		this.instance().runtime.log(
+			'info',
+			`Retrieving value for key ${this.getKey(key)}`
+		)
 		const val = StorageInstance.getLocalStorage()?.getItem(this.getKey(key))
-		if (typeof val === "string" && convertStringToThing(val)) {
+		if (typeof val === 'string' && convertStringToThing(val)) {
 			return convertStringToThing(val)
 		} else return null
 	}
@@ -56,18 +72,25 @@ export class StorageInstance {
 	set(key: string, value: any): void {
 		if (this.override?.set) {
 			this.override?.set(key, value)
+			return
 		}
 		// try to run with localstorage
 		const ls = StorageInstance.getLocalStorage()
 		if (ls === null) {
-			this.instance().runtime.log("warn", "No localstorage available, cannot persist in storage")
+			this.instance().runtime.log(
+				'warn',
+				'No localstorage available, cannot persist in storage'
+			)
 			return
 		}
 
 		if (isObject(value)) {
 			ls.setItem(this.getKey(key), JSON.stringify(value))
 		} else if (Array.isArray(value)) {
-			ls.setItem(this.getKey(key), JSON.stringify(Object.values<typeof value>(value)))
+			ls.setItem(
+				this.getKey(key),
+				JSON.stringify(Object.values<typeof value>(value))
+			)
 		} else {
 			ls.setItem(this.getKey(key), String(value))
 		}
@@ -76,34 +99,53 @@ export class StorageInstance {
 	patch(key: string, value: any): void {
 		if (this.override?.patch) {
 			this.override?.patch(key, value)
+			return
 		}
 		// try to run with localstorage
 		const ls = StorageInstance.getLocalStorage()
 		if (ls === null) {
-			this.instance().runtime.log("warn", "No localstorage available, cannot set value to storage")
+			this.instance().runtime.log(
+				'warn',
+				'No localstorage available, cannot set value to storage'
+			)
 			return
 		}
 		const item = ls.getItem(key)
 		if (!item) {
-			this.instance().runtime.log("warn", "Item in storage does not exist, cannot patch")
+			this.instance().runtime.log(
+				'warn',
+				'Item in storage does not exist, cannot patch'
+			)
 			return
 		}
 		if (isObject(value)) {
-			ls.setItem(this.getKey(key), JSON.stringify(deepMerge(ls.getItem(key), value)))
+			ls.setItem(
+				this.getKey(key),
+				JSON.stringify(deepMerge(ls.getItem(key), value))
+			)
 		} else if (Array.isArray(value)) {
-			ls.setItem(this.getKey(key), JSON.stringify(Object.values<typeof value>(deepMerge(JSON.parse(item), value))))
+			ls.setItem(
+				this.getKey(key),
+				JSON.stringify(
+					Object.values<typeof value>(deepMerge(JSON.parse(item), value))
+				)
+			)
 		} else {
 			ls.setItem(this.getKey(key), String(value))
 		}
 	}
 	remove(key: string): void {
-		if (this.override?.get) {
+		if (this.override?.remove) {
 			this.override?.remove(key)
+			return
 		}
 		// try to run with localstorage
 		const ls = StorageInstance.getLocalStorage()
 		if (ls === null) {
-			this.instance().runtime.log("warn", "No localstorage available, cannot remove value from storage")
+			this.instance().runtime.log(
+				'warn',
+				'No localstorage available, cannot remove value from storage'
+			)
 			return
 		}
 		ls.removeItem(this.getKey(key))
@@ -111,15 +153,21 @@ export class StorageInstance {
 	get watching() {
 		return Array.from(this._internalStore.tracking)
 	}
-	monitor<O extends Watchable, Type = O extends Watchable<infer T> ? T : never>(key: string, object: O) {
-		if (key === "" || key === undefined) {
-			this.instance().runtime.log("warn", `Can't monitor an object with no key`)
+	monitor<O extends Watchable, Type = O extends Watchable<infer T> ? T : never>(
+		key: string,
+		object: O
+	) {
+		if (key === '' || key === undefined) {
+			this.instance().runtime.log('warn', `Can't monitor an object with no key`)
 			return
 		}
 
 		this._internalStore.tracking.set(key, object)
 		let storedValue = this.get<Type>(key)
-		this.instance().runtime.log("info", `Persisting new key ${key}` /*, JSON.stringify(this.watching)*/)
+		this.instance().runtime.log(
+			'info',
+			`Persisting new key ${key}` /*, JSON.stringify(this.watching)*/
+		)
 		if (!storedValue) {
 			this.instance().storage?.set(key, object.value)
 			storedValue = object.value
@@ -127,41 +175,46 @@ export class StorageInstance {
 	}
 
 	sync(checkValue?: any) {
-		this.instance().runtime.log("info", "Syncing storage...")
-		this._internalStore.tracking.forEach((object) => {
+		this.instance().runtime.log('info', 'Syncing storage...')
+		this._internalStore.tracking.forEach(async (object) => {
 			let key: string | null = null
-			if (typeof object?.key === "string") {
+			if (typeof object?.key === 'string') {
 				key = object?.key
-			} else if (typeof object?.name === "string") {
+			} else if (typeof object?.name === 'string') {
 				key = object?.name
 			}
 
-			if (key === "" || key === undefined || key === null) {
-				this.instance().runtime.log("warn", `Can't sync an object with no key`)
+			if (key === '' || key === undefined || key === null) {
+				this.instance().runtime.log('warn', `Can't sync an object with no key`)
 				return
 			}
 
 			// instance().storage.monitor(key, object)
-			let storedValue = this.get(key)
+			let storedValue = await this.get(key)
 
 			if (storedValue) {
 				const val = checkValue ?? object.value
 				if (!isEqual(val, storedValue as any)) {
 					this.instance().runtime.log(
-						"info",
-						`Syncing "${key}" with storage value "${convertThingToString(val)}" to "${convertThingToString(storedValue)}"`
+						'info',
+						`Syncing "${key}" with storage value "${convertThingToString(
+							val
+						)}" to "${convertThingToString(storedValue)}"`
 					)
 					object.set(storedValue)
 				} else {
 					this.instance().runtime.log(
-						"info",
+						'info',
 						`Skipping the storage sync of item "${key}"; Values are already equal. (state["${convertThingToString(
 							val
 						)}"] storage["${convertThingToString(storedValue)}"])`
 					)
 				}
 			} else {
-				this.instance().runtime.log("warn", `Can't sync with storage; No Stored Value found`)
+				this.instance().runtime.log(
+					'warn',
+					`Can't sync with storage; No Stored Value found`
+				)
 			}
 		})
 	}
@@ -172,13 +225,17 @@ export class StorageInstance {
 	private static getLocalStorage() {
 		try {
 			const ls = window?.localStorage ? window.localStorage : localStorage
-			return typeof ls.getItem !== "function" ? null : ls
+			return typeof ls.getItem !== 'function' ? null : ls
 		} catch (e) {
 			return null
 		}
 	}
 }
 // storage func -> called from instance OR by integration -> hooks up to the instance
-export function storage(instance: () => PlexusInstance, name?: string, override?: StorageOverride): PlexusStorageInstance {
-	return new StorageInstance(instance, name)
+export function storage(
+	instance: () => PlexusInstance,
+	name?: string,
+	override?: StorageOverride
+): PlexusStorageInstance {
+	return new StorageInstance(instance, name, override)
 }

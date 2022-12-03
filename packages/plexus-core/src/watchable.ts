@@ -1,6 +1,6 @@
-import { PlexusInstance } from "."
-import { deepClone, deepMerge, genUID, isObject, isEqual } from "./helpers"
-import { AlmostAnything } from "./interfaces"
+import { PlexusInstance } from '.'
+import { deepClone, deepMerge, isObject, isEqual } from '@plexusjs/utils'
+import { AlmostAnything } from './interfaces'
 export type PlexusWatcher<V extends any = any> = (value: V) => void
 interface WatchableStore<Value = any> {
 	_initialValue: Value
@@ -42,7 +42,10 @@ export class Watchable<ValueType = any> {
 		}
 	}
 
-	watch<Value extends ValueType = ValueType>(callback: PlexusWatcher<ValueType>, from?: string): () => void {
+	watch<Value extends ValueType = ValueType>(
+		callback: PlexusWatcher<ValueType>,
+		from?: string
+	): () => void {
 		const destroyer = this.instance().runtime.subscribe(this.id, callback, from)
 		this._watchableStore._watchers.add(destroyer)
 
@@ -56,7 +59,9 @@ export class Watchable<ValueType = any> {
 	}
 }
 
-export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
+export class WatchableMutable<
+	ValueType extends AlmostAnything = any
+> extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		super(instance, init)
@@ -79,7 +84,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 				this.set(newValue)
 				this._history.archive_tail.unshift(currentValue)
 			} else {
-				this.instance().runtime.log("warn", `No history to undo for ${this.id}`)
+				this.instance().runtime.log('warn', `No history to undo for ${this.id}`)
 			}
 
 			this._history.skipArchiveUpdate = false
@@ -114,7 +119,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 				this.set(newValue)
 				this._history.archive_head.push(currentValue)
 			} else {
-				this.instance().runtime.log("warn", `No history to redo for ${this.id}`)
+				this.instance().runtime.log('warn', `No history to redo for ${this.id}`)
 				// this.set(this._watchableStore._nextValue)
 			}
 
@@ -142,7 +147,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 	history(maxLength: number = 10): this {
 		// disable history if maxLength is 0 (can be done at any time)
 		if (maxLength <= 0) {
-			this.instance().runtime.log("debug", `Disabling history for ${this.id}`)
+			this.instance().runtime.log('debug', `Disabling history for ${this.id}`)
 			delete this._history
 			return this
 		}
@@ -154,7 +159,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 			maxLength,
 			skipArchiveUpdate: false,
 		}
-		this.instance().runtime.log("debug", `Enabling history for ${this.id}`)
+		this.instance().runtime.log('debug', `Enabling history for ${this.id}`)
 
 		return this
 	}
@@ -168,9 +173,14 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 		this._watchableStore._lastValue = this._watchableStore._value
 		if (isObject(value) && isObject(this._watchableStore._value)) {
 			this._watchableStore._lastValue = deepClone(this._watchableStore._value)
-		} else if (Array.isArray(value) && Array.isArray(this._watchableStore._value)) {
+		} else if (
+			Array.isArray(value) &&
+			Array.isArray(this._watchableStore._value)
+		) {
 			const obj = deepMerge(this._watchableStore._value, value)
-			this._watchableStore._lastValue = Object.values(obj) as unknown as ValueType
+			this._watchableStore._lastValue = Object.values(
+				obj
+			) as unknown as ValueType
 		} else {
 			this._watchableStore._lastValue = this._watchableStore._value
 		}
@@ -185,15 +195,24 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 
 		// update the runtime conductor
 
-		this.instance().runtime.log("debug", `Broadcasting to Instance ${this.id}`)
+		this.instance().runtime.log('debug', `Broadcasting to Instance ${this.id}`)
 		this.instance().runtime.broadcast(this.id, value)
 
 		// if history, add to archive
-		if (this._history && this._history.maxLength > 0 && !this._history.skipArchiveUpdate) {
-			if (isEqual(this._watchableStore._lastValue, this._watchableStore._value)) {
+		if (
+			this._history &&
+			this._history.maxLength > 0 &&
+			!this._history.skipArchiveUpdate
+		) {
+			if (
+				isEqual(this._watchableStore._lastValue, this._watchableStore._value)
+			) {
 				return
 			}
-			this.instance().runtime.log("debug", `Watchable set caused its History to shift ${this.id}`)
+			this.instance().runtime.log(
+				'debug',
+				`Watchable set caused its History to shift ${this.id}`
+			)
 			this._history.archive_head.push(this._watchableStore._lastValue)
 			// if we are setting a new value and the tail has any values, remove them
 			// NOTE: this is needed because if we set new value, but are in the middle of the history somewhere, we need to remove the subsequent values

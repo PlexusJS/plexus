@@ -1,4 +1,4 @@
-import { deepClone, deepMerge } from "@plexusjs/utils/dist/shared"
+import { deepClone, deepMerge } from '@plexusjs/utils/dist/shared'
 // import { instance } from "./ "
 export interface PlexusApiRes<DataType = any> {
 	status: number
@@ -18,21 +18,21 @@ export interface PlexusApiReq<BodyType = any> {
 	path: string
 	baseURL: string
 	fullURL: string
-	method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH"
+	method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'
 	headers: Record<string, string>
 	body: BodyType
 	options: PlexusApiOptions
 }
 export interface PlexusApiOptions {
-	cache?: RequestInit["cache"]
-	credentials?: RequestInit["credentials"]
-	integrity?: RequestInit["integrity"]
-	keepalive?: RequestInit["keepalive"]
-	mode?: RequestInit["mode"]
-	redirect?: RequestInit["redirect"]
-	referrer?: RequestInit["referrer"]
-	signal?: RequestInit["signal"]
-	window?: RequestInit["window"]
+	cache?: RequestInit['cache']
+	credentials?: RequestInit['credentials']
+	integrity?: RequestInit['integrity']
+	keepalive?: RequestInit['keepalive']
+	mode?: RequestInit['mode']
+	redirect?: RequestInit['redirect']
+	referrer?: RequestInit['referrer']
+	signal?: RequestInit['signal']
+	window?: RequestInit['window']
 }
 
 export type PlexusApi = ApiInstance
@@ -47,20 +47,26 @@ interface ApiStore {
 	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
 }
 /**
- *
+ * An API instance is used to make requests to a server. Interact with this by using `api()`
  */
 export class ApiInstance {
 	// private
 	private _internalStore: ApiStore
 	private _headers: Map<string, string> = new Map()
-	constructor(baseURL: string = "", config: PlexusApiConfig = { defaultOptions: {} }) {
+	constructor(
+		baseURL: string = '',
+		config: PlexusApiConfig = { defaultOptions: {} }
+	) {
 		this._internalStore = {
 			_options: config.defaultOptions ?? {},
 			_optionsInit: { ...config.defaultOptions },
 			_timeout: config.timeout || undefined,
-			_baseURL: baseURL.endsWith("/") && baseURL.length > 1 ? baseURL.substring(0, baseURL.length - 1) : baseURL,
+			_baseURL:
+				baseURL.endsWith('/') && baseURL.length > 1
+					? baseURL.substring(0, baseURL.length - 1)
+					: baseURL,
 			_noFetch: false,
-			_authToken: "",
+			_authToken: '',
 			_silentFail: config.silentFail ?? false,
 			onResponse: config.onResponse,
 		}
@@ -68,26 +74,29 @@ export class ApiInstance {
 			fetch
 		} catch (e) {
 			// instance().runtime.log("warn", "Fetch is not supported in this environment; api will not work.")
-			console.warn("Fetch is not supported in this environment; api will not work.")
+			console.warn(
+				'Fetch is not supported in this environment; api will not work.'
+			)
 			this._internalStore._noFetch = true
 		}
 	}
 	private async send<ResponseDataType>(
 		path: string,
 		options: {
-			method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH"
-			body?: RequestInit["body"]
+			method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'
+			body?: RequestInit['body']
 		}
 	): Promise<PlexusApiRes<ResponseDataType>> {
 		// if we don't have fetch, return a blank response object
-		if (this._internalStore._noFetch) return ApiInstance.createEmptyRes<ResponseDataType>()
+		if (this._internalStore._noFetch)
+			return ApiInstance.createEmptyRes<ResponseDataType>()
 
 		//
-		if (!this._headers.has("Content-Type")) {
+		if (!this._headers.has('Content-Type')) {
 			if (options.body !== undefined) {
-				this._headers.set("Content-Type", "application/json")
+				this._headers.set('Content-Type', 'application/json')
 			} else {
-				this._headers.set("Content-Type", "text/html")
+				this._headers.set('Content-Type', 'text/html')
 			}
 		}
 		// init values used later
@@ -96,8 +105,17 @@ export class ApiInstance {
 		try {
 			// build out the URI
 			const matches = path.match(/^http(s)?/g)
-			const uri = matches && matches?.length > 0 ? path : `${this._internalStore._baseURL}${path.startsWith("/") ? path : `/${path}`}`
-			const requestObject = { ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers), ...options }
+			const uri =
+				matches && matches?.length > 0
+					? path
+					: `${this._internalStore._baseURL}${
+							path.startsWith('/') ? path : `/${path}`
+					  }`
+			const requestObject = {
+				...this._internalStore._options,
+				headers: ApiInstance.parseHeaders(this._headers),
+				...options,
+			}
 			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
 			if (this._internalStore._timeout) {
 				let to: any
@@ -120,7 +138,9 @@ export class ApiInstance {
 					res = raceResult
 				} else {
 					// a 504 response status means the programmatic timeout was surpassed
-					return ApiInstance.createEmptyRes<ResponseDataType>(timedOut ? 504 : res?.status ?? 513)
+					return ApiInstance.createEmptyRes<ResponseDataType>(
+						timedOut ? 504 : res?.status ?? 513
+					)
 				}
 			}
 			// if we don't have a timeout set, just try to fetch
@@ -141,7 +161,7 @@ export class ApiInstance {
 		}
 
 		const hasCookie = (cName: string): boolean => {
-			return res?.headers?.get("set-cookie")?.includes(cName) ?? false
+			return res?.headers?.get('set-cookie')?.includes(cName) ?? false
 		}
 
 		if (res.status >= 200 && res.status < 600) {
@@ -165,7 +185,7 @@ export class ApiInstance {
 			return {
 				status: res.status,
 				response: res,
-				rawData: "",
+				rawData: '',
 				ok: res.status > 199 && res.status < 300,
 				data: {} as ResponseDataType,
 				hasCookie,
@@ -175,8 +195,8 @@ export class ApiInstance {
 	private async preSend<ResponseDataType>(
 		path: string,
 		options: {
-			method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH"
-			body?: RequestInit["body"]
+			method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'
+			body?: RequestInit['body']
 		}
 	) {
 		const res = await this.send<ResponseDataType>(path, options)
@@ -210,11 +230,16 @@ export class ApiInstance {
 	options(options: RequestInit)
 	options(options: RequestInit, overwrite: boolean = false) {
 		if (overwrite) {
-			this._internalStore._options = deepClone(options) as RequestInit & { headers: Record<string, string> }
+			this._internalStore._options = deepClone(options) as RequestInit & {
+				headers: Record<string, string>
+			}
 			return this
 		}
 
-		this._internalStore._options = deepMerge(this._internalStore._options, options) as RequestInit & { headers: Record<string, string> }
+		this._internalStore._options = deepMerge(
+			this._internalStore._options,
+			options
+		) as RequestInit & { headers: Record<string, string> }
 
 		this.headers(options.headers)
 		return this
@@ -227,26 +252,38 @@ export class ApiInstance {
 	get<ResponseType = any>(path: string, query?: Record<string, any>) {
 		const params = new URLSearchParams(query)
 
-		return this.preSend<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, {
-			method: "GET",
-		})
+		return this.preSend<ResponseType>(
+			`${path}${params.toString().length > 0 ? `?${params.toString()}` : ''}`,
+			{
+				method: 'GET',
+			}
+		)
 	}
 	/**
 	 * Send a post request
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	post<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
-		if (typeof body !== "string") {
+	post<ResponseType = any>(
+		path: string,
+		body: Record<string, any> | string = {}
+	) {
+		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
 		const options = {
-			method: "POST",
+			method: 'POST',
 			body,
 		} as const
-		if (this._headers && this._headers.get("Content-Type") === "application/x-www-form-urlencoded") {
+		if (
+			this._headers &&
+			this._headers.get('Content-Type') === 'application/x-www-form-urlencoded'
+		) {
 			const params = new URLSearchParams(body)
-			return this.preSend<ResponseType>(`${path}${params.toString().length > 0 ? `?${params.toString()}` : ""}`, options)
+			return this.preSend<ResponseType>(
+				`${path}${params.toString().length > 0 ? `?${params.toString()}` : ''}`,
+				options
+			)
 		} else {
 			return this.preSend<ResponseType>(path, options)
 		}
@@ -256,12 +293,15 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	put<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
-		if (typeof body !== "string") {
+	put<ResponseType = any>(
+		path: string,
+		body: Record<string, any> | string = {}
+	) {
+		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
 		return this.preSend<ResponseType>(path, {
-			method: "PUT",
+			method: 'PUT',
 			body,
 		})
 	}
@@ -271,7 +311,7 @@ export class ApiInstance {
 	 */
 	delete<ResponseType = any>(path: string) {
 		return this.preSend<ResponseType>(path, {
-			method: "DELETE",
+			method: 'DELETE',
 			body: JSON.stringify({}),
 		})
 	}
@@ -280,12 +320,15 @@ export class ApiInstance {
 	 * @param url The url to send the request to
 	 * @param body The body of the request (can be a string or object)
 	 */
-	patch<ResponseType = any>(path: string, body: Record<string, any> | string = {}) {
-		if (typeof body !== "string") {
+	patch<ResponseType = any>(
+		path: string,
+		body: Record<string, any> | string = {}
+	) {
+		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
 		return this.preSend<ResponseType>(path, {
-			method: "PATCH",
+			method: 'PATCH',
 			body,
 		})
 	}
@@ -295,10 +338,10 @@ export class ApiInstance {
 	 * @param variables Variables
 	 */
 	gql<ResponseType = any>(query: string, variables?: Record<string, any>) {
-		this._headers.set("Content-Type", "application/json")
+		this._headers.set('Content-Type', 'application/json')
 
-		return this.preSend<ResponseType>("", {
-			method: "POST",
+		return this.preSend<ResponseType>('', {
+			method: 'POST',
 			body: JSON.stringify({
 				query,
 				variables,
@@ -310,15 +353,15 @@ export class ApiInstance {
 	 * @param token The token to use for authentication
 	 * @param type optional - The type of authentication to use. This determines what prefix to use for the header
 	 */
-	auth(token: string | undefined, type: "bearer" | "basic" | "jwt" = "bearer") {
+	auth(token: string | undefined, type: 'bearer' | 'basic' | 'jwt' = 'bearer') {
 		if (!token) return this
 		token = token
-			.replace(/^(B|b)earer /, "")
-			.replace(/^(B|b)asic /, "")
-			.replace(/^(JWT|jwt) /, "")
+			.replace(/^(B|b)earer /, '')
+			.replace(/^(B|b)asic /, '')
+			.replace(/^(JWT|jwt) /, '')
 		this._internalStore._authToken = token
-		const prefix = type === "jwt" ? "JWT " : type === "bearer" ? "Bearer " : ""
-		this._headers.set("Authorization", `${prefix}${token}`)
+		const prefix = type === 'jwt' ? 'JWT ' : type === 'bearer' ? 'Bearer ' : ''
+		this._headers.set('Authorization', `${prefix}${token}`)
 		return this
 	}
 	/**
@@ -333,18 +376,18 @@ export class ApiInstance {
 			// uppercase the dash separated tokens
 			temp[
 				key
-					.split("-")
+					.split('-')
 					.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
-					.join("-")
+					.join('-')
 			] = value
 		})
 		Object.entries(headers || {}).map(([key, value]) => {
 			// uppercase the dash separated tokens
 			temp[
 				key
-					.split("-")
+					.split('-')
 					.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
-					.join("-")
+					.join('-')
 			] = value
 		})
 		this._headers.clear()
@@ -357,14 +400,20 @@ export class ApiInstance {
 	 * Reset this routes configuration
 	 */
 	reset() {
-		this._internalStore._options = deepClone(this._internalStore._optionsInit) || {}
+		this._internalStore._options =
+			deepClone(this._internalStore._optionsInit) || {}
 		return this
 	}
 	/**
 	 * The configuration of this api
 	 */
 	get config() {
-		return Object.freeze(deepClone({ ...this._internalStore._options, headers: ApiInstance.parseHeaders(this._headers) })) as {
+		return Object.freeze(
+			deepClone({
+				...this._internalStore._options,
+				headers: ApiInstance.parseHeaders(this._headers),
+			})
+		) as {
 			headers: Record<string, string>
 		} & RequestInit
 	}
@@ -372,7 +421,7 @@ export class ApiInstance {
 		return {
 			status,
 			response: {},
-			rawData: "",
+			rawData: '',
 			data: {} as ResponseDataType,
 			ok: status > 199 && status < 300,
 			hasCookie: (name: string) => false,
@@ -380,6 +429,9 @@ export class ApiInstance {
 	}
 }
 
-export function api(baseURL: string = "", config: PlexusApiConfig = { defaultOptions: {} }) {
+export function api(
+	baseURL: string = '',
+	config: PlexusApiConfig = { defaultOptions: {} }
+) {
 	return new ApiInstance(baseURL, config)
 }

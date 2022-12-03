@@ -1,20 +1,20 @@
-import { beforeEach, afterEach, describe, test, expect } from "vitest"
-import { event, state } from "@plexusjs/core"
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { event, state } from '@plexusjs/core'
 
-describe("Testing Event Function", () => {
-	test("Emitting a string", async () => {
+describe('Testing Event Function', () => {
+	test('Emitting a string', async () => {
 		const myEvent = event<string>()
 		// const value = state(1)
 		const destroy = myEvent.on((value) => {
 			expect(value).toBeDefined()
-			expect(value).toBe("test")
+			expect(value).toBe('test')
 		})
 
-		myEvent.emit("test")
+		myEvent.emit('test')
 		// console.log(myApi.config)
 		destroy()
 	})
-	test("Emitting a number", async () => {
+	test('Emitting a number', async () => {
 		const myEvent = event<number>()
 		const _value = state(1)
 		const destroy = myEvent.on((value) => {
@@ -35,19 +35,19 @@ describe("Testing Event Function", () => {
 		// console.log(myApi.config)
 	})
 
-	test("Emitting a string, once", async () => {
+	test('Emitting a string, once', async () => {
 		const myEvent = event<string>()
 		// const value = state(1)
 		let count = 0
 		const destroy = myEvent.once((value) => {
 			expect(value).toBeDefined()
-			expect(value).toBe("test")
+			expect(value).toBe('test')
 			++count
 		})
 
-		myEvent.emit("test")
+		myEvent.emit('test')
 		expect(count).toBe(1)
-		myEvent.emit("test")
+		myEvent.emit('test')
 		expect(count).toBe(1)
 		// console.log(myApi.config)
 		destroy()

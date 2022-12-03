@@ -1,18 +1,34 @@
-import { instance, Watchable } from "@plexusjs/core"
-export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object
+import { instance, Watchable } from '@plexusjs/core'
+export type AlmostAnything =
+	| string
+	| number
+	| symbol
+	| Record<any, any>
+	| Array<any>
+	| Object
 
-export const normalizeDeps = (deps: Watchable | Watchable[]) => (Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable])
+export const normalizeDeps = (deps: Watchable | Watchable[]) =>
+	Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable]
 export function isObject(item: any): item is Object {
-	return item && item !== null && typeof item === "object" && !Array.isArray(item)
+	return (
+		item && item !== null && typeof item === 'object' && !Array.isArray(item)
+	)
 }
 
-export const concurrentWatch = (onChange: () => void, depsArray: Watchable[]) => {
+export const concurrentWatch = (
+	onChange: () => void,
+	depsArray: Watchable[]
+) => {
 	const depUnsubs: Array<() => void> = []
 
 	for (let dep of depsArray) {
 		// if not a watchable, then we can't watch it, skip to next iteration
 		if (!(dep instanceof Watchable) || !dep.watch) {
-			instance({ instanceId: "react" }).runtime.log("debug", `Skipping watch because the dependency isn't watchable`, dep)
+			instance({ instanceId: 'react' }).runtime.log(
+				'debug',
+				`Skipping watch because the dependency isn't watchable`,
+				dep
+			)
 			continue
 		}
 		const unsubscribe = dep.watch(function (v) {
@@ -30,7 +46,11 @@ export const concurrentWatch = (onChange: () => void, depsArray: Watchable[]) =>
 	}
 }
 export const convertThingToString = (input: any): string =>
-	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)
+	typeof input === 'object'
+		? JSON.stringify(input)
+		: typeof input === 'function'
+		? input.toString()
+		: String(input)
 export const hash = function (input: string) {
 	/* Simple hash function. */
 	let a = 1,
@@ -63,10 +83,10 @@ export const convertStringToThing = (inp: string) => {
 			return num
 		}
 		// ...as a boolean
-		if (inp === "true") {
+		if (inp === 'true') {
 			return true
 		}
-		if (inp === "false") {
+		if (inp === 'false') {
 			return false
 		}
 		// ...as a string
@@ -90,11 +110,11 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 			}
 		}
 		if (Array.isArray(thing)) {
-			return Object.values(cloned) as any as Type
+			return Object.values(cloned as any) as any as Type
 		}
 		// if it was originally an array, return an array
 		if (Array.isArray(thing)) {
-			return Object.values(cloned) as any as Type
+			return Object.values(cloned as any) as any as Type
 		}
 		// if it was originally an object, return an object
 		return cloned

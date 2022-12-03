@@ -1,19 +1,18 @@
-import { PlexusInstance } from "./instance"
+import { PlexusInstance } from './instance'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusActionHooks {
-	/**
-	 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
-	 * @param handler? A function that will be called when an error occurs; omit to fail silently.
-	 *
-	 */
 	onCatch(handler?: ErrorHandler): void
 	/**
 	 * Ignore the default hault preActions
 	 */
 	ignoreInit(): void
+	batch(fn: () => void): void
 }
-export class PlexusActionHelpers {
+/**
+ * The action helpers for a defined plexus action
+ */
+class PlexusActionHelpers {
 	private _internalStore = {
 		_errorHandlers: new Set<ErrorHandler>(),
 	}
@@ -26,7 +25,11 @@ export class PlexusActionHelpers {
 	 */
 	onCatch(handler: ErrorHandler = () => {}) {
 		if (handler) this._internalStore._errorHandlers.add(handler)
-		this.instance().runtime.log("info", "created an error handler; List of error handlers for this action: ", this._internalStore._errorHandlers)
+		this.instance().runtime.log(
+			'info',
+			'created an error handler; List of error handlers for this action: ',
+			this._internalStore._errorHandlers
+		)
 	}
 	/**
 	 * @internal
@@ -45,7 +48,10 @@ export class PlexusActionHelpers {
 	 * Does the helper instance have any errors handlers to handle an error?
 	 */
 	get catchError() {
-		return this._internalStore._errorHandlers.size > 0 ?? typeof this.instance()._globalCatch === "function"
+		return (
+			this._internalStore._errorHandlers.size > 0 ??
+			typeof this.instance()._globalCatch === 'function'
+		)
 	}
 
 	/**
@@ -53,6 +59,10 @@ export class PlexusActionHelpers {
 	 */
 	ignoreInit() {
 		this._skipInit = true
+	}
+
+	batch(fn: () => void) {
+		// this.instance.batch()
 	}
 
 	/**
@@ -66,6 +76,7 @@ export class PlexusActionHelpers {
 		const ignoreInit = (): void => {
 			return this.ignoreInit()
 		}
+		const batch = () => {}
 		return {
 			/**
 			 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
@@ -74,6 +85,7 @@ export class PlexusActionHelpers {
 			 */
 			onCatch,
 			ignoreInit,
+			batch,
 		}
 	}
 }
@@ -90,12 +102,13 @@ export type InnerFunction<ResultFn extends FunctionType> = ResultFn extends (
 // export type PlexusAction = <ReturnData=FunctionType>(fn: FunctionType) => (...args: any) => ReturnData | Promise<ReturnData>
 export type PlexusAction = typeof _action
 
-// export function action<ReturnData=any>(fn: FunctionType): (...args: any) => ReturnData| Promise<ReturnData>;
-
-export function _action<Fn extends FunctionType>(instance: () => PlexusInstance, fn: Fn) {
+export function _action<Fn extends FunctionType>(
+	instance: () => PlexusInstance,
+	fn: Fn
+) {
 	const helpers = new PlexusActionHelpers(instance)
 
-	if (fn.constructor.name === "Function") {
+	if (fn.constructor.name === 'Function') {
 		const newAction = (...args) => {
 			try {
 				// if the instance is not ready, wait for it to be
@@ -122,7 +135,7 @@ export function _action<Fn extends FunctionType>(instance: () => PlexusInstance,
 		// return the proxy function
 		return newAction as InnerFunction<Fn>
 		// return proxyFn as InnerFunction<Fn>
-	} else if (fn.constructor.name === "AsyncFunction") {
+	} else if (fn.constructor.name === 'AsyncFunction') {
 		const newAction = async (...args) => {
 			try {
 				// if the instance is not ready, wait for it to be
@@ -144,7 +157,11 @@ export function _action<Fn extends FunctionType>(instance: () => PlexusInstance,
 		return newAction as InnerFunction<Fn>
 		// return proxyFn as InnerFunction<Fn>
 	} else {
-		console.warn("%cPlexus WARN:%c An action must be of type Function.", "color: #f00;", "color: #FFF;")
-		throw new Error("An action must be of type Function.")
+		console.warn(
+			'%cPlexus WARN:%c An action must be of type Function.',
+			'color: #f00;',
+			'color: #FFF;'
+		)
+		throw new Error('An action must be of type Function.')
 	}
 }

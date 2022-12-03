@@ -1,11 +1,23 @@
-export type AlmostAnything = string | number | symbol | Record<any, any> | Array<any> | Object
+export type AlmostAnything =
+	| string
+	| number
+	| symbol
+	| Record<any, any>
+	| Array<any>
+	| Object
 
 export function isObject(item: any): item is Object {
-	return item && item !== null && typeof item === "object" && !Array.isArray(item)
+	return (
+		item && item !== null && typeof item === 'object' && !Array.isArray(item)
+	)
 }
 
 export const convertThingToString = (input: any) =>
-	typeof input === "object" ? JSON.stringify(input) : typeof input === "function" ? input.toString() : String(input)
+	typeof input === 'object'
+		? JSON.stringify(input)
+		: typeof input === 'function'
+		? input.toString()
+		: String(input)
 export const hash = function (input: string) {
 	/* Simple hash function. */
 	let a = 1,
@@ -38,10 +50,10 @@ export const convertStringToThing = (inp: string) => {
 			return num
 		}
 		// ...as a boolean
-		if (inp === "true") {
+		if (inp === 'true') {
 			return true
 		}
-		if (inp === "false") {
+		if (inp === 'false') {
 			return false
 		}
 		// ...as a string
@@ -49,15 +61,21 @@ export const convertStringToThing = (inp: string) => {
 	}
 }
 // A function to deeply merge two things (objects or arrays).
-export function deepMerge<Thing extends Object>(target: Thing, source: Thing): Thing {
-	let output = Object.assign({}, target)
-	if ((isObject(target) && isObject(source)) || (Array.isArray(target) && Array.isArray(source))) {
+export function deepMerge<Thing extends object>(
+	target: Thing,
+	source: Thing
+): Thing {
+	let output: Thing = Object.assign({}, target)
+	if (
+		(isObject(target) && isObject(source)) ||
+		(Array.isArray(target) && Array.isArray(source))
+	) {
 		for (const key in source) {
 			if (isObject(source[key])) {
 				if (!(key in target)) {
 					Object.assign(output, { [key]: source[key] })
 				} else {
-					output[key] = deepMerge(target[key], source[key])
+					output[key] = deepMerge(target[key] as any, source[key]) as any
 				}
 			} else {
 				Object.assign(output, { [key]: source[key] })
@@ -81,8 +99,10 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 		return new RegExp(thing) as any as Type
 	}
 	// must be an object
-	if (typeof thing === "object" && thing && thing !== null) {
-		const cloned: Type = Array.isArray(thing) ? (Array.from(thing) as unknown as Type) : ({ ...thing } as unknown as Type)
+	if (typeof thing === 'object' && thing && thing !== null) {
+		const cloned: Type = Array.isArray(thing)
+			? (Array.from(thing) as unknown as Type)
+			: ({ ...thing } as unknown as Type)
 		for (const key in thing) {
 			if ((thing as Object).hasOwnProperty(key)) {
 				cloned[key] = deepClone(thing[key])
@@ -90,7 +110,7 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 		}
 		// if it was originally an array, return an array
 		if (Array.isArray(thing)) {
-			return Object.values(cloned) as any as Type
+			return Object.values(cloned as any) as Type
 		}
 		// if it was originally an object, return an object
 		return cloned

@@ -1,15 +1,20 @@
-import { EventEngine } from "./engine"
-import { isAsyncFunction } from "./helpers"
-import { PlexusInstance } from "./instance"
-import { PlexusStateType } from "./state"
+import { EventEngine } from './engine'
+import { PlexusInstance } from './instance'
+import { PlexusStateType } from './state'
 
 export type PlexusRuntime = RuntimeInstance
 interface RuntimeConfig {
-	logLevel: "debug" | "warn" | "error" | "silent"
+	logLevel: 'debug' | 'warn' | 'error' | 'silent'
 }
 type Fn<Value> = (value: Value) => void
-type LogLevels = Exclude<RuntimeConfig["logLevel"], "silent"> | "info"
-type SubscriptionTypes = "state" | " collection" | "event" | "storage" | `plugin_${string}` | "*"
+type LogLevels = Exclude<RuntimeConfig['logLevel'], 'silent'> | 'info'
+type SubscriptionTypes =
+	| 'state'
+	| ' collection'
+	| 'event'
+	| 'storage'
+	| `plugin_${string}`
+	| '*'
 
 export class RuntimeInstance {
 	private instance: () => PlexusInstance
@@ -17,7 +22,10 @@ export class RuntimeInstance {
 	private initializing = false
 	private initsCompleted = 0
 
-	constructor(instance: () => PlexusInstance, protected config: Partial<RuntimeConfig> = {}) {
+	constructor(
+		instance: () => PlexusInstance,
+		protected config: Partial<RuntimeConfig> = {}
+	) {
 		this.instance = instance
 		this._engine = new EventEngine()
 	}
@@ -25,7 +33,7 @@ export class RuntimeInstance {
 	 * track a change and propagate to all listening children in instance
 	 *  */
 	broadcast<Value = PlexusStateType>(key: string, value: Value) {
-		this.log("info", `Broadcasting a change to ${key}`)
+		this.log('info', `Broadcasting a change to ${key}`)
 		this.engine.emit(key, { key, value })
 	}
 	/**
@@ -34,11 +42,15 @@ export class RuntimeInstance {
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
 	 */
-	subscribe<Value = PlexusStateType>(_key: string, _callback: Fn<Value>, from?: string) {
-		this.log("info", `Subscribing to changes of ${_key}`)
+	subscribe<Value = PlexusStateType>(
+		_key: string,
+		_callback: Fn<Value>,
+		from?: string
+	) {
+		this.log('info', `Subscribing to changes of ${_key}`)
 		const callback = (data: { key: string; value: Value }) => {
 			const { key, value } = data
-			this.log("debug", `${_key} has been changed to: `, value)
+			this.log('debug', `${_key} has been changed to: `, value)
 			if (_key === key) {
 				_callback?.(value)
 			}
@@ -57,7 +69,9 @@ export class RuntimeInstance {
 	 * @param key (optional) The event key
 	 */
 	getWatchers(key?: string) {
-		return key && this.engine.events.has(`${key}`) ? this.engine.events.get(`${key}`) : {}
+		return key && this.engine.events.has(`${key}`)
+			? this.engine.events.get(`${key}`)
+			: {}
 	}
 	/**
 	 * remove a watcher from the runtime given a type and a key
@@ -74,34 +88,34 @@ export class RuntimeInstance {
 	 */
 	log(type: LogLevels, ...message: any[]) {
 		const typeColors = {
-			info: "#4281A4",
-			warn: "#E9D985",
-			error: "#CE2D4F",
+			info: '#4281A4',
+			warn: '#E9D985',
+			error: '#CE2D4F',
 		}
 		const callLog = () =>
 			console[type](
 				`%cPlexus(%c${this.instance().name}%c) ${type.toUpperCase()}:%c`,
-				`color: ${typeColors[type] || "#4281A4"};`,
-				"color: #D8DC6A;",
-				`color: ${typeColors[type] || "#4281A4"};`,
-				"color: unset;",
+				`color: ${typeColors[type] || '#4281A4'};`,
+				'color: #D8DC6A;',
+				`color: ${typeColors[type] || '#4281A4'};`,
+				'color: unset;',
 				...message
 			)
 
 		if (this.instance().settings.logLevel) {
 			switch (this.instance().settings.logLevel) {
-				case "warn": {
-					if (type === "error" || type === "warn") callLog()
+				case 'warn': {
+					if (type === 'error' || type === 'warn') callLog()
 					break
 				}
-				case "error": {
-					type === "error" && callLog()
+				case 'error': {
+					type === 'error' && callLog()
 					break
 				}
-				case "silent": {
+				case 'silent': {
 					return
 				}
-				case "debug": {
+				case 'debug': {
 					callLog()
 					break
 				}
@@ -122,7 +136,7 @@ export class RuntimeInstance {
 	/**
 	 * You can use either the callback, or the promise to know when the instance runtime is ready
 	 * @param callback
-	 * @returns
+	 * @returns Promise that resolves when the runtime is ready
 	 */
 	runInit(callback?: (...args: any[]) => any) {
 		return new Promise<void>((resolve, reject) => {
@@ -138,10 +152,12 @@ export class RuntimeInstance {
 
 			// set the initializing flag
 			this.initializing = true
-			this.log("info", "Initializing Instance...")
+			this.log('info', 'Initializing Instance...')
 			const size = inits.length
 			// create an array of init action instances, and run them in parallel
-			const runners = inits.map((init) => (init.complete ? async () => {} : init.run()))
+			const runners = inits.map((init) =>
+				init.complete ? async () => {} : init.run()
+			)
 
 			// wait for all inits to complete in parallel
 			Promise.allSettled(runners).then(() => {
@@ -163,9 +179,12 @@ export class RuntimeInstance {
 /**
  * Create a runtime for an instance NOTE: NOT FOR PUBLIC USE
  * @param instance the instance the runtime is running on
- * @returns
+ * @returns A new runtime (or the currently existing runtime) for a given instance
  * @private
  */
-export function _runtime(instance: () => PlexusInstance, config?: Partial<RuntimeConfig>) {
+export function _runtime(
+	instance: () => PlexusInstance,
+	config?: Partial<RuntimeConfig>
+) {
 	return new RuntimeInstance(instance, config)
 }

@@ -1,0 +1,162 @@
+---
+title: StateInstance
+---
+
+[![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
+
+A trackable State
+
+- [StateInstance](#StateInstance)
+  - [.id](#StateInstance+id)
+  - [.instanceId](#StateInstance+instanceId)
+  - [.value](#StateInstance+value)
+  - [.lastValue](#StateInstance+lastValue)
+  - [.name](#StateInstance+name)
+  - [.nextValue](#StateInstance+nextValue)
+  - [.initialValue](#StateInstance+initialValue)
+  - [.set(value)](#StateInstance+set)
+  - [.patch(value)](#StateInstance+patch)
+  - [.watch(callback)](#StateInstance+watch) ⇒
+  - [.persist(name)](#StateInstance+persist)
+  - [.reset()](#StateInstance+reset)
+  - [.interval(setterFunction, ms)](#StateInstance+interval)
+  - [.isEqual(value)](#StateInstance+isEqual) ⇒ <code>boolean</code>
+  - [.clearInterval()](#StateInstance+clearInterval)
+  - [.key()](#StateInstance+key)
+
+<a name='StateInstance+id'></a>
+
+### .id
+
+<p>The internal id of the state</p>
+
+<a name='StateInstance+instanceId'></a>
+
+### .instanceId
+
+<p>The internal id of the state with an instance prefix</p>
+
+<a name='StateInstance+value'></a>
+
+### .value
+
+<p>The value of the state</p>
+
+<a name='StateInstance+lastValue'></a>
+
+### .lastValue
+
+<p>The previous (reactive) value of the state</p>
+
+<a name='StateInstance+name'></a>
+
+### .name
+
+<p>
+	The name of the state (NOTE: set with the <code>.key()</code> function)
+</p>
+
+<a name='StateInstance+nextValue'></a>
+
+### .nextValue
+
+<p>
+	The next value to apply to the state This is normally managed internally, but
+	you can use it to &quot;prepare&quot; the state before applying the value.
+</p>
+
+**Example**
+
+```js
+state.nextValue = { foo: 'bar' }
+state.set() // The state will be { foo: "bar" }
+```
+
+<a name='StateInstance+initialValue'></a>
+
+### .initialValue
+
+<p>The initial (default) value of the state</p>
+
+<a name='StateInstance+set'></a>
+
+### .set(value)
+
+<p>Set the value of the state</p>
+
+| Param | Description                        |
+| ----- | ---------------------------------- |
+| value | <p>The new value of this state</p> |
+
+<a name='StateInstance+patch'></a>
+
+### .patch(value)
+
+<p>Patch the current value of the state</p>
+
+| Param | Description                                                 |
+| ----- | ----------------------------------------------------------- |
+| value | <p>A value of the state to merge with the current value</p> |
+
+<a name='StateInstance+watch'></a>
+
+### .watch(callback) ⇒
+
+<p>Watch for changes on this state</p>
+
+**Returns**: <p>The remove function to stop watching</p>
+
+| Param    | Description                                       |
+| -------- | ------------------------------------------------- |
+| callback | <p>The callback to run when the state changes</p> |
+
+<a name='StateInstance+persist'></a>
+
+### .persist(name)
+
+<p>Persist the state to selected storage</p>
+
+| Param | Description                      |
+| ----- | -------------------------------- |
+| name  | <p>The storage prefix to use</p> |
+
+<a name='StateInstance+reset'></a>
+
+### .reset()
+
+<p>Reset the state to the initial value</p>
+
+<a name='StateInstance+interval'></a>
+
+### .interval(setterFunction, ms)
+
+<p>On a set interval, run a function to update the state</p>
+
+| Param          | Description                                                                         |
+| -------------- | ----------------------------------------------------------------------------------- |
+| setterFunction | <p>The function used to update the state on the interval; returns the new value</p> |
+| ms             | <p>The interval duration (in milliseconds)</p>                                      |
+
+<a name='StateInstance+isEqual'></a>
+
+### .isEqual(value) ⇒ <code>boolean</code>
+
+<p>Compare a thing to the current value, if they are equal, returns true</p>
+
+**Returns**: <code>boolean</code> <p>A boolean representing if they are equal</p>
+
+| Param | Description                                      |
+| ----- | ------------------------------------------------ |
+| value | <p>The thing to compare the current value to</p> |
+
+<a name='StateInstance+clearInterval'></a>
+
+### .clearInterval()
+
+<p>Stop the state interval</p>
+
+<a name='StateInstance+key'></a>
+
+### .key()
+
+<p>Set the key of the state for internal tracking</p>

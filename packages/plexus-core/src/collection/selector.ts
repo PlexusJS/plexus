@@ -1,9 +1,9 @@
-import { PlexusCollectionInstance } from ".."
-import { PlexusInstance } from "../instance"
-import { PlexusWatcher } from "../interfaces"
-import { WatchableMutable } from "../watchable"
+import { PlexusCollectionInstance } from '..'
+import { PlexusInstance } from '../instance'
+import { PlexusWatcher } from '../interfaces'
+import { WatchableMutable } from '../watchable'
 
-import { DataKey, PlexusDataInstance } from "./data"
+import { DataKey, PlexusDataInstance } from './data'
 export type SelectorName = string
 interface CollectionSelectorStore<ValueType = any> {
 	_name: string
@@ -12,8 +12,16 @@ interface CollectionSelectorStore<ValueType = any> {
 	_dataWatcherDestroyer: (() => void) | null
 }
 
-export type PlexusCollectionSelector<ValueType extends Record<string, any> = Record<string, any>> = CollectionSelector<ValueType>
-export class CollectionSelector<ValueType extends Record<string, any>> extends WatchableMutable<ValueType> {
+export type PlexusCollectionSelector<
+	ValueType extends Record<string, any> = Record<string, any>
+> = CollectionSelector<ValueType>
+
+/**
+ * A selector for data
+ */
+export class CollectionSelector<
+	ValueType extends Record<string, any>
+> extends WatchableMutable<ValueType> {
 	private _internalStore: CollectionSelectorStore<ValueType>
 	private collection: () => PlexusCollectionInstance<ValueType>
 	// private instance: () => PlexusInstance
@@ -30,7 +38,11 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	get instanceId(): string {
 		return `sel_${this._watchableStore._internalId}`
 	}
-	constructor(instance: () => PlexusInstance, collection: () => PlexusCollectionInstance<ValueType>, name: string) {
+	constructor(
+		instance: () => PlexusInstance,
+		collection: () => PlexusCollectionInstance<ValueType>,
+		name: string
+	) {
 		super(instance, {} as ValueType)
 		this._internalStore = {
 			_name: name,
@@ -41,7 +53,10 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		this.collection = collection
 	}
 	private runWatchers() {
-		this.instance().runtime.log("info", `Running watchers on selector ${this.instanceId}...`)
+		this.instance().runtime.log(
+			'info',
+			`Running watchers on selector ${this.instanceId}...`
+		)
 		// this._internalStore._watchers.forEach((callback) => {
 		// 	callback(this.value)
 		// })
@@ -59,7 +74,10 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 */
 	select(key: DataKey) {
 		if (key === this._internalStore._key) {
-			this.instance().runtime.log("warn", `Tried selecting the same key, skipping selection on selector ${this.instanceId}...`)
+			this.instance().runtime.log(
+				'warn',
+				`Tried selecting the same key, skipping selection on selector ${this.instanceId}...`
+			)
 			return
 		}
 		// reset the history if there was one
@@ -75,11 +93,15 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 			this.runWatchers()
 		}, this.id)
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
-		this.instance().runtime.log("info", `Selected data ${this.data?.instanceId} on selector ${this.instanceId}...`)
+		this.instance().runtime.log(
+			'info',
+			`Selected data ${this.data?.instanceId} on selector ${this.instanceId}...`
+		)
 		// reinitialize history with the same stored length
 		this.data?.history(this.historyLength)
 		// broadcast the change
 		this.runWatchers()
+		return this
 	}
 	/**
 	 * Set the value of the selected data instance
@@ -111,7 +133,10 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 		if (this._internalStore._key === null) {
 			return {} as ValueType
 		}
-		return this.collection().getItemValue(this._internalStore._key) || ({} as ValueType)
+		return (
+			this.collection().getItemValue(this._internalStore._key) ||
+			({} as ValueType)
+		)
 	}
 	/**
 	 * The data of the selector
@@ -129,7 +154,10 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	 */
 	watch(callback: PlexusWatcher<ValueType>) {
 		return super.watch((v) => {
-			this.instance().runtime.log("debug", `Watching selector ${this.instanceId} with a new callback`)
+			this.instance().runtime.log(
+				'debug',
+				`Watching selector ${this.instanceId} with a new callback`
+			)
 			callback(this.data?.value || v)
 		})
 	}
@@ -156,7 +184,9 @@ export class CollectionSelector<ValueType extends Record<string, any>> extends W
 	}
 }
 
-export function _selector<ValueType extends Record<string, any> = Record<string, any>>(
+export function _selector<
+	ValueType extends Record<string, any> = Record<string, any>
+>(
 	instance: () => PlexusInstance,
 	collection: () => PlexusCollectionInstance<ValueType>,
 	name: string

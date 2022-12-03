@@ -1,26 +1,26 @@
-import { collection, computed, instance, state } from "@plexusjs/core"
-import { beforeEach, afterEach, describe, test, expect } from "vitest"
+import { collection, computed, instance, state } from '@plexusjs/core'
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 
-const myState = state("")
+const myState = state('')
 const myCollection = collection()
 
 const myComputed = computed(() => {
-	return myState.value.split("").join("-")
+	return myState.value.split('').join('-')
 }, [myState])
 afterEach(() => {
 	myState.reset()
 	myCollection.clear()
 	myComputed.reset()
 })
-describe("Test Instance generation, manipulation and ", () => {
-	test("", () => {
+describe('Test Instance generation, manipulation and ', () => {
+	test('', () => {
 		console.log(myState.value)
 
-		myState.set("hello")
-		myCollection.collect({ id: "1", dad: "bob" })
+		myState.set('hello')
+		myCollection.collect({ id: '1', dad: 'bob' })
 		console.log(myState.value)
-		expect(myState.value).toBe("hello")
-		expect(myComputed.value).toBe("h-e-l-l-o")
+		expect(myState.value).toBe('hello')
+		expect(myComputed.value).toBe('h-e-l-l-o')
 
 		console.log(instance())
 

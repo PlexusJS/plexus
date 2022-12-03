@@ -1,27 +1,32 @@
-import { instance } from "./instance"
-import { PlexusInstance } from "./instance"
-import { WatchableMutable, Watchable } from "./watchable"
-import { _state, PlexusStateInstance } from "./state"
-import { _computed, PlexusComputedStateInstance } from "./computed"
-import { _action, FunctionType, PlexusAction, PlexusActionHelpers, PlexusActionHooks } from "./action"
+import { instance } from './instance'
+import { PlexusInstance } from './instance'
+import { WatchableMutable, Watchable } from './watchable'
+import { _state, PlexusStateInstance, PlexusStateType } from './state'
+import { _computed, PlexusComputedStateInstance } from './computed'
+import {
+	_action,
+	FunctionType,
+	PlexusAction,
+	PlexusActionHooks,
+} from './action'
 import {
 	_collection,
 	PlexusCollectionConfig,
 	PlexusCollectionInstance,
 	PlexusCollectionSelector,
 	PlexusCollectionGroup,
-} from "./collection/collection"
-import { _event, PlexusEventInstance } from "./event"
-import { storage as _storage, StorageOverride } from "./storage"
-import { PlexusPlugin, PlexusPluginConfig } from "./plugin"
-import { PlexusPreActionConfig, _preaction } from "./preaction"
+} from './collection/collection'
+import { _event, PlexusEventInstance } from './event'
+import { storage as _storage, StorageOverride } from './storage'
+import { PlexusPlugin, PlexusPluginConfig } from './plugin'
+import { PlexusPreActionConfig, _preaction } from './preaction'
 
 /**
  * Generate a Plexus State
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function state<Value = any>(item: Value) {
+export function state<Value extends PlexusStateType = any>(item: Value) {
 	return _state(() => instance(), item)
 }
 /**
@@ -29,7 +34,10 @@ export function state<Value = any>(item: Value) {
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function computed<Value = any>(item: (value?: Value) => Value, dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>) {
+export function computed<Value extends PlexusStateType = any>(
+	item: (value?: Value) => Value,
+	dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>
+) {
 	if (!Array.isArray(dependencies)) {
 		return _computed(() => instance(), item, [dependencies])
 	}
@@ -57,7 +65,9 @@ export function event<PayloadType = any>() {
  * @param config The configuration for the collection
  * @returns A collection Instance
  */
-export function collection<Type extends { [key: string]: any }>(config?: PlexusCollectionConfig<Type>) {
+export function collection<Type extends { [key: string]: any }>(
+	config?: PlexusCollectionConfig<Type>
+) {
 	return _collection<Type>(() => instance(), config)
 }
 /**
@@ -73,7 +83,10 @@ export function action<Fn extends FunctionType>(fn: Fn) {
  * @param fn The Plexus action function to run
  * @returns The intended return value of fn, or null if an error is caught
  */
-export function preaction<Fn extends FunctionType>(fn: Fn, config?: PlexusPreActionConfig) {
+export function preaction<Fn extends FunctionType>(
+	fn: Fn,
+	config?: PlexusPreActionConfig
+) {
 	return _preaction<Fn>(() => instance(), fn, config)
 }
 
@@ -86,24 +99,24 @@ function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
 
 export function usePlugin(instance: PlexusInstance, plugin: PlexusPlugin): void
 export function usePlugin(instanceId: string, plugin: PlexusPlugin): void
-export function usePlugin(instanceOrInstanceId: PlexusInstance | string, plugin: PlexusPlugin) {
-
+export function usePlugin(
+	instanceOrInstanceId: PlexusInstance | string,
+	plugin: PlexusPlugin
+) {
 	if (typeof instanceOrInstanceId === 'string') {
-
 		plugin.init((name?: string) => instance({ instanceId: name }))
 	}
 	instance()._plugins.set(plugin.name, plugin)
 }
 
 // export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
-export * from "./api"
-export { gql } from "./gql"
+export * from './api'
+export { gql } from './gql'
 
 export {
 	instance,
 	PlexusAction,
 	PlexusPlugin,
-	PlexusActionHelpers,
 	PlexusActionHooks,
 	PlexusPluginConfig,
 	PlexusCollectionConfig,

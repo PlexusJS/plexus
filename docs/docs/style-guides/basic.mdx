@@ -1,0 +1,124 @@
+---
+title: Basic Core
+sidebar_position: 1
+slug: /style-guides
+---
+
+## Quick Setup
+
+<small>With Yarn</small>
+
+```bash prefix="$"
+yarn create plexus-core --typescript
+```
+
+<small>With NPX</small>
+
+```bash
+npx create-plexus-core --typescript
+```
+
+## Ideology
+
+The focus of this style is to be simple and clean. Very little boilerplate but still well organized. This style works best for:
+
+<ul className='list'>
+	<li>Sub-sites and basic dashboards</li>
+	<li>Weekend side-projects</li>
+	<li>School projects</li>
+</ul>
+
+## File Structure Suggestion
+
+```sh
+/project-root
+├─ core/
+│ ├─ actions.ts
+│ ├─ states.ts
+└ ├─ api.ts
+  └─ types.ts
+```
+
+## File Content Examples
+
+### `/core/types.ts`
+
+We can create our types and interfaces in this file and export it for the rest of our core (or the rest of our app if we want).
+
+```ts title="/core/types.ts"
+export interface ChannelData {
+	uuid: string
+	name: string
+	followers: number
+}
+```
+
+### `/core/states.ts`
+
+This is where we define [stateful instances](/docs/getting-started/concepts#internal-terms) things like states, computed, and collections.
+
+```ts title="/core/states.ts"
+import { state, collection, computed } from '@plexusjs/core'
+
+// Importing the ChannelData type
+import { ChannelData } from '/types'
+
+// Create a state instance
+export const userData = state({
+	name: '',
+	age: -1,
+})
+
+// This collection is used to store the channels, the objects should be of type ChannelData defined above
+export const channelsCollection = collection<ChannelData>({
+	primaryKey: 'uuid', // default value is "id"
+})
+```
+
+### `/core/api.ts`
+
+This is where we can create our API [instances](/docs/getting-started/concepts#internal-terms). we can interract with this elsewhere to interract with data from the server.
+
+```ts title="/core/api.ts"
+import { api } from '@plexusjs/core'
+
+// You can use the api to make requests to the server at a specific endpoint
+export const channelBroker = api('https://api.example.com/channels').auth(
+	'MyCoolAuthToken',
+	'bearer'
+)
+```
+
+### `/core/actions.ts`
+
+Here is where we define our <i>actions</i>. An <i>action</i> is a function that is called to preform business logic. Technically, an <i>action</i> is just a buffed up function, so you can just use it as a function wrapper to gain the benifits of the <i>action hooks</i>.
+
+```ts title="/core/actions.ts"
+import { action } from '@plexusjs/core'
+
+// Import your module instances
+import { channelsCollection } from './states'
+import { channelBroker } from './api'
+
+// This action is used to fetch the channels from the API
+export const subscribeToChannel = action(async ({ onCatch }) => {
+	onCatch(console.error)
+	const { data } = await channelBroker.get('/get-channels')
+
+	channelsCollection.collect(data)
+})
+```
+
+### `/core/index.ts`
+
+Here is the final file we make; the index file takes all of your [instances](/docs/getting-started/concepts#internal-terms) from the other files and exports them into single point.
+
+```ts title="/core/index.ts"
+// Import your module instances
+import * as actions from './actions'
+import * as states from './states'
+import * as api from './api'
+
+// Export your module instances from a single index.ts file
+export { actions, states, api }
+```

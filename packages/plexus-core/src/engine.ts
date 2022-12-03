@@ -1,4 +1,4 @@
-import { PlexusWatcher } from "./interfaces"
+import { PlexusWatcher } from './interfaces'
 export interface EngineEventReceiver {
 	from: string
 	listener: PlexusWatcher
@@ -10,12 +10,12 @@ export class EventEngine {
 	}
 
 	on(eventId: string, listener: PlexusWatcher, origin?: string) {
-		if (!eventId || eventId === "") {
-			console.warn("Event Engine: Missing an eventId")
+		if (!eventId || eventId === '') {
+			console.warn('Event Engine: Missing an eventId')
 			return () => null
 		}
 		// create the variables to assign in the events list map
-		const from = origin || "unknown"
+		const from = origin || 'unknown'
 		const eventWatcher = { from, listener }
 		// ensure the eventId has a list, if not, create it
 		if (!this.events.has(eventId)) {
@@ -41,7 +41,10 @@ export class EventEngine {
 			if (idx === 0) {
 				this.events.set(eventId, [...eventWatchers.slice(idx + 1)])
 			} else if (idx > -1) {
-				this.events.set(eventId, [...eventWatchers.slice(0, idx), ...eventWatchers.slice(idx + 1)])
+				this.events.set(eventId, [
+					...eventWatchers.slice(0, idx),
+					...eventWatchers.slice(idx + 1),
+				])
 			}
 		}
 
@@ -54,7 +57,9 @@ export class EventEngine {
 		if (!this.events.has(eventId)) {
 			return
 		}
-		this.events.get(eventId)?.forEach((callbackObj) => callbackObj.listener(args))
+		this.events
+			.get(eventId)
+			?.forEach((callbackObj) => callbackObj.listener(args))
 	}
 	once(eventId: string, eventWatcher: EngineEventReceiver) {
 		const remove = this.on(eventId, (...args) => {

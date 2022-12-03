@@ -1,0 +1,24 @@
+---
+title: Event Engines
+sidebar_position: 4
+---
+
+You can create and patch over custom events using the `event()` from PlexusJS
+
+```ts title="/core/index.ts"
+import { event } from '@plexusjs/core'
+type FilterData = {
+	filters?: {
+		size?: 'small' | 'medium' | 'large'
+	}
+}
+export const core = {
+	search: {
+		filtering: event<FilterData>(),
+	},
+}
+
+// then use the event anywhere
+
+export default core
+```

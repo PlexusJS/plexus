@@ -1,9 +1,10 @@
-import { beforeEach, afterEach, describe, test, expect } from "vitest"
-import { screen, waitFor, within } from "@testing-library/react"
-import { render, act } from "./test-utils"
-import { collection, computed, instance, state, event } from "@plexusjs/core"
-import React, { FC, useEffect, useState } from "react"
-import { useDeposit, useEvent, usePlexus } from "@plexusjs/react"
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { screen, waitFor, within } from '@testing-library/react'
+import '@testing-library/react'
+import { render, act } from './test-utils'
+import { collection, computed, instance, state, event } from '@plexusjs/core'
+import React, { FC, useEffect, useState } from 'react'
+import { useDeposit, useEvent, usePlexus } from '@plexusjs/react'
 // import * as renderer from "react-test-renderer"
 
 // function toJson(component: renderer.ReactTestRenderer) {
@@ -19,19 +20,21 @@ type Payload = {
 }
 
 const myEvents = event<Payload>()
-const stringState = state<string>("yes")
+const stringState = state<string>('yes')
 const numberState = state(1)
-const objectState = state<Partial<{ name: string }>>({ name: "test" })
-instance({ logLevel: "debug" })
+const objectState = state<Partial<{ name: string }>>({ name: 'test' })
+instance({ logLevel: 'debug' })
 const computedState = computed(() => {
-	console.log("RUNNING THE COMP StATE VALUE")
+	console.log('RUNNING THE COMP STATE VALUE')
 	return stringState.value.length * 2
 }, [stringState])
-instance({ logLevel: "silent" })
-const myCollection = collection<{ id: string; a: number }>().createGroup("test").createSelector("MAIN")
+instance({ logLevel: 'silent' })
+const myCollection = collection<{ id: string; a: number }>()
+	.createGroup('test')
+	.createSelector('MAIN')
 
 beforeEach(() => {
-	myCollection.collect({ id: "poggers", a: 2 }, ["test"])
+	myCollection.collect({ id: 'poggers', a: 2 }, ['test'])
 })
 
 afterEach(() => {
@@ -45,76 +48,87 @@ afterEach(() => {
 const RandomComponent: FC = () => {
 	const str = usePlexus(stringState)
 	const [compu, num] = usePlexus([computedState, numberState])
-	const [groupValue, stateItem] = usePlexus([myCollection.getGroup("test"), numberState])
+	const [groupValue, stateItem] = usePlexus([
+		myCollection.getGroup('test'),
+		numberState,
+	])
 	const obj = usePlexus(objectState)
 	const [groupTest] = usePlexus([myCollection.groups.test])
-	const [MAIN] = usePlexus([myCollection.getSelector("MAIN")])
+	const [MAIN] = usePlexus([myCollection.getSelector('MAIN')])
 	useEffect(() => {
-		myCollection.collect({ id: "pog", a: 1 }, "test")
+		myCollection.collect({ id: 'pog', a: 1 }, 'test')
 	}, [])
 	return (
 		<div>
-			<p data-testid="str">{str}</p>
-			<p data-testid="compu">{compu}</p>
-			<p data-testid="num">{num}</p>
-			<strong data-testid="obj-property">{obj.name}</strong>
-			<p data-testid="group-test">{JSON.stringify(groupTest)}</p>
-			<p data-testid="selector-string">{JSON.stringify(MAIN)}</p>
+			<p data-testid='str'>{str}</p>
+			<p data-testid='compu'>{compu}</p>
+			<p data-testid='num'>{num}</p>
+			<strong data-testid='obj-property'>{obj.name}</strong>
+			<p data-testid='group-test'>{JSON.stringify(groupTest)}</p>
+			<p data-testid='selector-string'>{JSON.stringify(MAIN)}</p>
 		</div>
 	)
 }
-describe("Test react integration (usePlexus)", () => {
-	test("usePlexus hook w/ Watchables", async () => {
+describe('Test react integration (usePlexus)', () => {
+	test('usePlexus hook w/ Watchables', async () => {
 		// console.log(Array.from(instance()._states).map((v) => v.id))
 		render(<RandomComponent />)
 		await act(async () => {
-			await waitFor(() => screen.getByTestId("str"))
+			await waitFor(() => screen.getByTestId('str'))
 		})
-		expect(screen.getByTestId("str").innerHTML).toBe("yes")
-		expect(screen.getByTestId("group-test").innerHTML).toBe(`[{"id":"poggers","a":2},{"id":"pog","a":1}]`)
+		expect(screen.getByTestId('str').innerHTML).toBe('yes')
+		expect(screen.getByTestId('group-test').innerHTML).toBe(
+			`[{"id":"poggers","a":2},{"id":"pog","a":1}]`
+		)
 		await act(async () => {
-			myCollection.collect({ id: "pog", a: 2 }, "test")
-			myCollection.collect({ id: "3", a: 2 }, "test")
-			await waitFor(() => screen.getByTestId("group-test"))
+			myCollection.collect({ id: 'pog', a: 2 }, 'test')
+			myCollection.collect({ id: '3', a: 2 }, 'test')
+			await waitFor(() => screen.getByTestId('group-test'))
 		})
-		expect(screen.getByTestId("group-test").innerHTML).toBe(`[{"id":"poggers","a":2},{"id":"pog","a":2},{"id":"3","a":2}]`)
+		expect(screen.getByTestId('group-test').innerHTML).toBe(
+			`[{"id":"poggers","a":2},{"id":"pog","a":2},{"id":"3","a":2}]`
+		)
 
 		// instance({ logLevel: "debug" })
-		instance({ logLevel: "debug", instanceId: "react" })
-		expect(screen.getByTestId("compu").innerHTML).toBe("6")
+		instance({ logLevel: 'debug', instanceId: 'react' })
+		expect(screen.getByTestId('compu').innerHTML).toBe('6')
 		await act(async () => {
 			// test computed render
-			stringState.set("comp")
-			await waitFor(() => screen.getByTestId("compu"))
+			stringState.set('comp')
+			await waitFor(() => screen.getByTestId('compu'))
 		})
-		expect(screen.getByTestId("compu").innerHTML).toBe("8")
+		expect(screen.getByTestId('compu').innerHTML).toBe('8')
 
-		expect(Array.from(instance()._computedStates.entries()).find((obj) => obj[1].id === computedState.id)?.[1].value).toBe(8)
+		expect(
+			Array.from(instance()._computedStates.entries()).find(
+				(obj) => obj[1].id === computedState.id
+			)?.[1].value
+		).toBe(8)
 		await act(async () => {
-			stringState.set("no")
-			await waitFor(() => screen.getByTestId("str"))
+			stringState.set('no')
+			await waitFor(() => screen.getByTestId('str'))
 		})
-		expect(screen.getByTestId("compu").innerHTML).toBe("4")
-		instance({ logLevel: "silent", instanceId: "react" })
-		expect(screen.getByTestId("str").innerHTML).toBe("no")
+		expect(screen.getByTestId('compu').innerHTML).toBe('4')
+		instance({ logLevel: 'silent', instanceId: 'react' })
+		expect(screen.getByTestId('str').innerHTML).toBe('no')
 	})
 })
 
-describe("Test react integration (useEvent)", () => {
-	test("test useEvent", () => {
+describe('Test react integration (useEvent)', () => {
+	test('test useEvent', () => {
 		const RandomComponent: FC = () => {
-			const [val, setVal] = useState("")
+			const [val, setVal] = useState('')
 			useEvent(myEvents, (payload) => {
 				setVal(payload.name)
 			})
 
 			useEffect(() => {
-				myEvents.emit({ name: "test", status: "test" })
+				myEvents.emit({ name: 'test', status: 'test' })
 			}, [])
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
-					<p id="data">{val}</p>
+					<p id='data'>{val}</p>
 				</div>
 			)
 		}
@@ -126,32 +140,34 @@ describe("Test react integration (useEvent)", () => {
 		// act(() => {
 		// 	component.update(<RandomComponent />)
 		// })
-		expect(component.findByTestId("data")).toEqual("test")
+		component.findByTestId('data').then((v) => {
+			expect(v.innerHTML).toEqual('test')
+		})
 		// expect(tree).toMatchSnapshot()
 	})
 })
 
-describe("Test react integration (useDeposit)", () => {
-	test("test useDeposit", () => {
+describe('Test react integration (useDeposit)', () => {
+	test('test useDeposit', () => {
 		// lol idk how to test this without user input
 		const RandomComponent: FC = () => {
-			const [val, setVal] = useState("")
+			const [val, setVal] = useState('')
 			const { save, edit } = useDeposit(
-				{ name: "string" },
+				{ name: 'string' },
 				{
 					onSave(payload) {
-						setVal(payload.name ?? "")
+						setVal(payload.name ?? '')
 					},
 				}
 			)
 
 			useEffect(() => {
-				myEvents.emit({ name: "test", status: "test" })
+				myEvents.emit({ name: 'test', status: 'test' })
 			}, [])
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
-					<p id="data">{val}</p>
+					<p id='data'>{val}</p>
 				</div>
 			)
 		}
@@ -162,28 +178,28 @@ describe("Test react integration (useDeposit)", () => {
 		// expect().toEqual()
 		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
 	})
-	test("test useDeposit edit", () => {
+	test('test useDeposit edit', () => {
 		const def: { name?: string } = {}
 		const RandomComponent: FC = () => {
-			const [val, setVal] = useState("")
+			const [val, setVal] = useState('')
 			const { value, save, edit } = useDeposit(
 				{ ...def },
 				{
 					onEdit(k, v) {},
 					onSave(payload) {
-						setVal(payload.name ?? "")
+						setVal(payload.name ?? '')
 					},
 				}
 			)
 
 			useEffect(() => {
-				edit("name", "billy")
+				edit('name', 'billy')
 			}, [])
 
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
-					<p id="data">{JSON.stringify(value)}</p>
+					<p id='data'>{JSON.stringify(value)}</p>
 				</div>
 			)
 		}
@@ -196,27 +212,28 @@ describe("Test react integration (useDeposit)", () => {
 		// act(() => {
 		// 	component.update(<RandomComponent />)
 		// })
-
-		expect(component.findByTestId("data")).toEqual(['{"name":"billy"}'])
+		component.findByTestId('data').then((v) => {
+			expect(v.innerHTML).toEqual(['{"name":"billy"}'])
+		})
 		// expect(tree).toMatchSnapshot()
 		// expect().toEqual()
 		// expect(tree.root.findByProps({ id: "data" }).children).toEqual(["test"])
 	})
-	test("testing types of useDeposit", () => {
+	test('testing types of useDeposit', () => {
 		function RandomComponent() {
-			const [val, setVal] = useState("")
+			const [val, setVal] = useState('')
 			const { save, edit } = useDeposit<Payload>(
-				{ name: "string" },
+				{ name: 'string' },
 				{
 					onSave(payload) {
-						setVal(payload.name ?? "")
+						setVal(payload.name ?? '')
 					},
 				}
 			)
 			// const [groupValue] = usePlexus([myCollection.groups.test])
 			return (
 				<div>
-					<p id="data">{val}</p>
+					<p id='data'>{val}</p>
 				</div>
 			)
 		}
