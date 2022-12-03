@@ -16,7 +16,7 @@ interface PlexusDataStore<DataType extends Record<string, any>> {
 
 export type PlexusDataInstance<
 	DataType extends Record<string, any> = Record<string, any>
-> = CollectionDataInstance<DataType>
+> = CollectionData<DataType>
 export type DataKey = string | number
 
 // TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
@@ -27,7 +27,7 @@ type DataObjectType<PK extends string = 'id'> = Record<string, any> & {
 /**
  * A piece of data belonging to a collection
  */
-export class CollectionDataInstance<
+export class CollectionData<
 	DataType extends DataObjectType<PK> = any,
 	PK extends string = string
 > extends WatchableMutable<DataType> {
@@ -251,7 +251,7 @@ export function _data<DataType extends Record<string, any>>(
 		(value?.[primaryKey] !== undefined && value?.[primaryKey] !== null) ||
 		config.prov
 	) {
-		return new CollectionDataInstance(
+		return new CollectionData(
 			instance,
 			collection,
 			primaryKey,
