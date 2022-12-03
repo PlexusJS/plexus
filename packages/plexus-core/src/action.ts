@@ -61,8 +61,16 @@ class PlexusActionHelpers {
 		this._skipInit = true
 	}
 
-	batch(fn: () => void) {
-		// this.instance.batch()
+	/**
+	 * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
+	 * @param fnOrName The function to run in a batch
+	 */
+	batch(fnOrName: () => void, fn?: () => void) {
+		if (typeof fnOrName === 'function') {
+			this.instance().runtime.batch(fnOrName)
+		} else {
+			this.instance().runtime.batch(fnOrName, fn)
+		}
 	}
 
 	/**
