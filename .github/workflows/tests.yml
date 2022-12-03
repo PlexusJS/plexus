@@ -15,22 +15,23 @@ jobs:
         with:
           node-version: 16
       - name: Cache node modules
-        id: cache-npm
+        id: cache-yarn
         uses: actions/cache@v3
         env:
           cache-name: cache-node-module
         with:
-          path: ~/.npm
+          path: ~/.cache/yarn
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+      - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
         name: List the state of node modules
         continue-on-error: true
-        run: npm list
+        run: yarn list
+        
       - name: Install Dependencies
         run: yarn install
 
