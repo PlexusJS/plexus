@@ -40,6 +40,55 @@ const docTemplate = fs.readFileSync(
 	`${__dirname}/scripts/templates/ref.hbs`,
 	'utf8'
 )
+
+const writeDocFromIdentifier = (
+	identifier: Identifier,
+	templateData: Identifier[],
+	absoluteInputFiles: string[],
+	foundTokens: RegExpMatchArray | null
+) => {
+	try {
+		console.log(`Generating docs for`, c.yellow(identifier.name), `\n`)
+		let formattedDocTemplate = docTemplate
+
+		// A map to store all the identifiers that are used in the template
+		const tokenMap: TokenMap = {
+			name: identifier.name,
+			classKey: identifier.name,
+			description: identifier.description,
+		}
+
+		// generate the md file data
+		let fileData = jsdoc2md.renderSync({
+			files: absoluteInputFiles,
+			template: formattedDocTemplate.replace(
+				'${classKey}',
+				tokenMap.classKey || ''
+			),
+			data: templateData,
+			partial: `${__dirname}/scripts/templates/**/*.hbs`,
+		})
+
+		// replace all tokens in the returned data
+		foundTokens?.forEach((token) => {
+			fileData = fileData.replace(
+				token,
+				tokenMap[token.substring(2, token.length - 1)] || ''
+			)
+		})
+
+		// Write the file
+		fs.writeFileSync(
+			path.resolve(outputDir, `${identifier.name || new Date().getTime()}.mdx`),
+			fileData
+		)
+		//   process.stdout.moveCursor(0, -1)
+		process.stdout.write('✅\n')
+	} catch (err) {
+		//   process.stdout.moveCursor(0, -1)
+		process.stdout.write('❌\n')
+	}
+}
 const genDocs = async () => {
 	console.log(c.blue('\n\n- Initialization 🚩\n'))
 	/* input and output paths */
@@ -98,59 +147,92 @@ const genDocs = async () => {
 				description: text,
 			}
 		})
-	console.log(classIdentifiers)
+	const functionIdentifiers = templateData
+		.reduce((classData: Identifier[], identifier: Identifier) => {
+			if (identifier.kind === 'function' && !identifier.memberof)
+				classData.push(identifier)
+			return classData
+		}, [] as Identifier[])
+		.map((identifier) => {
+			const text = identifier.description?.replace(/<\/?[^>]+>/gi, '') || ''
+			return {
+				...identifier,
+				description: text,
+			}
+		})
+	// console.log(classIdentifiers)
 	SETTINGS.VERBOSE &&
 		console.log(
 			c.yellow('Found these classes:'),
 			classIdentifiers.map((data) => data.name)
 		)
+	SETTINGS.VERBOSE &&
+		console.log(
+			c.yellow('Found these functions:'),
+			functionIdentifiers.map((data) => data.name)
+		)
 
+	// write the docs for top level function
+	for (const identifier of functionIdentifiers) {
+		writeDocFromIdentifier(
+			identifier,
+			templateData,
+			absoluteInputFiles,
+			foundTokens
+		)
+	}
 	// generate docs for each class
 	for (let identifier of classIdentifiers) {
-		try {
-			console.log(`Generating docs for`, c.yellow(identifier.name), `\n`)
-			let formattedDocTemplate = docTemplate
+		writeDocFromIdentifier(
+			identifier,
+			templateData,
+			absoluteInputFiles,
+			foundTokens
+		)
+		// try {
+		// 	console.log(`Generating docs for`, c.yellow(identifier.name), `\n`)
+		// 	let formattedDocTemplate = docTemplate
 
-			// A map to store all the identifiers that are used in the template
-			const tokenMap: TokenMap = {
-				name: identifier.name,
-				classKey: identifier.name,
-				description: identifier.description,
-			}
+		// 	// A map to store all the identifiers that are used in the template
+		// 	const tokenMap: TokenMap = {
+		// 		name: identifier.name,
+		// 		classKey: identifier.name,
+		// 		description: identifier.description,
+		// 	}
 
-			// generate the md file data
-			let fileData = jsdoc2md.renderSync({
-				files: absoluteInputFiles,
-				template: formattedDocTemplate.replace(
-					'${classKey}',
-					tokenMap.classKey || ''
-				),
-				data: templateData,
-				partial: `${__dirname}/scripts/templates/**/*.hbs`,
-			})
+		// 	// generate the md file data
+		// 	let fileData = jsdoc2md.renderSync({
+		// 		files: absoluteInputFiles,
+		// 		template: formattedDocTemplate.replace(
+		// 			'${classKey}',
+		// 			tokenMap.classKey || ''
+		// 		),
+		// 		data: templateData,
+		// 		partial: `${__dirname}/scripts/templates/**/*.hbs`,
+		// 	})
 
-			// replace all tokens in the returned data
-			foundTokens?.forEach((token) => {
-				fileData = fileData.replace(
-					token,
-					tokenMap[token.substring(2, token.length - 1)] || ''
-				)
-			})
+		// 	// replace all tokens in the returned data
+		// 	foundTokens?.forEach((token) => {
+		// 		fileData = fileData.replace(
+		// 			token,
+		// 			tokenMap[token.substring(2, token.length - 1)] || ''
+		// 		)
+		// 	})
 
-			// Write the file
-			fs.writeFileSync(
-				path.resolve(
-					outputDir,
-					`${identifier.name || new Date().getTime()}.mdx`
-				),
-				fileData
-			)
-			//   process.stdout.moveCursor(0, -1)
-			process.stdout.write('✅\n')
-		} catch (err) {
-			//   process.stdout.moveCursor(0, -1)
-			process.stdout.write('❌\n')
-		}
+		// 	// Write the file
+		// 	fs.writeFileSync(
+		// 		path.resolve(
+		// 			outputDir,
+		// 			`${identifier.name || new Date().getTime()}.mdx`
+		// 		),
+		// 		fileData
+		// 	)
+		// 	//   process.stdout.moveCursor(0, -1)
+		// 	process.stdout.write('✅\n')
+		// } catch (err) {
+		// 	//   process.stdout.moveCursor(0, -1)
+		// 	process.stdout.write('❌\n')
+		// }
 	}
 }
 

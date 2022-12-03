@@ -4,9 +4,26 @@ export interface EngineEventReceiver {
 	listener: PlexusWatcher
 }
 export class EventEngine {
+	private batching: boolean = false
 	events: Map<string, Array<EngineEventReceiver>>
+	pendingEventPayloads: Map<string, any>
+
 	constructor() {
 		this.events = new Map()
+		this.pendingEventPayloads = new Map()
+	}
+
+	/**
+	 * Pause and store all events until the return function is called. Once called, all events will be emitted.
+	 */
+	halt() {
+		this.batching = true
+		return () => {
+			this.batching = false
+			this.pendingEventPayloads.forEach((args, eventId) => {
+				this.emit(eventId, args)
+			})
+		}
 	}
 
 	on(eventId: string, listener: PlexusWatcher, origin?: string) {
@@ -57,6 +74,13 @@ export class EventEngine {
 		if (!this.events.has(eventId)) {
 			return
 		}
+
+		// if we're batching, store the event payload
+		if (this.batching) {
+			this.pendingEventPayloads.set(eventId, args)
+			return
+		}
+		// run the event listeners for this event id
 		this.events
 			.get(eventId)
 			?.forEach((callbackObj) => callbackObj.listener(args))
