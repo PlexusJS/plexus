@@ -19,9 +19,9 @@ lint:
   ignore:
     - linters: [ALL]
       paths:
-        - ./**/dist
-        - ./**/node_modules
-        - ./**/.docusaurus/**/*
+        - packages/**/dist/**/*
+        - node_modules
+        - .docusaurus/**/*
 runtimes:
   enabled:
     - node@16.14.2
