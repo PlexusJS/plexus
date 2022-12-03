@@ -61,8 +61,12 @@ class PlexusActionHelpers {
 		this._skipInit = true
 	}
 
-	batch(fn: () => void) {
-		// this.instance.batch()
+	batch(fnOrName: () => void, fn?: () => void) {
+		if (typeof fnOrName === 'function') {
+			this.instance().runtime.batch(fnOrName)
+		} else {
+			this.instance().runtime.batch(fnOrName, fn)
+		}	
 	}
 
 	/**

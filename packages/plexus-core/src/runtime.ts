@@ -175,6 +175,9 @@ export class RuntimeInstance {
 			})
 		})
 	}
+	batch(fn: () => void) {
+		
+	}
 }
 /**
  * Create a runtime for an instance NOTE: NOT FOR PUBLIC USE
