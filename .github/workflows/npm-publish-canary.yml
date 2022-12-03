@@ -1,4 +1,4 @@
-name: NPM Package Publish
+name: NPM Package Publish - Canary
 on:
   release:
     types: [created]
