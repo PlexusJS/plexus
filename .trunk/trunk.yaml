@@ -16,12 +16,12 @@ lint:
     - gitleaks@8.15.2
     - prettier@2.8.0
     - actionlint@1.6.22
-  ignore: 
+  ignore:
     - linters: [ALL]
-    paths:
-      - ./**/dist
-      - ./**/node_modules
-      - ./**/.docusaurus/**/*
+      paths:
+        - ./**/dist
+        - ./**/node_modules
+        - ./**/.docusaurus/**/*
 runtimes:
   enabled:
     - node@16.14.2
