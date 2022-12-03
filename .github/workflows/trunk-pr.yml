@@ -1,4 +1,4 @@
-name: Pull Request
+name: Trunk - Pull Request
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
