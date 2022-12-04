@@ -83,12 +83,12 @@ export type PlexusCollectionInstance<
 	DataType extends Record<string, any> = Record<string, any>,
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
-> = Collection<DataType, Groups, Selectors>
+> = CollectionInstance<DataType, Groups, Selectors>
 /**
  * A Collection Instance
  *
  */
-export class Collection<
+export class CollectionInstance<
 	DataType extends Record<string, any>,
 	Groups extends GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType>
@@ -370,7 +370,7 @@ export class Collection<
 			)
 		)
 		this.mount()
-		return this as Collection<
+		return this as CollectionInstance<
 			DataType,
 			Groups,
 			Selectors & Map<Name, PlexusCollectionSelector<DataType>>
@@ -387,7 +387,7 @@ export class Collection<
 		for (const selectorName of selectorNames) {
 			this.createSelector(selectorName)
 		}
-		return this as Collection<
+		return this as CollectionInstance<
 			DataType,
 			Groups,
 			Selectors &
@@ -440,7 +440,7 @@ export class Collection<
 			)
 		)
 
-		return this as Collection<
+		return this as CollectionInstance<
 			DataType,
 			Groups & Map<Name, PlexusCollectionGroup<DataType>>,
 			Selectors
@@ -457,7 +457,7 @@ export class Collection<
 			this.createGroup(groupName)
 		}
 
-		return this as Collection<
+		return this as CollectionInstance<
 			DataType,
 			Groups & Map<typeof groupNames[number], PlexusCollectionGroup<DataType>>,
 			Selectors
@@ -827,7 +827,7 @@ export function _collection<
 	 * Helper Function; Mounts the collection to the instance
 	 */
 
-	const collection = new Collection<DataType, Groups, Selectors>(
+	const collection = new CollectionInstance<DataType, Groups, Selectors>(
 		instance,
 		_config
 	)

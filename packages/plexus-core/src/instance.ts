@@ -2,7 +2,7 @@ import { StateInstance } from './state'
 import { PlexusPlugin } from './plugin'
 import { RuntimeInstance, _runtime } from './runtime'
 import { PlexusStorageInstance, storage } from './storage'
-import { Collection } from './collection/collection'
+import { CollectionInstance } from './collection/collection'
 import { deepMerge, genUID, isEqual } from '@plexusjs/utils'
 import { PlexusPreAction } from './preaction'
 import { CollectionData } from './collection/data'
@@ -29,7 +29,7 @@ export class PlexusInstance {
 	_computedStates = new Set<PlexusComputedStateInstance>()
 	_states = new Set<StateInstance<any>>()
 	_plugins = new Map<string, PlexusPlugin>()
-	_collections = new Set<Collection<any, any, any>>()
+	_collections = new Set<CollectionInstance<any, any, any>>()
 	_collectionData = new Set<CollectionData<any>>()
 	_storages = new Map<string, PlexusStorageInstance>()
 
