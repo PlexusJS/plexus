@@ -1,66 +1,19 @@
----
-title: Computed
-sidebar_position: 2
----
+--- 
+	title: computed 
+--- 
 
-## Basic Use
+[![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
-```ts
-import { computed, state } from "@plexusjs/core"
-// A cool state to watch!
-const myCoolState = state(true)
+Generate a Plexus State
 
-// A computed that depends on myCoolState
-const myCoolComputedState = computed(() => {
-	return myCoolState.value ? "cool" : "not cool"
-	// do something
-}, [myCoolState])
+<a name="computed"></a>
 
-console.log(myCoolComputedState.value) //=> "cool"
-myCoolState.value = false
-console.log(myCoolComputedState.value) //=> "not cool"
-```
+## computed(item) ⇒
+<p>Generate a Plexus State</p>
 
-## Properties
+**Returns**: <p>A Plexus State Instance</p>  
 
-##### computed `.value`
+| Param | Description |
+| --- | --- |
+| item | <p>The default value to use when we generate the state</p> |
 
-The value (reactive) of the computed state
-
-##### computed `.lastValue`
-
-The previous value (reactive) of the state
-
-##### computed `.name`
-
-The name of the state (NOTE: set with the `.key()` function)
-
-##### computed `.deps`
-
-Returns a list of dependencies for the computed state
-
-## Methods
-
-##### computed `.addDep()`
-
-Adds a dependency to the computed state
-
-##### computed `.removeDep()`
-
-Removes a dependency from the computed state
-
-##### computed `.persist()`
-
-Persist the state to selected storage
-
-##### computed `.undo()`
-
-Reset the state to the previous value
-
-##### computed `.reset()`
-
-Reset the state to the initial value
-
-##### computed `.key()`
-
-Set the key of the state for internal tracking

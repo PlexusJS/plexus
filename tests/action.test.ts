@@ -1,8 +1,6 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { action, PlexusAction } from '../packages/plexus-core/src'
-import { instance } from '../packages/plexus-core/src/instance'
-// import { PxState, PxStateInstance } from '../src/interfaces';
-let myAction: PlexusAction
+import { action, state } from '@plexusjs/core'
+const stringState = state<string>('init')
 
 describe('Testing Action Function', () => {
 	test('Can run a Function', () => {
@@ -43,5 +41,34 @@ describe('Testing Action Function', () => {
 		})
 		const data = await myAction()
 		expect(data).toBe(successMsg)
+	})
+
+	test('Can handle batching', async () => {
+		const successMsg = 'waited 100 seconds'
+		stringState.set('init')
+
+		const kill = stringState.watch((val) => {
+			console.log('watcher called', val)
+			expect(val).toBe(successMsg)
+		})
+		const myAction = action(async ({ onCatch, batch }) => {
+			onCatch(console.error)
+			batch(async () => {
+				console.log('batched!')
+				stringState.set(successMsg)
+				await new Promise((resolve) =>
+					setTimeout(() => resolve(successMsg), 100)
+				)
+			})
+			return
+		})
+		const data = await myAction()
+		// the string state should be 'init' because the batch function hasn't finished yet
+		expect(stringState.value).toBe('init')
+		setTimeout(() => {
+			expect(stringState.value).toBe(successMsg)
+		}, 100)
+
+		kill()
 	})
 })

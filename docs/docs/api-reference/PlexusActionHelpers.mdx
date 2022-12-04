@@ -13,6 +13,7 @@ The action helpers for a defined plexus action
     * [.onCatch(handler)](#PlexusActionHelpers+onCatch)
     * [.runErrorHandlers()](#PlexusActionHelpers+runErrorHandlers)
     * [.ignoreInit()](#PlexusActionHelpers+ignoreInit)
+    * [.batch(fnOrName)](#PlexusActionHelpers+batch)
 
 <a name="PlexusActionHelpers+catchError"></a>
 
@@ -40,4 +41,14 @@ The action helpers for a defined plexus action
 
 ### .ignoreInit()
 <p>Ignore the default halt for preActions</p>
+
+<a name="PlexusActionHelpers+batch"></a>
+
+### .batch(fnOrName)
+<p>Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.</p>
+
+
+| Param | Description |
+| --- | --- |
+| fnOrName | <p>The function to run in a batch</p> |
 

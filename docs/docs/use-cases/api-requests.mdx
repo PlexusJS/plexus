@@ -6,9 +6,9 @@ sidebar_position: 3
 Here is an example of a user creating Plexus API Instances to communicate with a server.
 
 ```tsx live title="/pages/index.tsx"
-import { api } from "@plexusjs/core"
+import { api } from '@plexusjs/core'
 // this baseURL should lead to a path on your server. So We can point at `api/v1` for example.
-const apiv1 = api("/api/v1")
+const apiv1 = api('/api/v1')
 interface User {
 	name: string
 	age: number
@@ -16,7 +16,7 @@ interface User {
 export default function Home() {
 	const getUsers = async () => {
 		// Here you chose a method to call the API, also providing a path and a payload (if needed).
-		const response = await apiv1.get<User[]>("/users")
+		const response = await apiv1.get<User[]>('/users')
 
 		if (response.ok) {
 			// response.data will be of type User[]

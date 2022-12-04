@@ -1,43 +1,14 @@
----
-title: Event
-sidebar_position: 6
----
+--- 
+	title: event 
+--- 
 
-## Basic Use
+[![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
-```ts title="ts"
-import { event } from "@plexusjs/core"
+Create a new event Engine
 
-interface MyEventType {
-	name: string
-	data?: any
-}
-// An event engine instance is created by the event module
-const myCoolEvents = event<MyEventType>()
+<a name="event"></a>
 
-myCoolEvents.on((event) => {
-	console.log(event.name)
-})
+## event() ⇒
+<p>Create a new event Engine</p>
 
-myCoolEvents.emit({
-	name: "My Event",
-})
-```
-
-## Methods
-
-##### event `.on()`
-
-Listen for an event
-
-##### event `.emit()`
-
-Broadcast an event to all listeners
-
-##### event `.once()`
-
-Listen for an event only once
-
-##### event `.disable()`
-
-Turn the Event Manager off/on
+**Returns**: <p>An Event Instance</p>  

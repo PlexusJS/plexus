@@ -175,6 +175,33 @@ export class RuntimeInstance {
 			})
 		})
 	}
+
+	/**
+	 *	The batch function allows you to run a series of actions in a single transaction
+	 * @param fn The function to run
+	 */
+	batch(
+		fnOrName: (() => void | Promise<void>) | string,
+		fn?: () => void | Promise<void>
+	) {
+		const name = typeof fnOrName === 'string' ? fnOrName : undefined
+		const fnToRun = typeof fnOrName === 'function' ? fnOrName : fn
+		if (!fnToRun) {
+			throw new Error('You must provide a function to run in the batch')
+		}
+
+		const unhalt = this.engine.halt()
+		const prom = fnToRun()
+		// if the function returns a promise, wait for it to resolve
+		if (prom) {
+			prom?.finally(() => {
+				unhalt()
+			})
+			return
+		}
+		// if the function doesn't return a promise, just run the unhalt function
+		unhalt()
+	}
 }
 /**
  * Create a runtime for an instance NOTE: NOT FOR PUBLIC USE
