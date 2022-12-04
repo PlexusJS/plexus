@@ -16,7 +16,7 @@ interface PlexusDataStore<DataType extends Record<string, any>> {
 
 export type PlexusDataInstance<
 	DataType extends Record<string, any> = Record<string, any>
-> = CollectionDataInstance<DataType>
+> = CollectionData<DataType>
 export type DataKey = string | number
 
 // TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
@@ -27,7 +27,7 @@ type DataObjectType<PK extends string = 'id'> = Record<string, any> & {
 /**
  * A piece of data belonging to a collection
  */
-export class CollectionDataInstance<
+export class CollectionData<
 	DataType extends DataObjectType<PK> = any,
 	PK extends string = string
 > extends WatchableMutable<DataType> {
@@ -119,24 +119,53 @@ export class CollectionDataInstance<
 			// 	ReturnType<typeof foreignKeys[keyof typeof foreignKeys]["reference"]>
 			// >
 
-			const value = { ...super.value } as Partial<any> & DataType
-			let oldKey: keyof DataType
+			let value = { ...super.value } as Partial<any> & DataType
+			let idKey: keyof DataType
 
-			for (oldKey of Object.keys(foreignKeys ?? {})) {
-				const newKey: keyof Partial<any> = foreignKeys[oldKey]
+			for (idKey of Object.keys(foreignKeys ?? {})) {
+				const newKey: keyof Partial<any> = foreignKeys[idKey]
 					?.newKey as keyof Partial<any>
 				const that = this
-				Object.defineProperty(value, newKey, {
-					get() {
-						return that
-							.instance()
-							.findReference(foreignKeys[oldKey]?.reference || '')?.value
+
+				console.log(
+					newKey,
+					'from',
+					foreignKeys[idKey]?.reference,
+					that.instance().findReference(foreignKeys[idKey]?.reference || ''),
+					"here's the data",
+					foreignKeys[idKey]?.newKey,
+					that
+						.instance()
+						.findReference(foreignKeys[idKey]?.reference || '')
+						?.getItem(that.shallowValue[idKey]).shallowValue
+				)
+
+				value = new Proxy<any>(value, {
+					get(target, p, reciever) {
+						const freshValue =
+							that
+								.instance()
+								.findReference(foreignKeys[idKey]?.reference || '')
+								?.getItem(that.shallowValue[idKey]).shallowValue || ({} as any)
+						console.log('get', p, target, reciever, freshValue)
+						if (p === newKey) {
+							return freshValue
+						}
+						return Reflect.get(target, p, reciever)
 					},
-				})
+				}) as DataType & Record<typeof newKey, any>
 			}
+			console.log('new value', value)
 
 			return value
 		}
+		return super.value
+	}
+	/**
+	 * Get the shallow value of the data instance
+	 * @type {DataType}
+	 */
+	get shallowValue() {
 		return super.value
 	}
 	/**
@@ -254,7 +283,7 @@ export function _data<DataType extends Record<string, any>>(
 		(value?.[primaryKey] !== undefined && value?.[primaryKey] !== null) ||
 		config.prov
 	) {
-		return new CollectionDataInstance(
+		return new CollectionData(
 			instance,
 			collection,
 			primaryKey,

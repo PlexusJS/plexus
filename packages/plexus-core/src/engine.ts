@@ -1,3 +1,4 @@
+import { deepClone, deepMerge } from '@plexusjs/utils'
 import { PlexusWatcher } from './interfaces'
 export interface EngineEventReceiver {
 	from: string
@@ -77,7 +78,15 @@ export class EventEngine {
 
 		// if we're batching, store the event payload
 		if (this.batching) {
-			this.pendingEventPayloads.set(eventId, args)
+			this.pendingEventPayloads.set(
+				eventId,
+				deepMerge(
+					this.pendingEventPayloads.has(eventId)
+						? this.pendingEventPayloads.get(eventId)
+						: args,
+					args
+				)
+			)
 			return
 		}
 		// run the event listeners for this event id

@@ -541,42 +541,43 @@ type Appointment = {
 	userId: string
 }
 
-// const appointments = collection<Appointment>({
-// 	primaryKey: 'id',
-// 	name: 'appointments',
-// 	defaultGroup: 'upcoming',
-// 	foreignKeys: {
-// 		userId: {
-// 			newKey: 'user',
-// 			reference: 'users',
-// 		},
-// 	},
-// })
-// const users = collection<User>({
-// 	primaryKey: 'id',
-// 	name: 'users',
-// 	foreignKeys: {
-// 		appointmentId: {
-// 			newKey: 'appointment',
-// 			reference: 'appointments', // looks for the id(s) here
-// 		},
-// 	},
-// })
+const appointments = collection<Appointment>({
+	primaryKey: 'id',
+	name: 'appointments',
+	defaultGroup: 'upcoming',
+	foreignKeys: {
+		userId: {
+			newKey: 'user',
+			reference: 'users',
+		},
+	},
+})
+const users = collection<User>({
+	primaryKey: 'id',
+	name: 'users',
+	foreignKeys: {
+		appointmentId: {
+			newKey: 'appointment',
+			reference: 'appointments', // looks for the id(s) here
+		},
+	},
+})
 
 describe('testing collection relations', () => {
-	// test('', () => {
-	//     users.collect({
-	//         id: '1',
-	//         appointmentId: '1',
-	//     })
-	//     appointments.collect({
-	//         id: '1',
-	//         name: 'test',
-	//         date: 123,
-	//         userId: '1',
-	//     })
-	//     expect(users.getItem(0).value.appointment).toBeDefined()
-	//     expect(users.value[0].appointment?.name).toBe('test')
-	// 	console.log(users.value)
-	// })
+	test('', () => {
+		users.collect({
+			id: '1',
+			appointmentId: '1',
+		})
+		appointments.collect({
+			id: '1',
+			name: 'test',
+			date: 123,
+			userId: '1',
+		})
+		expect(users.getItem(0).value.appointment).toBeDefined()
+		console.log(users.getItem(0).value.appointment)
+		expect(users.value[0].appointment?.name).toBe('test')
+		console.log(users.value)
+	})
 })
