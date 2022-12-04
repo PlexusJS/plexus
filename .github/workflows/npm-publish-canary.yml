@@ -47,6 +47,8 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: read dir
+        run: ls -la
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -65,6 +67,9 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
+      - name: Install Dependencies
+        run: yarn install
 
       - run: yarn publish-canary
         env:
