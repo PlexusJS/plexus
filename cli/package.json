@@ -15,9 +15,9 @@
 		"precli:build": "rm -rf ./out/bin.js",
 		"cli:build": "rollup --config ./rollup.config.js",
 		"postcli:build": "node ./lib/postbuild.js",
-		"preexecute": "yarn build",
+		"preexecute": "yarn cli:build",
 		"execute": "npx .",
-		"prepublish": "yarn build",
+		"prepublish": "yarn cli:build",
 		"publish-stable": "yarn publish"
 	},
 	"repository": {
