@@ -9,12 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Run Local build workflow
-        uses: PlexusJS/plexus/.github/workflows/build.yml@canary
+    uses: PlexusJS/plexus/.github/workflows/build.yml@canary
       # - uses: actions/setup-node@v3
       #   with:
       #     node-version: 16
