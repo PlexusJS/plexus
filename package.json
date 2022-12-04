@@ -27,7 +27,7 @@
 		"postpublish": "pinst --enable",
 		"test": "vitest",
 		"test-ui": "vitest --ui",
-		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+		"format": "trunk fmt"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.19.3",
