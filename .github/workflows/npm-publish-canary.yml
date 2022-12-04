@@ -34,7 +34,9 @@ jobs:
         continue-on-error: true
         run: yarn list
 
-      - name: Install Dependencies
+      # If the cache is not hit (we don't have a cache for this set of deps), then we need to install the dependencies
+      - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
+        name: Install Dependencies
         run: yarn install
 
       - name: Yarn Build
@@ -47,14 +49,14 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: read dir
-        run: ls -la
+      - run: ls -la
       - uses: actions/checkout@v3
+      - run: ls -la
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://npm.pkg.github.com/
-
+      - run: ls -la
       - name: Cache node modules
         id: cache-yarn
         uses: actions/cache@v3
@@ -67,7 +69,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-
+      - run: ls -la
       - name: Install Dependencies
         run: yarn install
 
