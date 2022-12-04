@@ -36,9 +36,13 @@ jobs:
         name: List the state of node modules
         continue-on-error: true
         run: yarn list
+      - name: Check node_modules
+        uses: andstor/file-existence-action@v1
+        with:
+          files: 'node_modules'
 
       # If the cache is not hit (we don't have a cache for this set of deps), then we need to install the dependencies
-      - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
+      - if: steps.check_files.outputs.files_exists == 'false'
         name: Install Dependencies
         run: yarn install
 
