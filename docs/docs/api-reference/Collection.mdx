@@ -1,307 +1,347 @@
---- 
-	title: Collection 
---- 
+---
+title: Collection
+---
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 A Collection Instance
 
+- [Collection](#Collection)
+  - [.id](#Collection+id) : <code>string</code>
+  - [.instanceId](#Collection+instanceId) : <code>string</code>
+  - [.value](#Collection+value) : <code>Array.&lt;DataType&gt;</code>
+  - [.keys](#Collection+keys) : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+  - [.groups](#Collection+groups) : <code>Record.&lt;string, GroupInstance&gt;</code>
+  - [.groupsValue](#Collection+groupsValue) : <code>Record.&lt;GroupNames, Array.&lt;DataType&gt;&gt;</code>
+  - [.selectors](#Collection+selectors) : <code>Record.&lt;SelectorNames, PlexusCollectionSelector&gt;</code>
+  - [.selectorsValue](#Collection+selectorsValue) : <code>Record.&lt;SelectorNames, Array.&lt;DataType&gt;&gt;</code>
+  - [.name](#Collection+name) : <code>string</code>
+  - [.lastUpdatedKey](#Collection+lastUpdatedKey) : <code>string</code> \| <code>number</code>
+  - [.collect(data, groups)](#Collection+collect) ⇒ <code>this</code>
+  - [.update(key, data, config)](#Collection+update)
+  - [.getItem(dataKey)](#Collection+getItem) ⇒ <code>this</code>
+  - [.getItemValue(key)](#Collection+getItemValue) ⇒ <code>DataType</code>
+  - [.createSelector(selectorName)](#Collection+createSelector) ⇒ <code>this</code>
+  - [.createSelectors(selectorNames)](#Collection+createSelectors) ⇒ <code>this</code>
+  - [.getSelector(name)](#Collection+getSelector) ⇒ <code>this</code> \| <code>undefined</code>
+  - [.createGroup(groupName, config)](#Collection+createGroup) ⇒ <code>this</code>
+  - [.createGroups(groupNamesThe)](#Collection+createGroups) ⇒ <code>this</code>
+  - [.getGroup(name)](#Collection+getGroup) ⇒ <code>this</code>
+  - [.getGroupsOf(key)](#Collection+getGroupsOf) ⇒ <code>Array.&lt;string&gt;</code>
+  - [.addToGroups(key, groups)](#Collection+addToGroups) ⇒ <code>this</code>
+  - [.delete(keys)](#Collection+delete) ⇒ <code>this</code>
+  - [.removeFromGroup(keys, groups)](#Collection+removeFromGroup) ⇒ <code>this</code>
+  - [.clear(groupNames)](#Collection+clear) ⇒ <code>this</code>
+  - [.compute(fn)](#Collection+compute) ⇒ <code>this</code>
+  - [.reCompute(ids)](#Collection+reCompute) ⇒ <code>this</code>
+  - [.reComputeGroups(groupNames)](#Collection+reComputeGroups) ⇒ <code>this</code>
+  - [.key(key)](#Collection+key) ⇒ <code>this</code>
 
-* [Collection](#Collection)
-    * [.id](#Collection+id) : <code>string</code>
-    * [.instanceId](#Collection+instanceId) : <code>string</code>
-    * [.value](#Collection+value) : <code>Array.&lt;DataType&gt;</code>
-    * [.keys](#Collection+keys) : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
-    * [.groups](#Collection+groups) : <code>Record.&lt;string, GroupInstance&gt;</code>
-    * [.groupsValue](#Collection+groupsValue) : <code>Record.&lt;GroupNames, Array.&lt;DataType&gt;&gt;</code>
-    * [.selectors](#Collection+selectors) : <code>Record.&lt;SelectorNames, PlexusCollectionSelector&gt;</code>
-    * [.selectorsValue](#Collection+selectorsValue) : <code>Record.&lt;SelectorNames, Array.&lt;DataType&gt;&gt;</code>
-    * [.name](#Collection+name) : <code>string</code>
-    * [.lastUpdatedKey](#Collection+lastUpdatedKey) : <code>string</code> \| <code>number</code>
-    * [.collect(data, groups)](#Collection+collect) ⇒ <code>this</code>
-    * [.update(key, data, config)](#Collection+update)
-    * [.getItem(dataKey)](#Collection+getItem) ⇒ <code>this</code>
-    * [.getItemValue(key)](#Collection+getItemValue) ⇒ <code>DataType</code>
-    * [.createSelector(selectorName)](#Collection+createSelector) ⇒ <code>this</code>
-    * [.createSelectors(selectorNames)](#Collection+createSelectors) ⇒ <code>this</code>
-    * [.getSelector(name)](#Collection+getSelector) ⇒ <code>this</code> \| <code>undefined</code>
-    * [.createGroup(groupName, config)](#Collection+createGroup) ⇒ <code>this</code>
-    * [.createGroups(groupNamesThe)](#Collection+createGroups) ⇒ <code>this</code>
-    * [.getGroup(name)](#Collection+getGroup) ⇒ <code>this</code>
-    * [.getGroupsOf(key)](#Collection+getGroupsOf) ⇒ <code>Array.&lt;string&gt;</code>
-    * [.addToGroups(key, groups)](#Collection+addToGroups) ⇒ <code>this</code>
-    * [.delete(keys)](#Collection+delete) ⇒ <code>this</code>
-    * [.removeFromGroup(keys, groups)](#Collection+removeFromGroup) ⇒ <code>this</code>
-    * [.clear(groupNames)](#Collection+clear) ⇒ <code>this</code>
-    * [.compute(fn)](#Collection+compute) ⇒ <code>this</code>
-    * [.reCompute(ids)](#Collection+reCompute) ⇒ <code>this</code>
-    * [.reComputeGroups(groupNames)](#Collection+reComputeGroups) ⇒ <code>this</code>
-    * [.key(key)](#Collection+key) ⇒ <code>this</code>
-
-<a name="Collection+id"></a>
+<a name='Collection+id'></a>
 
 ### .id : <code>string</code>
+
 <p>The internal ID of the collection</p>
 
-<a name="Collection+instanceId"></a>
+<a name='Collection+instanceId'></a>
 
 ### .instanceId : <code>string</code>
+
 <p>The internal id of the collection with an instance prefix</p>
 
-<a name="Collection+value"></a>
+<a name='Collection+value'></a>
 
 ### .value : <code>Array.&lt;DataType&gt;</code>
+
 <p>Get all of the collection data values as an array</p>
 
-<a name="Collection+keys"></a>
+<a name='Collection+keys'></a>
 
 ### .keys : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+
 <p>Get all of the collection data keys as an array</p>
 
-<a name="Collection+groups"></a>
+<a name='Collection+groups'></a>
 
 ### .groups : <code>Record.&lt;string, GroupInstance&gt;</code>
+
 <p>Get all the groups in the collection as an object</p>
 
-<a name="Collection+groupsValue"></a>
+<a name='Collection+groupsValue'></a>
 
 ### .groupsValue : <code>Record.&lt;GroupNames, Array.&lt;DataType&gt;&gt;</code>
+
 <p>Get all the groups and their children's data values as an object</p>
 
-<a name="Collection+selectors"></a>
+<a name='Collection+selectors'></a>
 
 ### .selectors : <code>Record.&lt;SelectorNames, PlexusCollectionSelector&gt;</code>
+
 <p>Get all the selectors in the collection as an object</p>
 
-<a name="Collection+selectorsValue"></a>
+<a name='Collection+selectorsValue'></a>
 
 ### .selectorsValue : <code>Record.&lt;SelectorNames, Array.&lt;DataType&gt;&gt;</code>
+
 <p>Get all the groups and their children's data values as an object</p>
 
-<a name="Collection+name"></a>
+<a name='Collection+name'></a>
 
 ### .name : <code>string</code>
+
 <p>Get the name (generated or custom) of the collection store</p>
 
-<a name="Collection+lastUpdatedKey"></a>
+<a name='Collection+lastUpdatedKey'></a>
 
 ### .lastUpdatedKey : <code>string</code> \| <code>number</code>
+
 <p>Get the last updated key of the collection</p>
 
-<a name="Collection+collect"></a>
+<a name='Collection+collect'></a>
 
 ### .collect(data, groups) ⇒ <code>this</code>
-<p>Collect An item of data (or many items of data using an array) into the collection.</p>
+
+<p>
+	Collect An item of data (or many items of data using an array) into the
+	collection.
+</p>
 
 **Returns**: <code>this</code> <p>The collection instance</p>  
-**Requires:**: Each data item must have the primary key as a property  
+**Requires:**: Each data item must have the primary key as a property
 
-| Param | Type | Description |
-| --- | --- | --- |
-| data | <code>Array.&lt;DataType&gt;</code> \| <code>DataType</code> | <p>The data to collect</p> |
-| groups | <code>string</code> \| <code>Array.&lt;string&gt;</code> | <p>The groups to add the items to</p> |
+| Param  | Type                                                         | Description                           |
+| ------ | ------------------------------------------------------------ | ------------------------------------- |
+| data   | <code>Array.&lt;DataType&gt;</code> \| <code>DataType</code> | <p>The data to collect</p>            |
+| groups | <code>string</code> \| <code>Array.&lt;string&gt;</code>     | <p>The groups to add the items to</p> |
 
-<a name="Collection+update"></a>
+<a name='Collection+update'></a>
 
 ### .update(key, data, config)
-<p>Update the collection with data;
-This is like collect but will not add new items, and can can be used to patch existing items</p>
 
+<p>
+	Update the collection with data; This is like collect but will not add new
+	items, and can can be used to patch existing items
+</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| key | <code>string</code> \| <code>number</code> | <p>The key of the item to update</p> |
-| data | <code>DataType</code> | <p>The data to update the item with</p> |
-| config |  | <p>The configuration to use for the update</p> |
-| config.deep | <code>boolean</code> | <p>Should the update be deep or shallow</p> |
+| Param       | Type                                       | Description                                    |
+| ----------- | ------------------------------------------ | ---------------------------------------------- |
+| key         | <code>string</code> \| <code>number</code> | <p>The key of the item to update</p>           |
+| data        | <code>DataType</code>                      | <p>The data to update the item with</p>        |
+| config      |                                            | <p>The configuration to use for the update</p> |
+| config.deep | <code>boolean</code>                       | <p>Should the update be deep or shallow</p>    |
 
-<a name="Collection+getItem"></a>
+<a name='Collection+getItem'></a>
 
 ### .getItem(dataKey) ⇒ <code>this</code>
-<p>Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a <em>provisional</em> one</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+<p>
+	Get the Value of the data item with the provided key (the raw data). If there
+	is not an existing data item, this will return a <em>provisional</em> one
+</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
+
+| Param   | Type                                       | Description                            |
+| ------- | ------------------------------------------ | -------------------------------------- |
 | dataKey | <code>string</code> \| <code>number</code> | <p>The key of the data item to get</p> |
 
-<a name="Collection+getItemValue"></a>
+<a name='Collection+getItemValue'></a>
 
 ### .getItemValue(key) ⇒ <code>DataType</code>
+
 <p>Get the value of an item in the collection</p>
 
-**Returns**: <code>DataType</code> <p>The value of the item</p>  
+**Returns**: <code>DataType</code> <p>The value of the item</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| key | <code>string</code> \| <code>number</code> | <p>The key of the item to get</p> |
+| Param | Type                                       | Description                       |
+| ----- | ------------------------------------------ | --------------------------------- |
+| key   | <code>string</code> \| <code>number</code> | <p>The key of the item to get</p> |
 
-<a name="Collection+createSelector"></a>
+<a name='Collection+createSelector'></a>
 
 ### .createSelector(selectorName) ⇒ <code>this</code>
+
 <p>Create a Selector instance for a given selector name</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param        | Type                | Description                     |
+| ------------ | ------------------- | ------------------------------- |
 | selectorName | <code>string</code> | <p>The name of the selector</p> |
 
-<a name="Collection+createSelectors"></a>
+<a name='Collection+createSelectors'></a>
 
 ### .createSelectors(selectorNames) ⇒ <code>this</code>
+
 <p>Create Selector instances for a given set of selector names</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param         | Type                              | Description                                 |
+| ------------- | --------------------------------- | ------------------------------------------- |
 | selectorNames | <code>Array.&lt;string&gt;</code> | <p>The names of the selectors to create</p> |
 
-<a name="Collection+getSelector"></a>
+<a name='Collection+getSelector'></a>
 
 ### .getSelector(name) ⇒ <code>this</code> \| <code>undefined</code>
+
 <p>Get A Selector instance of a given selector name</p>
 
-**Returns**: <code>this</code> \| <code>undefined</code> <p>Either a Selector Instance or undefined</p>  
+**Returns**: <code>this</code> \| <code>undefined</code> <p>Either a Selector Instance or undefined</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | <p>The Selector Name to search for</p> |
+| Param | Type                | Description                            |
+| ----- | ------------------- | -------------------------------------- |
+| name  | <code>string</code> | <p>The Selector Name to search for</p> |
 
-<a name="Collection+createGroup"></a>
+<a name='Collection+createGroup'></a>
 
 ### .createGroup(groupName, config) ⇒ <code>this</code>
+
 <p>Create a group with a name and a configuration</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| groupName | <code>string</code> | <p>The name of the group</p> |
-| config | <code>PlexusCollectionGroupConfig</code> |  |
+| Param     | Type                                     | Description                  |
+| --------- | ---------------------------------------- | ---------------------------- |
+| groupName | <code>string</code>                      | <p>The name of the group</p> |
+| config    | <code>PlexusCollectionGroupConfig</code> |                              |
 
-<a name="Collection+createGroups"></a>
+<a name='Collection+createGroups'></a>
 
 ### .createGroups(groupNamesThe) ⇒ <code>this</code>
+
 <p>Create multiple groups with a name (no configuration)</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param         | Type                              | Description                          |
+| ------------- | --------------------------------- | ------------------------------------ |
 | groupNamesThe | <code>Array.&lt;string&gt;</code> | <p>names of the groups to create</p> |
 
-<a name="Collection+getGroup"></a>
+<a name='Collection+getGroup'></a>
 
 ### .getGroup(name) ⇒ <code>this</code>
+
 <p>Get A Group instance of a given group name</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | <p>The Group Name to search for</p> |
+| Param | Type                | Description                         |
+| ----- | ------------------- | ----------------------------------- |
+| name  | <code>string</code> | <p>The Group Name to search for</p> |
 
-<a name="Collection+getGroupsOf"></a>
+<a name='Collection+getGroupsOf'></a>
 
 ### .getGroupsOf(key) ⇒ <code>Array.&lt;string&gt;</code>
+
 <p>Given a key, get all Group names that the key is in</p>
 
-**Returns**: <code>Array.&lt;string&gt;</code> <p>An array of Group names that the key is in</p>  
+**Returns**: <code>Array.&lt;string&gt;</code> <p>An array of Group names that the key is in</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| key | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
+| Param | Type                                       | Description                              |
+| ----- | ------------------------------------------ | ---------------------------------------- |
+| key   | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
 
-<a name="Collection+addToGroups"></a>
+<a name='Collection+addToGroups'></a>
 
 ### .addToGroups(key, groups) ⇒ <code>this</code>
+
 <p>Add a data item to a group or groups</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| key | <code>string</code> \| <code>number</code> | <p>The key of the item to add</p> |
+| Param  | Type                                                     | Description                            |
+| ------ | -------------------------------------------------------- | -------------------------------------- |
+| key    | <code>string</code> \| <code>number</code>               | <p>The key of the item to add</p>      |
 | groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>The group(s) to add the item to</p> |
 
-<a name="Collection+delete"></a>
+<a name='Collection+delete'></a>
 
 ### .delete(keys) ⇒ <code>this</code>
+
 <p>Delete a data item completely from the collection.</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| keys | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
+| Param | Type                                       | Description                              |
+| ----- | ------------------------------------------ | ---------------------------------------- |
+| keys  | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
 
-<a name="Collection+removeFromGroup"></a>
+<a name='Collection+removeFromGroup'></a>
 
 ### .removeFromGroup(keys, groups) ⇒ <code>this</code>
+
 <p>Remove a data item from a set of groups</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| keys | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
+| Param  | Type                                                     | Description                                                                |
+| ------ | -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| keys   | <code>string</code> \| <code>number</code>               | <p>The data key(s) to use for lookup</p>                                   |
 | groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>Either a single group or an array of groups to remove the data from</p> |
 
-<a name="Collection+clear"></a>
+<a name='Collection+clear'></a>
 
 ### .clear(groupNames) ⇒ <code>this</code>
+
 <p>Delete all data in the collection</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param      | Type                | Description                                                                 |
+| ---------- | ------------------- | --------------------------------------------------------------------------- |
 | groupNames | <code>string</code> | <p>(Optional) Either an array or a single group name to clear data from</p> |
 
-<a name="Collection+compute"></a>
+<a name='Collection+compute'></a>
 
 ### .compute(fn) ⇒ <code>this</code>
-<p>Run this function when data is collected to format it in a particular way; useful for converting one datatype into another</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+<p>
+	Run this function when data is collected to format it in a particular way;
+	useful for converting one datatype into another
+</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| fn | <code>function</code> | <p>A function that takes in the data and returns the formatted data</p> |
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-<a name="Collection+reCompute"></a>
+| Param | Type                  | Description                                                             |
+| ----- | --------------------- | ----------------------------------------------------------------------- |
+| fn    | <code>function</code> | <p>A function that takes in the data and returns the formatted data</p> |
+
+<a name='Collection+reCompute'></a>
 
 ### .reCompute(ids) ⇒ <code>this</code>
-<p>Re-runs the compute function on select IDs (or all the collection if none provided)</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+<p>
+	Re-runs the compute function on select IDs (or all the collection if none
+	provided)
+</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| ids | <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;Number&gt;</code> | <p>The data key(s) to use for lookup</p> |
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-<a name="Collection+reComputeGroups"></a>
+| Param | Type                                                                   | Description                              |
+| ----- | ---------------------------------------------------------------------- | ---------------------------------------- |
+| ids   | <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;Number&gt;</code> | <p>The data key(s) to use for lookup</p> |
+
+<a name='Collection+reComputeGroups'></a>
 
 ### .reComputeGroups(groupNames) ⇒ <code>this</code>
+
 <p>Same as reCompute, but for groups</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param      | Type                                                     | Description                              |
+| ---------- | -------------------------------------------------------- | ---------------------------------------- |
 | groupNames | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>The data key(s) to use for lookup</p> |
 
-<a name="Collection+key"></a>
+<a name='Collection+key'></a>
 
 ### .key(key) ⇒ <code>this</code>
+
 <p>Set the key of the collection for enhanced internal tracking</p>
 
-**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+**Returns**: <code>this</code> <p>The new Collection Instance</p>
 
-| Param | Type | Description |
-| --- | --- | --- |
-| key | <code>string</code> | <p>The key to use for the collection</p> |
-
+| Param | Type                | Description                              |
+| ----- | ------------------- | ---------------------------------------- |
+| key   | <code>string</code> | <p>The key to use for the collection</p> |
