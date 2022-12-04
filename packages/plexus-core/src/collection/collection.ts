@@ -706,9 +706,9 @@ export class CollectionInstance<
 	 * Get all of the collection data values as an array
 	 * @type {DataType[]}
 	 */
-	get value(): DataType[] {
+	get value(): (DataType & { [key: string]: any })[] {
 		this.mount()
-		const keys: DataType[] = []
+		const keys: (DataType & { [key: string]: any })[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {
 				keys.push(item.value)

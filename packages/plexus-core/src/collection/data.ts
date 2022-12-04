@@ -111,7 +111,7 @@ export class CollectionData<
 	 * Get the value of the data instance
 	 * @type {DataType}
 	 */
-	get value() {
+	get value(): DataType & { [key: string]: any } {
 		const foreignKeys = this.collection().config.foreignKeys
 		if (foreignKeys) {
 			// type ForeignRecords = Record<
@@ -165,7 +165,7 @@ export class CollectionData<
 	 * Get the shallow value of the data instance
 	 * @type {DataType}
 	 */
-	get shallowValue() {
+	get shallowValue(): DataType & { [key: string]: any } {
 		return super.value
 	}
 	/**

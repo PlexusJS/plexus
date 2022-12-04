@@ -16,7 +16,7 @@
 		"plexus-cli": "yarn workspace plexus-cli",
 		"docs": "yarn workspace plexus-docs",
 		"docs:generate:ref": "ts-node write-documentation.ts",
-		"predocs:generate:ref": "yarn format --all",
+		"postdocs:generate:ref": "yarn format --all",
 		"bootstrap": "lerna bootstrap --use-workspaces",
 		"build": "lerna run build",
 		"postbuild": "yarn docs:generate:ref",
