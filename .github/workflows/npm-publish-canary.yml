@@ -85,7 +85,7 @@ jobs:
       - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
         name: Install Dependencies
         env:
-          NOYARNPOSTINSTALL: 1
+          NO_YARN_POSTINSTALL: 1
         run: yarn install
 
       - run: yarn publish-canary

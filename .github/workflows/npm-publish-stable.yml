@@ -50,7 +50,7 @@ jobs:
         run: yarn list
 
       - name: Install Dependencies
-        run: yarn install
+        run: NO_YARN_POSTINSTALL=1 yarn install
 
       - name: Yarn Build
         run: yarn build
