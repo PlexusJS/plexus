@@ -44,4 +44,4 @@ jobs:
         name: Install Dependencies
         env:
           NO_YARN_POSTINSTALL: 1
-        run: NO_YARN_POSTINSTALL=1 yarn install
+        run: NO_YARN_POSTINSTALL=1 yarn install --ignore-scripts
