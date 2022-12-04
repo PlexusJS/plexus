@@ -9,7 +9,7 @@
 	"license": "MIT",
 	"private": true,
 	"scripts": {
-		"postinstall": "test -n \"$NOYARNPOSTINSTALL\" || yarn run build",
+		"postinstall": "test -n \"$NO_YARN_POSTINSTALL\" || yarn run build",
 		"core": "yarn workspace @plexusjs/core",
 		"react": "yarn workspace @plexusjs/react",
 		"next": "yarn workspace @plexusjs/next",

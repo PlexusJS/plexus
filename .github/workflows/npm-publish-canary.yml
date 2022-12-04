@@ -9,7 +9,8 @@ on:
 
 jobs:
   build:
-    uses: PlexusJS/plexus/.github/workflows/build.yml@canary
+    uses:
+      PlexusJS/plexus/.github/workflows/build.yml@canary
       # - uses: actions/setup-node@v3
       #   with:
       #     node-version: 16
@@ -71,7 +72,9 @@ jobs:
         env:
           cache-name: cache-node-module
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
