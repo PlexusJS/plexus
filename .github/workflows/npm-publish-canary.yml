@@ -25,7 +25,6 @@ jobs:
           path: |
             ~/.cache/yarn
             node_modules
-            
 
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
@@ -37,8 +36,7 @@ jobs:
         name: List the state of node modules
         continue-on-error: true
         run: yarn list
-      # print out the current dir
-      - run: ls -la
+
       # If the cache is not hit (we don't have a cache for this set of deps), then we need to install the dependencies
       - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
         name: Install Dependencies
@@ -55,12 +53,10 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v3
-      - run: ls -la
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://npm.pkg.github.com/
-      - run: ls -la
       - name: Cache node modules
         id: cache-yarn
         uses: actions/cache@v3
@@ -73,6 +69,11 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+
+      - run: ls -la
+      - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
+        name: Install Dependencies
+        run: yarn install
 
       - run: yarn publish-canary
         env:
