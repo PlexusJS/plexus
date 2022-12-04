@@ -532,6 +532,7 @@ describe('default group behavior', () => {
 
 type User = {
 	id: string
+	firstName: string
 	appointmentId: string
 }
 type Appointment = {
@@ -543,23 +544,49 @@ type Appointment = {
 
 const appointments = collection<Appointment>({
 	primaryKey: 'id',
+	name: 'appointments',
+	defaultGroup: 'upcoming',
 	foreignKeys: {
 		userId: {
 			newKey: 'user',
-			reference: () => collection(),
+			reference: 'users',
 		},
 	},
 })
-// const users = collection<User>({
-// 	primaryKey: 'id',
-// 	foreignKeys: {
-// 		appointmentId: {
-// 			newKey: 'appointment',
-// 			reference: () => appointments, // looks for the id(s) here
-// 		},
-// 	},
-// })
+const users = collection<User>({
+	primaryKey: 'id',
+	name: 'users',
+	foreignKeys: {
+		appointmentId: {
+			newKey: 'appointment',
+			reference: 'appointments', // looks for the id(s) here
+		},
+	},
+})
 
 describe('testing collection relations', () => {
-	test('', () => {})
+	test('', () => {
+		users.collect({
+			id: '1',
+			firstName: 'John',
+			appointmentId: '1',
+		})
+		appointments.collect({
+			id: '1',
+			name: 'test',
+			date: 123,
+			userId: '1',
+		})
+		expect(users.getItem('1').value.appointment).toBeDefined()
+		console.log(users.getItem('1').value.appointment)
+		expect(users.value[0].appointment?.name).toBe('test')
+		expect(users.getItem('1').value.appointment.name).toBe('test')
+
+		// Checking foreign
+		expect(appointments.getItem('1').value.user).toBeDefined()
+		console.log(appointments.getItem('1').value.user)
+		expect(appointments.value[0].user?.firstName).toBe('John')
+		expect(appointments.getItem('1').value.user.firstName).toBe('John')
+		console.log(appointments.value)
+	})
 })

@@ -52,7 +52,8 @@ export interface PlexusCollectionConfig<DataType> {
 			keyof DataType,
 			{
 				newKey: string
-				reference: () => PlexusCollectionInstance
+				// reference: () => PlexusCollectionInstance
+				reference: string
 			}
 		>
 	>
@@ -85,11 +86,13 @@ export type PlexusCollectionInstance<
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * A Collection Instance
+ *
  */
 export class CollectionInstance<
 	DataType extends Record<string, any>,
 	Groups extends GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType>
+	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
 	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
 	private instance: () => PlexusInstance
@@ -112,10 +115,9 @@ export class CollectionInstance<
 		// return this._internalStore._internalId
 		return `coll_${this._internalStore._internalId}`
 	}
-
 	constructor(
 		instance: () => PlexusInstance,
-		_config: PlexusCollectionConfig<DataType> = {
+		config: PlexusCollectionConfig<DataType> = {
 			primaryKey: 'id',
 			defaultGroup: false,
 		} as const
@@ -123,7 +125,8 @@ export class CollectionInstance<
 		this.instance = instance
 		this.config = {
 			computeLocations: ['collect', 'getValue'],
-			..._config,
+			...config,
+			foreignKeys: config.foreignKeys || {},
 		}
 		this._internalStore = {
 			_internalId:
@@ -131,14 +134,14 @@ export class CollectionInstance<
 				Math.random().toString(36).substring(2, 15),
 			_lookup: new Map<string, string>(),
 			_lastChanged: '',
-			_key: _config?.primaryKey || 'id',
+			_key: config?.primaryKey || 'id',
 			_data: new Map<string, PlexusDataInstance<DataType>>(),
 			_groups: new Map<GroupName, PlexusCollectionGroup<DataType>>() as Groups,
 			_selectors: new Map<
 				SelectorName,
 				PlexusCollectionSelector<DataType>
 			>() as Selectors,
-			_name: _config?.name || '',
+			_name: config?.name || '',
 			_externalName: '',
 			set externalName(value: string) {
 				this._externalName = value
@@ -151,11 +154,11 @@ export class CollectionInstance<
 		}
 		this.mount()
 
-		if (_config.defaultGroup) {
+		if (config.defaultGroup) {
 			// this ensured default shows up as a group name option
 			return this.createGroup(
-				typeof _config.defaultGroup === 'string'
-					? _config.defaultGroup
+				typeof config.defaultGroup === 'string'
+					? config.defaultGroup
 					: 'default'
 			)
 		}
@@ -703,9 +706,9 @@ export class CollectionInstance<
 	 * Get all of the collection data values as an array
 	 * @type {DataType[]}
 	 */
-	get value(): DataType[] {
+	get value(): (DataType & { [key: string]: any })[] {
 		this.mount()
-		const keys: DataType[] = []
+		const keys: (DataType & { [key: string]: any })[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {
 				keys.push(item.value)

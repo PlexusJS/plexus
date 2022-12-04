@@ -43,7 +43,7 @@ jobs:
         name: Install Dependencies
         env:
           NO_YARN_POSTINSTALL: 1
-        run: yarn install
+        run: yarn install --ignore-scripts
 
       - run: yarn publish-canary
         env:

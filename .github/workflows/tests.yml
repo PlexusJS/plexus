@@ -1,7 +1,7 @@
 name: Run Tests
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 on:
   pull_request:
   workflow_dispatch:

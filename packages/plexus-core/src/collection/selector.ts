@@ -18,32 +18,40 @@ export type PlexusCollectionSelector<
 
 /**
  * A selector for data
+ * @example
+ * ```ts
+ * const posts = collection().createSelector('myPosts')
+ * poss.collect({id: 1, title: 'Hello World'})
+ * posts.selectors.myPosts.select(1)
+ * ```
  */
 export class CollectionSelector<
-	ValueType extends Record<string, any>
-> extends WatchableMutable<ValueType> {
-	private _internalStore: CollectionSelectorStore<ValueType>
-	private collection: () => PlexusCollectionInstance<ValueType>
+	DataType extends Record<string, any>
+> extends WatchableMutable<DataType> {
+	private _internalStore: CollectionSelectorStore<DataType>
+	private collection: () => PlexusCollectionInstance<DataType>
 	// private instance: () => PlexusInstance
 
 	/**
 	 * The internal ID of the Selector
+	 * @type {string}
 	 */
 	get id() {
 		return `${this._watchableStore._internalId}`
 	}
 	/**
 	 * The internal id of the Selector with an instance prefix
+	 * @type {string}
 	 */
 	get instanceId(): string {
 		return `sel_${this._watchableStore._internalId}`
 	}
 	constructor(
 		instance: () => PlexusInstance,
-		collection: () => PlexusCollectionInstance<ValueType>,
+		collection: () => PlexusCollectionInstance<DataType>,
 		name: string
 	) {
-		super(instance, {} as ValueType)
+		super(instance, {} as DataType)
 		this._internalStore = {
 			_name: name,
 			_key: null as DataKey | null,
@@ -64,21 +72,23 @@ export class CollectionSelector<
 	}
 	/**
 	 * The key of a data item assigned to this selector
+	 * @type {DataKey | null}
 	 */
 	get key() {
 		return this._internalStore._key
 	}
 	/**
 	 * Select an item in the collection
-	 * @param key The key to select
+	 * @param {string|number} key The key to select
+	 * @returns {this} The selector instance
 	 */
-	select(key: DataKey) {
+	select(key: DataKey): this {
 		if (key === this._internalStore._key) {
 			this.instance().runtime.log(
 				'warn',
 				`Tried selecting the same key, skipping selection on selector ${this.instanceId}...`
 			)
-			return
+			return this
 		}
 		// reset the history if there was one
 		if (this.historyLength) {
@@ -105,41 +115,43 @@ export class CollectionSelector<
 	}
 	/**
 	 * Set the value of the selected data instance
-	 * @param value The value to set
-	 * @param config The config to use when setting the value
-	 * @param config.mode should we 'patch' or 'replace' the value
+	 * @param {DataType} value The value to set
+	 * @returns {this} The selector instance
 	 */
-	set(value: ValueType) {
+	set(value: DataType): this {
 		// TODO add a warning here if the key is not set
 		this.data?.set(value)
 		this.runWatchers()
+		return this
 	}
 	/**
 	 * Patch the value of the selected data instance
-	 * @param value The value to set
-	 * @param config The config to use when setting the value
-	 * @param config.mode should we 'patch' or 'replace' the value
+	 * @param {DataType} value The value to set
+	 * @returns {this} The selector instance
 	 */
-	patch(value: Partial<ValueType>) {
+	patch(value: Partial<DataType>): this {
 		// TODO add a warning here if the key is not set
 		this.data?.patch(value)
 		this.runWatchers()
+		return this
 	}
 
 	/**
 	 * Return the data value of the selected item
+	 * @type {DataType}
 	 */
 	get value() {
 		if (this._internalStore._key === null) {
-			return {} as ValueType
+			return {} as DataType
 		}
 		return (
 			this.collection().getItemValue(this._internalStore._key) ||
-			({} as ValueType)
+			({} as DataType)
 		)
 	}
 	/**
 	 * The data of the selector
+	 * @type {PlexusDataInstance | null}
 	 */
 	get data() {
 		if (this._internalStore._key === null) {
@@ -149,10 +161,12 @@ export class CollectionSelector<
 	}
 	/**
 	 * Watch for changes on this selector
-	 * @param callback The callback to run when the state changes
-	 * @returns The remove function to stop watching
+	 * @callback watcher
+	 * @callback killWatcher
+	 * @param {watcher} callback The callback to run when the state changes
+	 * @returns {killWatcher} The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<ValueType>) {
+	watch(callback: PlexusWatcher<DataType>) {
 		return super.watch((v) => {
 			this.instance().runtime.log(
 				'debug',
@@ -163,21 +177,42 @@ export class CollectionSelector<
 	}
 	private historyLength: number = 0
 
+	/**
+	 * Enable, disable, or set the history length of the state history stored for this selector
+	 * @param {number} maxLength The maximum length of the history
+	 * @returns {this} The selector instance
+	 */
 	history(maxLength: number = 10): this {
 		this.historyLength = maxLength
 		this.data?.history(maxLength)
 		return this
 	}
+	/**
+	 * Can the state be redone any further?
+	 * @type {boolean}
+	 */
 	get canRedo(): boolean {
 		return !!this.data?.canRedo
 	}
+	/**
+	 * Can the state be undone any further?
+	 * @type {boolean}
+	 */
 	get canUndo(): boolean {
 		return !!this.data?.canUndo
 	}
+	/**
+	 * Undo the last change to the state
+	 * @returns {this} The selector instance
+	 */
 	undo(): this {
 		this.data?.undo()
 		return this
 	}
+	/**
+	 * Redo the last change to the state
+	 * @returns {this} The selector instance
+	 */
 	redo(): this {
 		this.data?.redo()
 		return this

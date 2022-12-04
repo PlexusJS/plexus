@@ -111,7 +111,7 @@ export class CollectionData<
 	 * Get the value of the data instance
 	 * @type {DataType}
 	 */
-	get value() {
+	get value(): DataType & { [key: string]: any } {
 		const foreignKeys = this.collection().config.foreignKeys
 		if (foreignKeys) {
 			// type ForeignRecords = Record<
@@ -119,21 +119,53 @@ export class CollectionData<
 			// 	ReturnType<typeof foreignKeys[keyof typeof foreignKeys]["reference"]>
 			// >
 
-			const value = { ...super.value } as Partial<any> & DataType
-			let oldKey: keyof DataType
+			let value = { ...super.value } as Partial<any> & DataType
+			let idKey: keyof DataType
 
-			for (oldKey of Object.keys(foreignKeys ?? {})) {
-				const newKey: keyof Partial<any> = foreignKeys[oldKey]
+			for (idKey of Object.keys(foreignKeys ?? {})) {
+				const newKey: keyof Partial<any> = foreignKeys[idKey]
 					?.newKey as keyof Partial<any>
-				Object.defineProperty(value, newKey, {
-					get() {
-						return foreignKeys[oldKey]?.reference().value
+				const that = this
+
+				// console.log(
+				// 	newKey,
+				// 	'from',
+				// 	foreignKeys[idKey]?.reference,
+				// 	that.instance().findReference(foreignKeys[idKey]?.reference || ''),
+				// 	"here's the data",
+				// 	foreignKeys[idKey]?.newKey,
+				// 	that
+				// 		.instance()
+				// 		.findReference(foreignKeys[idKey]?.reference || '')
+				// 		?.getItem(that.shallowValue[idKey]).shallowValue
+				// )
+
+				value = new Proxy<any>(value, {
+					get(target, p, reciever) {
+						const freshValue =
+							that
+								.instance()
+								.findReference(foreignKeys[idKey]?.reference || '')
+								?.getItem(that.shallowValue[idKey]).shallowValue || ({} as any)
+						console.log('get', p, target, reciever, freshValue)
+						if (p === newKey) {
+							return freshValue
+						}
+						return Reflect.get(target, p, reciever)
 					},
-				})
+				}) as DataType & Record<typeof newKey, any>
 			}
+			// console.log('new value', value)
 
 			return value
 		}
+		return super.value
+	}
+	/**
+	 * Get the shallow value of the data instance
+	 * @type {DataType}
+	 */
+	get shallowValue(): DataType & { [key: string]: any } {
 		return super.value
 	}
 	/**

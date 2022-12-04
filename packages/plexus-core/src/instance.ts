@@ -105,10 +105,17 @@ export class PlexusInstance {
 	 * @internal
 	 * @returns {string} A new unique id (used internally to generate new watchable value keys)
 	 */
-	genId(prefix: string = '') {
+	genId(prefix: string = ''): string {
 		return `${
 			prefix.endsWith('_') ? prefix.substring(0, prefix.length - 1) : prefix
 		}${prefix.length > 0 ? '_' : ''}${genUID()}`
+	}
+
+	findReference(name: string) {
+		const namedCollection = Array.from(this._collections.values()).find(
+			(collection) => collection.name === name
+		)
+		return namedCollection
 	}
 }
 

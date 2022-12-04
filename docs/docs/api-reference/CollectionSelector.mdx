@@ -1,90 +1,131 @@
---- 
-	title: CollectionSelector 
---- 
+---
+title: CollectionSelector
+---
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 A selector for data
 
+- [CollectionSelector](#CollectionSelector)
+  - [.id](#CollectionSelector+id) : <code>string</code>
+  - [.instanceId](#CollectionSelector+instanceId) : <code>string</code>
+  - [.key](#CollectionSelector+key) : <code>DataKey</code> \| <code>null</code>
+  - [.value](#CollectionSelector+value) : <code>DataType</code>
+  - [.data](#CollectionSelector+data) : <code>PlexusDataInstance</code> \| <code>null</code>
+  - [.canRedo](#CollectionSelector+canRedo) : <code>boolean</code>
+  - [.canUndo](#CollectionSelector+canUndo) : <code>boolean</code>
+  - [.select(key)](#CollectionSelector+select) ⇒ <code>this</code>
+  - [.set(value)](#CollectionSelector+set) ⇒ <code>this</code>
+  - [.patch(value)](#CollectionSelector+patch) ⇒ <code>this</code>
+  - [.history(maxLength)](#CollectionSelector+history) ⇒ <code>this</code>
+  - [.undo()](#CollectionSelector+undo) ⇒ <code>this</code>
+  - [.redo()](#CollectionSelector+redo) ⇒ <code>this</code>
 
-* [CollectionSelector](#CollectionSelector)
-    * [.id](#CollectionSelector+id)
-    * [.instanceId](#CollectionSelector+instanceId)
-    * [.key](#CollectionSelector+key)
-    * [.value](#CollectionSelector+value)
-    * [.data](#CollectionSelector+data)
-    * [.select(key)](#CollectionSelector+select)
-    * [.set(value, config)](#CollectionSelector+set)
-    * [.patch(value, config)](#CollectionSelector+patch)
-    * [.watch(callback)](#CollectionSelector+watch) ⇒
+<a name='CollectionSelector+id'></a>
 
-<a name="CollectionSelector+id"></a>
+### .id : <code>string</code>
 
-### .id
 <p>The internal ID of the Selector</p>
 
-<a name="CollectionSelector+instanceId"></a>
+<a name='CollectionSelector+instanceId'></a>
 
-### .instanceId
+### .instanceId : <code>string</code>
+
 <p>The internal id of the Selector with an instance prefix</p>
 
-<a name="CollectionSelector+key"></a>
+<a name='CollectionSelector+key'></a>
 
-### .key
+### .key : <code>DataKey</code> \| <code>null</code>
+
 <p>The key of a data item assigned to this selector</p>
 
-<a name="CollectionSelector+value"></a>
+<a name='CollectionSelector+value'></a>
 
-### .value
+### .value : <code>DataType</code>
+
 <p>Return the data value of the selected item</p>
 
-<a name="CollectionSelector+data"></a>
+<a name='CollectionSelector+data'></a>
 
-### .data
+### .data : <code>PlexusDataInstance</code> \| <code>null</code>
+
 <p>The data of the selector</p>
 
-<a name="CollectionSelector+select"></a>
+<a name='CollectionSelector+canRedo'></a>
 
-### .select(key)
+### .canRedo : <code>boolean</code>
+
+<p>Can the state be redone any further?</p>
+
+<a name='CollectionSelector+canUndo'></a>
+
+### .canUndo : <code>boolean</code>
+
+<p>Can the state be undone any further?</p>
+
+<a name='CollectionSelector+select'></a>
+
+### .select(key) ⇒ <code>this</code>
+
 <p>Select an item in the collection</p>
 
+**Returns**: <code>this</code> <p>The selector instance</p>
 
-| Param | Description |
-| --- | --- |
-| key | <p>The key to select</p> |
+| Param | Type                                       | Description              |
+| ----- | ------------------------------------------ | ------------------------ |
+| key   | <code>string</code> \| <code>number</code> | <p>The key to select</p> |
 
-<a name="CollectionSelector+set"></a>
+<a name='CollectionSelector+set'></a>
 
-### .set(value, config)
+### .set(value) ⇒ <code>this</code>
+
 <p>Set the value of the selected data instance</p>
 
+**Returns**: <code>this</code> <p>The selector instance</p>
 
-| Param | Description |
-| --- | --- |
-| value | <p>The value to set</p> |
-| config | <p>The config to use when setting the value</p> |
-| config.mode | <p>should we 'patch' or 'replace' the value</p> |
+| Param | Type                  | Description             |
+| ----- | --------------------- | ----------------------- |
+| value | <code>DataType</code> | <p>The value to set</p> |
 
-<a name="CollectionSelector+patch"></a>
+<a name='CollectionSelector+patch'></a>
 
-### .patch(value, config)
+### .patch(value) ⇒ <code>this</code>
+
 <p>Patch the value of the selected data instance</p>
 
+**Returns**: <code>this</code> <p>The selector instance</p>
 
-| Param | Description |
-| --- | --- |
-| value | <p>The value to set</p> |
-| config | <p>The config to use when setting the value</p> |
-| config.mode | <p>should we 'patch' or 'replace' the value</p> |
+| Param | Type                  | Description             |
+| ----- | --------------------- | ----------------------- |
+| value | <code>DataType</code> | <p>The value to set</p> |
 
-<a name="CollectionSelector+watch"></a>
+<a name='CollectionSelector+history'></a>
 
-### .watch(callback) ⇒
-<p>Watch for changes on this selector</p>
+### .history(maxLength) ⇒ <code>this</code>
 
-**Returns**: <p>The remove function to stop watching</p>  
+<p>
+	Enable, disable, or set the history length of the state history stored for
+	this selector
+</p>
 
-| Param | Description |
-| --- | --- |
-| callback | <p>The callback to run when the state changes</p> |
+**Returns**: <code>this</code> <p>The selector instance</p>
 
+| Param     | Type                | Default         | Description                              |
+| --------- | ------------------- | --------------- | ---------------------------------------- |
+| maxLength | <code>number</code> | <code>10</code> | <p>The maximum length of the history</p> |
+
+<a name='CollectionSelector+undo'></a>
+
+### .undo() ⇒ <code>this</code>
+
+<p>Undo the last change to the state</p>
+
+**Returns**: <code>this</code> <p>The selector instance</p>
+
+<a name='CollectionSelector+redo'></a>
+
+### .redo() ⇒ <code>this</code>
+
+<p>Redo the last change to the state</p>
+
+**Returns**: <code>this</code> <p>The selector instance</p>
