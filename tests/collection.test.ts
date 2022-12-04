@@ -565,19 +565,18 @@ type Appointment = {
 
 describe('testing collection relations', () => {
 	// test('', () => {
-    //     users.collect({
-    //         id: '1',
-    //         appointmentId: '1',
-            
-    //     })
-    //     appointments.collect({
-    //         id: '1',
-    //         name: 'test',
-    //         date: 123,
-    //         userId: '1',
-    //     })
-    //     expect(users.getItem(0).value.appointment).toBeDefined()
-    //     expect(users.value[0].appointment?.name).toBe('test')
+	//     users.collect({
+	//         id: '1',
+	//         appointmentId: '1',
+	//     })
+	//     appointments.collect({
+	//         id: '1',
+	//         name: 'test',
+	//         date: 123,
+	//         userId: '1',
+	//     })
+	//     expect(users.getItem(0).value.appointment).toBeDefined()
+	//     expect(users.value[0].appointment?.name).toBe('test')
 	// 	console.log(users.value)
 	// })
 })

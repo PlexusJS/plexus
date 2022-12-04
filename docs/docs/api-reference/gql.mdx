@@ -1,14 +1,15 @@
---- 
-	title: gql 
---- 
+---
+title: gql
+---
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 Simple GraphQL query builder.
 
-<a name="gql"></a>
+<a name='gql'></a>
 
 ## gql(chunks, ...variables) ⇒ <code>string</code>
+
 <p>Simple GraphQL query builder.</p>
 
 **Returns**: <code>string</code> <p>The built query</p>  
@@ -17,20 +18,18 @@ Simple GraphQL query builder.
 - [ ] Improve type safety
 - [ ] Make this work better
 
+| Param        | Type                              | Description                                            |
+| ------------ | --------------------------------- | ------------------------------------------------------ |
+| chunks       | <code>TemplateStringsArray</code> | <p>The template string chunks</p>                      |
+| ...variables | <code>Array.&lt;any&gt;</code>    | <p>The variables to be interpolated into the query</p> |
 
-| Param | Type | Description |
-| --- | --- | --- |
-| chunks | <code>TemplateStringsArray</code> | <p>The template string chunks</p> |
-| ...variables | <code>Array.&lt;any&gt;</code> | <p>The variables to be interpolated into the query</p> |
-
-<a name="ApiInstance+gql"></a>
+<a name='ApiInstance+gql'></a>
 
 ## .gql(query, variables)
+
 <p>Send a graphql request</p>
 
-
-| Param | Description |
-| --- | --- |
-| query | <p>The gql query to send</p> |
-| variables | <p>Variables</p> |
-
+| Param     | Description                  |
+| --------- | ---------------------------- |
+| query     | <p>The gql query to send</p> |
+| variables | <p>Variables</p>             |
