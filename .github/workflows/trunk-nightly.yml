@@ -36,6 +36,8 @@ jobs:
         run: npm list
 
       - name: Install Dependencies
+        env:
+          NOYARNPOSTINSTALL: 1
         run: yarn install
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1
