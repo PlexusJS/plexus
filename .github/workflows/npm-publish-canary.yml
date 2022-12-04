@@ -33,7 +33,8 @@ jobs:
         name: List the state of node modules
         continue-on-error: true
         run: yarn list
-
+      # print out the current dir
+      - run: ls -la
       # If the cache is not hit (we don't have a cache for this set of deps), then we need to install the dependencies
       - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
         name: Install Dependencies
