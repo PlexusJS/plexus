@@ -22,7 +22,11 @@ jobs:
         env:
           cache-name: cache-node-module
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
+            
+
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
@@ -50,7 +54,6 @@ jobs:
       contents: read
       packages: write
     steps:
-      - run: ls -la
       - uses: actions/checkout@v3
       - run: ls -la
       - uses: actions/setup-node@v3
@@ -70,9 +73,6 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - run: ls -la
-      - name: Install Dependencies
-        run: yarn install
 
       - run: yarn publish-canary
         env:
