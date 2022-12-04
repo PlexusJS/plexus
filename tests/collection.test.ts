@@ -532,6 +532,7 @@ describe('default group behavior', () => {
 
 type User = {
 	id: string
+	firstName: string
 	appointmentId: string
 }
 type Appointment = {
@@ -567,6 +568,7 @@ describe('testing collection relations', () => {
 	test('', () => {
 		users.collect({
 			id: '1',
+			firstName: 'John',
 			appointmentId: '1',
 		})
 		appointments.collect({
@@ -575,9 +577,16 @@ describe('testing collection relations', () => {
 			date: 123,
 			userId: '1',
 		})
-		expect(users.getItem(0).value.appointment).toBeDefined()
-		console.log(users.getItem(0).value.appointment)
+		expect(users.getItem('1').value.appointment).toBeDefined()
+		console.log(users.getItem('1').value.appointment)
 		expect(users.value[0].appointment?.name).toBe('test')
-		console.log(users.value)
+		expect(users.getItem('1').value.appointment.name).toBe('test')
+
+		// Checking foreign
+		expect(appointments.getItem('1').value.user).toBeDefined()
+		console.log(appointments.getItem('1').value.user)
+		expect(appointments.value[0].user?.firstName).toBe('John')
+		expect(appointments.getItem('1').value.user.firstName).toBe('John')
+		console.log(appointments.value)
 	})
 })

@@ -83,15 +83,16 @@ export type PlexusCollectionInstance<
 	DataType extends Record<string, any> = Record<string, any>,
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
-> = CollectionInstance<DataType, Groups, Selectors>
+> = Collection<DataType, Groups, Selectors>
 /**
  * A Collection Instance
  *
  */
-export class CollectionInstance<
+export class Collection<
 	DataType extends Record<string, any>,
 	Groups extends GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType>
+	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
 	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
 	private instance: () => PlexusInstance
@@ -125,6 +126,7 @@ export class CollectionInstance<
 		this.config = {
 			computeLocations: ['collect', 'getValue'],
 			...config,
+			foreignKeys: config.foreignKeys || {},
 		}
 		this._internalStore = {
 			_internalId:
@@ -368,7 +370,7 @@ export class CollectionInstance<
 			)
 		)
 		this.mount()
-		return this as CollectionInstance<
+		return this as Collection<
 			DataType,
 			Groups,
 			Selectors & Map<Name, PlexusCollectionSelector<DataType>>
@@ -385,7 +387,7 @@ export class CollectionInstance<
 		for (const selectorName of selectorNames) {
 			this.createSelector(selectorName)
 		}
-		return this as CollectionInstance<
+		return this as Collection<
 			DataType,
 			Groups,
 			Selectors &
@@ -438,7 +440,7 @@ export class CollectionInstance<
 			)
 		)
 
-		return this as CollectionInstance<
+		return this as Collection<
 			DataType,
 			Groups & Map<Name, PlexusCollectionGroup<DataType>>,
 			Selectors
@@ -455,7 +457,7 @@ export class CollectionInstance<
 			this.createGroup(groupName)
 		}
 
-		return this as CollectionInstance<
+		return this as Collection<
 			DataType,
 			Groups & Map<typeof groupNames[number], PlexusCollectionGroup<DataType>>,
 			Selectors
@@ -825,7 +827,7 @@ export function _collection<
 	 * Helper Function; Mounts the collection to the instance
 	 */
 
-	const collection = new CollectionInstance<DataType, Groups, Selectors>(
+	const collection = new Collection<DataType, Groups, Selectors>(
 		instance,
 		_config
 	)

@@ -127,18 +127,18 @@ export class CollectionData<
 					?.newKey as keyof Partial<any>
 				const that = this
 
-				console.log(
-					newKey,
-					'from',
-					foreignKeys[idKey]?.reference,
-					that.instance().findReference(foreignKeys[idKey]?.reference || ''),
-					"here's the data",
-					foreignKeys[idKey]?.newKey,
-					that
-						.instance()
-						.findReference(foreignKeys[idKey]?.reference || '')
-						?.getItem(that.shallowValue[idKey]).shallowValue
-				)
+				// console.log(
+				// 	newKey,
+				// 	'from',
+				// 	foreignKeys[idKey]?.reference,
+				// 	that.instance().findReference(foreignKeys[idKey]?.reference || ''),
+				// 	"here's the data",
+				// 	foreignKeys[idKey]?.newKey,
+				// 	that
+				// 		.instance()
+				// 		.findReference(foreignKeys[idKey]?.reference || '')
+				// 		?.getItem(that.shallowValue[idKey]).shallowValue
+				// )
 
 				value = new Proxy<any>(value, {
 					get(target, p, reciever) {
@@ -155,7 +155,7 @@ export class CollectionData<
 					},
 				}) as DataType & Record<typeof newKey, any>
 			}
-			console.log('new value', value)
+			// console.log('new value', value)
 
 			return value
 		}
