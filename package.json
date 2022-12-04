@@ -22,7 +22,7 @@
 		"dev": "nodemon --exec lerna run build",
 		"prepublish": "yarn build",
 		"prepublishOnly": "pinst --disable",
-		"publish-canary": "lerna publish --canary --preid canary --yes",
+		"publish-canary": "lerna publish --canary --preid canary --yes --force-publish",
 		"publish-stable": "lerna publish --yes --force-publish",
 		"publish": "lerna publish --preid canary",
 		"postpublish": "pinst --enable",

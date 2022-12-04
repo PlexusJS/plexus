@@ -12,7 +12,7 @@
 			"npmClient": "yarn",
 			"allowBranch": ["master", "canary"],
 			"registry": "https://registry.npmjs.org/",
-			"ignore": [""]
+			"ignoreChanges": ["docs/**/*"]
 		}
 	}
 }
