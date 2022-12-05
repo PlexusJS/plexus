@@ -72,10 +72,6 @@ export class EventEngine {
 		}
 	}
 	emit(eventId: string, args: any) {
-		if (this.events.has(eventId)) {
-			return
-		}
-
 		// if we're batching, store the event payload
 		if (this.batching) {
 			this.pendingEventPayloads.set(
