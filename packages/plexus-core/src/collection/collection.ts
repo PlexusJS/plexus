@@ -30,7 +30,6 @@ export type ForeignKeyData<DataType> = Partial<
 		keyof DataType,
 		{
 			newKey: string
-			// reference: () => PlexusCollectionInstance
 			reference: string
 		}
 	>

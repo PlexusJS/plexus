@@ -565,7 +565,6 @@ const appointments = collection<Appointment>({
 	},
 })
 
-
 describe('testing collection relations', () => {
 	test('shallow injecting', () => {
 		users.collect({
