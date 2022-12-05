@@ -1,6 +1,7 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { action, state } from '@plexusjs/core'
+import { action, collection, state } from '@plexusjs/core'
 const stringState = state<string>('init')
+const dummyCollection = collection();
 
 describe('Testing Action Function', () => {
 	test('Can run a Function', () => {
@@ -56,6 +57,7 @@ describe('Testing Action Function', () => {
 			batch(async () => {
 				console.log('batched!')
 				stringState.set(successMsg)
+				dummyCollection.collect({ id: 'test' })
 				await new Promise((resolve) =>
 					setTimeout(() => resolve(successMsg), 100)
 				)
@@ -67,6 +69,7 @@ describe('Testing Action Function', () => {
 		expect(stringState.value).toBe('init')
 		setTimeout(() => {
 			expect(stringState.value).toBe(successMsg)
+			expect(dummyCollection.keys.length).toBe(1)
 		}, 100)
 
 		kill()
