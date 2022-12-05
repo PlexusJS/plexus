@@ -191,16 +191,21 @@ export class RuntimeInstance {
 		}
 
 		const unhalt = this.engine.halt()
-		const prom = fnToRun()
-		// if the function returns a promise, wait for it to resolve
-		if (prom) {
-			prom?.finally(() => {
-				unhalt()
-			})
-			return
-		}
-		// if the function doesn't return a promise, just run the unhalt function
-		unhalt()
+		return new Promise<void>(async (resolve, reject) => {
+			const prom = fnToRun()
+			// if the function returns a promise, wait for it to resolve
+			return prom
+				? prom
+						.finally(() => {
+							resolve(unhalt())
+						})
+						.catch((err) => {
+							reject(err)
+						})
+				: resolve(unhalt())
+
+			// if the function doesn't return a promise, just run the unhalt function
+		})
 	}
 }
 /**
