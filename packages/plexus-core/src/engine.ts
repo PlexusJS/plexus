@@ -72,7 +72,7 @@ export class EventEngine {
 		}
 	}
 	emit(eventId: string, args: any) {
-		if (!this.events.has(eventId)) {
+		if (this.events.has(eventId)) {
 			return
 		}
 
