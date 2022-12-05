@@ -2,7 +2,7 @@
 	"name": "plexus-cli",
 	"author": "Philippe Clesca <hello@philippec.me>",
 	"license": "MIT",
-	"version": "1.4.2-canary.30+2dfca5d",
+	"version": "1.4.2-canary.32+d4d517d",
 	"bin": "./out/bin.js",
 	"main": "./out/bin.js",
 	"type": "module",
@@ -29,5 +29,5 @@
 	"devDependencies": {
 		"rollup": "^2.72.1"
 	},
-	"gitHead": "2dfca5dba71dfb3a2f4a4c2fd7bdbc3f80332248"
+	"gitHead": "d4d517dfcc2208b90fd13d4b92c6017f316f04af"
 }
