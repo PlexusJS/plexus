@@ -35,7 +35,7 @@ export class CollectionData<
 	readonly key: string | number
 	provisional: boolean
 	private _internalStore: PlexusDataStore<DataType>
-	private foreignKeyData: Record<string, any> = {}
+	private foreignKeyData: Record<string | number | symbol, any> = {}
 	private watchingForeignData: Map<string, () => void>
 
 	constructor(
@@ -59,7 +59,7 @@ export class CollectionData<
 		}
 		if (!this.provisional) {
 			this.mount()
-			this.syncForeignKeyData()
+			this.syncForeignKeyData(true)
 		}
 	}
 	/**
@@ -113,6 +113,7 @@ export class CollectionData<
 	}
 
 	private syncForeignKeyData(injectListener: boolean = false) {
+		this.instance().runtime.log('info', `syncing foreign key data`)
 		// extract the foreign keys from the collection
 		const foreignKeys = this.collection().config.foreignKeys
 		if (foreignKeys && Object.keys(foreignKeys).length) {
@@ -120,6 +121,7 @@ export class CollectionData<
 
 			let idKey: keyof DataType
 
+			// loop through the foreign keys
 			for (idKey of Object.keys(foreignKeys ?? {})) {
 				const newKey = foreignKeys[idKey]?.newKey as string
 				const foreignCollectionName = foreignKeys[idKey]?.reference as string
@@ -127,7 +129,7 @@ export class CollectionData<
 					foreignCollectionName
 				)
 
-				console.log(this.shallowValue, idKey)
+				// if we have a shallow value, then we can try to get the fresh value from the foreign collection
 				if (this.shallowValue) {
 					const freshValue =
 						foreignCollection?.getItem(this.shallowValue?.[idKey])
@@ -154,9 +156,15 @@ export class CollectionData<
 					}
 					const killWatcher = foreignCollection
 						?.getItem(this.shallowValue?.[idKey])
-						?.watch((value) => {
+						?.watch((value, pk) => {
 							//
-							this.syncForeignKeyData(!!value)
+							if (
+								pk &&
+								value &&
+								this.foreignKeyData &&
+								value[pk] !== this.foreignKeyData[pk]
+							)
+								this.syncForeignKeyData(true)
 						})
 					if (killWatcher) {
 						this.watchingForeignData.set(newKey, killWatcher)
@@ -179,7 +187,7 @@ export class CollectionData<
 				// 		return Reflect.get(target, prop, reciever)
 				// 	},
 				// })
-				console.log('get', foreignKeys, 'value', this.foreignKeyData[newKey])
+				console.log('get', foreignKeys, 'value', this.foreignKeyData?.[newKey])
 			}
 			// this.foreignKeyData = value
 		}
@@ -261,8 +269,10 @@ export class CollectionData<
 		const foreignKeys = this.collection().config.foreignKeys
 		for (let foreignKey of Object.keys(foreignKeys ?? {})) {
 			if (
+				this._watchableStore._value?.[foreignKey] &&
+				this._watchableStore._lastValue?.[foreignKey] &&
 				!isEqual(
-					this._watchableStore._value[foreignKey],
+					this._watchableStore._value?.[foreignKey],
 					this._watchableStore._lastValue?.[foreignKey]
 				)
 			) {
@@ -319,10 +329,10 @@ export class CollectionData<
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
 	watch(callback: PlexusWatcher<DataType>, from?: string) {
-		this.syncForeignKeyData()
+		// this.syncForeignKeyData()
 		const destroyer = super.watch((value) => {
-			this.syncForeignKeyData()
-			return callback(value)
+			this.syncForeignKeyData(true)
+			return callback(value, this.primaryKey)
 		}, from)
 		return destroyer
 	}

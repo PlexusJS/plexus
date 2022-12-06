@@ -555,7 +555,6 @@ const users = collection<User>({
 const appointments = collection<Appointment>({
 	primaryKey: 'id',
 	name: 'appointments',
-	unfoundKeyReturnsUndefined: true,
 	defaultGroup: 'upcoming',
 	foreignKeys: {
 		userId: {
