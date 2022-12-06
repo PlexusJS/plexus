@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/napi",
-	"version": "1.4.2-canary.38+3e9fcfe",
+	"version": "1.4.2-canary.39+c5c871a",
 	"description": "A library for building modular interconnected applications",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -23,7 +23,7 @@
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "3e9fcfe07255a1894ebdfb5199c38da1e9ea0337",
+	"gitHead": "c5c871ad2c28a0eb18644b8c95b9541d8b0db37d",
 	"devDependencies": {
 		"isomorphic-fetch": "^3.0.0"
 	},
