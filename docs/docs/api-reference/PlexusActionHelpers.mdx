@@ -12,7 +12,7 @@ The action helpers for a defined plexus action
   - [.onCatch(handler)](#PlexusActionHelpers+onCatch)
   - [.runErrorHandlers()](#PlexusActionHelpers+runErrorHandlers)
   - [.ignoreInit()](#PlexusActionHelpers+ignoreInit)
-  - [.batch(fnOrName)](#PlexusActionHelpers+batch)
+  - [.batch(fn)](#PlexusActionHelpers+batch)
 
 <a name='PlexusActionHelpers+catchError'></a>
 
@@ -53,13 +53,13 @@ The action helpers for a defined plexus action
 
 <a name='PlexusActionHelpers+batch'></a>
 
-### .batch(fnOrName)
+### .batch(fn)
 
 <p>
 	Run a function. During that function's execution, any state changes will be
 	batched and only applied once the function has finished.
 </p>
 
-| Param    | Description                           |
-| -------- | ------------------------------------- |
-| fnOrName | <p>The function to run in a batch</p> |
+| Param | Description                           |
+| ----- | ------------------------------------- |
+| fn    | <p>The function to run in a batch</p> |

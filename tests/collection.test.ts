@@ -541,7 +541,17 @@ type Appointment = {
 	date: number
 	userId: string
 }
-
+const users = collection<User>({
+	primaryKey: 'id',
+	name: 'users',
+	unfoundKeyReturnsUndefined: true,
+	foreignKeys: {
+		appointmentId: {
+			newKey: 'appointment',
+			reference: 'appointments', // looks for the id(s) here
+		},
+	},
+})
 const appointments = collection<Appointment>({
 	primaryKey: 'id',
 	name: 'appointments',
@@ -553,19 +563,9 @@ const appointments = collection<Appointment>({
 		},
 	},
 })
-const users = collection<User>({
-	primaryKey: 'id',
-	name: 'users',
-	foreignKeys: {
-		appointmentId: {
-			newKey: 'appointment',
-			reference: 'appointments', // looks for the id(s) here
-		},
-	},
-})
 
 describe('testing collection relations', () => {
-	test('', () => {
+	test('shallow injecting', () => {
 		users.collect({
 			id: '1',
 			firstName: 'John',
@@ -577,9 +577,9 @@ describe('testing collection relations', () => {
 			date: 123,
 			userId: '1',
 		})
-		expect(users.getItem('1').value.appointment).toBeDefined()
-		console.log(users.getItem('1').value.appointment)
-		expect(users.value[0].appointment?.name).toBe('test')
+		expect(users.getItem('1').value).toBeDefined()
+		console.log('found appointment', users.getItem('1').value.appointment)
+		expect(users.value[0].appointment.name).toBe('test')
 		expect(users.getItem('1').value.appointment.name).toBe('test')
 
 		// Checking foreign

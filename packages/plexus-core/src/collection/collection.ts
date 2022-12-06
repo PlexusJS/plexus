@@ -25,7 +25,15 @@ type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<
 	? K
 	: never
 
-// type valuesOfArray =
+export type ForeignKeyData<DataType> = Partial<
+	Record<
+		keyof DataType,
+		{
+			newKey: string
+			reference: string
+		}
+	>
+>
 
 export { PlexusCollectionGroup, PlexusCollectionSelector }
 export interface PlexusCollectionConfig<DataType> {
@@ -47,16 +55,7 @@ export interface PlexusCollectionConfig<DataType> {
 	 */
 	unfoundKeyReturnsUndefined?: boolean
 
-	foreignKeys?: Partial<
-		Record<
-			keyof DataType,
-			{
-				newKey: string
-				// reference: () => PlexusCollectionInstance
-				reference: string
-			}
-		>
-	>
+	foreignKeys?: ForeignKeyData<DataType>
 	computeLocations?: Array<'collect' | 'getValue'>
 }
 interface PlexusCollectionStore<

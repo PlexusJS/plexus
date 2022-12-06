@@ -20,26 +20,33 @@ import { _event, PlexusEventInstance } from './event'
 import { storage as _storage, StorageOverride } from './storage'
 import { PlexusPlugin, PlexusPluginConfig } from './plugin'
 import { PlexusPreActionConfig, _preaction } from './preaction'
+import { LiteralType } from '@plexusjs/utils'
 
 /**
  * Generate a Plexus State
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function state<Value extends PlexusStateType = any>(item: Value) {
-	return _state(() => instance(), item)
+export function state<
+	Literal extends PlexusStateType = any,
+	Value = LiteralType<Literal>
+>(item: Value) {
+	return _state<Value>(() => instance(), item)
 }
 /**
  * Generate a Plexus State
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function computed<Value extends PlexusStateType = any>(
+export function computed<
+	Literal extends PlexusStateType = any,
+	Value = LiteralType<Literal>
+>(
 	item: (value?: Value) => Value,
 	dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>
 ) {
 	if (!Array.isArray(dependencies)) {
-		return _computed(() => instance(), item, [dependencies])
+		return _computed<Value>(() => instance(), item, [dependencies])
 	}
 	return _computed(() => instance(), item, dependencies)
 }

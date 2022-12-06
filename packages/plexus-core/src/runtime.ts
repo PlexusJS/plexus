@@ -21,6 +21,8 @@ export class RuntimeInstance {
 	private _engine: EventEngine
 	private initializing = false
 	private initsCompleted = 0
+	private batching: boolean = false
+	batchedSetters: Set<() => any> = new Set()
 
 	constructor(
 		instance: () => PlexusInstance,
@@ -180,27 +182,31 @@ export class RuntimeInstance {
 	 *	The batch function allows you to run a series of actions in a single transaction
 	 * @param fn The function to run
 	 */
-	batch(
-		fnOrName: (() => void | Promise<void>) | string,
-		fn?: () => void | Promise<void>
-	) {
-		const name = typeof fnOrName === 'string' ? fnOrName : undefined
-		const fnToRun = typeof fnOrName === 'function' ? fnOrName : fn
-		if (!fnToRun) {
+	async batch(fn: () => void | Promise<void>) {
+		if (!fn) {
 			throw new Error('You must provide a function to run in the batch')
 		}
 
+		// hold the reactivity engine and start storing changes
 		const unhalt = this.engine.halt()
-		const prom = fnToRun()
-		// if the function returns a promise, wait for it to resolve
-		if (prom) {
-			prom?.finally(() => {
-				unhalt()
-			})
-			return
-		}
-		// if the function doesn't return a promise, just run the unhalt function
+		this.batching = true
+		// run the function
+		const prom = await fn()
+		this.instance().runtime.log('info', 'batch callback ran!')
+		// stop storing changes and emit the changes
 		unhalt()
+		// reset the batching flag
+		this.batching = false
+		this.batchedSetters.forEach((setter) => setter())
+		return
+	}
+
+	/**
+	 * The batching flag
+	 * @type {boolean} true if the runtime is batching
+	 */
+	get isBatching() {
+		return this.batching
 	}
 }
 /**

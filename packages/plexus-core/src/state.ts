@@ -1,15 +1,10 @@
-import {
-	AlmostAnything,
-	deepClone,
-	deepMerge,
-	isEqual,
-	isObject,
-} from '@plexusjs/utils'
+import { deepClone, deepMerge, isEqual, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance'
 import { PlexusWatcher } from './interfaces'
+
 import { WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
-export type PlexusStateType = AlmostAnything
+export type PlexusStateType = NonNullable<any>
 export type PlexusState = <Value extends PlexusStateType = any>(
 	instance: () => PlexusInstance,
 	input: Value

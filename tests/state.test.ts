@@ -18,20 +18,19 @@ const initialValue = {
 	],
 	null: null,
 }
-const booleanState = state(initialValue.boolean)
-const stringState = state(initialValue.string)
+const booleanState = state(true)
+const stringState = state('Hello Plexus!')
 const objectState = state<ObjectStateExample>(initialValue.object)
 const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(
 	initialValue.array
 )
-const nullState = state(initialValue.null)
+// TODO Disallow null as initial value
 
 beforeEach(() => {
 	booleanState.reset()
 	stringState.reset()
 	objectState.reset()
 	arrayState.reset()
-	nullState.reset()
 })
 describe('Testing State Function', () => {
 	test('Can save a value', () => {

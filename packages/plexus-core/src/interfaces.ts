@@ -10,4 +10,7 @@ export type AlmostAnything =
 
 export type PlexusRuntime = ReturnType<typeof _runtime>
 export type PlexusEvent = ReturnType<typeof _event>
-export type PlexusWatcher<V extends any = any> = (value: V) => void
+export type PlexusWatcher<V extends any = any> = (
+	value: V,
+	primaryKey?: keyof V
+) => void

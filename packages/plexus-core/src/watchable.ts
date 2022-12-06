@@ -1,6 +1,5 @@
 import { PlexusInstance } from '.'
 import { deepClone, deepMerge, isObject, isEqual } from '@plexusjs/utils'
-import { AlmostAnything } from './interfaces'
 export type PlexusWatcher<V extends any = any> = (value: V) => void
 interface WatchableStore<Value = any> {
 	_initialValue: Value
@@ -60,7 +59,7 @@ export class Watchable<ValueType = any> {
 }
 
 export class WatchableMutable<
-	ValueType extends AlmostAnything = any
+	ValueType extends NonNullable<any> = any
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
 	constructor(instance: () => PlexusInstance, init: ValueType) {
@@ -169,6 +168,10 @@ export class WatchableMutable<
 	 * @param newValue The new value of this state
 	 */
 	set(newValue?: ValueType) {
+		if (this.instance().runtime.isBatching) {
+			this.instance().runtime.batchedSetters.add(() => this.set(newValue))
+			return
+		}
 		const value = deepClone(newValue)
 		this._watchableStore._lastValue = this._watchableStore._value
 		if (isObject(value) && isObject(this._watchableStore._value)) {
