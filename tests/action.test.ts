@@ -91,14 +91,11 @@ describe('Testing Action Function', () => {
 		// the string state should be 'init' because the batch function hasn't finished yet
 		expect(stringState.value).toBe('init')
 		expect(users.getItemValue('1')?.firstName).toBeFalsy()
-		setTimeout(() => {
-			expect(stringState.value).toBe(successMsg)
-			expect(dummyCollection.keys.length).toBe(1)
-		}, 100)
 
 		await waitFor(
 			() => {
 				console.log('finished waiting!')
+				expect(dummyCollection.keys.length).toBe(1)
 				expect(stringState.value).toBe(successMsg)
 				expect(users.getItem('1').value?.firstName).toBe('John')
 				console.log('batch successful', users.getItemValue('1')?.firstName)
