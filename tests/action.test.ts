@@ -1,7 +1,10 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { action, instance, state } from '@plexusjs/core'
+
+import { action, instance, state, collection } from '@plexusjs/core'
 import { appointments, users, waitFor } from './test-utils'
+
 const stringState = state<string>('init')
+const dummyCollection = collection()
 
 describe('Testing Action Function', () => {
 	test('Can run a Function', () => {
@@ -70,6 +73,7 @@ describe('Testing Action Function', () => {
 				})
 				console.log('batched!')
 				stringState.set(successMsg)
+				dummyCollection.collect({ id: 'test' })
 				return new Promise((resolve) =>
 					setTimeout(() => resolve(successMsg), 900)
 				)
@@ -87,6 +91,10 @@ describe('Testing Action Function', () => {
 		// the string state should be 'init' because the batch function hasn't finished yet
 		expect(stringState.value).toBe('init')
 		expect(users.getItemValue('1')?.firstName).toBeFalsy()
+		setTimeout(() => {
+			expect(stringState.value).toBe(successMsg)
+			expect(dummyCollection.keys.length).toBe(1)
+		}, 100)
 
 		await waitFor(
 			() => {
