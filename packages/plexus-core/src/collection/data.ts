@@ -187,7 +187,7 @@ export class CollectionData<
 				// 		return Reflect.get(target, prop, reciever)
 				// 	},
 				// })
-				console.log('get', foreignKeys, 'value', this.foreignKeyData?.[newKey])
+				// console.log('get', foreignKeys, 'value', this.foreignKeyData?.[newKey])
 			}
 			// this.foreignKeyData = value
 		}
@@ -200,7 +200,7 @@ export class CollectionData<
 			  }
 			: undefined
 
-		console.log('generated value:', value)
+		// console.log('generated value:', value)
 		return value as DataType & { [key: string]: any }
 	}
 	/**

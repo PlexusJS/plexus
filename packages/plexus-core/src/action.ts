@@ -63,14 +63,10 @@ class PlexusActionHelpers {
 
 	/**
 	 * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
-	 * @param fnOrName The function to run in a batch
+	 * @param fn The function to run in a batch
 	 */
-	batch(fnOrName: () => void, fn?: () => void): Promise<void> {
-		if (typeof fnOrName === 'function') {
-			return this.instance().runtime.batch(fnOrName)
-		} else {
-			return this.instance().runtime.batch(fnOrName, fn)
-		}
+	batch(fn: () => void | Promise<void>): Promise<void> {
+		return this.instance().runtime.batch(fn)
 	}
 
 	/**
@@ -84,7 +80,9 @@ class PlexusActionHelpers {
 		const ignoreInit = (): void => {
 			return this.ignoreInit()
 		}
-		const batch = () => {}
+		const batch = (batchedActions: () => void | Promise<void>) => {
+			return this.batch(batchedActions)
+		}
 		return {
 			/**
 			 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
