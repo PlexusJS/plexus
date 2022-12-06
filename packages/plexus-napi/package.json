@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/napi",
-	"version": "1.4.2-canary.39+c5c871a",
+	"version": "1.4.2-canary.41+377d11d",
 	"description": "A library for building modular interconnected applications",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -20,10 +20,9 @@
 	"scripts": {
 		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
 		"build": "tsc --build --force && echo \"Build complete.\"",
-		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "c5c871ad2c28a0eb18644b8c95b9541d8b0db37d",
+	"gitHead": "377d11dc1c9e4ad39b05ec029b6dbc442fa70769",
 	"devDependencies": {
 		"isomorphic-fetch": "^3.0.0"
 	},
