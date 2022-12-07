@@ -46,6 +46,13 @@ interface ApiStore {
 	_silentFail: boolean
 	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
 }
+
+type HeaderCache<CacheValue = Record<string, any>> =
+	| [
+			CacheValue | Promise<CacheValue> | undefined,
+			(() => CacheValue | Promise<CacheValue> | undefined) | undefined
+	  ]
+	| []
 /**
  * An API instance is used to make requests to a server. Interact with this by using `api()`
  */
@@ -53,6 +60,13 @@ export class ApiInstance {
 	// private
 	private _internalStore: ApiStore
 	private _headers: Map<string, string> = new Map()
+	private headerGetter: () =>
+		| Record<string, any>
+		| Promise<Record<string, any>>
+		| undefined = () => ({})
+
+	private waiting = false
+	private waitingQueue: (() => void)[] = []
 	constructor(
 		baseURL: string = '',
 		config: PlexusApiConfig = { defaultOptions: {} }
@@ -241,7 +255,7 @@ export class ApiInstance {
 			options
 		) as RequestInit & { headers: Record<string, string> }
 
-		this.headers(options.headers)
+		this.setHeaders(() => options.headers)
 		return this
 	}
 	/**
@@ -364,13 +378,20 @@ export class ApiInstance {
 		this._headers.set('Authorization', `${prefix}${token}`)
 		return this
 	}
+
 	/**
 	 * Set headers for the request
 	 * @param headers The headers to set for the request
 	 */
-	headers(headers?: Record<string, any>) {
+	setHeaders<
+		ReturnType extends
+			| Record<string, any>
+			| Promise<Record<string, any>>
+			| undefined
+	>(headersGenerator?: () => ReturnType): Promise<this> | this {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore._noFetch) return this
+
 		const temp: Record<string, any> = {}
 		Array.from(this._headers.entries()).map(([key, value]) => {
 			// uppercase the dash separated tokens
@@ -381,20 +402,39 @@ export class ApiInstance {
 					.join('-')
 			] = value
 		})
-		Object.entries(headers || {}).map(([key, value]) => {
-			// uppercase the dash separated tokens
-			temp[
-				key
-					.split('-')
-					.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
-					.join('-')
-			] = value
+		return new Promise<this>(async (resolve) => {
+			this.waiting = true
+			const generateHeaders = (headers: ReturnType) => {
+				this.headerGetter = !!headersGenerator ? headersGenerator : () => ({})
+				this.waiting = false
+				Object.entries(headers || {}).map(([key, value]) => {
+					// uppercase the dash separated tokens
+					temp[
+						key
+							.split('-')
+							.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
+							.join('-')
+					] = value
+				})
+				this._headers.clear()
+				Object.entries(temp).forEach((kvPair) => {
+					this._headers.set(kvPair[0], kvPair[1])
+				})
+				return this
+			}
+			const headers = headersGenerator?.()
+			if (headers instanceof Promise) {
+				await headers
+				resolve(generateHeaders(headers))
+				return this
+			}
+			if (!!headers) {
+				resolve(generateHeaders(headers))
+				return this
+			}
+
+			resolve(this)
 		})
-		this._headers.clear()
-		Object.entries(temp).forEach((kvPair) => {
-			this._headers.set(kvPair[0], kvPair[1])
-		})
-		return this
 	}
 	/**
 	 * Reset this routes configuration
