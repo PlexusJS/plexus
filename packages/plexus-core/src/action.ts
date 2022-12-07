@@ -7,7 +7,7 @@ export interface PlexusActionHooks {
 	 * Ignore the default hault preActions
 	 */
 	ignoreInit(): void
-	batch(fn: () => void): void
+	batch(fn: () => void): void|Promise<void>
 }
 /**
  * The action helpers for a defined plexus action
