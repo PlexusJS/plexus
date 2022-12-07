@@ -1,6 +1,12 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 
-import { action, instance, state, collection } from '@plexusjs/core'
+import {
+	batchAction,
+	action,
+	instance,
+	state,
+	collection,
+} from '@plexusjs/core'
 import { appointments, users, waitFor } from './test-utils'
 
 const stringState = state<string>('init')
@@ -58,6 +64,64 @@ describe('Testing Action Function', () => {
 			expect(val).toBe(successMsg)
 		})
 		const myAction = action(async ({ onCatch, batch }) => {
+			onCatch(console.error)
+			await batch(() => {
+				users.collect({
+					id: '1',
+					firstName: 'John',
+					appointmentId: '1',
+				})
+				appointments.collect({
+					id: '1',
+					name: 'test',
+					date: 123,
+					userId: '1',
+				})
+				console.log('batched!')
+				stringState.set(successMsg)
+				dummyCollection.collect({ id: 'test' })
+				return new Promise<string>((resolve) =>
+					setTimeout(() => resolve(successMsg), 900)
+				)
+			})
+			return
+		})
+
+		// the string state should be 'init' because the batch function hasn't finished yet
+		expect(stringState.value).toBe('init')
+		expect(users.getItemValue('1')?.firstName).toBeFalsy()
+
+		// purposely not waiting for the async action to finish
+		myAction()
+
+		// the string state should be 'init' because the batch function hasn't finished yet
+		expect(stringState.value).toBe('init')
+		expect(users.getItemValue('1')?.firstName).toBeFalsy()
+
+		await waitFor(
+			() => {
+				console.log('finished waiting!')
+				expect(dummyCollection.keys.length).toBe(1)
+				expect(stringState.value).toBe(successMsg)
+				expect(users.getItem('1').value?.firstName).toBe('John')
+				console.log('batch successful', users.getItemValue('1')?.firstName)
+				kill()
+			},
+			{ timeout: 1000 }
+		)
+	})
+
+	test('Can handle batching with batchAction', async () => {
+		const successMsg = 'waited 100 seconds'
+		stringState.set('init')
+
+		instance({ logLevel: 'debug' })
+
+		const kill = stringState.watch((val) => {
+			console.log('watcher called', val)
+			expect(val).toBe(successMsg)
+		})
+		const myAction = batchAction(async ({ onCatch, batch }) => {
 			onCatch(console.error)
 			await batch(() => {
 				users.collect({

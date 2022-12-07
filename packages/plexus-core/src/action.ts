@@ -117,7 +117,7 @@ export type PlexusAction = typeof _action
 export function _action<Fn extends FunctionType>(
 	instance: () => PlexusInstance,
 	fn: Fn,
-	batched: boolean
+	batched?: boolean
 ) {
 	const helpers = new PlexusActionHelpers(instance)
 

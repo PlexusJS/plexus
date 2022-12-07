@@ -278,7 +278,7 @@ export class CollectionInstance<
 		if (this.config.useBatching) {
 			this.instance().runtime.batch(collectFn)
 		} else {
-			collectFn();
+			collectFn()
 		}
 		this.mount()
 		return this
@@ -550,11 +550,11 @@ export class CollectionInstance<
 				addToGroup(groups)
 			}
 		}
-		
+
 		if (this.config.useBatching) {
 			this.instance().runtime.batch(fn)
 		} else {
-			fn();
+			fn()
 		}
 
 		return this
