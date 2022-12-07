@@ -7,7 +7,9 @@ export interface PlexusActionHooks {
 	 * Ignore the default hault preActions
 	 */
 	ignoreInit(): void
-	batch(fn: () => void): void | Promise<void>
+	batch<ReturnType extends any = any>(
+		fn: () => ReturnType
+	): ReturnType | Promise<ReturnType>
 }
 /**
  * The action helpers for a defined plexus action
@@ -82,7 +84,9 @@ class PlexusActionHelpers {
 		const ignoreInit = (): void => {
 			return this.ignoreInit()
 		}
-		const batch = (batchedActions: () => void | Promise<void>) => {
+		const batch = <ReturnType extends any = any>(
+			batchedActions: () => ReturnType | Promise<ReturnType>
+		) => {
 			return this.batch(batchedActions)
 		}
 		return {
