@@ -24,6 +24,7 @@ export class EventEngine {
 			this.pendingEventPayloads.forEach((args, eventId) => {
 				this.emit(eventId, args)
 			})
+			this.pendingEventPayloads.clear()
 		}
 	}
 

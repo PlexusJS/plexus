@@ -74,7 +74,7 @@ describe('Testing Action Function', () => {
 				console.log('batched!')
 				stringState.set(successMsg)
 				dummyCollection.collect({ id: 'test' })
-				return new Promise((resolve) =>
+				return new Promise<string>((resolve) =>
 					setTimeout(() => resolve(successMsg), 900)
 				)
 			})
