@@ -85,6 +85,16 @@ export function collection<Type extends { [key: string]: any }>(
 export function action<Fn extends FunctionType>(fn: Fn) {
 	return _action<Fn>(() => instance(), fn)
 }
+
+/**
+ * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
+ * @param fn The function to run in a batch
+ */
+export function batch<ReturnType extends any = any>(
+	fn: () => ReturnType | Promise<ReturnType>
+): Promise<ReturnType> {
+	return instance().runtime.batch(fn)
+}
 /**
  * Generate a Plexus Action
  * @param fn The Plexus action function to run

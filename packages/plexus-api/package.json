@@ -20,7 +20,6 @@
 	"scripts": {
 		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
 		"build": "tsc --build --force && echo \"Build complete.\"",
-
 		"dev": "tsc --watch"
 	},
 	"gitHead": "377d11dc1c9e4ad39b05ec029b6dbc442fa70769",

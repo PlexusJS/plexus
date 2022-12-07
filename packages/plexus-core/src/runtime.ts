@@ -182,7 +182,9 @@ export class RuntimeInstance {
 	 *	The batch function allows you to run a series of actions in a single transaction
 	 * @param fn The function to run
 	 */
-	async batch(fn: () => void | Promise<void>) {
+	async batch<ReturnType extends any = any>(
+		fn: () => ReturnType | Promise<ReturnType>
+	) {
 		if (!fn) {
 			throw new Error('You must provide a function to run in the batch')
 		}
@@ -198,7 +200,7 @@ export class RuntimeInstance {
 		// reset the batching flag
 		this.batching = false
 		this.batchedSetters.forEach((setter) => setter())
-		return
+		return prom
 	}
 
 	/**
