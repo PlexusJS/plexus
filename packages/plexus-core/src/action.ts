@@ -7,7 +7,7 @@ export interface PlexusActionHooks {
 	 * Ignore the default hault preActions
 	 */
 	ignoreInit(): void
-	batch(fn: () => void): void|Promise<void>
+	batch(fn: () => void): void | Promise<void>
 }
 /**
  * The action helpers for a defined plexus action
@@ -65,7 +65,9 @@ class PlexusActionHelpers {
 	 * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
 	 * @param fn The function to run in a batch
 	 */
-	batch(fn: () => void | Promise<void>): Promise<void> {
+	batch<ReturnType extends any = any>(
+		fn: () => ReturnType | Promise<ReturnType>
+	): Promise<ReturnType> {
 		return this.instance().runtime.batch(fn)
 	}
 
