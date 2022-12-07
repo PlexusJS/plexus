@@ -54,6 +54,11 @@ export interface PlexusCollectionConfig<DataType> {
 	 * @warning The type of the returned value WILL NOT change to undefined. Only the literal value will be undefined as this is _technically_ an override. Please beware and plan accordingly.
 	 */
 	unfoundKeyReturnsUndefined?: boolean
+	/**
+	 * When this value is true, the collection will use batching when running operations (like collections) on array to reduce the number of rerenders. This is useful when you are ingesting a large amount of data at once.
+	 * @default true
+	 */
+	useBatching?: boolean
 
 	foreignKeys?: ForeignKeyData<DataType>
 	computeLocations?: Array<'collect' | 'getValue'>
@@ -124,6 +129,7 @@ export class CollectionInstance<
 		this.instance = instance
 		this.config = {
 			computeLocations: ['collect', 'getValue'],
+			useBatching: true,
 			...config,
 			foreignKeys: config.foreignKeys || {},
 		}
@@ -260,12 +266,19 @@ export class CollectionInstance<
 				}
 			}
 		}
-		if (Array.isArray(data)) {
-			for (let item of data) {
-				collectItem(item)
+		const collectFn = () => {
+			if (Array.isArray(data)) {
+				for (let item of data) {
+					collectItem(item)
+				}
+			} else {
+				collectItem(data)
 			}
+		}
+		if (this.config.useBatching) {
+			this.instance().runtime.batch(collectFn)
 		} else {
-			collectItem(data)
+			collectFn();
 		}
 		this.mount()
 		return this
@@ -528,12 +541,20 @@ export class CollectionInstance<
 			}
 			g.add(key)
 		}
-		if (Array.isArray(groups)) {
-			for (let group of groups) {
-				addToGroup(group)
+		const fn = () => {
+			if (Array.isArray(groups)) {
+				for (let group of groups) {
+					addToGroup(group)
+				}
+			} else {
+				addToGroup(groups)
 			}
+		}
+		
+		if (this.config.useBatching) {
+			this.instance().runtime.batch(fn)
 		} else {
-			addToGroup(groups)
+			fn();
 		}
 
 		return this
