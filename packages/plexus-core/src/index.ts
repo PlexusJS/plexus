@@ -29,7 +29,7 @@ import { LiteralType } from '@plexusjs/utils'
  */
 export function state<
 	Literal extends PlexusStateType = any,
-	Value = LiteralType<Literal>
+	Value = Literal extends any ? LiteralType<Literal> : Literal
 >(item: Value) {
 	return _state<Value>(() => instance(), item)
 }
