@@ -116,7 +116,8 @@ export type PlexusAction = typeof _action
 
 export function _action<Fn extends FunctionType>(
 	instance: () => PlexusInstance,
-	fn: Fn
+	fn: Fn,
+	batched: boolean
 ) {
 	const helpers = new PlexusActionHelpers(instance)
 
@@ -133,9 +134,14 @@ export function _action<Fn extends FunctionType>(
 						})
 					}
 				}
+				// if the action is batched, run it in a batch
+				if (batched) {
+					return instance().runtime.batch(() => {
+						return fn(helpers.hooks, ...args)
+					})
+				}
 				// run the function
-				const ret = fn(helpers.hooks, ...args)
-				return ret
+				return fn(helpers.hooks, ...args)
 			} catch (e) {
 				// only return the error if there is no handler
 				if (!helpers.catchError) throw e
@@ -154,9 +160,14 @@ export function _action<Fn extends FunctionType>(
 				if (!instance().ready && !helpers._skipInit) {
 					await instance().runtime.runInit()
 				}
+				// if the action is batched, run it in a batch
+				if (batched) {
+					return instance().runtime.batch(() => {
+						return fn(helpers.hooks, ...args)
+					})
+				}
 				// run the function
-				const ret = await fn(helpers.hooks, ...args)
-				return ret
+				return await fn(helpers.hooks, ...args)
 			} catch (e) {
 				// only return the error if there is no handler
 				if (!helpers.catchError) throw e

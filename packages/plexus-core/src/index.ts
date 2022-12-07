@@ -85,7 +85,14 @@ export function collection<Type extends { [key: string]: any }>(
 export function action<Fn extends FunctionType>(fn: Fn) {
 	return _action<Fn>(() => instance(), fn)
 }
-
+/**
+ * Generate a Plexus Action
+ * @param fn The Plexus action function to run
+ * @returns The intended return value of fn, or null if an error is caught
+ */
+export function batchAction<Fn extends FunctionType>(fn: Fn) {
+	return _action<Fn>(() => instance(), fn, true)
+}
 /**
  * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
  * @param fn The function to run in a batch

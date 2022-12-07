@@ -188,6 +188,10 @@ export class RuntimeInstance {
 		if (!fn) {
 			throw new Error('You must provide a function to run in the batch')
 		}
+		// if we are already batching, just run the function
+		if (this.batching) {
+			return fn()
+		}
 
 		// hold the reactivity engine and start storing changes
 		const unhalt = this.engine.halt()
