@@ -20,7 +20,7 @@ import { _event, PlexusEventInstance } from './event'
 import { storage as _storage, StorageOverride } from './storage'
 import { PlexusPlugin, PlexusPluginConfig } from './plugin'
 import { PlexusPreActionConfig, _preaction } from './preaction'
-import { LiteralType } from '@plexusjs/utils'
+import { LiteralType, AlmostAnything } from '@plexusjs/utils'
 
 /**
  * Generate a Plexus State
@@ -29,7 +29,7 @@ import { LiteralType } from '@plexusjs/utils'
  */
 export function state<
 	Literal extends PlexusStateType = any,
-	Value = Literal extends any ? LiteralType<Literal> : Literal
+	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
 >(item: Value) {
 	return _state<Value>(() => instance(), item)
 }
