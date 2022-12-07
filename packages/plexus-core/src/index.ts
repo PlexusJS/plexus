@@ -40,7 +40,7 @@ export function state<
  */
 export function computed<
 	Literal extends PlexusStateType = any,
-	Value = LiteralType<Literal>
+	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
 >(
 	item: (value?: Value) => Value,
 	dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>
