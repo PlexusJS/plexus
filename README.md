@@ -23,7 +23,6 @@
 
 ## Used by 🤝
 
-[![SoloSegment](https://knowledgebase.solosegment.com/wp-content/uploads/2022/01/solosegment-google.png)](https://solosegment.com/)
 [![Wander](https://www.wander.com/images/wander-horizontal-white.svg)](https://www.wander.com/)
 
 ## Links & Socials 🔗

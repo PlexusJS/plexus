@@ -1,5 +1,6 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 import { collection, instance, PlexusCollectionInstance } from '@plexusjs/core'
+import { appointments, users } from './test-utils'
 
 const myCollection = collection<{
 	thing: string
@@ -528,40 +529,6 @@ describe('default group behavior', () => {
 		expect(posts.groups.all.value.length).toBe(2)
 		expect(posts.getGroup('all').value.length).toBe(2)
 	})
-})
-
-type User = {
-	id: string
-	firstName: string
-	appointmentId: string
-}
-type Appointment = {
-	id: string
-	name: string
-	date: number
-	userId: string
-}
-const users = collection<User>({
-	primaryKey: 'id',
-	name: 'users',
-	unfoundKeyReturnsUndefined: true,
-	foreignKeys: {
-		appointmentId: {
-			newKey: 'appointment',
-			reference: 'appointments', // looks for the id(s) here
-		},
-	},
-})
-const appointments = collection<Appointment>({
-	primaryKey: 'id',
-	name: 'appointments',
-	defaultGroup: 'upcoming',
-	foreignKeys: {
-		userId: {
-			newKey: 'user',
-			reference: 'users',
-		},
-	},
 })
 
 describe('testing collection relations', () => {

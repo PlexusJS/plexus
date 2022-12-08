@@ -11,6 +11,12 @@ import { appointments, users, waitFor } from './test-utils'
 
 const stringState = state<string>('init')
 const dummyCollection = collection()
+beforeEach(() => {
+	stringState.reset()
+	dummyCollection.clear()
+	appointments.clear()
+	users.clear()
+})
 
 describe('Testing Action Function', () => {
 	test('Can run a Function', () => {
@@ -123,26 +129,27 @@ describe('Testing Action Function', () => {
 		})
 		const myAction = batchAction(async ({ onCatch, batch }) => {
 			onCatch(console.error)
-			await batch(() => {
-				users.collect({
-					id: '1',
-					firstName: 'John',
-					appointmentId: '1',
-				})
-				appointments.collect({
-					id: '1',
-					name: 'test',
-					date: 123,
-					userId: '1',
-				})
-				console.log('batched!')
-				stringState.set(successMsg)
-				dummyCollection.collect({ id: 'test' })
-				return new Promise<string>((resolve) =>
-					setTimeout(() => resolve(successMsg), 900)
-				)
+
+			users.collect({
+				id: '1',
+				firstName: 'John',
+				appointmentId: '1',
 			})
-			return
+			appointments.collect({
+				id: '1',
+				name: 'test',
+				date: 123,
+				userId: '1',
+			})
+			stringState.set(successMsg)
+			dummyCollection.collect({ id: 'test' })
+			// console.log('')
+			return new Promise<string>((resolve) =>
+				setTimeout(() => {
+					resolve(successMsg)
+					console.log('Batched Function Complete!')
+				}, 900)
+			)
 		})
 
 		// the string state should be 'init' because the batch function hasn't finished yet
