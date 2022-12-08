@@ -256,6 +256,21 @@ export class CollectionData<
 				// give the id to the new value if it's missing
 				super.set({ ...value, [this.primaryKey]: this.key } as DataType)
 			}
+			// in order to sync foreign keys, we need to check if the value has changed
+			const foreignKeys = this.collection().config.foreignKeys
+			for (let foreignKey of Object.keys(foreignKeys ?? {})) {
+				if (
+					this._watchableStore._value?.[foreignKey] &&
+					this._watchableStore._lastValue?.[foreignKey] &&
+					!isEqual(
+						this._watchableStore._value?.[foreignKey],
+						this._watchableStore._lastValue?.[foreignKey]
+					)
+				) {
+					this.syncForeignKeyData()
+					break
+				}
+			}
 		} else {
 			this.instance().runtime.log(
 				'warn',
@@ -266,20 +281,6 @@ export class CollectionData<
 		}
 		this.collection().lastUpdatedKey = this.key
 
-		const foreignKeys = this.collection().config.foreignKeys
-		for (let foreignKey of Object.keys(foreignKeys ?? {})) {
-			if (
-				this._watchableStore._value?.[foreignKey] &&
-				this._watchableStore._lastValue?.[foreignKey] &&
-				!isEqual(
-					this._watchableStore._value?.[foreignKey],
-					this._watchableStore._lastValue?.[foreignKey]
-				)
-			) {
-				this.syncForeignKeyData()
-				break
-			}
-		}
 		return this
 	}
 	/**

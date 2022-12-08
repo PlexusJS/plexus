@@ -22,7 +22,7 @@ export class RuntimeInstance {
 	private initializing = false
 	private initsCompleted = 0
 	private batching: boolean = false
-	batchedSetters: Set<() => any> = new Set()
+	batchedCalls: Array<() => any> = []
 
 	constructor(
 		instance: () => PlexusInstance,
@@ -180,11 +180,11 @@ export class RuntimeInstance {
 
 	/**
 	 *	The batch function allows you to run a series of actions in a single transaction
-	 * @param fn The function to run
+	 * @param {Function} fn The function to run
 	 */
-	async batch<ReturnType extends any = any>(
-		fn: () => ReturnType | Promise<ReturnType>
-	) {
+	batch<BatchFunction extends () => any | Promise<any>>(
+		fn: BatchFunction
+	): ReturnType<BatchFunction> {
 		if (!fn) {
 			throw new Error('You must provide a function to run in the batch')
 		}
@@ -196,14 +196,36 @@ export class RuntimeInstance {
 		// hold the reactivity engine and start storing changes
 		const unhalt = this.engine.halt()
 		this.batching = true
-		// run the function
-		const prom = await fn()
-		this.instance().runtime.log('info', 'batch callback ran!')
-		// stop storing changes and emit the changes
-		unhalt()
-		// reset the batching flag
-		this.batching = false
-		this.batchedSetters.forEach((setter) => setter())
+		this.instance().runtime.log('info', 'Batch function started!')
+		const releaseBatch = () => {
+			// if we aren't batching anymore, just return
+			if (this.batching === false) {
+				return
+			}
+			// stop storing changes and emit the changes
+			this.batching = false
+			// call all the pending functions and clear the array
+			this.batchedCalls.forEach((pendingFn) => pendingFn())
+			this.batchedCalls.length = 0
+
+			// release the reactivity engine
+			unhalt()
+
+			this.instance().runtime.log('info', 'Batch function completed!')
+		}
+		// run the function. If it returns a promise, wait for it to resolve
+		const prom = fn()
+		if (prom instanceof Promise) {
+			return new Promise<ReturnType<BatchFunction>>(async (resolve, reject) => {
+				// wait for the promise to resolve
+				const value = await prom
+				// release the batch
+				releaseBatch()
+				// resolve the promise, return the value of the promise
+				return resolve(value)
+			}) as ReturnType<BatchFunction>
+		}
+		releaseBatch()
 		return prom
 	}
 
