@@ -125,6 +125,10 @@ export class CollectionSelector<
 	 * @returns {this} The selector instance
 	 */
 	set(value: DataType): this {
+		this.instance().runtime.log(
+			'info',
+			`Setting data value to ${value} on selector ${this.instanceId}...`
+		)
 		// TODO add a warning here if the key is not set
 		if (this.data) {
 			this.data.set(value)
