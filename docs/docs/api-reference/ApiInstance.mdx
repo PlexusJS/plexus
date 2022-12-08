@@ -15,7 +15,7 @@ An API instance is used to make requests to a server. Interact with this by usin
   - [.patch(url, body)](#ApiInstance+patch)
   - [.gql(query, variables)](#ApiInstance+gql)
   - [.auth(token, type)](#ApiInstance+auth)
-  - [.headers(headers)](#ApiInstance+headers)
+  - [.setHeaders(headers)](#ApiInstance+setHeaders)
   - [.reset()](#ApiInstance+reset)
 
 <a name='ApiInstance+config'></a>
@@ -100,9 +100,9 @@ An API instance is used to make requests to a server. Interact with this by usin
 | token |                     | <p>The token to use for authentication</p>                                                             |
 | type  | <code>bearer</code> | <p>optional - The type of authentication to use. This determines what prefix to use for the header</p> |
 
-<a name='ApiInstance+headers'></a>
+<a name='ApiInstance+setHeaders'></a>
 
-### .headers(headers)
+### .setHeaders(headers)
 
 <p>Set headers for the request</p>
 
