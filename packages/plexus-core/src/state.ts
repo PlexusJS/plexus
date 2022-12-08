@@ -42,9 +42,9 @@ export class StateInstance<
 	constructor(
 		instance: () => PlexusInstance,
 		init: StateValue,
-		fetcher?: (currentValue: StateValue) => StateValue
+		fetcher?: (currentValue?: StateValue) => StateValue
 	) {
-		super(instance, init)
+		super(instance, init, fetcher)
 		this.instance = instance
 		this._internalStore = {
 			_name: '',
@@ -267,9 +267,10 @@ export class StateInstance<
 
 export function _state<StateValue extends PlexusStateType>(
 	instance: () => PlexusInstance,
-	_init: StateValue
+	_init: StateValue,
+	fetcher?: (currentValue?: StateValue) => StateValue
 ) {
 	// Returned Object //
 
-	return new StateInstance<StateValue>(instance, _init)
+	return new StateInstance<StateValue>(instance, _init, fetcher)
 }

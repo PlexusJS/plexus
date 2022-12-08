@@ -9,6 +9,7 @@ interface WatchableStore<Value = any> {
 	_nextValue: Value
 	_watchers: Set<PlexusWatcher<Value>>
 	_internalId: string
+	_initialized: boolean
 }
 
 type HistorySeed<ValueType = any> = {
@@ -22,15 +23,26 @@ type HistorySeed<ValueType = any> = {
 export class Watchable<ValueType = any> {
 	protected _watchableStore: WatchableStore<ValueType>
 	protected instance: () => PlexusInstance
+	protected initFetcher: ((currentValue?: ValueType) => ValueType) | undefined
+	private loading: boolean = false
+	public get isLoading() {
+		return this.loading
+	}
+
 	/**
 	 * The internal id of the computed state
 	 */
 	get id(): string {
 		return `${this._watchableStore._internalId}`
 	}
-	constructor(instance: () => PlexusInstance, init: ValueType) {
+	constructor(
+		instance: () => PlexusInstance,
+		init: ValueType,
+		fetcher?: (currentValue?: ValueType) => ValueType
+	) {
 		this.instance = instance
 		this._watchableStore = {
+			_initialized: false,
 			_internalId: instance().genId(),
 			_nextValue: init,
 			_value: init,
@@ -39,6 +51,14 @@ export class Watchable<ValueType = any> {
 			_lastValue: null,
 			_watchers: new Set(),
 		}
+		this.initFetcher = fetcher
+			? (currentValue?: ValueType) => {
+					this.loading = true
+					const newValue = fetcher?.(currentValue)
+					this.loading = false
+					return newValue || init
+			  }
+			: undefined
 	}
 
 	watch<Value extends ValueType = ValueType>(
@@ -54,6 +74,13 @@ export class Watchable<ValueType = any> {
 		}
 	}
 	get value(): ValueType {
+		if (this._watchableStore._initialized === false && this.initFetcher) {
+			this._watchableStore._value =
+				this.initFetcher?.(this._watchableStore._value) ||
+				this._watchableStore._value
+			this._watchableStore._publicValue = deepClone(this._watchableStore._value)
+			this._watchableStore._initialized = true
+		}
 		return this._watchableStore._publicValue
 	}
 }
@@ -62,8 +89,12 @@ export class WatchableMutable<
 	ValueType extends NonNullable<any> = any
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
-	constructor(instance: () => PlexusInstance, init: ValueType) {
-		super(instance, init)
+	constructor(
+		instance: () => PlexusInstance,
+		init: ValueType,
+		fetcher?: (currentValue?: ValueType) => ValueType
+	) {
+		super(instance, init, fetcher)
 	}
 
 	/**

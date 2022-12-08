@@ -349,7 +349,7 @@ export class CollectionInstance<
 		return this
 	}
 	/**
-	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
+	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one (an empty untracked data instance)
 	 * @param {string|number} dataKey The key of the data item to get
 	 * @returns {this} The new Collection Instance
 	 */
@@ -469,7 +469,8 @@ export class CollectionInstance<
 	 */
 	createGroup<Name extends GroupName>(
 		groupName: Name,
-		config?: PlexusCollectionGroupConfig<DataType>
+		config?: PlexusCollectionGroupConfig<DataType>,
+		fetcher?: (currentValue?: DataType) => DataType
 	) {
 		this.mount()
 		if (this._internalStore._groups.has(groupName)) return this

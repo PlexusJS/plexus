@@ -123,7 +123,7 @@ export class CollectionData<
 
 			// loop through the foreign keys
 			for (idKey of Object.keys(foreignKeys ?? {})) {
-				const isArray = foreignKeys[idKey]?.mode === 'array';
+				const isArray = foreignKeys[idKey]?.mode === 'array'
 				const newKey = foreignKeys[idKey]?.newKey as string
 				const foreignCollectionName = foreignKeys[idKey]?.reference as string
 				const foreignCollection = this.instance().findReference(
@@ -132,9 +132,12 @@ export class CollectionData<
 
 				// if we have a shallow value, then we can try to get the fresh value from the foreign collection
 				if (this.shallowValue) {
-					const freshValue = isArray ?
-						this.shallowValue?.[idKey]?.map((id: string) => foreignCollection?.getItem(id).shallowValue) || undefined
-						: foreignCollection?.getItem(this.shallowValue?.[idKey]).shallowValue || undefined
+					const freshValue = isArray
+						? this.shallowValue?.[idKey]?.map(
+								(id: string) => foreignCollection?.getItem(id).shallowValue
+						  ) || undefined
+						: foreignCollection?.getItem(this.shallowValue?.[idKey])
+								.shallowValue || undefined
 					if (
 						freshValue &&
 						foreignCollection?.config.foreignKeys?.[idKey]?.newKey
