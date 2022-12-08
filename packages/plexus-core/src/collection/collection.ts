@@ -31,6 +31,8 @@ export type ForeignKeyData<DataType> = Partial<
 		{
 			newKey: string
 			reference: string
+			// @default 'object'
+			mode?: 'object' | 'array'
 		}
 	>
 >
