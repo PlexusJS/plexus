@@ -62,8 +62,7 @@ export class ApiInstance {
 	private _headers: Map<string, string> = new Map()
 	private headerGetter: () =>
 		| Record<string, any>
-		| Promise<Record<string, any>>
-		| undefined = () => ({})
+		| Promise<Record<string, any>> = () => ({})
 
 	private waiting = false
 	private waitingQueue: (() => void)[] = []
@@ -105,12 +104,13 @@ export class ApiInstance {
 		if (this._internalStore._noFetch)
 			return ApiInstance.createEmptyRes<ResponseDataType>()
 
-		//
-		if (!this._headers.has('Content-Type')) {
+		const headers = await this.headerGetter()
+
+		if (!headers['Content-Type']) {
 			if (options.body !== undefined) {
-				this._headers.set('Content-Type', 'application/json')
+				headers['Content-Type'] = 'application/json'
 			} else {
-				this._headers.set('Content-Type', 'text/html')
+				headers['Content-Type'] = 'text/html'
 			}
 		}
 		// init values used later
@@ -127,7 +127,7 @@ export class ApiInstance {
 					  }`
 			const requestObject = {
 				...this._internalStore._options,
-				headers: ApiInstance.parseHeaders(this._headers),
+				headers: headers,
 				...options,
 			}
 			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
@@ -206,6 +206,7 @@ export class ApiInstance {
 			}
 		}
 	}
+
 	private async preSend<ResponseDataType>(
 		path: string,
 		options: {
@@ -214,12 +215,13 @@ export class ApiInstance {
 		}
 	) {
 		const res = await this.send<ResponseDataType>(path, options)
+		const headers = await this.headerGetter()
 		this._internalStore.onResponse?.(
 			{
 				path,
 				baseURL: this._internalStore._baseURL,
 				options: this._internalStore._options,
-				headers: ApiInstance.parseHeaders(this._headers),
+				headers: headers,
 				body: options.body,
 				method: options.method,
 			} as PlexusApiReq<typeof options.body>,
@@ -237,8 +239,8 @@ export class ApiInstance {
 	}
 	/**
 	 * Set the configuration options for fetch
-	 * @param options RequestInit - Same as fetch options
-	 * @param overwrite (optional) If true, will overwrite the current options object
+	 * @param {RequestInit} options  - Same as fetch options
+	 * @param {boolean} overwrite (optional) If true, will overwrite the current options object
 	 */
 	options(options: RequestInit, overwrite: boolean)
 	options(options: RequestInit)
@@ -255,13 +257,13 @@ export class ApiInstance {
 			options
 		) as RequestInit & { headers: Record<string, string> }
 
-		this.setHeaders(() => options.headers)
+		options.headers && this.setHeaders(options.headers)
 		return this
 	}
 	/**
 	 * Send a get request
-	 * @param url The url to send the request to
-	 * @param query The url query to send
+	 * @param {string} path The url to send the request to
+	 * @param {Record<string, any>} query The url query to send
 	 */
 	get<ResponseType = any>(path: string, query?: Record<string, any>) {
 		const params = new URLSearchParams(query)
@@ -275,10 +277,10 @@ export class ApiInstance {
 	}
 	/**
 	 * Send a post request
-	 * @param url The url to send the request to
-	 * @param body The body of the request (can be a string or object)
+	 * @param {string} path The url to send the request to
+	 * @param {Record<string, any> | string} body The body of the request (can be a string or object)
 	 */
-	post<ResponseType = any>(
+	async post<ResponseType = any>(
 		path: string,
 		body: Record<string, any> | string = {}
 	) {
@@ -289,9 +291,10 @@ export class ApiInstance {
 			method: 'POST',
 			body,
 		} as const
+		const headers = await this.headerGetter()
 		if (
-			this._headers &&
-			this._headers.get('Content-Type') === 'application/x-www-form-urlencoded'
+			headers &&
+			headers['Content-Type'] === 'application/x-www-form-urlencoded'
 		) {
 			const params = new URLSearchParams(body)
 			return this.preSend<ResponseType>(
@@ -304,8 +307,8 @@ export class ApiInstance {
 	}
 	/**
 	 * Send a put request
-	 * @param url The url to send the request to
-	 * @param body The body of the request (can be a string or object)
+	 * @param {string} path The url to send the request to
+	 * @param {Record<string, any> | string} body The body of the request (can be a string or object)
 	 */
 	put<ResponseType = any>(
 		path: string,
@@ -331,8 +334,8 @@ export class ApiInstance {
 	}
 	/**
 	 * Send a patch request
-	 * @param url The url to send the request to
-	 * @param body The body of the request (can be a string or object)
+	 * @param {string} path The url to send the request to
+	 * @param {Record<string, any> | string} body The body of the request (can be a string or object)
 	 */
 	patch<ResponseType = any>(
 		path: string,
@@ -381,61 +384,86 @@ export class ApiInstance {
 
 	/**
 	 * Set headers for the request
-	 * @param headers The headers to set for the request
+	 * @callback HeaderFunction () => Record<string, any> | Promise<Record<string, any>> - A function that returns the headers to set for the request
+	 * @param {HeaderFunction | Record<string, any>} headers The headers to set for the request
 	 */
+	setHeaders<HeaderFunction extends () => Promise<Record<string, any>>>(
+		inputFnOrObj: () => Promise<Record<string, any>>
+	): Promise<this>
+
+	setHeaders<HeaderFunction extends () => Record<string, any>>(
+		inputFnOrObj: Record<string, any>
+	): this
+
 	setHeaders<
-		ReturnType extends
+		HeaderFunction extends () =>
 			| Record<string, any>
 			| Promise<Record<string, any>>
-			| undefined
-	>(headersGenerator?: () => ReturnType): Promise<this> | this {
+	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore._noFetch) return this
+		if (!inputFnOrObj) return this
 
-		const temp: Record<string, any> = {}
-		Array.from(this._headers.entries()).map(([key, value]) => {
-			// uppercase the dash separated tokens
-			temp[
-				key
-					.split('-')
-					.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
-					.join('-')
-			] = value
-		})
-		return new Promise<this>(async (resolve) => {
-			this.waiting = true
-			const generateHeaders = (headers: ReturnType) => {
-				this.headerGetter = !!headersGenerator ? headersGenerator : () => ({})
-				this.waiting = false
-				Object.entries(headers || {}).map(([key, value]) => {
-					// uppercase the dash separated tokens
-					temp[
-						key
-							.split('-')
-							.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
-							.join('-')
-					] = value
-				})
-				this._headers.clear()
-				Object.entries(temp).forEach((kvPair) => {
-					this._headers.set(kvPair[0], kvPair[1])
-				})
-				return this
-			}
-			const headers = headersGenerator?.()
-			if (headers instanceof Promise) {
-				await headers
-				resolve(generateHeaders(headers))
-				return this
-			}
-			if (!!headers) {
-				resolve(generateHeaders(headers))
-				return this
-			}
+		// if the headers are a promise, wait for it to resolve
+		const formatHeaders = <HeaderType extends Record<string, any>>(
+			headers: HeaderType
+		) => {
+			const formattedHeaders: Record<string, any> = {}
+			Array.from(this._headers.entries()).map(([key, value]) => {
+				// uppercase the dash separated tokens
+				formattedHeaders[
+					key
+						.split('-')
+						.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
+						.join('-')
+						.replace(' ', '-')
+				] = value
+			})
+			this.waiting = false
+			Object.entries(headers || {}).map(([key, value]) => {
+				// uppercase the dash separated tokens
+				formattedHeaders[
+					key
+						.split('-')
+						.map((v) => `${v?.at?.(0)}${v?.substring?.(1)}`)
+						.join('-')
+						.replace(' ', '-')
+				] = value
+			})
+			this._headers.clear()
+			Object.entries(formattedHeaders).forEach((kvPair) => {
+				this._headers.set(kvPair[0], kvPair[1])
+			})
+			return formattedHeaders
+		}
 
-			resolve(this)
-		})
+		if (typeof inputFnOrObj === 'object') {
+			// if the headers are a function, set it to the header getter
+			this.headerGetter = () => formatHeaders(inputFnOrObj)
+			this.headerGetter()
+			return this
+		}
+		// call the function passed by the user
+		const headers = inputFnOrObj?.()
+
+		if (headers instanceof Promise) {
+			return new Promise<this>(async (resolve) => {
+				this.waiting = true
+				// if the headers are a function, set it to the header getter
+				this.headerGetter = async () => formatHeaders(await headers)
+				this.headerGetter()
+				resolve(this)
+				return this
+			})
+		}
+		this.headerGetter()
+		return this
 	}
+
+	get headers() {
+		return ApiInstance.parseHeaders(this._headers)
+	}
+
 	/**
 	 * Reset this routes configuration
 	 */

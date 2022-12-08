@@ -8,14 +8,13 @@ An API instance is used to make requests to a server. Interact with this by usin
 
 - [ApiInstance](#ApiInstance)
   - [.config](#ApiInstance+config)
-  - [.get(url, query)](#ApiInstance+get)
-  - [.post(url, body)](#ApiInstance+post)
-  - [.put(url, body)](#ApiInstance+put)
+  - [.get(path, query)](#ApiInstance+get)
+  - [.post(path, body)](#ApiInstance+post)
+  - [.put(path, body)](#ApiInstance+put)
   - [.delete(url)](#ApiInstance+delete)
-  - [.patch(url, body)](#ApiInstance+patch)
+  - [.patch(path, body)](#ApiInstance+patch)
   - [.gql(query, variables)](#ApiInstance+gql)
   - [.auth(token, type)](#ApiInstance+auth)
-  - [.setHeaders(headers)](#ApiInstance+setHeaders)
   - [.reset()](#ApiInstance+reset)
 
 <a name='ApiInstance+config'></a>
@@ -26,36 +25,36 @@ An API instance is used to make requests to a server. Interact with this by usin
 
 <a name='ApiInstance+get'></a>
 
-### .get(url, query)
+### .get(path, query)
 
 <p>Send a get request</p>
 
-| Param | Description                           |
-| ----- | ------------------------------------- |
-| url   | <p>The url to send the request to</p> |
-| query | <p>The url query to send</p>          |
+| Param | Type                                    | Description                           |
+| ----- | --------------------------------------- | ------------------------------------- |
+| path  | <code>string</code>                     | <p>The url to send the request to</p> |
+| query | <code>Record.&lt;string, any&gt;</code> | <p>The url query to send</p>          |
 
 <a name='ApiInstance+post'></a>
 
-### .post(url, body)
+### .post(path, body)
 
 <p>Send a post request</p>
 
-| Param | Description                                                |
-| ----- | ---------------------------------------------------------- |
-| url   | <p>The url to send the request to</p>                      |
-| body  | <p>The body of the request (can be a string or object)</p> |
+| Param | Type                                                           | Description                                                |
+| ----- | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| path  | <code>string</code>                                            | <p>The url to send the request to</p>                      |
+| body  | <code>Record.&lt;string, any&gt;</code> \| <code>string</code> | <p>The body of the request (can be a string or object)</p> |
 
 <a name='ApiInstance+put'></a>
 
-### .put(url, body)
+### .put(path, body)
 
 <p>Send a put request</p>
 
-| Param | Description                                                |
-| ----- | ---------------------------------------------------------- |
-| url   | <p>The url to send the request to</p>                      |
-| body  | <p>The body of the request (can be a string or object)</p> |
+| Param | Type                                                           | Description                                                |
+| ----- | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| path  | <code>string</code>                                            | <p>The url to send the request to</p>                      |
+| body  | <code>Record.&lt;string, any&gt;</code> \| <code>string</code> | <p>The body of the request (can be a string or object)</p> |
 
 <a name='ApiInstance+delete'></a>
 
@@ -69,14 +68,14 @@ An API instance is used to make requests to a server. Interact with this by usin
 
 <a name='ApiInstance+patch'></a>
 
-### .patch(url, body)
+### .patch(path, body)
 
 <p>Send a patch request</p>
 
-| Param | Description                                                |
-| ----- | ---------------------------------------------------------- |
-| url   | <p>The url to send the request to</p>                      |
-| body  | <p>The body of the request (can be a string or object)</p> |
+| Param | Type                                                           | Description                                                |
+| ----- | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| path  | <code>string</code>                                            | <p>The url to send the request to</p>                      |
+| body  | <code>Record.&lt;string, any&gt;</code> \| <code>string</code> | <p>The body of the request (can be a string or object)</p> |
 
 <a name='ApiInstance+gql'></a>
 
@@ -99,16 +98,6 @@ An API instance is used to make requests to a server. Interact with this by usin
 | ----- | ------------------- | ------------------------------------------------------------------------------------------------------ |
 | token |                     | <p>The token to use for authentication</p>                                                             |
 | type  | <code>bearer</code> | <p>optional - The type of authentication to use. This determines what prefix to use for the header</p> |
-
-<a name='ApiInstance+setHeaders'></a>
-
-### .setHeaders(headers)
-
-<p>Set headers for the request</p>
-
-| Param   | Description                               |
-| ------- | ----------------------------------------- |
-| headers | <p>The headers to set for the request</p> |
 
 <a name='ApiInstance+reset'></a>
 
