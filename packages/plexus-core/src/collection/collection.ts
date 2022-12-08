@@ -79,6 +79,7 @@ interface PlexusCollectionStore<
 	_externalName: string
 	set externalName(value: string)
 	_persist: boolean
+	_internalCalledGroupCollect?: boolean
 	set persist(value: boolean)
 	_computeFn?: (data: DataType) => DataType
 }
@@ -206,7 +207,7 @@ export class CollectionInstance<
 	 * @returns {this} The collection instance
 	 */
 	collect(
-		data: DataType[],
+		data: DataType[] | DataType,
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	): void
 	collect(data: DataType, groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
@@ -216,12 +217,37 @@ export class CollectionInstance<
 		data: DataType | DataType[],
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	) {
-		const collectItem = (item: DataType) => {
+		const collectItem = (
+			item: DataType,
+			groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>,
+			startedFromInnerBatch?: boolean
+		) => {
 			if (!item) return
+
 			if (
 				item[this._internalStore._key] !== undefined &&
 				item[this._internalStore._key] !== null
 			) {
+				// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
+				if (
+					this.instance().runtime.isBatching &&
+					this.config.useBatching &&
+					!startedFromInnerBatch
+				) {
+					this.instance().runtime.log(
+						'debug',
+						`Batching started for addToGroups`
+					)
+					// store this in the batchedSetters for execution once batching is over
+					this.instance().runtime.batchedCalls.push(() => {
+						this.instance().runtime.log(
+							'debug',
+							'Batching completed for addToGroups'
+						)
+						return collectItem(item, groups, true)
+					})
+					return this
+				}
 				// Compute item before setting/storing
 				if (
 					typeof this._internalStore._computeFn === 'function' &&
@@ -255,26 +281,30 @@ export class CollectionInstance<
 				// if a group (or groups) is provided, add the item to the group
 				if (groups) {
 					const groupsNorm = Array.isArray(groups) ? groups : [groups]
+					this._internalStore._internalCalledGroupCollect = true
 					this.addToGroups(
 						dataKey,
 						groupsNorm.filter((name) => name !== defaultGroupName)
 					)
 				}
 				if (this.config.defaultGroup) {
+					this._internalStore._internalCalledGroupCollect = true
 					// if it is not (undefined or some other string), add to group
 					this.addToGroups(dataKey, defaultGroupName as any)
 				}
+				this._internalStore._internalCalledGroupCollect = false
 			}
 		}
 		const collectFn = () => {
 			if (Array.isArray(data)) {
 				for (let item of data) {
-					collectItem(item)
+					collectItem(item, groups)
 				}
 			} else {
-				collectItem(data)
+				collectItem(data, groups)
 			}
 		}
+		// we only need to call back if the instance is not batching
 		if (this.config.useBatching) {
 			this.instance().runtime.batch(collectFn)
 		} else {
@@ -528,9 +558,30 @@ export class CollectionInstance<
 		key: DataKey,
 		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	): this {
-		const addToGroup = (group: GroupName) => {
+		const addToGroup = (
+			key: DataKey,
+			group: GroupName,
+			startedFromInnerBatch?: boolean
+		) => {
+			// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
+			if (
+				this.instance().runtime.isBatching &&
+				this.config.useBatching &&
+				!startedFromInnerBatch
+			) {
+				this.instance().runtime.log('debug', `Batching started for addToGroups`)
+				// store this in the batchedSetters for execution once batching is over
+				this.instance().runtime.batchedCalls.push(() => {
+					this.instance().runtime.log(
+						'debug',
+						`Batching completed for addToGroups`
+					)
+					return addToGroup(key, group, true)
+				})
+				return this
+			}
 			let g = this.getGroup(group as GroupName)
-			// if the group does not exist, create it
+			// if the group does not exist, create it. This should technically never happen because of getGroup, but leaving here for redundancy
 			if (!g) {
 				g = _group(
 					() => this.instance(),
@@ -541,22 +592,24 @@ export class CollectionInstance<
 			}
 			g.add(key)
 		}
-		const fn = () => {
+		const parseAndPushGroups = () => {
 			if (Array.isArray(groups)) {
 				for (let group of groups) {
-					addToGroup(group)
+					addToGroup(key, group)
 				}
 			} else {
-				addToGroup(groups)
+				addToGroup(key, groups)
 			}
 		}
 
-		if (this.config.useBatching) {
-			this.instance().runtime.batch(fn)
+		if (
+			this.config.useBatching &&
+			!this._internalStore._internalCalledGroupCollect
+		) {
+			this.instance().runtime.batch(parseAndPushGroups)
 		} else {
-			fn()
+			parseAndPushGroups()
 		}
-
 		return this
 	}
 	watchGroup(name: KeyOfMap<Groups>, callback: PlexusWatcher<DataType[]>)
