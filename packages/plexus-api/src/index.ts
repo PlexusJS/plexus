@@ -47,6 +47,7 @@ interface ApiStore {
 	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
 }
 
+const AuthTypes = ['bearer', 'basic', 'jwt'] as const
 type HeaderCache<CacheValue = Record<string, any>> =
 	| [
 			CacheValue | Promise<CacheValue> | undefined,
@@ -241,9 +242,10 @@ export class ApiInstance {
 	 * Set the configuration options for fetch
 	 * @param {RequestInit} options  - Same as fetch options
 	 * @param {boolean} overwrite (optional) If true, will overwrite the current options object
+	 * @returns {this} The current instance
 	 */
-	options(options: RequestInit, overwrite: boolean)
-	options(options: RequestInit)
+	options(options: RequestInit, overwrite: boolean): this
+	options(options: RequestInit): this
 	options(options: RequestInit, overwrite: boolean = false) {
 		if (overwrite) {
 			this._internalStore._options = deepClone(options) as RequestInit & {
@@ -279,6 +281,7 @@ export class ApiInstance {
 	 * Send a post request
 	 * @param {string} path The url to send the request to
 	 * @param {Record<string, any> | string} body The body of the request (can be a string or object)
+	 * @returns {Promise<PlexusApiRes<unknown>>} The response from the server
 	 */
 	async post<ResponseType = any>(
 		path: string,
@@ -309,6 +312,7 @@ export class ApiInstance {
 	 * Send a put request
 	 * @param {string} path The url to send the request to
 	 * @param {Record<string, any> | string} body The body of the request (can be a string or object)
+	 * @returns {Promise<PlexusApiRes<unknown>>} The response from the server
 	 */
 	put<ResponseType = any>(
 		path: string,
@@ -324,7 +328,8 @@ export class ApiInstance {
 	}
 	/**
 	 * Send a delete request
-	 * @param url The url to send the request to
+	 * @param {string} path The url to send the request to
+	 * @returns {Promise<PlexusApiRes<unknown>>} The response from the server
 	 */
 	delete<ResponseType = any>(path: string) {
 		return this.preSend<ResponseType>(path, {
@@ -336,6 +341,7 @@ export class ApiInstance {
 	 * Send a patch request
 	 * @param {string} path The url to send the request to
 	 * @param {Record<string, any> | string} body The body of the request (can be a string or object)
+	 * @returns {Promise<PlexusApiRes<unknown>>} The response from the server
 	 */
 	patch<ResponseType = any>(
 		path: string,
@@ -351,8 +357,9 @@ export class ApiInstance {
 	}
 	/**
 	 * Send a graphql request
-	 * @param query The gql query to send
-	 * @param variables Variables
+	 * @param {string} query The gql query to send
+	 * @param {Record<string, any>} variables Variables
+	 * @returns {Promise<PlexusApiRes<unknown>>} The response from the server
 	 */
 	gql<ResponseType = any>(query: string, variables?: Record<string, any>) {
 		this._headers.set('Content-Type', 'application/json')
@@ -367,17 +374,34 @@ export class ApiInstance {
 	}
 	/**
 	 * Set the authentication details for the request
-	 * @param token The token to use for authentication
-	 * @param type optional - The type of authentication to use. This determines what prefix to use for the header
+	 * @param {'bearer' | 'basic' | 'jwt'} type optional - The type of authentication to use. This determines what prefix to use for the header
+	 * @param {string} token The token to use for authentication
+	 * @returns {this} The current instance
 	 */
-	auth(token: string | undefined, type: 'bearer' | 'basic' | 'jwt' = 'bearer') {
-		if (!token) return this
+	auth(type: typeof AuthTypes[number], token: string): this
+	auth(token: string): this
+	auth(
+		typeOrToken: typeof AuthTypes[number] | string = 'bearer',
+		token?: string
+	) {
+		if (!token) {
+			if (AuthTypes.includes(typeOrToken as any)) {
+				return this
+			}
+			token = typeOrToken as string
+		}
+		if (typeOrToken === token) {
+			typeOrToken = 'bearer'
+		}
+		if (!token || !typeOrToken) return this
 		token = token
 			.replace(/^(B|b)earer /, '')
 			.replace(/^(B|b)asic /, '')
 			.replace(/^(JWT|jwt) /, '')
+
 		this._internalStore._authToken = token
-		const prefix = type === 'jwt' ? 'JWT ' : type === 'bearer' ? 'Bearer ' : ''
+		const prefix =
+			typeOrToken === 'jwt' ? 'JWT ' : typeOrToken === 'bearer' ? 'Bearer ' : ''
 		this._headers.set('Authorization', `${prefix}${token}`)
 		return this
 	}
@@ -386,6 +410,7 @@ export class ApiInstance {
 	 * Set headers for the request
 	 * @callback HeaderFunction () => Record<string, any> | Promise<Record<string, any>> - A function that returns the headers to set for the request
 	 * @param {HeaderFunction | Record<string, any>} headers The headers to set for the request
+	 * @returns {this | Promise<this>} The current instance
 	 */
 	setHeaders<HeaderFunction extends () => Promise<Record<string, any>>>(
 		inputFnOrObj: () => Promise<Record<string, any>>
@@ -460,12 +485,17 @@ export class ApiInstance {
 		return this
 	}
 
-	get headers() {
+	/**
+	 * Get the headers for the request
+	 * @returns {Record<string, string>} The headers for the request
+	 */
+	get headers(): Record<string, string> {
 		return ApiInstance.parseHeaders(this._headers)
 	}
 
 	/**
 	 * Reset this routes configuration
+	 * @returns {this} The current instance
 	 */
 	reset() {
 		this._internalStore._options =
@@ -474,6 +504,7 @@ export class ApiInstance {
 	}
 	/**
 	 * The configuration of this api
+	 * @returns {Record<string, any>} The configuration of this api
 	 */
 	get config() {
 		return Object.freeze(

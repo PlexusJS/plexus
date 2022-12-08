@@ -7,21 +7,32 @@ title: ApiInstance
 An API instance is used to make requests to a server. Interact with this by using api()
 
 - [ApiInstance](#ApiInstance)
-  - [.config](#ApiInstance+config)
+  - [.headers](#ApiInstance+headers) ⇒ <code>Record.&lt;string, string&gt;</code>
+  - [.config](#ApiInstance+config) ⇒ <code>Record.&lt;string, any&gt;</code>
   - [.get(path, query)](#ApiInstance+get)
-  - [.post(path, body)](#ApiInstance+post)
-  - [.put(path, body)](#ApiInstance+put)
-  - [.delete(url)](#ApiInstance+delete)
-  - [.patch(path, body)](#ApiInstance+patch)
-  - [.gql(query, variables)](#ApiInstance+gql)
-  - [.auth(token, type)](#ApiInstance+auth)
-  - [.reset()](#ApiInstance+reset)
+  - [.post(path, body)](#ApiInstance+post) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
+  - [.put(path, body)](#ApiInstance+put) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
+  - [.delete(path)](#ApiInstance+delete) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
+  - [.patch(path, body)](#ApiInstance+patch) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
+  - [.gql(query, variables)](#ApiInstance+gql) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
+  - [.auth(type, token)](#ApiInstance+auth) ⇒ <code>this</code>
+  - [.reset()](#ApiInstance+reset) ⇒ <code>this</code>
+
+<a name='ApiInstance+headers'></a>
+
+### .headers ⇒ <code>Record.&lt;string, string&gt;</code>
+
+<p>Get the headers for the request</p>
+
+**Returns**: <code>Record.&lt;string, string&gt;</code> <p>The headers for the request</p>
 
 <a name='ApiInstance+config'></a>
 
-### .config
+### .config ⇒ <code>Record.&lt;string, any&gt;</code>
 
 <p>The configuration of this api</p>
+
+**Returns**: <code>Record.&lt;string, any&gt;</code> <p>The configuration of this api</p>
 
 <a name='ApiInstance+get'></a>
 
@@ -36,9 +47,11 @@ An API instance is used to make requests to a server. Interact with this by usin
 
 <a name='ApiInstance+post'></a>
 
-### .post(path, body)
+### .post(path, body) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
 
 <p>Send a post request</p>
+
+**Returns**: <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code> <p>The response from the server</p>
 
 | Param | Type                                                           | Description                                                |
 | ----- | -------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -47,9 +60,11 @@ An API instance is used to make requests to a server. Interact with this by usin
 
 <a name='ApiInstance+put'></a>
 
-### .put(path, body)
+### .put(path, body) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
 
 <p>Send a put request</p>
+
+**Returns**: <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code> <p>The response from the server</p>
 
 | Param | Type                                                           | Description                                                |
 | ----- | -------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -58,19 +73,23 @@ An API instance is used to make requests to a server. Interact with this by usin
 
 <a name='ApiInstance+delete'></a>
 
-### .delete(url)
+### .delete(path) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
 
 <p>Send a delete request</p>
 
-| Param | Description                           |
-| ----- | ------------------------------------- |
-| url   | <p>The url to send the request to</p> |
+**Returns**: <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code> <p>The response from the server</p>
+
+| Param | Type                | Description                           |
+| ----- | ------------------- | ------------------------------------- |
+| path  | <code>string</code> | <p>The url to send the request to</p> |
 
 <a name='ApiInstance+patch'></a>
 
-### .patch(path, body)
+### .patch(path, body) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
 
 <p>Send a patch request</p>
+
+**Returns**: <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code> <p>The response from the server</p>
 
 | Param | Type                                                           | Description                                                |
 | ----- | -------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -79,28 +98,34 @@ An API instance is used to make requests to a server. Interact with this by usin
 
 <a name='ApiInstance+gql'></a>
 
-### .gql(query, variables)
+### .gql(query, variables) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
 
 <p>Send a graphql request</p>
 
-| Param     | Description                  |
-| --------- | ---------------------------- |
-| query     | <p>The gql query to send</p> |
-| variables | <p>Variables</p>             |
+**Returns**: <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code> <p>The response from the server</p>
+
+| Param     | Type                                    | Description                  |
+| --------- | --------------------------------------- | ---------------------------- |
+| query     | <code>string</code>                     | <p>The gql query to send</p> |
+| variables | <code>Record.&lt;string, any&gt;</code> | <p>Variables</p>             |
 
 <a name='ApiInstance+auth'></a>
 
-### .auth(token, type)
+### .auth(type, token) ⇒ <code>this</code>
 
 <p>Set the authentication details for the request</p>
 
-| Param | Default             | Description                                                                                            |
-| ----- | ------------------- | ------------------------------------------------------------------------------------------------------ |
-| token |                     | <p>The token to use for authentication</p>                                                             |
-| type  | <code>bearer</code> | <p>optional - The type of authentication to use. This determines what prefix to use for the header</p> |
+**Returns**: <code>this</code> <p>The current instance</p>
+
+| Param | Type                                                                                              | Description                                                                                            |
+| ----- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| type  | <code>&#x27;bearer&#x27;</code> \| <code>&#x27;basic&#x27;</code> \| <code>&#x27;jwt&#x27;</code> | <p>optional - The type of authentication to use. This determines what prefix to use for the header</p> |
+| token | <code>string</code>                                                                               | <p>The token to use for authentication</p>                                                             |
 
 <a name='ApiInstance+reset'></a>
 
-### .reset()
+### .reset() ⇒ <code>this</code>
 
 <p>Reset this routes configuration</p>
+
+**Returns**: <code>this</code> <p>The current instance</p>
