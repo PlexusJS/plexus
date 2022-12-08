@@ -36,6 +36,10 @@ export class RuntimeInstance {
 	 *  */
 	broadcast<Value = PlexusStateType>(key: string, value: Value) {
 		this.log('info', `Broadcasting a change to ${key}`)
+		if (this.batching) {
+			this.batchedCalls.push(() => this.engine.emit(key, { key, value }))
+			return
+		}
 		this.engine.emit(key, { key, value })
 	}
 	/**
@@ -194,7 +198,7 @@ export class RuntimeInstance {
 		}
 
 		// hold the reactivity engine and start storing changes
-		const unhalt = this.engine.halt()
+		// const unhalt = this.engine.halt()
 		this.batching = true
 		this.instance().runtime.log('info', 'Batch function started!')
 		const releaseBatch = () => {
@@ -209,7 +213,7 @@ export class RuntimeInstance {
 			this.batchedCalls.length = 0
 
 			// release the reactivity engine
-			unhalt()
+			// unhalt()
 
 			this.instance().runtime.log('info', 'Batch function completed!')
 		}

@@ -30,8 +30,8 @@ import { LiteralType, AlmostAnything } from '@plexusjs/utils'
 export function state<
 	Literal extends PlexusStateType = any,
 	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
->(item: Value) {
-	return _state<Value>(() => instance(), item)
+>(item: Value, fetcher?: (currentValue?: Value) => Value) {
+	return _state<Value>(() => instance(), item, fetcher)
 }
 /**
  * Generate a Plexus State

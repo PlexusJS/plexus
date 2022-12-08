@@ -147,3 +147,15 @@ export function isEqual(a: NonNullable<any>, b: NonNullable<any>): boolean {
 	}
 	return false
 }
+
+/**
+ *
+ */
+// export function asyncNormalizer<
+// 	InputFunction extends () => Promise<unknown> | unknown
+// >(
+// 	inputFunction: InputFunction
+// ): [ReturnType<InputFunction> | undefined, Error | undefined] {
+
+// 	// return [inputFunction()]
+// }
