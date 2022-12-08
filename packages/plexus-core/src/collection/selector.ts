@@ -74,7 +74,7 @@ export class CollectionSelector<
 		// this._internalStore._watchers.forEach((callback) => {
 		// 	callback(this.value)
 		// })
-		super.set({} as any)
+		super.set(this.value as any)
 	}
 	/**
 	 * The key of a data item assigned to this selector
@@ -127,7 +127,9 @@ export class CollectionSelector<
 	set(value: DataType): this {
 		this.instance().runtime.log(
 			'info',
-			`Setting data value to ${JSON.stringify(value)} on selector ${this.instanceId}...`
+			`Setting data value to ${JSON.stringify(value)} on selector ${
+				this.instanceId
+			}...`
 		)
 		// TODO add a warning here if the key is not set
 		if (this.data) {
