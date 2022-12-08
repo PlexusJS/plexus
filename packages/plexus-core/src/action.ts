@@ -67,9 +67,9 @@ class PlexusActionHelpers {
 	 * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
 	 * @param fn The function to run in a batch
 	 */
-	batch<ReturnType extends any = any>(
-		fn: () => ReturnType | Promise<ReturnType>
-	): Promise<ReturnType> {
+	batch<BatchFunction extends () => unknown | Promise<unknown>>(
+		fn: BatchFunction
+	): ReturnType<BatchFunction> {
 		return this.instance().runtime.batch(fn)
 	}
 

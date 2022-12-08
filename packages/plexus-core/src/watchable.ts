@@ -71,7 +71,7 @@ export class WatchableMutable<
 	 * If history is enabled, we traverse the history archive.
 	 * if not, we try to go to the last set value.
 	 * If no previous value (either `.set()` was never called or we previously used `.undo()`), reset to initial value.
-	 * @returns this
+	 * @returns {this}
 	 */
 	undo() {
 		if (this._history && this._history.maxLength > 0) {
@@ -169,7 +169,7 @@ export class WatchableMutable<
 	 */
 	set(newValue?: ValueType) {
 		if (this.instance().runtime.isBatching) {
-			this.instance().runtime.batchedSetters.add(() => this.set(newValue))
+			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
 			return
 		}
 		const value = deepClone(newValue)
