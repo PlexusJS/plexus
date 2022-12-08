@@ -47,7 +47,8 @@ describe('Testing Collection', () => {
 		expect(myCollection.getItemValue(1)?.thing).toBe('lols')
 
 		// does the unfoundKeyReturnsUndefined configuration work
-		expect(myCollectionUndefined.getItemValue(0)).toBeUndefined()
+		expect(myCollectionUndefined.getItemValue(1)).toBeUndefined()
+		console.log('an undefined object', myCollectionUndefined.getItemValue(1))
 	})
 	test('Does it pass the vibe check ?', () => {
 		myCollection.collect({ thing: 'xqcL', id: 0 })
@@ -544,6 +545,8 @@ describe('testing collection relations', () => {
 			date: 123,
 			userId: '1',
 		})
+
+		// Checking foreign
 		expect(users.getItem('1').value).toBeDefined()
 		console.log('found appointment', users.getItem('1').value.appointment)
 		expect(users.value[0].appointment.name).toBe('test')
@@ -555,5 +558,9 @@ describe('testing collection relations', () => {
 		expect(appointments.value[0].user?.firstName).toBe('John')
 		expect(appointments.getItem('1').value.user.firstName).toBe('John')
 		console.log(appointments.value)
+
+		// does the unfoundKeyReturnsUndefined configuration work
+		expect(users.getItemValue(3)).toBeUndefined()
+		console.log('an undefined object', users.getItemValue(3))
 	})
 })

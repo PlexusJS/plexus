@@ -12,8 +12,11 @@ export interface PlexusApiConfig {
 	defaultOptions?: PlexusApiOptions
 	timeout?: number
 	silentFail?: boolean
-	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void;
-	headers?: Record<string, string> | (() => Record<string, string>) | (() => Promise<Record<string, string>>)
+	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
+	headers?:
+		| Record<string, string>
+		| (() => Record<string, string>)
+		| (() => Promise<Record<string, string>>)
 }
 export interface PlexusApiReq<BodyType = any> {
 	path: string

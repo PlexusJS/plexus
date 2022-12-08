@@ -30,6 +30,7 @@ export class CollectionSelector<
 > extends WatchableMutable<DataType> {
 	private _internalStore: CollectionSelectorStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>
+	private defaultValue: DataType
 	// private instance: () => PlexusInstance
 
 	/**
@@ -59,6 +60,11 @@ export class CollectionSelector<
 			_dataWatcherDestroyer: null,
 		}
 		this.collection = collection
+
+		// the fallback value if the key or data is not found
+		this.defaultValue = this.collection().config.unfoundKeyReturnsUndefined
+			? (undefined as any as DataType)
+			: ({} as DataType)
 	}
 	private runWatchers() {
 		this.instance().runtime.log(
@@ -120,8 +126,10 @@ export class CollectionSelector<
 	 */
 	set(value: DataType): this {
 		// TODO add a warning here if the key is not set
-		this.data?.set(value)
-		this.runWatchers()
+		if (this.data) {
+			this.data.set(value)
+			this.runWatchers()
+		}
 		return this
 	}
 	/**
@@ -131,8 +139,10 @@ export class CollectionSelector<
 	 */
 	patch(value: Partial<DataType>): this {
 		// TODO add a warning here if the key is not set
-		this.data?.patch(value)
-		this.runWatchers()
+		if (this.data) {
+			this.data.patch(value)
+			this.runWatchers()
+		}
 		return this
 	}
 
@@ -142,11 +152,11 @@ export class CollectionSelector<
 	 */
 	get value() {
 		if (this._internalStore._key === null) {
-			return {} as DataType
+			return this.defaultValue
 		}
 		return (
 			this.collection().getItemValue(this._internalStore._key) ||
-			({} as DataType)
+			this.defaultValue
 		)
 	}
 	/**

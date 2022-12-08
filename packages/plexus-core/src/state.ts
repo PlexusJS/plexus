@@ -39,7 +39,11 @@ export class StateInstance<
 	get instanceId(): string {
 		return `ste_${this._watchableStore._internalId}`
 	}
-	constructor(instance: () => PlexusInstance, init: StateValue) {
+	constructor(
+		instance: () => PlexusInstance,
+		init: StateValue,
+		fetcher?: (currentValue: StateValue) => StateValue
+	) {
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
