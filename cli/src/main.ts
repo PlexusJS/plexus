@@ -1,11 +1,10 @@
-#!/usr/bin/env node
-import chalk from 'chalk';
-import yArgs from 'yargs';
-import fs from 'fs';
-import { execSync } from 'child_process';
+import chalk from 'chalk'
+import yArgs from 'yargs'
+import * as fs from 'fs'
+import { execSync } from 'child_process'
 
-const yargs = yArgs(process.argv);
-const __dirname = process.cwd();
+const yargs = yArgs(process.argv)
+const __dirname = process.cwd()
 
 const templates = {
 	basic: {
@@ -188,7 +187,7 @@ const templates = {
 			],
 		},
 	},
-};
+}
 
 const helpString = `
 	Usage:
@@ -208,11 +207,11 @@ const helpString = `
 		--next					Install the Next package
 		--template=<template>	Choose the template to use to generate a PlexusJS core
 
-`;
+`
 function tryIt(fn) {
 	try {
 		if (fn instanceof Function) {
-			const val = fn();
+			const val = fn()
 			if (val !== undefined && val !== null) {
 				return val
 			}
@@ -232,46 +231,47 @@ const genFileOrDir = (arr, path = '/core') => {
 	}
 
 	for (let obj of arr) {
-		const fileName = `${obj.name}.${obj.ext || 'js'}`;
-		let filePath = `${path}/${fileName}`;
+		const fileName = `${obj.name}.${obj.ext || 'js'}`
+		let filePath = `${path}/${fileName}`
+		let status = 'writing...'
 		// if we are creating a file
 		if (obj.type === 'file') {
 			process.stdout.write(
 				`Creating ${chalk.cyan(`"${path}/${fileName}"`)}... ::`
-			);
+			)
 			tryIt(() => fs.writeFileSync(`${__dirname}${filePath}`, obj.content))
 				? process.stdout.write(chalk.green(`Success!\n`))
-				: process.stdout.write(chalk.yellow(`Failure!\n`));
+				: process.stdout.write(chalk.yellow(`Failure!\n`))
 		}
 		// if we are creating a directory
 		else if (obj.type === 'dir') {
 			process.stdout.write(
 				`Creating ${chalk.cyan(`"${path}/${obj.name}/"`)}... ::`
-			);
+			)
 			tryIt(() => fs.mkdirSync(`${__dirname}${path}/${obj.name}`))
 				? process.stdout.write(chalk.green(`Success\n`))
-				: process.stdout.write(chalk.yellow(`Failed\n`));
+				: process.stdout.write(chalk.yellow(`Failed\n`))
 			// recurse into the directory
-			genFileOrDir(obj.content, `${path}/${obj.name}`);
+			genFileOrDir(obj.content, `${path}/${obj.name}`)
 		}
 	}
 	return true
-};
+}
 
 const installPlexus = (tag = '') => {
 	if (!yargs.argv['skip-install']) {
 		// initialize the prefix with npm install syntax
-		let prefix = 'npm install --save';
+		let prefix = 'npm install --save'
 		// if we have a yarn.lock file, use yarn to install
 
 		if (fs.existsSync(`${__dirname}/yarn.lock`)) {
-			console.log(chalk.cyan.bgWhite(`Using Yarn Package Manager`));
-			prefix = 'yarn add';
+			console.log(chalk.cyan.bgWhite(`Using Yarn Package Manager`))
+			prefix = 'yarn add'
 		} else {
-			console.log(chalk.cyan.bgWhite('Using NPM Package Manager'));
+			console.log(chalk.cyan.bgWhite('Using NPM Package Manager'))
 		}
 		// install the packages
-		const tagFinal = tag && ['canary', 'latest'].includes(tag) ? `@${tag}` : '';
+		const tagFinal = tag && ['canary', 'latest'].includes(tag) ? `@${tag}` : ''
 		tryIt(() =>
 			execSync(
 				`${prefix} @plexusjs/core${tagFinal}${
@@ -291,71 +291,78 @@ const installPlexus = (tag = '') => {
 			  )
 			: console.error(
 					chalk.bgRed.black('Failed to install Plexus Packages. 😞')
-			  );
+			  )
 	} else {
-		console.log('Skipping Install...');
+		console.log('Skipping Install...')
 	}
-};
+}
 // make the core directory in the root folder
 const lookForCore = () =>
 	tryIt(
 		() =>
-			!fs.existsSync(`${__dirname}/core`) && !fs.mkdirSync(`${__dirname}/core`)
-	);
+			!fs.existsSync(`${__dirname}/core`) && fs.mkdirSync(`${__dirname}/core`)
+	)
+const lookForCoreModules = () =>
+	tryIt(
+		() =>
+			!fs.existsSync(`${__dirname}/core/modules`) &&
+			fs.mkdirSync(`${__dirname}/core/modules`)
+	)
 
 const genFiles = (template = 'basic') => {
 	// check if the template string is one of the available templates
 	if (![...Object.keys(templates)].includes(template)) {
-		console.error(`Template ${template} not found.`);
+		console.error(`Template ${template} not found.`)
 		return false
 	}
 	// make the core directory in the root folder
-	lookForCore();
+	lookForCore()
 
 	// copy the core files to the core directory
 	// const structRaw = fs.readFileSync(`./data/${template}.json`, { encoding: 'utf8' })
 
 	// const struct = JSON.parse(structRaw)
-	const struct = templates[template];
+	const struct = templates[template]
 
 	if (yargs.argv.typescript || yargs.argv.ts) {
-		console.log(chalk.bgWhite.black('Creating TS Files...'));
-		genFileOrDir(struct?.$schema?.ts);
+		console.log(chalk.bgWhite.black('Creating TS Files...'))
+		genFileOrDir(struct?.$schema?.ts)
 	} else {
-		console.log(chalk.bgWhite.black('Creating JS Files...'));
-		genFileOrDir(struct?.$schema?.js);
+		console.log(chalk.bgWhite.black('Creating JS Files...'))
+		genFileOrDir(struct?.$schema?.js)
 	}
-};
+}
 
 function run() {
-	let commandRan = false;
+	let commandRan = false
 
 	if (yargs.argv._[2] === 'module') {
-		if (yargs.argv._[1]) ;
+		if (yargs.argv._[1]) {
+		}
 		return
 	}
 	if (yargs.argv._[2] === 'update') {
 		if (yargs.argv.canary) {
 			console.log(
 				chalk.bgWhite.black('Updating PlexusJS to latest Canary build...')
-			);
-			installPlexus('canary');
+			)
+			installPlexus('canary')
 		} else if (yargs.argv.latest) {
 			console.log(
 				chalk.bgWhite.black('Updating PlexusJS to Latest stable build...')
-			);
-			installPlexus('latest');
+			)
+			installPlexus('latest')
 		} else {
-			installPlexus();
+			installPlexus()
 		}
-		commandRan = true;
+		commandRan = true
 		return
 	}
 
 	// parse the command line arguments
 	if (yargs.argv.template) {
 		// try installing the packages
-		installPlexus();
+		installPlexus()
 
 		// generate the core files
 		if (
@@ -365,31 +372,31 @@ function run() {
 			try {
 				switch (yargs.argv.template) {
 					case 'scalable': {
-						console.log('Using Scalable Template...');
-						genFiles('scalable');
+						console.log('Using Scalable Template...')
+						genFiles('scalable')
 						break
 					}
 					default: {
-						console.log('Using Basic Template...');
-						genFiles();
+						console.log('Using Basic Template...')
+						genFiles()
 						break
 					}
 				}
 			} catch (e) {
-				console.warn(e);
+				console.warn(e)
 			}
 		} else {
-			console.warn('Invalid Template');
+			console.warn('Invalid Template')
 		}
-		commandRan = true;
+		commandRan = true
 		return
 	}
 
 	if (!commandRan) {
-		console.log(helpString);
+		console.log(helpString)
 
 		return
 	}
 }
 
-run();
+run()
