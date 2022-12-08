@@ -27,13 +27,26 @@ describe('Testing Action Function', () => {
 		expect(data).toBe('resolved')
 	})
 
-	test('Can catch an error', () => {
+	test('Can catch a sync error', () => {
 		const myAction = action(({ onCatch }) => {
 			onCatch(() => console.log('error caught successfully!'))
 
 			throw new Error('A test error')
 		})
 		const data = myAction()
+		expect(data).toBeDefined()
+	})
+
+	test('Can catch a promise error', async () => {
+		const myAction = action(async ({ onCatch }) => {
+			onCatch(() => console.log('error caught successfully!'))
+			await new Promise(() =>
+				setTimeout(() => {
+					throw new Error('eeeeeeeeeeeeee')
+				}, 100)
+			)
+		})
+		const data = await myAction()
 		expect(data).toBeDefined()
 	})
 
