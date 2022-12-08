@@ -12,7 +12,8 @@ export interface PlexusApiConfig {
 	defaultOptions?: PlexusApiOptions
 	timeout?: number
 	silentFail?: boolean
-	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
+	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void;
+	headers?: Record<string, string> | (() => Record<string, string>) | (() => Promise<Record<string, string>>)
 }
 export interface PlexusApiReq<BodyType = any> {
 	path: string
@@ -412,10 +413,6 @@ export class ApiInstance {
 	 * @param {HeaderFunction | Record<string, any>} headers The headers to set for the request
 	 * @returns {this | Promise<this>} The current instance
 	 */
-	setHeaders<HeaderFunction extends () => Promise<Record<string, any>>>(
-		inputFnOrObj: () => Promise<Record<string, any>>
-	): Promise<this>
-
 	setHeaders<HeaderFunction extends () => Record<string, any>>(
 		inputFnOrObj: Record<string, any>
 	): this
@@ -468,19 +465,7 @@ export class ApiInstance {
 			this.headerGetter()
 			return this
 		}
-		// call the function passed by the user
-		const headers = inputFnOrObj?.()
-
-		if (headers instanceof Promise) {
-			return new Promise<this>(async (resolve) => {
-				this.waiting = true
-				// if the headers are a function, set it to the header getter
-				this.headerGetter = async () => formatHeaders(await headers)
-				this.headerGetter()
-				resolve(this)
-				return this
-			})
-		}
+		this.headerGetter = async () => formatHeaders(await inputFnOrObj())
 		this.headerGetter()
 		return this
 	}
