@@ -209,7 +209,9 @@ export class RuntimeInstance {
 			// stop storing changes and emit the changes
 			this.batching = false
 			// call all the pending functions and clear the array
-			this.batchedCalls.forEach((pendingFn) => pendingFn())
+			for (const pendingFn of this.batchedCalls) {
+				pendingFn()
+			}
 			this.batchedCalls.length = 0
 
 			// release the reactivity engine
