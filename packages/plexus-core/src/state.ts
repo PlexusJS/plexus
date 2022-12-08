@@ -49,8 +49,8 @@ export class StateInstance<
 			_ready: false,
 		}
 
-		this.mount()
 		this.persistSync()
+		this.mount()
 	}
 
 	private persistSync() {
