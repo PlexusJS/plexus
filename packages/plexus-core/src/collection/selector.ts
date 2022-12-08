@@ -127,7 +127,7 @@ export class CollectionSelector<
 	set(value: DataType): this {
 		this.instance().runtime.log(
 			'info',
-			`Setting data value to ${value} on selector ${this.instanceId}...`
+			`Setting data value to ${JSON.stringify(value)} on selector ${this.instanceId}...`
 		)
 		// TODO add a warning here if the key is not set
 		if (this.data) {
