@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/core",
-	"version": "1.4.2-canary.69+8da7613",
+	"version": "1.4.2-canary.70+f860b2e",
 	"description": "A library for building modular interconnected applications",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -22,12 +22,12 @@
 		"build": "tsc --build --force && echo \"Build complete.\"",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "8da7613073f5687acd6462390f8756213aa79d6c",
+	"gitHead": "f860b2e1b8d7c38b0909c18b84f4b98fa2381410",
 	"devDependencies": {
 		"isomorphic-fetch": "^3.0.0"
 	},
 	"dependencies": {
-		"@plexusjs/api": "1.4.2-canary.69+8da7613",
-		"@plexusjs/utils": "1.4.2-canary.69+8da7613"
+		"@plexusjs/api": "1.4.2-canary.70+f860b2e",
+		"@plexusjs/utils": "1.4.2-canary.70+f860b2e"
 	}
 }
