@@ -238,7 +238,7 @@ export class CollectionSelector<
 	 * Clears the selector
 	 */
 	clear(): this {
-		this.select(null as any);
+		this.select(null as any)
 		return this
 	}
 }
