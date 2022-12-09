@@ -23,6 +23,7 @@ const myCollectionUndefined = collection<{ thing: string; id: number }>({
 // instance({ logLevel: "debug" })
 beforeEach(() => {
 	myCollection.clear()
+	myCollectionUndefined.clear()
 })
 describe('Testing Collection', () => {
 	test('Can create collection', () => {
@@ -49,6 +50,16 @@ describe('Testing Collection', () => {
 		// does the unfoundKeyReturnsUndefined configuration work
 		expect(myCollectionUndefined.getItemValue(1)).toBeUndefined()
 		console.log('an undefined object', myCollectionUndefined.getItemValue(1))
+	})
+
+	test('ingest multiple values in collect', () => {
+		expect(myCollectionUndefined.getItemValue(1)).toBeUndefined()
+		myCollectionUndefined.collect([
+			{ thing: 'lol3', id: 2 },
+			{ thing: 'lols', id: 1 },
+		])
+		expect(myCollectionUndefined.value.length).toBe(2)
+		expect(myCollectionUndefined.value.length).toBe(2)
 	})
 	test('Does it pass the vibe check ?', () => {
 		myCollection.collect({ thing: 'xqcL', id: 0 })

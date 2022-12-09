@@ -1,12 +1,6 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 
-import {
-	batchAction,
-	action,
-	instance,
-	state,
-	collection,
-} from '@plexusjs/core'
+import { batchAction, instance, collection, batch } from '@plexusjs/core'
 import { appointments, users, waitFor } from './test-utils'
 
 const dummyCollection = collection()
@@ -63,5 +57,12 @@ describe('Collection Relations', () => {
 			},
 			{ timeout: 1000 }
 		)
+	})
+
+	test('Batching race condition with selectors', () => {
+
+		batch(() => {
+			
+		})
 	})
 })
