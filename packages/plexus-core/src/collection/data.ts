@@ -123,8 +123,8 @@ export class CollectionData<
 
 			// loop through the foreign keys
 			for (idKey of Object.keys(foreignKeys ?? {})) {
-				const isArray = foreignKeys[idKey]?.mode === 'array'
 				const newKey = foreignKeys[idKey]?.newKey as string
+				const isArray = foreignKeys[idKey]?.mode === 'array' || Array.isArray(this.shallowValue?.[idKey]);
 				const foreignCollectionName = foreignKeys[idKey]?.reference as string
 				const foreignCollection = this.instance().findReference(
 					foreignCollectionName
@@ -137,7 +137,7 @@ export class CollectionData<
 								(id: string) => foreignCollection?.getItem(id).shallowValue
 						  ) || undefined
 						: foreignCollection?.getItem(this.shallowValue?.[idKey])
-								.shallowValue || undefined
+								.shallowValue || undefined;
 					if (
 						freshValue &&
 						foreignCollection?.config.foreignKeys?.[idKey]?.newKey
