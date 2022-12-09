@@ -4,4 +4,4 @@ export { useEvent } from './useEvent'
 
 export { useDeposit } from './useDeposit'
 
-export { useInit } from './useInit'
+export { useInit } from './useLoader'
