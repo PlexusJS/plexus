@@ -1,5 +1,5 @@
 import { deepClone } from '@plexusjs/utils'
-import { PlexusCollectionInstance, Watchable } from '..'
+import { PlexusCollectionInstance } from '..'
 import { PlexusInstance } from '../instance'
 import { PlexusWatcher } from '../interfaces'
 import { WatchableMutable } from '../watchable'
@@ -28,7 +28,7 @@ export type PlexusCollectionSelector<
  */
 export class CollectionSelector<
 	DataType extends Record<string, any>
-> extends Watchable<DataType> {
+> extends WatchableMutable<DataType> {
 	private _internalStore: CollectionSelectorStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>
 	private defaultValue: DataType
@@ -75,6 +75,11 @@ export class CollectionSelector<
 		)
 		// super.set({} as any)
 
+		this.instance().runtime.log(
+			'debug',
+			`...Selector ${this.instanceId} subscribers:`,
+			this.instance().runtime.getWatchers(this.id)
+		)
 		this.instance().runtime.broadcast(this.id, this.value)
 		this.instance().runtime.log(
 			'debug',
