@@ -78,7 +78,8 @@ export class CollectionSelector<
 		this.instance().runtime.broadcast(this.id, this.value)
 		this.instance().runtime.log(
 			'debug',
-			`...Selector ${this.instanceId} finished running watchers`
+			`...Selector ${this.instanceId} finished running watchers`,
+			this.id, this.value
 		)
 	}
 	/**
