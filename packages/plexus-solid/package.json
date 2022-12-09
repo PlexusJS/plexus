@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/solid",
-	"version": "1.4.2-canary.72+7294469",
+	"version": "1.4.2-canary.72+6de90f4",
 	"description": "SolidJS Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -26,9 +26,9 @@
 		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "7294469b48f4f539f87b79a2ec3d3f204876c57c",
+	"gitHead": "6de90f4af4048feccd9ab8b44ba887d5e3b824a8",
 	"dependencies": {
-		"@plexusjs/utils": "1.4.2-canary.72+7294469",
+		"@plexusjs/utils": "1.4.2-canary.72+6de90f4",
 		"solid-js": "^1.4.7"
 	}
 }
