@@ -36,10 +36,10 @@ export class RuntimeInstance {
 	 *  */
 	broadcast<Value = PlexusStateType>(key: string, value: Value) {
 		this.log('debug', `Broadcasting a change to ${key}`)
-		if (this.batching) {
-			this.batchedCalls.push(() => this.engine.emit(key, { key, value }))
-			return
-		}
+		// if (this.batching) {
+		// 	this.batchedCalls.push(() => this.engine.emit(key, { key, value }))
+		// 	return
+		// }
 		this.engine.emit(key, { key, value })
 	}
 	/**
