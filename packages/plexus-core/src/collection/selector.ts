@@ -76,7 +76,7 @@ export class CollectionSelector<
 		// 	callback(this.value)
 		// })
 		// super.set(deepClone(this.value) as any)
-		super.set(this.value as any)
+		super.set({} as any)
 	}
 	/**
 	 * The key of a data item assigned to this selector

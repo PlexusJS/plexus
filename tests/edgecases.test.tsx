@@ -17,7 +17,7 @@ describe('Collection Relations', () => {
 		const myAction = action(async ({ batch, onCatch }) => {
 			onCatch(console.error)
 
-			batch(() => {
+			await batch(async () => {
 				// #here gets stuck
 				users.collect({
 					id: '1',
@@ -34,14 +34,14 @@ describe('Collection Relations', () => {
 
 				// #hereEnd
 				dummyCollection.collect({ id: 'test' })
-			})
 
-			return new Promise<string>((resolve) =>
-				setTimeout(() => {
-					resolve('')
-					console.log('Batched Function Complete!')
-				}, 500)
-			)
+				await new Promise<string>((resolve) =>
+					setTimeout(() => {
+						resolve('')
+						console.log('Batched Function Complete!')
+					}, 500)
+				)
+			})
 		})
 
 		// the related collection value state should be undefined or something because the batch function hasn't finished yet
