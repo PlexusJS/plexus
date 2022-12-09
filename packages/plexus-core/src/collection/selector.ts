@@ -241,7 +241,7 @@ export class CollectionSelector<
 		this._internalStore._dataWatcherDestroyer?.()
 		this._internalStore._dataWatcherDestroyer = null
 		this.runWatchers()
-		return this;
+		return this
 	}
 }
 

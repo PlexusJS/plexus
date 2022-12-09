@@ -569,20 +569,20 @@ describe('testing collection relations', () => {
 			name: string
 		}>({
 			name: 'c1',
-		});
+		})
 		const c2 = collection<{
 			id: string
-			c1ids: string[];
-			c1s?: { id: string; name: string }[];
+			c1ids: string[]
+			c1s?: { id: string; name: string }[]
 		}>({
 			name: 'c2',
 			foreignKeys: {
 				c1ids: {
 					reference: 'c1',
 					newKey: 'c1s',
-				}
-			}
-		});
+				},
+			},
+		})
 		c1.collect([
 			{ id: '1', name: 'c1-1' },
 			{ id: '2', name: 'c1-2' },
@@ -591,7 +591,10 @@ describe('testing collection relations', () => {
 			{ id: '1', c1ids: ['1', '2'] },
 			{ id: '2', c1ids: ['1'] },
 		])
-		expect(c2.getItemValue('1').c1s?.length).toBe(2);
-		expect(c2.getItemValue('1').c1s?.[0]).toMatchObject({ id: '1', name: 'c1-1' });
+		expect(c2.getItemValue('1').c1s?.length).toBe(2)
+		expect(c2.getItemValue('1').c1s?.[0]).toMatchObject({
+			id: '1',
+			name: 'c1-1',
+		})
 	})
 })
