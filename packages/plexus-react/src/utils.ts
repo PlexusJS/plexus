@@ -1,4 +1,5 @@
 import { instance, Watchable } from '@plexusjs/core'
+import { WatchableMutable } from '@plexusjs/core/dist/watchable'
 export type AlmostAnything =
 	| string
 	| number
@@ -7,8 +8,10 @@ export type AlmostAnything =
 	| Array<any>
 	| Object
 
-export const normalizeDeps = (deps: Watchable | Watchable[]) =>
-	Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable]
+type W = Watchable | WatchableMutable;
+
+export const normalizeDeps = (deps: W | W[]) =>
+	Array.isArray(deps) ? (deps as W[]) : [deps as W]
 export function isObject(item: any): item is Object {
 	return (
 		item && item !== null && typeof item === 'object' && !Array.isArray(item)
@@ -17,13 +20,13 @@ export function isObject(item: any): item is Object {
 
 export const concurrentWatch = (
 	onChange: () => void,
-	depsArray: Watchable[]
+	depsArray: W[]
 ) => {
 	const depUnsubs: Array<() => void> = []
 
 	for (let dep of depsArray) {
 		// if not a watchable, then we can't watch it, skip to next iteration
-		if (!(dep instanceof Watchable) && !dep.watch) {
+		if ((!(dep instanceof Watchable) && !(dep instanceof WatchableMutable)) || !dep.watch) {
 			instance({ instanceId: 'react' }).runtime.log(
 				'debug',
 				`Skipping watch because the dependency isn't watchable`,
