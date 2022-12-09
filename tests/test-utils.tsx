@@ -38,7 +38,7 @@ export const users = collection<User>({
 			reference: 'appointments', // looks for the id(s) here
 		},
 	},
-})
+}).createSelector('batched')
 export const appointments = collection<Appointment>({
 	primaryKey: 'id',
 	name: 'appointments',
