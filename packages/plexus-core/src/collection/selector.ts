@@ -75,7 +75,6 @@ export class CollectionSelector<
 		// this._internalStore._watchers.forEach((callback) => {
 		// 	callback(this.value)
 		// })
-		super.set({} as any)
 		super.set(deepClone(this.value) as any)
 	}
 	/**
