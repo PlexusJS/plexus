@@ -233,6 +233,16 @@ export class CollectionSelector<
 		this.data?.redo()
 		return this
 	}
+	/**
+	 * Clears the selector
+	 */
+	clear(): this {
+		this._internalStore._key = null
+		this._internalStore._dataWatcherDestroyer?.()
+		this._internalStore._dataWatcherDestroyer = null
+		this.runWatchers()
+		return this;
+	}
 }
 
 export function _selector<
