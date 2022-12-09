@@ -43,7 +43,7 @@ export function computed<
 	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
 >(
 	item: (value?: Value) => Value,
-	dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>
+	dependencies: Array<Watchable<any>> | Watchable<any>
 ) {
 	if (!Array.isArray(dependencies)) {
 		return _computed<Value>(() => instance(), item, [dependencies])
