@@ -1,8 +1,12 @@
 import { WatchableMutable } from './../watchable'
 import { PlexusInstance } from '../instance'
-import { PlexusWatcher } from '../interfaces'
 import { ForeignKeyData, PlexusCollectionInstance } from './collection'
 import { deepClone, deepMerge, isEqual } from '@plexusjs/utils'
+
+export type PlexusGroupWatcher<V extends any = any> = (
+	value: V,
+	primaryKey?: keyof V
+) => void
 
 interface CollectionDataConfig {
 	prov: boolean
@@ -338,10 +342,11 @@ export class CollectionData<
 	 * @param {WatchCallback} callback The callback to run when the state changes
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<DataType>, from?: string) {
+	watch(callback: PlexusGroupWatcher<DataType>, from?: string) {
 		// this.syncForeignKeyData()
 		const destroyer = super.watch((value) => {
 			this.syncForeignKeyData(true)
+
 			return callback(value, this.primaryKey)
 		}, from)
 		return destroyer

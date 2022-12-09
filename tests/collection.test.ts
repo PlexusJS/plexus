@@ -383,8 +383,11 @@ describe('testing collection selectors', () => {
 	test('Do Selectors Work?', () => {
 		expect(myCollection.value.length).toBe(0)
 		const ref = { numOfLoops: 0 }
-		const del = myCollection.selectors.main.watch((v) => {
-			console.log(`${new Date().getTime()} selector watcher value changed`, v)
+		const del = myCollection.selectors.main.watch((v, from) => {
+			console.log(
+				`${new Date().getTime()} selector watcher invoked from "${from}" with value: `,
+				v
+			)
 			expect(v.thing).toBeDefined()
 			ref.numOfLoops = ref.numOfLoops + 1
 		})

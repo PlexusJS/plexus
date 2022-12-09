@@ -73,13 +73,13 @@ export class CollectionSelector<
 			'info',
 			`Selector ${this.instanceId} running watchers on selector...`
 		)
-		// this._internalStore._watchers.forEach((callback) => {
-		// 	callback(this.value)
-		// })
-		// super.set(deepClone(this.value) as any)
-		super.set({} as any)
+		// super.set({} as any)
 
 		this.instance().runtime.broadcast(this.id, this.value)
+		this.instance().runtime.log(
+			'debug',
+			`...Selector ${this.instanceId} finished running watchers`
+		)
 	}
 	/**
 	 * The key of a data item assigned to this selector
@@ -109,19 +109,24 @@ export class CollectionSelector<
 
 		this._internalStore._dataWatcherDestroyer?.()
 
-		// this.set(this.value)
-		const dataWatcherDestroyer = this.data?.watch((value) => {
+		// when this new data is changed, we want to run the watchers
+		const dataWatcherDestroyer = this.data?.watch((value, from) => {
+			this.instance().runtime.log(
+				'debug',
+				`Selector ${this.instanceId} noticed changed data on ${this.data?.instanceId}`
+			)
 			this.runWatchers()
 		}, this.id)
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
-		this.instance().runtime.log(
-			'info',
-			`Selector ${this.instanceId} selected data ${this.data?.instanceId}...`
-		)
 		// reinitialize history with the same stored length
 		this.data?.history(this.historyLength)
 		// broadcast the change
 		this.runWatchers()
+
+		this.instance().runtime.log(
+			'info',
+			`Selector ${this.instanceId} selected data ${this.data?.instanceId}...`
+		)
 		return this
 	}
 	/**
@@ -139,7 +144,7 @@ export class CollectionSelector<
 		// TODO add a warning here if the key is not set
 		if (this.data) {
 			this.data.set(value)
-			this.runWatchers()
+			// this.runWatchers()
 		}
 		return this
 	}
@@ -152,7 +157,7 @@ export class CollectionSelector<
 		// TODO add a warning here if the key is not set
 		if (this.data) {
 			this.data.patch(value)
-			this.runWatchers()
+			// this.runWatchers()
 		}
 		return this
 	}
@@ -199,7 +204,7 @@ export class CollectionSelector<
 							: 'Either the key or the data changed'
 					}.`
 				)
-				callback(this.data?.value || this.defaultValue)
+				callback(this.data?.value || this.defaultValue, from)
 			},
 			from
 		)

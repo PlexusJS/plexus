@@ -46,11 +46,8 @@ export class Watchable<ValueType = any> {
 		from?: string
 	): () => void {
 		const destroyer = this.instance().runtime.subscribe(this.id, callback, from)
-		this._watchableStore._watchers.add(destroyer)
-
 		return () => {
 			destroyer()
-			this._watchableStore._watchers.delete(destroyer)
 		}
 	}
 
