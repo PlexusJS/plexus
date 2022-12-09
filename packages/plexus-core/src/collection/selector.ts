@@ -1,3 +1,4 @@
+import { deepClone } from '@plexusjs/utils'
 import { PlexusCollectionInstance } from '..'
 import { PlexusInstance } from '../instance'
 import { PlexusWatcher } from '../interfaces'
@@ -74,7 +75,7 @@ export class CollectionSelector<
 		// this._internalStore._watchers.forEach((callback) => {
 		// 	callback(this.value)
 		// })
-		super.set(this.value as any)
+		super.set(deepClone(this.value) as any)
 	}
 	/**
 	 * The key of a data item assigned to this selector
