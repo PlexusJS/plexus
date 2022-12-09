@@ -238,10 +238,7 @@ export class CollectionSelector<
 	 * Clears the selector
 	 */
 	clear(): this {
-		this._internalStore._key = null
-		this._internalStore._dataWatcherDestroyer?.()
-		this._internalStore._dataWatcherDestroyer = null
-		this.runWatchers()
+		this.select(null as any);
 		return this
 	}
 }
