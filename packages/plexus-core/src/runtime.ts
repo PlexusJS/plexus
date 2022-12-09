@@ -6,7 +6,7 @@ export type PlexusRuntime = RuntimeInstance
 interface RuntimeConfig {
 	logLevel: 'debug' | 'warn' | 'error' | 'silent'
 }
-type Fn<Value> = (value: Value) => void
+type ListenerFn<Value> = (value: Value, from?: string) => void
 type LogLevels = Exclude<RuntimeConfig['logLevel'], 'silent'> | 'info'
 type SubscriptionTypes =
 	| 'state'
@@ -35,7 +35,7 @@ export class RuntimeInstance {
 	 * track a change and propagate to all listening children in instance
 	 *  */
 	broadcast<Value = PlexusStateType>(key: string, value: Value) {
-		this.log('info', `Broadcasting a change to ${key}`)
+		this.log('debug', `Broadcasting a change to ${key}`)
 		if (this.batching) {
 			this.batchedCalls.push(() => this.engine.emit(key, { key, value }))
 			return
@@ -50,15 +50,15 @@ export class RuntimeInstance {
 	 */
 	subscribe<Value = PlexusStateType>(
 		_key: string,
-		_callback: Fn<Value>,
+		_callback: ListenerFn<Value>,
 		from?: string
 	) {
-		this.log('info', `Subscribing to changes of ${_key}`)
+		this.log('debug', `Subscribing to changes of ${_key}`)
 		const callback = (data: { key: string; value: Value }) => {
 			const { key, value } = data
 			this.log('debug', `${_key} has been changed to: `, value)
 			if (_key === key) {
-				_callback?.(value)
+				_callback?.(value, from)
 			}
 		}
 

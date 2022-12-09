@@ -113,10 +113,13 @@ export class CollectionData<
 	}
 
 	private syncForeignKeyData(injectListener: boolean = false) {
-		this.instance().runtime.log('info', `syncing foreign key data`)
 		// extract the foreign keys from the collection
 		const foreignKeys = this.collection().config.foreignKeys
 		if (foreignKeys && Object.keys(foreignKeys).length) {
+			this.instance().runtime.log(
+				'info',
+				`Data ${this.instanceId} is syncing foreign key data`
+			)
 			// get the previous foreign key data stored for this data instance
 
 			let idKey: keyof DataType
@@ -249,7 +252,7 @@ export class CollectionData<
 		if (this.provisional) {
 			this.instance().runtime.log(
 				'debug',
-				`Mounting provisional data instance "${this.key}" to instance...`
+				`Data(provisional) ${this.instanceId} mounting to "${this.key}" to instance...`
 			)
 			this.mount()
 			this.provisional = false
@@ -280,8 +283,8 @@ export class CollectionData<
 		} else {
 			this.instance().runtime.log(
 				'warn',
-				`Tried applying the same value to data "${this.key}" in collection ${
-					this.collection().id
+				`Data ${this.instanceId} tried applying the same value in collection ${
+					this.collection().instanceId
 				}...`
 			)
 		}

@@ -48,6 +48,7 @@ export class CollectionSelector<
 	get instanceId(): string {
 		return `sel_${this._watchableStore._internalId}`
 	}
+
 	constructor(
 		instance: () => PlexusInstance,
 		collection: () => PlexusCollectionInstance<DataType>,
@@ -70,13 +71,15 @@ export class CollectionSelector<
 	private runWatchers() {
 		this.instance().runtime.log(
 			'info',
-			`Running watchers on selector ${this.instanceId}...`
+			`Selector ${this.instanceId} running watchers on selector...`
 		)
 		// this._internalStore._watchers.forEach((callback) => {
 		// 	callback(this.value)
 		// })
 		// super.set(deepClone(this.value) as any)
 		super.set({} as any)
+
+		this.instance().runtime.broadcast(this.id, this.value)
 	}
 	/**
 	 * The key of a data item assigned to this selector
@@ -94,7 +97,7 @@ export class CollectionSelector<
 		if (key === this._internalStore._key) {
 			this.instance().runtime.log(
 				'warn',
-				`Tried selecting the same key, skipping selection on selector ${this.instanceId}...`
+				`Selector ${this.instanceId} tried selecting the same key, skipping selection...`
 			)
 			return this
 		}
@@ -113,7 +116,7 @@ export class CollectionSelector<
 		this._internalStore._dataWatcherDestroyer = dataWatcherDestroyer || null
 		this.instance().runtime.log(
 			'info',
-			`Selected data ${this.data?.instanceId} on selector ${this.instanceId}...`
+			`Selector ${this.instanceId} selected data ${this.data?.instanceId}...`
 		)
 		// reinitialize history with the same stored length
 		this.data?.history(this.historyLength)
@@ -129,9 +132,9 @@ export class CollectionSelector<
 	set(value: DataType): this {
 		this.instance().runtime.log(
 			'info',
-			`Setting data value to ${JSON.stringify(value)} on selector ${
-				this.instanceId
-			}...`
+			`Selector ${this.instanceId} has a data instance ${
+				this.data?.instanceId
+			} being set to data value to ${JSON.stringify(value)} on ...`
 		)
 		// TODO add a warning here if the key is not set
 		if (this.data) {
@@ -184,14 +187,22 @@ export class CollectionSelector<
 	 * @param {watcher} callback The callback to run when the state changes
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<DataType>) {
-		return super.watch((v) => {
-			this.instance().runtime.log(
-				'debug',
-				`Watching selector ${this.instanceId} with a new callback`
-			)
-			callback(this.data?.value || v)
-		})
+	watch(callback: PlexusWatcher<DataType>, from?: string) {
+		return this.instance().runtime.subscribe(
+			this.id,
+			(v, from) => {
+				this.instance().runtime.log(
+					'info',
+					`Selector ${this.instanceId} updated. ${
+						from
+							? `${from} caused the broadcast`
+							: 'Either the key or the data changed'
+					}.`
+				)
+				callback(this.data?.value || this.defaultValue)
+			},
+			from
+		)
 	}
 	private historyLength: number = 0
 

@@ -70,7 +70,7 @@ export class CollectionGroup<
 	private runWatchers() {
 		this.instance().runtime.log(
 			'info',
-			`Running watchers on group ${this._internalStore._name}(${this.instanceId})...`
+			`Group ${this.instanceId} running watchers...`
 		)
 		const keys = Array.from(this._internalStore._includedKeys)
 		// memoization: this updates the groups stored value! This reduces computation as the state of the group is only updated when the data changes
@@ -82,7 +82,7 @@ export class CollectionGroup<
 	private rebuildDataWatchers() {
 		this.instance().runtime.log(
 			'info',
-			`Rebuilding data watcher connections on group ${this._internalStore._name}(${this.instanceId})...`
+			`Group ${this.instanceId} rebuilding data watcher connections...`
 		)
 		this._internalStore._dataWatcherDestroyers.forEach((destroyer) =>
 			destroyer()

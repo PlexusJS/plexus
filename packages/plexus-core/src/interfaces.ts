@@ -12,5 +12,5 @@ export type PlexusRuntime = ReturnType<typeof _runtime>
 export type PlexusEvent = ReturnType<typeof _event>
 export type PlexusWatcher<V extends any = any> = (
 	value: V,
-	primaryKey?: keyof V
+	from?: string
 ) => void

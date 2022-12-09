@@ -53,6 +53,7 @@ export class Watchable<ValueType = any> {
 			this._watchableStore._watchers.delete(destroyer)
 		}
 	}
+
 	get value(): ValueType {
 		return this._watchableStore._publicValue
 	}
@@ -146,7 +147,7 @@ export class WatchableMutable<
 	history(maxLength: number = 10): this {
 		// disable history if maxLength is 0 (can be done at any time)
 		if (maxLength <= 0) {
-			this.instance().runtime.log('debug', `Disabling history for ${this.id}`)
+			this.instance().runtime.log('debug', `History disabled for ${this.id}`)
 			delete this._history
 			return this
 		}
@@ -158,7 +159,7 @@ export class WatchableMutable<
 			maxLength,
 			skipArchiveUpdate: false,
 		}
-		this.instance().runtime.log('debug', `Enabling history for ${this.id}`)
+		this.instance().runtime.log('debug', `History enabled for ${this.id}`)
 
 		return this
 	}
@@ -198,7 +199,10 @@ export class WatchableMutable<
 
 		// update the runtime conductor
 
-		this.instance().runtime.log('debug', `Broadcasting to Instance ${this.id}`)
+		this.instance().runtime.log(
+			'debug',
+			`Watchable ${this.id} broadcasting to change to subscribers`
+		)
 		this.instance().runtime.broadcast(this.id, value)
 
 		// if history, add to archive
@@ -214,7 +218,7 @@ export class WatchableMutable<
 			}
 			this.instance().runtime.log(
 				'debug',
-				`Watchable set caused its History to shift ${this.id}`
+				`Watchable ${this.id} set caused its History to shift`
 			)
 			this._history.archive_head.push(this._watchableStore._lastValue)
 			// if we are setting a new value and the tail has any values, remove them

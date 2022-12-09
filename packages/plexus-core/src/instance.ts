@@ -7,6 +7,7 @@ import { deepMerge, genUID, isEqual } from '@plexusjs/utils'
 import { PlexusPreAction } from './preaction'
 import { CollectionData } from './collection/data'
 import { PlexusComputedStateInstance } from './computed'
+import { CollectionSelector } from './collection/selector'
 
 /**
  * Get the correctly formatted instance name
@@ -31,6 +32,7 @@ export class PlexusInstance {
 	_plugins = new Map<string, PlexusPlugin>()
 	_collections = new Set<CollectionInstance<any, any, any>>()
 	_collectionData = new Set<CollectionData<any>>()
+	_collectionSelectors = new Set<CollectionSelector<any>>()
 	_storages = new Map<string, PlexusStorageInstance>()
 
 	_globalCatch: ((error: any) => unknown) | undefined

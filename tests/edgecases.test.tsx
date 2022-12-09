@@ -1,6 +1,12 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 
-import { batchAction, instance, collection, batch, action } from '@plexusjs/core'
+import {
+	batchAction,
+	instance,
+	collection,
+	batch,
+	action,
+} from '@plexusjs/core'
 import { appointments, users, waitFor } from './test-utils'
 
 const dummyCollection = collection()

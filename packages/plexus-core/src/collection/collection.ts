@@ -193,7 +193,7 @@ export class CollectionInstance<
 		if (!this.instance()._collections.has(this)) {
 			this.instance()._collections.add(this)
 			this.instance().runtime.log(
-				'info',
+				'debug',
 				`Hoisting collection ${this.instanceId} to instance`
 			)
 			if (this._internalStore.persist) {
@@ -238,13 +238,13 @@ export class CollectionInstance<
 				) {
 					this.instance().runtime.log(
 						'debug',
-						`Batching started for addToGroups`
+						`Batching an addToGroups call for collection ${this.instanceId}`
 					)
 					// store this in the batchedSetters for execution once batching is over
 					this.instance().runtime.batchedCalls.push(() => {
 						this.instance().runtime.log(
 							'debug',
-							'Batching completed for addToGroups'
+							`Batched addToGroups call fulfilled for collection ${this.instanceId}`
 						)
 						return collectItem(item, groups, true)
 					})
@@ -524,8 +524,7 @@ export class CollectionInstance<
 		} else {
 			this.instance().runtime.log(
 				'warn',
-				'Failed to find group %s; creating placeholder group.',
-				name
+				`Group ${this.instanceId} failed to find group ${name}; creating placeholder group.`
 			)
 			const g = _group(
 				() => this.instance(),
@@ -571,12 +570,15 @@ export class CollectionInstance<
 				this.config.useBatching &&
 				!startedFromInnerBatch
 			) {
-				this.instance().runtime.log('debug', `Batching started for addToGroups`)
+				this.instance().runtime.log(
+					'debug',
+					`Collection Batching started for addToGroups`
+				)
 				// store this in the batchedSetters for execution once batching is over
 				this.instance().runtime.batchedCalls.push(() => {
 					this.instance().runtime.log(
 						'debug',
-						`Batching completed for addToGroups`
+						`Collection Batching completed for addToGroups`
 					)
 					return addToGroup(key, group, true)
 				})
@@ -625,7 +627,7 @@ export class CollectionInstance<
 			return group.watch(callback)
 		} else {
 			// TODO Replace with runtime log
-			console.warn('No group found for name', name)
+			console.warn(`Group ${name} not found`)
 			return () => {}
 		}
 	}
@@ -733,7 +735,9 @@ export class CollectionInstance<
 		if (typeof this._internalStore._computeFn !== 'function') {
 			this.instance().runtime.log(
 				'warn',
-				`Attempted to recompute ${this.name} without a compute fn set`
+				`Collection ${
+					this.name || this.instanceId
+				} attempted to recompute without a compute fn set`
 			)
 			return this
 		}

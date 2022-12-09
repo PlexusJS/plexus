@@ -382,24 +382,41 @@ describe('testing collection groups', () => {
 describe('testing collection selectors', () => {
 	test('Do Selectors Work?', () => {
 		expect(myCollection.value.length).toBe(0)
+		const ref = { numOfLoops: 0 }
+		const del = myCollection.selectors.main.watch((v) => {
+			console.log(`${new Date().getTime()} selector watcher value changed`, v)
+			expect(v.thing).toBeDefined()
+			ref.numOfLoops = ref.numOfLoops + 1
+		})
+		expect(ref.numOfLoops).toBe(0)
+
 		myCollection.collect([
 			{ thing: 'lol', id: 0 },
 			{ thing: 'lol3', id: 2 },
 			{ thing: 'lols', id: 1 },
 		])
+		instance().settings.logLevel = 'debug'
 		myCollection.getSelector('main').select(0)
+		expect(ref.numOfLoops).toBe(1)
 		// console.log(myCollection.getSelector("main").key)
 
-		const del = myCollection.getSelector('main').watch((v) => {
-			console.log(v)
-			expect(v.thing).toBe('haha')
-		})
-		expect(myCollection.getSelector('main').value?.thing).toBe('lol')
+		expect(myCollection.selectors.main.value?.id).toBe(0)
+		expect(myCollection.selectors.main.value?.thing).toBe('lol')
+
+		console.log(myCollection.selectors.main.value?.thing)
 		myCollection.update(0, { thing: 'haha' })
-		del()
+		expect(ref.numOfLoops).toBe(2)
+		console.log(myCollection.selectors.main.value?.thing)
 		expect(myCollection.selectors.main.key).toBe(0)
-		expect(myCollection.getSelector('main').value?.id).toBe(0)
-		expect(myCollection.getSelector('main').value?.thing).toBe('haha')
+		expect(myCollection.selectors.main.value?.thing).toBe('haha')
+
+		myCollection.selectors.main.select(1)
+		console.log(myCollection.selectors.main.value?.thing)
+		expect(myCollection.selectors.main.value?.id).toBe(1)
+		expect(myCollection.selectors.main.value?.thing).toBe('lols')
+		expect(ref.numOfLoops).toBe(3)
+
+		del()
 	})
 
 	test('Watching Selectors', () => {
