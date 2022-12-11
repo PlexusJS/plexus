@@ -58,6 +58,7 @@ export class StateInstance<
 
 	private persistSync() {
 		if (this._internalStore._persist) {
+			this.instance().storage?.monitor(this.name, this);
 			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
