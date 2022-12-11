@@ -189,7 +189,7 @@ export class StorageInstance {
 				return
 			}
 
-			// instance().storage.monitor(key, object)
+			this.monitor(key, object)
 			let storedValue = await this.get(key)
 
 			if (storedValue) {
