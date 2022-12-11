@@ -17,6 +17,7 @@ export interface StateStore<Value> {
 	_persist: boolean
 	_interval: NodeJS.Timer | null
 	_ready: boolean
+	_isSetting: boolean
 }
 export type PlexusStateInstance<Value extends PlexusStateType = any> =
 	StateInstance<Value>
@@ -51,6 +52,7 @@ export class StateInstance<
 			_persist: false,
 			_interval: null,
 			_ready: false,
+			_isSetting: false,
 		}
 
 		this.mount();
@@ -65,17 +67,17 @@ export class StateInstance<
 	}
 
 	private async syncPersistToValue () {
+		if (this._internalStore._isSetting) return
 		const storedValue = (await this.instance().storage?.get(
 			this._internalStore._name
 		)) as StateValue
 		if (storedValue) {
-			if (isEqual(storedValue, this._watchableStore._value)) return
+			if (this.isEqual(storedValue)) return
 			this.set(storedValue)
 		}
 	}
 
 	private mount() {
-		this.syncPersistToValue();
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
 			this.instance().runtime.log(
@@ -94,12 +96,14 @@ export class StateInstance<
 	 * @param value The new value of this state
 	 */
 	set(value?: StateValue) {
+		this._internalStore._isSetting = true
 		super.set(value)
 		if (this._internalStore._persist)
 			this.instance().storage?.set(
 				this._internalStore._name,
 				this._watchableStore._value
 			)
+		this._internalStore._isSetting = false
 		return this
 	}
 	/**
@@ -240,6 +244,7 @@ export class StateInstance<
 			}`
 		)
 		this.mount()
+		this.syncPersistToValue();
 		return super.value
 	}
 	/**
