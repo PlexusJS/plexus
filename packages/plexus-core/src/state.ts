@@ -53,7 +53,8 @@ export class StateInstance<
 			_ready: false,
 		}
 
-		this.mount()
+		this.mount();
+		this.persistSync();
 	}
 
 	private persistSync() {
@@ -62,7 +63,13 @@ export class StateInstance<
 			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
-	private mount(noPersist = false) {
+	private mount() {
+		(async () => {
+			const storedValue = (await this.instance().storage?.get(
+				this._internalStore._name
+			)) as StateValue
+			storedValue && this.set(storedValue)
+		})();
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
 			this.instance().runtime.log(
@@ -72,7 +79,6 @@ export class StateInstance<
 				`to instance`
 			)
 		}
-		if (!noPersist) this.persistSync()
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
 		this.instance().runtime.log('info', `State ${this.id} is ready`)
@@ -227,7 +233,7 @@ export class StateInstance<
 				this._internalStore._persist ? '; Persist Enabled' : ''
 			}`
 		)
-		this.mount(true)
+		this.mount()
 		return super.value
 	}
 	/**
