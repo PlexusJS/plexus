@@ -71,8 +71,8 @@ export class StateInstance<
 				this._watchableStore._value,
 				`to instance`
 			)
+			this.persistSync()
 		}
-		this.persistSync()
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
 		this.instance().runtime.log('info', `State ${this.id} is ready`)
