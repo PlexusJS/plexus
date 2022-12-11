@@ -63,13 +63,19 @@ export class StateInstance<
 			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
+
+	private async syncPersistToValue () {
+		const storedValue = (await this.instance().storage?.get(
+			this._internalStore._name
+		)) as StateValue
+		if (storedValue) {
+			if (isEqual(storedValue, this._watchableStore._value)) return
+			this.set(storedValue)
+		}
+	}
+
 	private mount() {
-		(async () => {
-			const storedValue = (await this.instance().storage?.get(
-				this._internalStore._name
-			)) as StateValue
-			storedValue && this.set(storedValue)
-		})();
+		this.syncPersistToValue();
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
 			this.instance().runtime.log(
