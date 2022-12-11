@@ -1,54 +1,63 @@
 ---
-title: CollectionDataInstance
+title: CollectionData
 ---
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 A piece of data belonging to a collection
 
-- [CollectionDataInstance](#CollectionDataInstance)
-  - [.id](#CollectionDataInstance+id) : <code>string</code>
-  - [.instanceId](#CollectionDataInstance+instanceId) : <code>string</code>
-  - [.value](#CollectionDataInstance+value) : <code>DataType</code>
-  - [.lastValue](#CollectionDataInstance+lastValue) : <code>DataType</code>
-  - [.initialValue](#CollectionDataInstance+initialValue) : <code>DataType</code>
-  - [.set(value)](#CollectionDataInstance+set) ⇒ <code>this</code>
-  - [.patch(value)](#CollectionDataInstance+patch) ⇒ <code>this</code>
-  - [.isEqual(value)](#CollectionDataInstance+isEqual) ⇒ <code>boolean</code>
-  - [.delete()](#CollectionDataInstance+delete) ⇒ <code>this</code>
-  - [.clean()](#CollectionDataInstance+clean) ⇒ <code>this</code>
+- [CollectionData](#CollectionData)
+  - [.id](#CollectionData+id) : <code>string</code>
+  - [.instanceId](#CollectionData+instanceId) : <code>string</code>
+  - [.value](#CollectionData+value) : <code>DataType</code>
+  - [.shallowValue](#CollectionData+shallowValue) : <code>DataType</code>
+  - [.lastValue](#CollectionData+lastValue) : <code>DataType</code>
+  - [.initialValue](#CollectionData+initialValue) : <code>DataType</code>
+  - [.set(value)](#CollectionData+set) ⇒ <code>this</code>
+  - [.patch(value)](#CollectionData+patch) ⇒ <code>this</code>
+  - [.isEqual(value)](#CollectionData+isEqual) ⇒ <code>boolean</code>
+  - [.delete()](#CollectionData+delete) ⇒ <code>this</code>
+  - [.clean()](#CollectionData+clean) ⇒ <code>this</code>
 
-<a name='CollectionDataInstance+id'></a>
+<a name='CollectionData+id'></a>
 
 ### .id : <code>string</code>
 
 <p>The internal id of the state with an instance prefix</p>
 
-<a name='CollectionDataInstance+instanceId'></a>
+<a name='CollectionData+instanceId'></a>
 
 ### .instanceId : <code>string</code>
 
 <p>The internal id of the state with an instance prefix</p>
 
-<a name='CollectionDataInstance+value'></a>
+<a name='CollectionData+value'></a>
 
 ### .value : <code>DataType</code>
 
 <p>Get the value of the data instance</p>
 
-<a name='CollectionDataInstance+lastValue'></a>
+<a name='CollectionData+shallowValue'></a>
+
+### .shallowValue : <code>DataType</code>
+
+<p>
+	Get the shallow value of the data instance (no foreign key values injected)
+</p>
+
+<a name='CollectionData+lastValue'></a>
 
 ### .lastValue : <code>DataType</code>
 
 <p>The previous (reactive) value of the state</p>
 
-<a name='CollectionDataInstance+initialValue'></a>
+<a name='CollectionData+initialValue'></a>
 
 ### .initialValue : <code>DataType</code>
 
 <p>The initial (default) value of the state</p>
 
-<a name='CollectionDataInstance+set'></a>
+<a name='CollectionData+set'></a>
 
 ### .set(value) ⇒ <code>this</code>
 
@@ -60,7 +69,7 @@ A piece of data belonging to a collection
 | ----- | --------------------- | ----------------------- |
 | value | <code>DataType</code> | <p>The value to set</p> |
 
-<a name='CollectionDataInstance+patch'></a>
+<a name='CollectionData+patch'></a>
 
 ### .patch(value) ⇒ <code>this</code>
 
@@ -72,7 +81,7 @@ A piece of data belonging to a collection
 | ----- | --------------------- | ----------------------------------------------------------- |
 | value | <code>DataType</code> | <p>A value of the state to merge with the current value</p> |
 
-<a name='CollectionDataInstance+isEqual'></a>
+<a name='CollectionData+isEqual'></a>
 
 ### .isEqual(value) ⇒ <code>boolean</code>
 
@@ -84,7 +93,7 @@ A piece of data belonging to a collection
 | ----- | ------------------------------------------------ |
 | value | <p>The thing to compare the current value to</p> |
 
-<a name='CollectionDataInstance+delete'></a>
+<a name='CollectionData+delete'></a>
 
 ### .delete() ⇒ <code>this</code>
 
@@ -92,7 +101,7 @@ A piece of data belonging to a collection
 
 **Returns**: <code>this</code> <p>The data instance</p>
 
-<a name='CollectionDataInstance+clean'></a>
+<a name='CollectionData+clean'></a>
 
 ### .clean() ⇒ <code>this</code>
 

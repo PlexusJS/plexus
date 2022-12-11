@@ -1,15 +1,10 @@
-import {
-	AlmostAnything,
-	deepClone,
-	deepMerge,
-	isEqual,
-	isObject,
-} from '@plexusjs/utils'
+import { deepClone, deepMerge, isEqual, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance'
 import { PlexusWatcher } from './interfaces'
+
 import { WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
-export type PlexusStateType = AlmostAnything
+export type PlexusStateType = NonNullable<any>
 export type PlexusState = <Value extends PlexusStateType = any>(
 	instance: () => PlexusInstance,
 	input: Value
@@ -22,6 +17,7 @@ export interface StateStore<Value> {
 	_persist: boolean
 	_interval: NodeJS.Timer | null
 	_ready: boolean
+	_isSetting: boolean
 }
 export type PlexusStateInstance<Value extends PlexusStateType = any> =
 	StateInstance<Value>
@@ -44,7 +40,11 @@ export class StateInstance<
 	get instanceId(): string {
 		return `ste_${this._watchableStore._internalId}`
 	}
-	constructor(instance: () => PlexusInstance, init: StateValue) {
+	constructor(
+		instance: () => PlexusInstance,
+		init: StateValue,
+		fetcher?: (currentValue: StateValue) => StateValue
+	) {
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
@@ -52,17 +52,31 @@ export class StateInstance<
 			_persist: false,
 			_interval: null,
 			_ready: false,
+			_isSetting: false,
 		}
 
-		this.mount()
-		this.persistSync()
+		this.mount();
+		this.persistSync();
 	}
 
 	private persistSync() {
 		if (this._internalStore._persist) {
+			this.instance().storage?.monitor(this.name, this);
 			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
+
+	private async syncPersistToValue () {
+		if (this._internalStore._isSetting) return
+		const storedValue = (await this.instance().storage?.get(
+			this._internalStore._name
+		)) as StateValue
+		if (storedValue) {
+			if (this.isEqual(storedValue)) return
+			this.set(storedValue)
+		}
+	}
+
 	private mount() {
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
@@ -72,7 +86,6 @@ export class StateInstance<
 				this._watchableStore._value,
 				`to instance`
 			)
-			this.persistSync()
 		}
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
@@ -83,12 +96,14 @@ export class StateInstance<
 	 * @param value The new value of this state
 	 */
 	set(value?: StateValue) {
+		this._internalStore._isSetting = true
 		super.set(value)
 		if (this._internalStore._persist)
 			this.instance().storage?.set(
 				this._internalStore._name,
 				this._watchableStore._value
 			)
+		this._internalStore._isSetting = false
 		return this
 	}
 	/**
@@ -229,6 +244,7 @@ export class StateInstance<
 			}`
 		)
 		this.mount()
+		this.syncPersistToValue();
 		return super.value
 	}
 	/**

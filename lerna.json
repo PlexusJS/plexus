@@ -11,7 +11,8 @@
 		"publish": {
 			"npmClient": "yarn",
 			"allowBranch": ["master", "canary"],
-			"registry": "https://registry.npmjs.org/"
+			"registry": "https://registry.npmjs.org/",
+			"ignoreChanges": ["docs/**/*"]
 		}
 	}
 }

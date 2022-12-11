@@ -12,11 +12,10 @@ beforeEach(() => {
 describe('Testing Api Function', () => {
 	test('Send a get request to google', async () => {
 		// const value = state(1)
-		myApi.options({
-			headers: {
-				custom: 'header',
-			},
+		myApi.setHeaders({
+			custom: 'header',
 		})
+		console.log(myApi.config)
 		// console.log(myApi.config)
 		expect(myApi.config).toBeDefined()
 		expect(myApi.config.headers).toBeDefined()
@@ -48,11 +47,31 @@ describe('Testing Api Function', () => {
 	})
 })
 describe("Test the API's baseURL capabilities", () => {
-	const myApi2 = api('https://google.com')
+	const myApi2 = api('https://google.com').setHeaders({
+		'Content-Type': 'application/json',
+	})
 	test('Can make a request to a sub-path', async () => {
 		const res = await myApi2.post('maps')
 
 		expect(myApi2.config.headers['Content-Type']).toBe('application/json')
+		// console.log(JSON.stringify(res, null, 2))
+		expect(res?.status).toBeGreaterThan(0)
+	})
+	test('test async setHeaders', async () => {
+		const intendedValue = 'success'
+		await myApi2.setHeaders(async () => {
+			const headerValue = await new Promise((resolve) =>
+				setTimeout(() => resolve(intendedValue), 100)
+			)
+			return {
+				'Content-Type': 'application/json',
+				'X-Test': headerValue,
+			}
+		})
+
+		const res = await myApi2.post('maps')
+
+		expect(myApi2.config.headers['X-Test']).toBe(intendedValue)
 		// console.log(JSON.stringify(res, null, 2))
 		expect(res?.status).toBeGreaterThan(0)
 	})

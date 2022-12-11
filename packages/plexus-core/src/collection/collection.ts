@@ -25,7 +25,17 @@ type KeyOfMap<T extends ReadonlyMap<unknown, unknown>> = T extends ReadonlyMap<
 	? K
 	: never
 
-// type valuesOfArray =
+export type ForeignKeyData<DataType> = Partial<
+	Record<
+		keyof DataType,
+		{
+			newKey: string
+			reference: string
+			// @default 'object'
+			mode?: 'object' | 'array'
+		}
+	>
+>
 
 export { PlexusCollectionGroup, PlexusCollectionSelector }
 export interface PlexusCollectionConfig<DataType> {
@@ -46,16 +56,13 @@ export interface PlexusCollectionConfig<DataType> {
 	 * @warning The type of the returned value WILL NOT change to undefined. Only the literal value will be undefined as this is _technically_ an override. Please beware and plan accordingly.
 	 */
 	unfoundKeyReturnsUndefined?: boolean
+	/**
+	 * When this value is true, the collection will use batching when running operations (like collections) on array to reduce the number of rerenders. This is useful when you are ingesting a large amount of data at once.
+	 * @default true
+	 */
+	useBatching?: boolean
 
-	foreignKeys?: Partial<
-		Record<
-			keyof DataType,
-			{
-				newKey: string
-				reference: () => PlexusCollectionInstance
-			}
-		>
-	>
+	foreignKeys?: ForeignKeyData<DataType>
 	computeLocations?: Array<'collect' | 'getValue'>
 }
 interface PlexusCollectionStore<
@@ -74,6 +81,7 @@ interface PlexusCollectionStore<
 	_externalName: string
 	set externalName(value: string)
 	_persist: boolean
+	_internalCalledGroupCollect?: boolean
 	set persist(value: boolean)
 	_computeFn?: (data: DataType) => DataType
 }
@@ -85,11 +93,13 @@ export type PlexusCollectionInstance<
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * A Collection Instance
+ *
  */
 export class CollectionInstance<
 	DataType extends Record<string, any>,
 	Groups extends GroupMap<DataType>,
 	Selectors extends SelectorMap<DataType>
+	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
 	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
 	private instance: () => PlexusInstance
@@ -112,10 +122,9 @@ export class CollectionInstance<
 		// return this._internalStore._internalId
 		return `coll_${this._internalStore._internalId}`
 	}
-
 	constructor(
 		instance: () => PlexusInstance,
-		_config: PlexusCollectionConfig<DataType> = {
+		config: PlexusCollectionConfig<DataType> = {
 			primaryKey: 'id',
 			defaultGroup: false,
 		} as const
@@ -123,7 +132,9 @@ export class CollectionInstance<
 		this.instance = instance
 		this.config = {
 			computeLocations: ['collect', 'getValue'],
-			..._config,
+			useBatching: true,
+			...config,
+			foreignKeys: config.foreignKeys || {},
 		}
 		this._internalStore = {
 			_internalId:
@@ -131,14 +142,14 @@ export class CollectionInstance<
 				Math.random().toString(36).substring(2, 15),
 			_lookup: new Map<string, string>(),
 			_lastChanged: '',
-			_key: _config?.primaryKey || 'id',
+			_key: config?.primaryKey || 'id',
 			_data: new Map<string, PlexusDataInstance<DataType>>(),
 			_groups: new Map<GroupName, PlexusCollectionGroup<DataType>>() as Groups,
 			_selectors: new Map<
 				SelectorName,
 				PlexusCollectionSelector<DataType>
 			>() as Selectors,
-			_name: _config?.name || '',
+			_name: config?.name || '',
 			_externalName: '',
 			set externalName(value: string) {
 				this._externalName = value
@@ -151,11 +162,11 @@ export class CollectionInstance<
 		}
 		this.mount()
 
-		if (_config.defaultGroup) {
+		if (config.defaultGroup) {
 			// this ensured default shows up as a group name option
 			return this.createGroup(
-				typeof _config.defaultGroup === 'string'
-					? _config.defaultGroup
+				typeof config.defaultGroup === 'string'
+					? config.defaultGroup
 					: 'default'
 			)
 		}
@@ -182,7 +193,7 @@ export class CollectionInstance<
 		if (!this.instance()._collections.has(this)) {
 			this.instance()._collections.add(this)
 			this.instance().runtime.log(
-				'info',
+				'debug',
 				`Hoisting collection ${this.instanceId} to instance`
 			)
 			if (this._internalStore.persist) {
@@ -198,7 +209,7 @@ export class CollectionInstance<
 	 * @returns {this} The collection instance
 	 */
 	collect(
-		data: DataType[],
+		data: DataType[] | DataType,
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	): void
 	collect(data: DataType, groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
@@ -208,12 +219,37 @@ export class CollectionInstance<
 		data: DataType | DataType[],
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	) {
-		const collectItem = (item: DataType) => {
+		const collectItem = (
+			item: DataType,
+			groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>,
+			startedFromInnerBatch?: boolean
+		) => {
 			if (!item) return
+
 			if (
 				item[this._internalStore._key] !== undefined &&
 				item[this._internalStore._key] !== null
 			) {
+				// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
+				if (
+					this.instance().runtime.isBatching &&
+					this.config.useBatching &&
+					!startedFromInnerBatch
+				) {
+					this.instance().runtime.log(
+						'debug',
+						`Batching an addToGroups call for collection ${this.instanceId}`
+					)
+					// store this in the batchedSetters for execution once batching is over
+					this.instance().runtime.batchedCalls.push(() => {
+						this.instance().runtime.log(
+							'debug',
+							`Batched addToGroups call fulfilled for collection ${this.instanceId}`
+						)
+						return collectItem(item, groups, true)
+					})
+					return this
+				}
 				// Compute item before setting/storing
 				if (
 					typeof this._internalStore._computeFn === 'function' &&
@@ -247,23 +283,34 @@ export class CollectionInstance<
 				// if a group (or groups) is provided, add the item to the group
 				if (groups) {
 					const groupsNorm = Array.isArray(groups) ? groups : [groups]
+					this._internalStore._internalCalledGroupCollect = true
 					this.addToGroups(
 						dataKey,
 						groupsNorm.filter((name) => name !== defaultGroupName)
 					)
 				}
 				if (this.config.defaultGroup) {
+					this._internalStore._internalCalledGroupCollect = true
 					// if it is not (undefined or some other string), add to group
 					this.addToGroups(dataKey, defaultGroupName as any)
 				}
+				this._internalStore._internalCalledGroupCollect = false
 			}
 		}
-		if (Array.isArray(data)) {
-			for (let item of data) {
-				collectItem(item)
+		const collectFn = () => {
+			if (Array.isArray(data)) {
+				for (let item of data) {
+					collectItem(item, groups)
+				}
+			} else {
+				collectItem(data, groups)
 			}
+		}
+		// we only need to call back if the instance is not batching
+		if (this.config.useBatching) {
+			this.instance().runtime.batch(collectFn)
 		} else {
-			collectItem(data)
+			collectFn()
 		}
 		this.mount()
 		return this
@@ -477,8 +524,7 @@ export class CollectionInstance<
 		} else {
 			this.instance().runtime.log(
 				'warn',
-				'Failed to find group %s; creating placeholder group.',
-				name
+				`Group ${this.instanceId} failed to find group ${name}; creating placeholder group.`
 			)
 			const g = _group(
 				() => this.instance(),
@@ -513,9 +559,33 @@ export class CollectionInstance<
 		key: DataKey,
 		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	): this {
-		const addToGroup = (group: GroupName) => {
+		const addToGroup = (
+			key: DataKey,
+			group: GroupName,
+			startedFromInnerBatch?: boolean
+		) => {
+			// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
+			if (
+				this.instance().runtime.isBatching &&
+				this.config.useBatching &&
+				!startedFromInnerBatch
+			) {
+				this.instance().runtime.log(
+					'debug',
+					`Collection Batching started for addToGroups`
+				)
+				// store this in the batchedSetters for execution once batching is over
+				this.instance().runtime.batchedCalls.push(() => {
+					this.instance().runtime.log(
+						'debug',
+						`Collection Batching completed for addToGroups`
+					)
+					return addToGroup(key, group, true)
+				})
+				return this
+			}
 			let g = this.getGroup(group as GroupName)
-			// if the group does not exist, create it
+			// if the group does not exist, create it. This should technically never happen because of getGroup, but leaving here for redundancy
 			if (!g) {
 				g = _group(
 					() => this.instance(),
@@ -526,14 +596,24 @@ export class CollectionInstance<
 			}
 			g.add(key)
 		}
-		if (Array.isArray(groups)) {
-			for (let group of groups) {
-				addToGroup(group)
+		const parseAndPushGroups = () => {
+			if (Array.isArray(groups)) {
+				for (let group of groups) {
+					addToGroup(key, group)
+				}
+			} else {
+				addToGroup(key, groups)
 			}
-		} else {
-			addToGroup(groups)
 		}
 
+		if (
+			this.config.useBatching &&
+			!this._internalStore._internalCalledGroupCollect
+		) {
+			this.instance().runtime.batch(parseAndPushGroups)
+		} else {
+			parseAndPushGroups()
+		}
 		return this
 	}
 	watchGroup(name: KeyOfMap<Groups>, callback: PlexusWatcher<DataType[]>)
@@ -547,7 +627,7 @@ export class CollectionInstance<
 			return group.watch(callback)
 		} else {
 			// TODO Replace with runtime log
-			console.warn('No group found for name', name)
+			console.warn(`Group ${name} not found`)
 			return () => {}
 		}
 	}
@@ -655,7 +735,9 @@ export class CollectionInstance<
 		if (typeof this._internalStore._computeFn !== 'function') {
 			this.instance().runtime.log(
 				'warn',
-				`Attempted to recompute ${this.name} without a compute fn set`
+				`Collection ${
+					this.name || this.instanceId
+				} attempted to recompute without a compute fn set`
 			)
 			return this
 		}
@@ -703,9 +785,9 @@ export class CollectionInstance<
 	 * Get all of the collection data values as an array
 	 * @type {DataType[]}
 	 */
-	get value(): DataType[] {
+	get value(): (DataType & { [key: string]: any })[] {
 		this.mount()
-		const keys: DataType[] = []
+		const keys: (DataType & { [key: string]: any })[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {
 				keys.push(item.value)

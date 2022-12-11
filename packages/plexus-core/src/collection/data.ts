@@ -1,8 +1,12 @@
 import { WatchableMutable } from './../watchable'
 import { PlexusInstance } from '../instance'
-import { PlexusWatcher } from '../interfaces'
-import { PlexusCollectionInstance } from './collection'
+import { ForeignKeyData, PlexusCollectionInstance } from './collection'
 import { deepClone, deepMerge, isEqual } from '@plexusjs/utils'
+
+export type PlexusGroupWatcher<V extends any = any> = (
+	value: V,
+	primaryKey?: keyof V
+) => void
 
 interface CollectionDataConfig {
 	prov: boolean
@@ -16,7 +20,7 @@ interface PlexusDataStore<DataType extends Record<string, any>> {
 
 export type PlexusDataInstance<
 	DataType extends Record<string, any> = Record<string, any>
-> = CollectionDataInstance<DataType>
+> = CollectionData<DataType>
 export type DataKey = string | number
 
 // TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
@@ -27,7 +31,7 @@ type DataObjectType<PK extends string = 'id'> = Record<string, any> & {
 /**
  * A piece of data belonging to a collection
  */
-export class CollectionDataInstance<
+export class CollectionData<
 	DataType extends DataObjectType<PK> = any,
 	PK extends string = string
 > extends WatchableMutable<DataType> {
@@ -35,6 +39,8 @@ export class CollectionDataInstance<
 	readonly key: string | number
 	provisional: boolean
 	private _internalStore: PlexusDataStore<DataType>
+	private foreignKeyData: Record<string | number | symbol, any> = {}
+	private watchingForeignData: Map<string, () => void>
 
 	constructor(
 		instance: () => PlexusInstance,
@@ -48,6 +54,7 @@ export class CollectionDataInstance<
 		this.provisional = config.prov
 		this.primaryKey = primaryKey
 		this.key = keyValue
+		this.watchingForeignData = new Map()
 
 		this._internalStore = {
 			primaryKey,
@@ -56,6 +63,7 @@ export class CollectionDataInstance<
 		}
 		if (!this.provisional) {
 			this.mount()
+			this.syncForeignKeyData(true)
 		}
 	}
 	/**
@@ -107,34 +115,120 @@ export class CollectionDataInstance<
 		)
 		return valid
 	}
+
+	private syncForeignKeyData(injectListener: boolean = false) {
+		// extract the foreign keys from the collection
+		const foreignKeys = this.collection().config.foreignKeys
+		if (foreignKeys && Object.keys(foreignKeys).length) {
+			this.instance().runtime.log(
+				'info',
+				`Data ${this.instanceId} is syncing foreign key data`
+			)
+			// get the previous foreign key data stored for this data instance
+
+			let idKey: keyof DataType
+
+			// loop through the foreign keys
+			for (idKey of Object.keys(foreignKeys ?? {})) {
+				const newKey = foreignKeys[idKey]?.newKey as string
+				const isArray =
+					foreignKeys[idKey]?.mode === 'array' ||
+					Array.isArray(this.shallowValue?.[idKey])
+				const foreignCollectionName = foreignKeys[idKey]?.reference as string
+				const foreignCollection = this.instance().findReference(
+					foreignCollectionName
+				)
+
+				// if we have a shallow value, then we can try to get the fresh value from the foreign collection
+				if (this.shallowValue) {
+					const freshValue = isArray
+						? this.shallowValue?.[idKey]?.map(
+								(id: string) => foreignCollection?.getItem(id).shallowValue
+						  ) || undefined
+						: foreignCollection?.getItem(this.shallowValue?.[idKey])
+								.shallowValue || undefined
+					if (
+						freshValue &&
+						foreignCollection?.config.foreignKeys?.[idKey]?.newKey
+					) {
+						delete freshValue[idKey]
+					}
+					this.foreignKeyData = {
+						...this.foreignKeyData,
+						[newKey]: freshValue,
+					}
+				}
+				if (
+					foreignCollectionName &&
+					foreignCollectionName !== this.collection().name &&
+					injectListener
+				) {
+					if (this.watchingForeignData.has(newKey)) {
+						this.watchingForeignData.get(newKey)?.()
+						this.watchingForeignData.delete(newKey)
+					}
+					const killWatcher = foreignCollection
+						?.getItem(this.shallowValue?.[idKey])
+						?.watch((value, pk) => {
+							//
+							if (
+								pk &&
+								value &&
+								this.foreignKeyData &&
+								value[pk] !== this.foreignKeyData[pk]
+							)
+								this.syncForeignKeyData(true)
+						})
+					if (killWatcher) {
+						this.watchingForeignData.set(newKey, killWatcher)
+					}
+				}
+				// const that = this
+				// this.foreignKeyData = new Proxy<any>(this.foreignKeyData, {
+				// 	get(target, prop, reciever) {
+				// 		console.log('get', prop, target, reciever)
+				// 		if (prop === newKey) {
+				// 			const freshValue =
+				// 				that
+				// 					.instance()
+				// 					.findReference(foreignKeys[idKey]?.reference || '')
+				// 					?.getItem(that.primaryKey).shallowValue || undefined
+				// 			freshValue && delete freshValue[idKey]
+				// 			console.log('freshValue', freshValue)
+				// 			return freshValue
+				// 		}
+				// 		return Reflect.get(target, prop, reciever)
+				// 	},
+				// })
+				// console.log('get', foreignKeys, 'value', this.foreignKeyData?.[newKey])
+			}
+			// this.foreignKeyData = value
+		}
+	}
+	private genValue(incomingValue?: DataType) {
+		const value = incomingValue
+			? {
+					...incomingValue,
+					...this.foreignKeyData,
+			  }
+			: undefined
+
+		// console.log('generated value:', value)
+		return value as DataType & { [key: string]: any }
+	}
 	/**
 	 * Get the value of the data instance
-	 * @type {DataType}
+	 * @type {!DataType}
 	 */
 	get value() {
-		const foreignKeys = this.collection().config.foreignKeys
-		if (foreignKeys) {
-			// type ForeignRecords = Record<
-			// 	keyof typeof foreignKeys[keyof typeof foreignKeys]["newKey"],
-			// 	ReturnType<typeof foreignKeys[keyof typeof foreignKeys]["reference"]>
-			// >
-
-			const value = { ...super.value } as Partial<any> & DataType
-			let oldKey: keyof DataType
-
-			for (oldKey of Object.keys(foreignKeys ?? {})) {
-				const newKey: keyof Partial<any> = foreignKeys[oldKey]
-					?.newKey as keyof Partial<any>
-				Object.defineProperty(value, newKey, {
-					get() {
-						return foreignKeys[oldKey]?.reference().value
-					},
-				})
-			}
-
-			return value
-		}
-		return super.value
+		return this.genValue(super.value) as DataType & { [key: string]: any }
+	}
+	/**
+	 * Get the shallow value of the data instance (no foreign key values injected)
+	 * @type {DataType}
+	 */
+	get shallowValue(): DataType & { [key: string]: any } {
+		return deepClone(super.value)
 	}
 	/**
 	 * The previous (reactive) value of the state
@@ -162,7 +256,7 @@ export class CollectionDataInstance<
 		if (this.provisional) {
 			this.instance().runtime.log(
 				'debug',
-				`Mounting provisional data instance "${this.key}" to instance...`
+				`Data(provisional) ${this.instanceId} mounting to "${this.key}" to instance...`
 			)
 			this.mount()
 			this.provisional = false
@@ -175,11 +269,26 @@ export class CollectionDataInstance<
 				// give the id to the new value if it's missing
 				super.set({ ...value, [this.primaryKey]: this.key } as DataType)
 			}
+			// in order to sync foreign keys, we need to check if the value has changed
+			const foreignKeys = this.collection().config.foreignKeys
+			for (let foreignKey of Object.keys(foreignKeys ?? {})) {
+				if (
+					this._watchableStore._value?.[foreignKey] &&
+					this._watchableStore._lastValue?.[foreignKey] &&
+					!isEqual(
+						this._watchableStore._value?.[foreignKey],
+						this._watchableStore._lastValue?.[foreignKey]
+					)
+				) {
+					this.syncForeignKeyData()
+					break
+				}
+			}
 		} else {
 			this.instance().runtime.log(
 				'warn',
-				`Tried applying the same value to data "${this.key}" in collection ${
-					this.collection().id
+				`Data ${this.instanceId} tried applying the same value in collection ${
+					this.collection().instanceId
 				}...`
 			)
 		}
@@ -233,8 +342,13 @@ export class CollectionDataInstance<
 	 * @param {WatchCallback} callback The callback to run when the state changes
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<DataType>, from?: string) {
-		const destroyer = super.watch(callback, from)
+	watch(callback: PlexusGroupWatcher<DataType>, from?: string) {
+		// this.syncForeignKeyData()
+		const destroyer = super.watch((value) => {
+			this.syncForeignKeyData(true)
+
+			return callback(value, this.primaryKey)
+		}, from)
 		return destroyer
 	}
 }
@@ -251,7 +365,7 @@ export function _data<DataType extends Record<string, any>>(
 		(value?.[primaryKey] !== undefined && value?.[primaryKey] !== null) ||
 		config.prov
 	) {
-		return new CollectionDataInstance(
+		return new CollectionData(
 			instance,
 			collection,
 			primaryKey,

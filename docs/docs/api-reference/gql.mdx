@@ -1,0 +1,37 @@
+---
+title: gql
+---
+
+[![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
+
+Simple GraphQL query builder.
+
+<a name='gql'></a>
+
+## gql(chunks, ...variables) ⇒ <code>string</code>
+
+<p>Simple GraphQL query builder.</p>
+
+**Returns**: <code>string</code> <p>The built query</p>  
+**Todo**
+
+- [ ] Improve type safety
+- [ ] Make this work better
+
+| Param        | Type                              | Description                                            |
+| ------------ | --------------------------------- | ------------------------------------------------------ |
+| chunks       | <code>TemplateStringsArray</code> | <p>The template string chunks</p>                      |
+| ...variables | <code>Array.&lt;any&gt;</code>    | <p>The variables to be interpolated into the query</p> |
+
+<a name='ApiInstance+gql'></a>
+
+## .gql(query, variables) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
+
+<p>Send a graphql request</p>
+
+**Returns**: <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code> <p>The response from the server</p>
+
+| Param     | Type                                    | Description                  |
+| --------- | --------------------------------------- | ---------------------------- |
+| query     | <code>string</code>                     | <p>The gql query to send</p> |
+| variables | <code>Record.&lt;string, any&gt;</code> | <p>Variables</p>             |

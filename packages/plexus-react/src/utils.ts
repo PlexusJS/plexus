@@ -23,10 +23,17 @@ export const concurrentWatch = (
 
 	for (let dep of depsArray) {
 		// if not a watchable, then we can't watch it, skip to next iteration
-		if (!(dep instanceof Watchable) || !dep.watch) {
+		if (
+			!(dep.watch instanceof Function) &&
+			typeof dep.watch !== 'function' &&
+			Object.prototype.toString.call(dep.watch) != '[Function watch]' &&
+			Object.prototype.toString.call(dep.watch) != '[object Function]'
+			// && !(dep instanceof Watchable)
+		) {
 			instance({ instanceId: 'react' }).runtime.log(
 				'debug',
 				`Skipping watch because the dependency isn't watchable`,
+				dep?.watch,
 				dep
 			)
 			continue

@@ -24,6 +24,7 @@ lint:
         - .docusaurus/**/*
 runtimes:
   enabled:
+    - go@1.18.3
     - node@16.14.2
 actions:
   enabled:

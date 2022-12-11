@@ -2,7 +2,7 @@
 	"name": "plexus-cli",
 	"author": "Philippe Clesca <hello@philippec.me>",
 	"license": "MIT",
-	"version": "1.5.1",
+	"version": "1.4.2-canary.34+1c75ea5",
 	"bin": "./out/bin.js",
 	"main": "./out/bin.js",
 	"type": "module",
@@ -13,8 +13,8 @@
 	},
 	"scripts": {
 		"precli:build": "rm -rf ./out/bin.js",
-		"cli:build": "rollup --config ./rollup.config.js",
-		"postcli:build": "node ./lib/postbuild.js",
+		"build": "rollup --config ./rollup.config.js",
+		"postbuild": "node ./lib/postbuild.js",
 		"preexecute": "yarn build",
 		"execute": "npx .",
 		"prepublish": "yarn build",
@@ -27,6 +27,10 @@
 	},
 	"private": false,
 	"devDependencies": {
-		"rollup": "^2.72.1"
-	}
+		"@rollup/plugin-typescript": "^10.0.1",
+		"@types/node": "^18.11.11",
+		"rollup": "^2.72.1",
+		"tslib": "^2.4.1"
+	},
+	"gitHead": "1c75ea589f9be8be7cf0886875c89f3dce6c00f3"
 }

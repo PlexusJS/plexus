@@ -42,22 +42,16 @@
 // }
 
 // const appointments = collection<Appointment>({
-// 	primaryKey: "id",
-// 	foreignKeys: {
-// 		// if the key id a string|number, we look for the one item within the reference. if it is in array, we look for many items within the reference
-// 		userId: {
-// 			newKey: "user",
-// 			reference: () => users, // looks for the id(s) here
-// 		},
-// 	},
+// 	primaryKey: 'id',
+// 	name: 'appointments',
 // })
 // const users = collection<User>({
-// 	primaryKey: "id",
+// 	primaryKey: 'id',
 // 	foreignKeys: {
 // 		// if the key id a string|number, we look for the one item within the reference. if it is in array, we look for many items within the reference
 // 		appointmentId: {
-// 			newKey: "appointment",
-// 			reference: () => appointments, // looks for the id(s) here
+// 			newKey: 'appointment',
+// 			reference: 'appointments', // looks for the id(s) here
 // 		},
 // 	},
 // })
@@ -73,3 +67,13 @@
 	userId: string
 }
  */
+
+const relation = {
+	appointments: {
+		// if the key id a string|number, we look for the one item within the reference. if it is in array, we look for many items within the reference
+		userId: {
+			newKey: 'user',
+			reference: 'users', // looks for the id(s) here
+		},
+	},
+}

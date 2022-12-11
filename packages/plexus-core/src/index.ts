@@ -20,26 +20,33 @@ import { _event, PlexusEventInstance } from './event'
 import { storage as _storage, StorageOverride } from './storage'
 import { PlexusPlugin, PlexusPluginConfig } from './plugin'
 import { PlexusPreActionConfig, _preaction } from './preaction'
+import { LiteralType, AlmostAnything } from '@plexusjs/utils'
 
 /**
  * Generate a Plexus State
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function state<Value extends PlexusStateType = any>(item: Value) {
-	return _state(() => instance(), item)
+export function state<
+	Literal extends PlexusStateType = any,
+	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
+>(item: Value) {
+	return _state<Value>(() => instance(), item)
 }
 /**
  * Generate a Plexus State
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function computed<Value extends PlexusStateType = any>(
+export function computed<
+	Literal extends PlexusStateType = any,
+	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
+>(
 	item: (value?: Value) => Value,
-	dependencies: Array<WatchableMutable<any>> | WatchableMutable<any>
+	dependencies: Array<Watchable<any>> | Watchable<any>
 ) {
 	if (!Array.isArray(dependencies)) {
-		return _computed(() => instance(), item, [dependencies])
+		return _computed<Value>(() => instance(), item, [dependencies])
 	}
 	return _computed(() => instance(), item, dependencies)
 }
@@ -77,6 +84,23 @@ export function collection<Type extends { [key: string]: any }>(
  */
 export function action<Fn extends FunctionType>(fn: Fn) {
 	return _action<Fn>(() => instance(), fn)
+}
+/**
+ * Generate a Plexus Action
+ * @param fn The Plexus action function to run
+ * @returns The intended return value of fn, or null if an error is caught
+ */
+export function batchAction<Fn extends FunctionType>(fn: Fn) {
+	return _action<Fn>(() => instance(), fn, true)
+}
+/**
+ * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
+ * @param fn The function to run in a batch
+ */
+export function batch<BatchFunction extends () => any | Promise<any> = any>(
+	fn: BatchFunction
+): ReturnType<BatchFunction> {
+	return instance().runtime.batch(fn)
 }
 /**
  * Generate a Plexus Action

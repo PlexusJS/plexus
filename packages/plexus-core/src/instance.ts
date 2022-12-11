@@ -5,8 +5,9 @@ import { PlexusStorageInstance, storage } from './storage'
 import { CollectionInstance } from './collection/collection'
 import { deepMerge, genUID, isEqual } from '@plexusjs/utils'
 import { PlexusPreAction } from './preaction'
-import { CollectionDataInstance } from './collection/data'
+import { CollectionData } from './collection/data'
 import { PlexusComputedStateInstance } from './computed'
+import { CollectionSelector } from './collection/selector'
 
 /**
  * Get the correctly formatted instance name
@@ -30,7 +31,8 @@ export class PlexusInstance {
 	_states = new Set<StateInstance<any>>()
 	_plugins = new Map<string, PlexusPlugin>()
 	_collections = new Set<CollectionInstance<any, any, any>>()
-	_collectionData = new Set<CollectionDataInstance<any>>()
+	_collectionData = new Set<CollectionData<any>>()
+	_collectionSelectors = new Set<CollectionSelector<any>>()
 	_storages = new Map<string, PlexusStorageInstance>()
 
 	_globalCatch: ((error: any) => unknown) | undefined
@@ -105,10 +107,17 @@ export class PlexusInstance {
 	 * @internal
 	 * @returns {string} A new unique id (used internally to generate new watchable value keys)
 	 */
-	genId(prefix: string = '') {
+	genId(prefix: string = ''): string {
 		return `${
 			prefix.endsWith('_') ? prefix.substring(0, prefix.length - 1) : prefix
 		}${prefix.length > 0 ? '_' : ''}${genUID()}`
+	}
+
+	findReference(name: string) {
+		const namedCollection = Array.from(this._collections.values()).find(
+			(collection) => collection.name === name
+		)
+		return namedCollection
 	}
 }
 

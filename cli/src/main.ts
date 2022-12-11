@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import yArgs from 'yargs'
-import fs from 'fs'
+import * as fs from 'fs'
 import { execSync } from 'child_process'
 
 const yargs = yArgs(process.argv)
@@ -300,13 +300,13 @@ const installPlexus = (tag = '') => {
 const lookForCore = () =>
 	tryIt(
 		() =>
-			!fs.existsSync(`${__dirname}/core`) && !fs.mkdirSync(`${__dirname}/core`)
+			!fs.existsSync(`${__dirname}/core`) && fs.mkdirSync(`${__dirname}/core`)
 	)
 const lookForCoreModules = () =>
 	tryIt(
 		() =>
 			!fs.existsSync(`${__dirname}/core/modules`) &&
-			!fs.mkdirSync(`${__dirname}/core/modules`)
+			fs.mkdirSync(`${__dirname}/core/modules`)
 	)
 
 const genFiles = (template = 'basic') => {

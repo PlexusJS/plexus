@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 import chalk from 'chalk'
-import yArgs from 'yargs'
 import fs from 'fs'
-import { execSync } from 'child_process'
 
 const upperScriptTag = '#!/usr/bin/env node'
 

@@ -6,7 +6,7 @@ export type PlexusRuntime = RuntimeInstance
 interface RuntimeConfig {
 	logLevel: 'debug' | 'warn' | 'error' | 'silent'
 }
-type Fn<Value> = (value: Value) => void
+type ListenerFn<Value> = (value: Value, from?: string) => void
 type LogLevels = Exclude<RuntimeConfig['logLevel'], 'silent'> | 'info'
 type SubscriptionTypes =
 	| 'state'
@@ -21,6 +21,8 @@ export class RuntimeInstance {
 	private _engine: EventEngine
 	private initializing = false
 	private initsCompleted = 0
+	private batching: boolean = false
+	batchedCalls: Array<() => any> = []
 
 	constructor(
 		instance: () => PlexusInstance,
@@ -33,7 +35,11 @@ export class RuntimeInstance {
 	 * track a change and propagate to all listening children in instance
 	 *  */
 	broadcast<Value = PlexusStateType>(key: string, value: Value) {
-		this.log('info', `Broadcasting a change to ${key}`)
+		this.log('debug', `Broadcasting a change to ${key}`)
+		if (this.batching) {
+			this.batchedCalls.push(() => this.engine.emit(key, { key, value }))
+			return
+		}
 		this.engine.emit(key, { key, value })
 	}
 	/**
@@ -44,15 +50,15 @@ export class RuntimeInstance {
 	 */
 	subscribe<Value = PlexusStateType>(
 		_key: string,
-		_callback: Fn<Value>,
+		_callback: ListenerFn<Value>,
 		from?: string
 	) {
-		this.log('info', `Subscribing to changes of ${_key}`)
+		this.log('debug', `Subscribing to changes of ${_key}`)
 		const callback = (data: { key: string; value: Value }) => {
 			const { key, value } = data
 			this.log('debug', `${_key} has been changed to: `, value)
 			if (_key === key) {
-				_callback?.(value)
+				_callback?.(value, from)
 			}
 		}
 
@@ -174,6 +180,65 @@ export class RuntimeInstance {
 				resolve()
 			})
 		})
+	}
+
+	/**
+	 *	The batch function allows you to run a series of actions in a single transaction
+	 * @param {Function} fn The function to run
+	 */
+	batch<BatchFunction extends () => any | Promise<any>>(
+		fn: BatchFunction
+	): ReturnType<BatchFunction> {
+		if (!fn) {
+			throw new Error('You must provide a function to run in the batch')
+		}
+		// if we are already batching, just run the function
+		if (this.batching) {
+			return fn()
+		}
+
+		// hold the reactivity engine and start storing changes
+		// const unhalt = this.engine.halt()
+		this.batching = true
+		this.instance().runtime.log('info', 'Batch function started!')
+		const releaseBatch = () => {
+			// if we aren't batching anymore, just return
+			if (this.batching === false) {
+				return
+			}
+			// stop storing changes and emit the changes
+			this.batching = false
+			// call all the pending functions and clear the array
+			this.batchedCalls.forEach((pendingFn) => pendingFn())
+			this.batchedCalls.length = 0
+
+			// release the reactivity engine
+			// unhalt()
+
+			this.instance().runtime.log('info', 'Batch function completed!')
+		}
+		// run the function. If it returns a promise, wait for it to resolve
+		const prom = fn()
+		if (prom instanceof Promise) {
+			return new Promise<ReturnType<BatchFunction>>(async (resolve, reject) => {
+				// wait for the promise to resolve
+				const value = await prom
+				// release the batch
+				releaseBatch()
+				// resolve the promise, return the value of the promise
+				return resolve(value)
+			}) as ReturnType<BatchFunction>
+		}
+		releaseBatch()
+		return prom
+	}
+
+	/**
+	 * The batching flag
+	 * @type {boolean} true if the runtime is batching
+	 */
+	get isBatching() {
+		return this.batching
 	}
 }
 /**

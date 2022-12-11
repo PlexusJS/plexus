@@ -1,6 +1,5 @@
 import { PlexusInstance } from '.'
 import { deepClone, deepMerge, isObject, isEqual } from '@plexusjs/utils'
-import { AlmostAnything } from './interfaces'
 export type PlexusWatcher<V extends any = any> = (value: V) => void
 interface WatchableStore<Value = any> {
 	_initialValue: Value
@@ -47,20 +46,18 @@ export class Watchable<ValueType = any> {
 		from?: string
 	): () => void {
 		const destroyer = this.instance().runtime.subscribe(this.id, callback, from)
-		this._watchableStore._watchers.add(destroyer)
-
 		return () => {
 			destroyer()
-			this._watchableStore._watchers.delete(destroyer)
 		}
 	}
+
 	get value(): ValueType {
 		return this._watchableStore._publicValue
 	}
 }
 
 export class WatchableMutable<
-	ValueType extends AlmostAnything = any
+	ValueType extends NonNullable<any> = any
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
 	constructor(instance: () => PlexusInstance, init: ValueType) {
@@ -72,7 +69,7 @@ export class WatchableMutable<
 	 * If history is enabled, we traverse the history archive.
 	 * if not, we try to go to the last set value.
 	 * If no previous value (either `.set()` was never called or we previously used `.undo()`), reset to initial value.
-	 * @returns this
+	 * @returns {this}
 	 */
 	undo() {
 		if (this._history && this._history.maxLength > 0) {
@@ -147,7 +144,7 @@ export class WatchableMutable<
 	history(maxLength: number = 10): this {
 		// disable history if maxLength is 0 (can be done at any time)
 		if (maxLength <= 0) {
-			this.instance().runtime.log('debug', `Disabling history for ${this.id}`)
+			this.instance().runtime.log('debug', `History disabled for ${this.id}`)
 			delete this._history
 			return this
 		}
@@ -159,7 +156,7 @@ export class WatchableMutable<
 			maxLength,
 			skipArchiveUpdate: false,
 		}
-		this.instance().runtime.log('debug', `Enabling history for ${this.id}`)
+		this.instance().runtime.log('debug', `History enabled for ${this.id}`)
 
 		return this
 	}
@@ -169,6 +166,10 @@ export class WatchableMutable<
 	 * @param newValue The new value of this state
 	 */
 	set(newValue?: ValueType) {
+		if (this.instance().runtime.isBatching) {
+			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
+			return
+		}
 		const value = deepClone(newValue)
 		this._watchableStore._lastValue = this._watchableStore._value
 		if (isObject(value) && isObject(this._watchableStore._value)) {
@@ -195,7 +196,10 @@ export class WatchableMutable<
 
 		// update the runtime conductor
 
-		this.instance().runtime.log('debug', `Broadcasting to Instance ${this.id}`)
+		this.instance().runtime.log(
+			'debug',
+			`Watchable ${this.id} broadcasting to change to subscribers`
+		)
 		this.instance().runtime.broadcast(this.id, value)
 
 		// if history, add to archive
@@ -211,7 +215,7 @@ export class WatchableMutable<
 			}
 			this.instance().runtime.log(
 				'debug',
-				`Watchable set caused its History to shift ${this.id}`
+				`Watchable ${this.id} set caused its History to shift`
 			)
 			this._history.archive_head.push(this._watchableStore._lastValue)
 			// if we are setting a new value and the tail has any values, remove them

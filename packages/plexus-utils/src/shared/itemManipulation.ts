@@ -1,10 +1,4 @@
-export type AlmostAnything =
-	| string
-	| number
-	| symbol
-	| Record<any, any>
-	| Array<any>
-	| Object
+import { AlmostAnything } from '../types'
 
 export function isObject(item: any): item is Object {
 	return (
@@ -117,7 +111,7 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 	}
 	return thing
 }
-export function isEqual(a: AlmostAnything, b: AlmostAnything): boolean {
+export function isEqual(a: NonNullable<any>, b: NonNullable<any>): boolean {
 	if (a instanceof Date && b instanceof Date) {
 		return a.getTime() === b.getTime()
 	}

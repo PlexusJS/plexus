@@ -54,10 +54,12 @@ const RandomComponent: FC = () => {
 	])
 	const obj = usePlexus(objectState)
 	const [groupTest] = usePlexus([myCollection.groups.test])
-	const [MAIN] = usePlexus([myCollection.getSelector('MAIN')])
+	const [MAIN] = usePlexus([myCollection.selectors.MAIN])
+
 	useEffect(() => {
 		myCollection.collect({ id: 'pog', a: 1 }, 'test')
 	}, [])
+
 	return (
 		<div>
 			<p data-testid='str'>{str}</p>
@@ -84,11 +86,14 @@ describe('Test react integration (usePlexus)', () => {
 			myCollection.collect({ id: 'pog', a: 2 }, 'test')
 			myCollection.collect({ id: '3', a: 2 }, 'test')
 			await waitFor(() => screen.getByTestId('group-test'))
+			myCollection.selectors.MAIN.select('3')
 		})
 		expect(screen.getByTestId('group-test').innerHTML).toBe(
 			`[{"id":"poggers","a":2},{"id":"pog","a":2},{"id":"3","a":2}]`
 		)
-
+		expect(screen.getByTestId('selector-string').innerHTML).toBe(
+			`{"id":"3","a":2}`
+		)
 		// instance({ logLevel: "debug" })
 		instance({ logLevel: 'debug', instanceId: 'react' })
 		expect(screen.getByTestId('compu').innerHTML).toBe('6')

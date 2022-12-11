@@ -1,7 +1,7 @@
 name: Trunk Nightly
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 on:
   schedule:
@@ -36,6 +36,8 @@ jobs:
         run: npm list
 
       - name: Install Dependencies
+        env:
+          NOYARNPOSTINSTALL: 1
         run: yarn install
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1

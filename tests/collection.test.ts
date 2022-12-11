@@ -1,5 +1,6 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 import { collection, instance, PlexusCollectionInstance } from '@plexusjs/core'
+import { appointments, users } from './test-utils'
 
 const myCollection = collection<{
 	thing: string
@@ -22,6 +23,7 @@ const myCollectionUndefined = collection<{ thing: string; id: number }>({
 // instance({ logLevel: "debug" })
 beforeEach(() => {
 	myCollection.clear()
+	myCollectionUndefined.clear()
 })
 describe('Testing Collection', () => {
 	test('Can create collection', () => {
@@ -46,7 +48,18 @@ describe('Testing Collection', () => {
 		expect(myCollection.getItemValue(1)?.thing).toBe('lols')
 
 		// does the unfoundKeyReturnsUndefined configuration work
-		expect(myCollectionUndefined.getItemValue(0)).toBeUndefined()
+		expect(myCollectionUndefined.getItemValue(1)).toBeUndefined()
+		console.log('an undefined object', myCollectionUndefined.getItemValue(1))
+	})
+
+	test('ingest multiple values in collect', () => {
+		expect(myCollectionUndefined.getItemValue(1)).toBeUndefined()
+		myCollectionUndefined.collect([
+			{ thing: 'lol3', id: 2 },
+			{ thing: 'lols', id: 1 },
+		])
+		expect(myCollectionUndefined.value.length).toBe(2)
+		expect(myCollectionUndefined.value.length).toBe(2)
 	})
 	test('Does it pass the vibe check ?', () => {
 		myCollection.collect({ thing: 'xqcL', id: 0 })
@@ -369,24 +382,44 @@ describe('testing collection groups', () => {
 describe('testing collection selectors', () => {
 	test('Do Selectors Work?', () => {
 		expect(myCollection.value.length).toBe(0)
+		const ref = { numOfLoops: 0 }
+		const del = myCollection.selectors.main.watch((v, from) => {
+			console.log(
+				`${new Date().getTime()} selector watcher invoked from "${from}" with value: `,
+				v
+			)
+			expect(v.thing).toBeDefined()
+			ref.numOfLoops = ref.numOfLoops + 1
+		})
+		expect(ref.numOfLoops).toBe(0)
+
 		myCollection.collect([
 			{ thing: 'lol', id: 0 },
 			{ thing: 'lol3', id: 2 },
 			{ thing: 'lols', id: 1 },
 		])
+		instance().settings.logLevel = 'debug'
 		myCollection.getSelector('main').select(0)
+		expect(ref.numOfLoops).toBe(1)
 		// console.log(myCollection.getSelector("main").key)
 
-		const del = myCollection.getSelector('main').watch((v) => {
-			console.log(v)
-			expect(v.thing).toBe('haha')
-		})
-		expect(myCollection.getSelector('main').value?.thing).toBe('lol')
+		expect(myCollection.selectors.main.value?.id).toBe(0)
+		expect(myCollection.selectors.main.value?.thing).toBe('lol')
+
+		console.log(myCollection.selectors.main.value?.thing)
 		myCollection.update(0, { thing: 'haha' })
-		del()
+		expect(ref.numOfLoops).toBe(2)
+		console.log(myCollection.selectors.main.value?.thing)
 		expect(myCollection.selectors.main.key).toBe(0)
-		expect(myCollection.getSelector('main').value?.id).toBe(0)
-		expect(myCollection.getSelector('main').value?.thing).toBe('haha')
+		expect(myCollection.selectors.main.value?.thing).toBe('haha')
+
+		myCollection.selectors.main.select(1)
+		console.log(myCollection.selectors.main.value?.thing)
+		expect(myCollection.selectors.main.value?.id).toBe(1)
+		expect(myCollection.selectors.main.value?.thing).toBe('lols')
+		expect(ref.numOfLoops).toBe(3)
+
+		del()
 	})
 
 	test('Watching Selectors', () => {
@@ -530,36 +563,69 @@ describe('default group behavior', () => {
 	})
 })
 
-type User = {
-	id: string
-	appointmentId: string
-}
-type Appointment = {
-	id: string
-	name: string
-	date: number
-	userId: string
-}
-
-const appointments = collection<Appointment>({
-	primaryKey: 'id',
-	foreignKeys: {
-		userId: {
-			newKey: 'user',
-			reference: () => collection(),
-		},
-	},
-})
-// const users = collection<User>({
-// 	primaryKey: 'id',
-// 	foreignKeys: {
-// 		appointmentId: {
-// 			newKey: 'appointment',
-// 			reference: () => appointments, // looks for the id(s) here
-// 		},
-// 	},
-// })
-
 describe('testing collection relations', () => {
-	test('', () => {})
+	test('shallow injecting', () => {
+		users.collect({
+			id: '1',
+			firstName: 'John',
+			appointmentId: '1',
+		})
+		appointments.collect({
+			id: '1',
+			name: 'test',
+			date: 123,
+			userId: '1',
+		})
+
+		// Checking foreign
+		expect(users.getItem('1').value).toBeDefined()
+		console.log('found appointment', users.getItem('1').value.appointment)
+		expect(users.value[0].appointment.name).toBe('test')
+		expect(users.getItem('1').value.appointment.name).toBe('test')
+
+		// Checking foreign
+		expect(appointments.getItem('1').value.user).toBeDefined()
+		console.log(appointments.getItem('1').value.user)
+		expect(appointments.value[0].user?.firstName).toBe('John')
+		expect(appointments.getItem('1').value.user.firstName).toBe('John')
+		console.log(appointments.value)
+
+		// does the unfoundKeyReturnsUndefined configuration work
+		expect(users.getItemValue(3)).toBeUndefined()
+		console.log('an undefined object', users.getItemValue(3))
+	})
+	test('shallow array injecting', () => {
+		const c1 = collection<{
+			id: string
+			name: string
+		}>({
+			name: 'c1',
+		})
+		const c2 = collection<{
+			id: string
+			c1ids: string[]
+			c1s?: { id: string; name: string }[]
+		}>({
+			name: 'c2',
+			foreignKeys: {
+				c1ids: {
+					reference: 'c1',
+					newKey: 'c1s',
+				},
+			},
+		})
+		c1.collect([
+			{ id: '1', name: 'c1-1' },
+			{ id: '2', name: 'c1-2' },
+		])
+		c2.collect([
+			{ id: '1', c1ids: ['1', '2'] },
+			{ id: '2', c1ids: ['1'] },
+		])
+		expect(c2.getItemValue('1').c1s?.length).toBe(2)
+		expect(c2.getItemValue('1').c1s?.[0]).toMatchObject({
+			id: '1',
+			name: 'c1-1',
+		})
+	})
 })

@@ -1,8 +1,8 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
 import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance'
-import { PlexusStateType, StateInstance } from './state'
-import { PlexusWatcher, Watchable, WatchableMutable } from './watchable'
+import { PlexusStateType } from './state'
+import { PlexusWatcher, Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<
 	ValueType extends PlexusStateType = any
@@ -45,9 +45,9 @@ export class ComputedStateInstance<
 		_name: string
 		_persist: boolean
 		// utilizing maps because it allows us to preform a lookup in O(1)
-		_depsDestroyers: Map<Dependency, ReturnType<WatchableMutable<any>['watch']>>
+		_depsDestroyers: Map<Dependency, ReturnType<Watchable<any>['watch']>>
 		_depUnsubscribe: () => void
-		_deps: Set<WatchableMutable<any>>
+		_deps: Set<Watchable<any>>
 		_ready: boolean
 	}
 	// private instance: () => PlexusInstance
@@ -68,7 +68,7 @@ export class ComputedStateInstance<
 	constructor(
 		instance: () => PlexusInstance,
 		computeFn: () => ValueType,
-		deps: WatchableMutable<any>[]
+		deps: Watchable<any>[]
 	) {
 		super(instance, computeFn())
 		this.instance = instance
@@ -78,10 +78,7 @@ export class ComputedStateInstance<
 			_name: '',
 			_persist: false,
 			// utilizing maps because it allows us to preform a lookup in O(1)
-			_depsDestroyers: new Map<
-				Dependency,
-				ReturnType<WatchableMutable['watch']>
-			>(),
+			_depsDestroyers: new Map<Dependency, ReturnType<Watchable['watch']>>(),
 			_depUnsubscribe: () => {},
 			_deps: new Set(deps),
 			_ready: false,
@@ -191,7 +188,7 @@ export class ComputedStateInstance<
 	 *	Adds a dependency to the computed state
 	 * @param dep
 	 */
-	addDep(dep: WatchableMutable<any>): void {
+	addDep(dep: Watchable<any>): void {
 		this._internalStore._deps.add(dep)
 		this.refreshDeps()
 	}
@@ -199,7 +196,7 @@ export class ComputedStateInstance<
 	 * Removes a dependency from the computed state
 	 * @param dep
 	 */
-	removeDep(dep: WatchableMutable<any>) {
+	removeDep(dep: Watchable<any>) {
 		this._internalStore._deps.delete(dep)
 		this.refreshDeps()
 	}
@@ -255,7 +252,7 @@ export class ComputedStateInstance<
 		return this
 	}
 }
-interface Dependency extends WatchableMutable<any> {
+interface Dependency extends Watchable<any> {
 	[key: string]: any
 }
 export function _computed<StateValue extends PlexusStateType>(

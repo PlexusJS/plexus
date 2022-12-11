@@ -9,13 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - run: yarn test
+    uses: PlexusJS/plexus/.github/workflows/build.yml@canary
 
   publish-gpr:
     needs: build
@@ -29,30 +23,27 @@ jobs:
         with:
           node-version: 16
           registry-url: https://npm.pkg.github.com/
-
       - name: Cache node modules
         id: cache-yarn
         uses: actions/cache@v3
         env:
           cache-name: cache-node-module
         with:
-          path: ~/.cache/yarn
+          path: |
+            ~/.cache/yarn
+            node_modules
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
+      - run: ls -la
       - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
-        name: List the state of node modules
-        continue-on-error: true
-        run: yarn list
-
-      - name: Install Dependencies
-        run: yarn install
-
-      - name: Yarn Build
-        run: yarn build
+        name: Install Dependencies
+        env:
+          NO_YARN_POSTINSTALL: 1
+        run: yarn install --ignore-scripts
 
       - run: yarn publish-canary
         env:

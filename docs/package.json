@@ -4,6 +4,7 @@
 	"repository": "git@github.com:PlexusJS/plexus-docs.git",
 	"author": "Philippe Clesca <hello@philippec.me>",
 	"license": "MIT",
+	"private": true,
 	"scripts": {
 		"docusaurus": "docusaurus",
 		"start": "docusaurus start",
