@@ -62,7 +62,7 @@ export class StateInstance<
 			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
-	private mount() {
+	private mount(noPersist = false) {
 		if (!this.instance()._states.has(this)) {
 			this.instance()._states.add(this)
 			this.instance().runtime.log(
@@ -71,8 +71,8 @@ export class StateInstance<
 				this._watchableStore._value,
 				`to instance`
 			)
-			this.persistSync()
 		}
+		if (!noPersist) this.persistSync()
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
 		this.instance().runtime.log('info', `State ${this.id} is ready`)
@@ -227,7 +227,7 @@ export class StateInstance<
 				this._internalStore._persist ? '; Persist Enabled' : ''
 			}`
 		)
-		this.mount()
+		this.mount(true)
 		return super.value
 	}
 	/**
