@@ -1,6 +1,6 @@
 export { usePlexus } from './usePlexus'
 
-export { usePlexusState } from './usePlexusState';
+export { usePlexusState } from './usePlexusState'
 
 export { useEvent } from './useEvent'
 
