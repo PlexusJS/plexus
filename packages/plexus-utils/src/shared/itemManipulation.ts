@@ -57,7 +57,8 @@ export const convertStringToThing = (inp: string) => {
 // A function to deeply merge two things (objects or arrays).
 export function deepMerge<Thing extends object>(
 	target: Thing,
-	source: Thing
+	source: Thing,
+	override = false
 ): Thing {
 	let output: Thing = Object.assign({}, target)
 	if (
@@ -67,12 +68,22 @@ export function deepMerge<Thing extends object>(
 		for (const key in source) {
 			if (isObject(source[key])) {
 				if (!(key in target)) {
+					console.log('no key in target', key)
 					Object.assign(output, { [key]: source[key] })
 				} else {
+					console.log('deepmerging', key)
 					output[key] = deepMerge(target[key] as any, source[key]) as any
 				}
 			} else {
-				Object.assign(output, { [key]: source[key] })
+				if (
+					Array.isArray(target[key]) &&
+					Array.isArray(source[key]) &&
+					!override
+				) {
+					Object.assign(output, {
+						[key]: [...(target[key] as any), ...(source[key] as any)],
+					})
+				} else Object.assign(output, { [key]: source[key] })
 			}
 		}
 	}

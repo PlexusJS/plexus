@@ -55,18 +55,18 @@ export class StateInstance<
 			_isSetting: false,
 		}
 
-		this.mount();
-		this.persistSync();
+		this.mount()
+		this.persistSync()
 	}
 
 	private persistSync() {
 		if (this._internalStore._persist) {
-			this.instance().storage?.monitor(this.name, this);
+			this.instance().storage?.monitor(this.name, this)
 			this.instance().storage?.sync(this._watchableStore._value)
 		}
 	}
 
-	private async syncPersistToValue () {
+	private async syncPersistToValue() {
 		if (this._internalStore._isSetting) return
 		const storedValue = (await this.instance().storage?.get(
 			this._internalStore._name
@@ -244,7 +244,7 @@ export class StateInstance<
 			}`
 		)
 		this.mount()
-		this.syncPersistToValue();
+		this.syncPersistToValue()
 		return super.value
 	}
 	/**
