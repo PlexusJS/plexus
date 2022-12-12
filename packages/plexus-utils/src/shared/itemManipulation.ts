@@ -65,6 +65,9 @@ export function deepMerge<Thing extends object>(
 		(isObject(target) && isObject(source)) ||
 		(Array.isArray(target) && Array.isArray(source))
 	) {
+		if (Array.isArray(target) && Array.isArray(source) && !override) {
+			return [...target, ...source] as any
+		}
 		for (const key in source) {
 			if (isObject(source[key])) {
 				if (!(key in target)) {
@@ -72,7 +75,7 @@ export function deepMerge<Thing extends object>(
 					Object.assign(output, { [key]: source[key] })
 				} else {
 					console.log('deepmerging', key)
-					output[key] = deepMerge(target[key] as any, source[key]) as any
+					output[key] = deepMerge(target[key] as any, source[key], override) as any
 				}
 			} else {
 				if (
