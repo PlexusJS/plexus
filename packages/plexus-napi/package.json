@@ -27,7 +27,7 @@
 		"isomorphic-fetch": "^3.0.0"
 	},
 	"dependencies": {
-		"@plexusjs/api": "1.4.1-canary.2+583332e",
+		"@plexusjs/api": "1.5.4",
 		"cross-fetch": "^3.1.5"
 	}
 }
