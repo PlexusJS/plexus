@@ -1,5 +1,5 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
-import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
+import { deepClone, deepMerge, isAsyncFunction, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance'
 import { PlexusStateType } from './state'
 import { PlexusWatcher, Watchable } from './watchable'
@@ -51,7 +51,7 @@ export class ComputedStateInstance<
 		_ready: boolean
 	}
 	// private instance: () => PlexusInstance
-	private computeFn: () => ValueType
+	private computeFn: () => ValueType | Promise<ValueType>
 	/**
 	 * The internal id of the computed state
 	 */
@@ -67,9 +67,13 @@ export class ComputedStateInstance<
 
 	constructor(
 		instance: () => PlexusInstance,
-		computeFn: () => ValueType,
+		computeFn: () => ValueType | Promise<ValueType>,
 		deps: Watchable<any>[]
 	) {
+		if(isAsyncFunction(computeFn)){
+			
+		}
+
 		super(instance, computeFn())
 		this.instance = instance
 		this.computeFn = computeFn

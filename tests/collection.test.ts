@@ -399,7 +399,7 @@ describe('testing collection selectors', () => {
 			{ thing: 'lols', id: 1 },
 		])
 		instance().settings.logLevel = 'debug'
-		myCollection.getSelector('main').select(0)
+		myCollection.selectors.main.select(0)
 		expect(ref.numOfLoops).toBe(1)
 		// console.log(myCollection.getSelector("main").key)
 
