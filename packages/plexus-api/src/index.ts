@@ -175,6 +175,7 @@ export class ApiInstance {
 		}
 		let data: ResponseDataType
 		let rawData: string
+		let blob: Blob
 		// we never got a response
 		if (res === undefined) {
 			return ApiInstance.createEmptyRes<ResponseDataType>(500)
@@ -194,12 +195,13 @@ export class ApiInstance {
 			} catch (e) {}
 			data = parsed ?? ({} as ResponseDataType)
 			rawData = text
+			blob = new Blob([text], { type: 'text/plain' })
 
 			return {
 				status: res.status,
 				response: res,
 				rawData,
-				blob: await res.blob(),
+				blob,
 				ok,
 				data,
 				hasCookie,
