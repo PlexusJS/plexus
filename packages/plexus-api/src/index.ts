@@ -4,6 +4,7 @@ export interface PlexusApiRes<DataType = any> {
 	status: number
 	response: ResponseInit
 	rawData: string
+	blob?: Blob
 	data: DataType
 	ok: boolean
 	hasCookie: (cookieName: string) => boolean
@@ -182,7 +183,9 @@ export class ApiInstance {
 		const hasCookie = (cName: string): boolean => {
 			return res?.headers?.get('set-cookie')?.includes(cName) ?? false
 		}
+		const ok = res.status > 199 && res.status < 300
 
+		// if we got a response, parse it and return it
 		if (res.status >= 200 && res.status < 600) {
 			const text = await res.text()
 			let parsed: ResponseDataType = undefined as any
@@ -196,19 +199,20 @@ export class ApiInstance {
 				status: res.status,
 				response: res,
 				rawData,
-				ok: res.status > 199 && res.status < 300,
+				blob: await res.blob(),
+				ok,
 				data,
 				hasCookie,
 			}
-		} else {
-			return {
-				status: res.status,
-				response: res,
-				rawData: '',
-				ok: res.status > 199 && res.status < 300,
-				data: {} as ResponseDataType,
-				hasCookie,
-			}
+		}
+		// if we got a response, but it's not in the 200 range, return it
+		return {
+			status: res.status,
+			response: res,
+			rawData: '',
+			ok,
+			data: {} as ResponseDataType,
+			hasCookie,
 		}
 	}
 
