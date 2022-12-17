@@ -2,7 +2,7 @@ import { deepClone, deepMerge } from '@plexusjs/utils/dist/shared'
 // import { instance } from "./ "
 export interface PlexusApiRes<DataType = any> {
 	status: number
-	response: ResponseInit
+	response: Response
 	rawData: string
 	blob?: Blob
 	data: DataType
@@ -511,7 +511,7 @@ export class ApiInstance {
 	private static createEmptyRes<ResponseDataType = any>(status: number = 408) {
 		return {
 			status,
-			response: {},
+			response: {} as Response,
 			rawData: '',
 			data: {} as ResponseDataType,
 			ok: status > 199 && status < 300,
