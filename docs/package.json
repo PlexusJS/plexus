@@ -1,6 +1,6 @@
 {
 	"name": "plexus-docs",
-	"version": "1.0.0",
+	"version": "1.5.6",
 	"repository": "git@github.com:PlexusJS/plexus-docs.git",
 	"author": "Philippe Clesca <hello@philippec.me>",
 	"license": "MIT",
