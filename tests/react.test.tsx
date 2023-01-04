@@ -95,7 +95,7 @@ describe('Test react integration (usePlexus)', () => {
 			`{"id":"3","a":2}`
 		)
 		// instance({ logLevel: "debug" })
-		instance({ logLevel: 'debug', instanceId: 'react' })
+		instance({ logLevel: 'debug', id: 'react' })
 		expect(screen.getByTestId('compu').innerHTML).toBe('6')
 		await act(async () => {
 			// test computed render
@@ -114,7 +114,7 @@ describe('Test react integration (usePlexus)', () => {
 			await waitFor(() => screen.getByTestId('str'))
 		})
 		expect(screen.getByTestId('compu').innerHTML).toBe('4')
-		instance({ logLevel: 'silent', instanceId: 'react' })
+		instance({ logLevel: 'silent', id: 'react' })
 		expect(screen.getByTestId('str').innerHTML).toBe('no')
 	})
 })

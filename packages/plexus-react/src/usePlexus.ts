@@ -1,6 +1,6 @@
 import { instance, Watchable } from '@plexusjs/core'
-import { isEqual, deepMerge } from '@plexusjs/utils/dist/shared'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { isEqual } from '@plexusjs/utils/dist/shared'
+import { useCallback, useRef, useState } from 'react'
 import { useSyncExternalStore } from 'use-sync-external-store/shim'
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 import { concurrentWatch, convertThingToString, deepClone } from './utils'
@@ -40,13 +40,13 @@ export function usePlexus<V extends Watchable[]>(
 	// TODO: Consider using unstable_batchedUpdates for batching updates to prevent unnecessary rerenders
 	const subscribe = useCallback(
 		(onChange: () => void) => {
-			instance({ instanceId: 'react' }).runtime.log(
+			instance({ id: 'react' }).runtime.log(
 				'info',
 				`Component subscribing to ${id.current}`
 			)
 			const depsArray = normalizeDeps(deps)
 			return concurrentWatch(() => {
-				instance({ instanceId: 'react' }).runtime.log(
+				instance({ id: 'react' }).runtime.log(
 					'info',
 					`Re-rendering Component; Dependency (${depsArray
 						.map((v) => v.id)
@@ -62,7 +62,7 @@ export function usePlexus<V extends Watchable[]>(
 	)
 	const fetchValues = useCallback(() => {
 		const depsArray = normalizeDeps(deps)
-		instance({ instanceId: 'react' }).runtime.log(
+		instance({ id: 'react' }).runtime.log(
 			'info',
 			`${id.current} Fetching (${snapshot.current})`
 		)

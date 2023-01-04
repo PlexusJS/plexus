@@ -59,6 +59,11 @@ export class StorageInstance {
 			)
 			return null
 		}
+		if (!key) {
+			this.instance().runtime.log('warn', `Cannot get value for key ${key}`)
+
+			return null
+		}
 		this.instance().runtime.log(
 			'info',
 			`Retrieving value for key ${this.getKey(key)}`
