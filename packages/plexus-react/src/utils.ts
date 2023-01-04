@@ -30,7 +30,7 @@ export const concurrentWatch = (
 			Object.prototype.toString.call(dep.watch) != '[object Function]'
 			// && !(dep instanceof Watchable)
 		) {
-			instance({ instanceId: 'react' }).runtime.log(
+			instance({ id: 'react' }).runtime.log(
 				'debug',
 				`Skipping watch because the dependency isn't watchable`,
 				dep?.watch,

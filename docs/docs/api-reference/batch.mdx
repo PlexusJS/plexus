@@ -32,6 +32,19 @@ Run a function. During that function's execution, any state changes will be batc
 | ----- | ------------------------------------- |
 | fn    | <p>The function to run in a batch</p> |
 
+<a name='Plugin+batch'></a>
+
+## .batch(fn)
+
+<p>
+	Run a function. During that function's execution, any state changes will be
+	batched and only applied once the function has finished.
+</p>
+
+| Param | Description                           |
+| ----- | ------------------------------------- |
+| fn    | <p>The function to run in a batch</p> |
+
 <a name='RuntimeInstance+batch'></a>
 
 ## .batch(fn)

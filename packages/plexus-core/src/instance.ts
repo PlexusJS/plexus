@@ -47,7 +47,7 @@ export class PlexusInstance {
 	constructor(config?: Partial<PlexusInstanceConfig>) {
 		this._internalStore = {
 			_nonce: 0,
-			_id: config?.instanceId || ``,
+			_id: config?.id || ``,
 			_selectedStorage: undefined,
 			_settings: { ...config },
 			_ready: false,
@@ -122,7 +122,7 @@ export class PlexusInstance {
 }
 
 interface PlexusInstanceConfig {
-	instanceId: string
+	id: string
 	logLevel: 'debug' | 'warn' | 'error' | 'silent'
 	exclusiveGlobalError: boolean
 }
@@ -154,6 +154,8 @@ export const getPlexusInstance = (name: string = 'default') =>
 export function instance(
 	config?: Partial<PlexusInstanceConfig>
 ): PlexusInstance {
+	// if the config is a string, then it is the instanceId
+
 	// if the master is not created, create it
 	if (globalThis['__plexusMaster__'] === undefined) {
 		const plexusMaster: PlexusMaster = {
@@ -163,7 +165,7 @@ export function instance(
 		}
 		globalThis['__plexusMaster__'] = plexusMaster
 	}
-	const instanceName = getInstanceName(config?.instanceId)
+	const instanceName = getInstanceName(config?.id)
 	// if the instance is not created, create it
 	if (globalThis[instanceName] === undefined) {
 		const newInstance: PlexusInstance = new PlexusInstance(config)
@@ -190,14 +192,14 @@ export function instance(
 		)
 	} else if (
 		config &&
-		!isEqual(config, getPlexusInstance(config?.instanceId || '').settings)
+		!isEqual(config, getPlexusInstance(config?.id || '').settings)
 	) {
-		getPlexusInstance(config?.instanceId || '').settings = deepMerge(
-			getPlexusInstance(config?.instanceId || '').settings,
+		getPlexusInstance(config?.id || '').settings = deepMerge(
+			getPlexusInstance(config?.id || '').settings,
 			config
 		)
 		// getPlexusInstance(config?.instanceId || "").runtime
 	}
 	// return the instance
-	return getPlexusInstance(config?.instanceId || '') as PlexusInstance
+	return getPlexusInstance(config?.id || '') as PlexusInstance
 }

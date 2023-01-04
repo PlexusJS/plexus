@@ -128,7 +128,7 @@ export function usePlugin(
 	plugin: PlexusPlugin
 ) {
 	if (typeof instanceOrInstanceId === 'string') {
-		plugin.init((name?: string) => instance({ instanceId: name }))
+		plugin.init((name?: string) => instance({ id: name }))
 	}
 	instance()._plugins.set(plugin.name, plugin)
 }
