@@ -1,24 +1,19 @@
----
-title: usePlexusState
----
+--- 
+	title: usePlexusState 
+--- 
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 A React hook to extract the values from plexus objects and reactively update the component and value when the value changes. This hook returns an array, similar to that of React's useState. The arguments are similar to useState as well, it returns the current value and a function to update the value.
 
-<a name='usePlexusState'></a>
+<a name="usePlexusState"></a>
 
 ## usePlexusState(dep) ⇒
+<p>A React hook to extract the values from plexus objects and reactively update the component and value when the value changes. This hook returns an array, similar to that of React's useState. The arguments are similar to useState as well, it returns the current value and a function to update the value.</p>
 
-<p>
-	A React hook to extract the values from plexus objects and reactively update
-	the component and value when the value changes. This hook returns an array,
-	similar to that of React's useState. The arguments are similar to useState as
-	well, it returns the current value and a function to update the value.
-</p>
+**Returns**: <p>[currentValue, Function] The current value and a function to update the value</p>  
 
-**Returns**: <p>[currentValue, Function] The current value and a function to update the value</p>
+| Param | Description |
+| --- | --- |
+| dep | <p>The Plexus dependency to watch</p> |
 
-| Param | Description                           |
-| ----- | ------------------------------------- |
-| dep   | <p>The Plexus dependency to watch</p> |
