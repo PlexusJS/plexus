@@ -302,7 +302,7 @@ export class CollectionData<
 	 * @returns {this} The data instance
 	 */
 	patch(value: Partial<DataType>): this {
-		this.set(deepMerge(this._watchableStore._value, value))
+		this.set(deepMerge(this._watchableStore._value, value, true))
 
 		this.collection().lastUpdatedKey = this.key
 		return this

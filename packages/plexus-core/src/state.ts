@@ -60,13 +60,17 @@ export class StateInstance<
 	}
 
 	private persistSync() {
-		if (this._internalStore._persist) {
-			this.instance().storage?.monitor(this.name, this)
-			this.instance().storage?.sync(this._watchableStore._value)
+		if (!this._internalStore._persist) {
+			return
 		}
+		this.instance().storage?.monitor(this.name, this)
+		this.instance().storage?.sync(this._watchableStore._value)
 	}
 
 	private async syncPersistToValue() {
+		if (!this._internalStore._persist) {
+			return
+		}
 		if (this._internalStore._isSetting) return
 		const storedValue = (await this.instance().storage?.get(
 			this._internalStore._name
@@ -114,7 +118,7 @@ export class StateInstance<
 		if (isObject(value) && isObject(this._watchableStore._value)) {
 			// ! Shitty type casting, should be fixed
 			this.set(
-				deepMerge(this._watchableStore._value as any, value) as StateValue
+				deepMerge(this._watchableStore._value as any, value, true) as StateValue
 			)
 		}
 		// if the deep merge is on an array type, we need to convert the merged object back to an array
@@ -122,7 +126,7 @@ export class StateInstance<
 			Array.isArray(value) &&
 			Array.isArray(this._watchableStore._value)
 		) {
-			const obj = deepMerge(this._watchableStore._value, value)
+			const obj = deepMerge(this._watchableStore._value, value, true)
 			this.set(Object.values(obj) as StateValue)
 		} else {
 			this.set(value)

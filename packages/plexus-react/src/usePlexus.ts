@@ -1,6 +1,6 @@
 import { instance, Watchable } from '@plexusjs/core'
-import { isEqual, deepMerge } from '@plexusjs/utils/dist/shared'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { isEqual } from '@plexusjs/utils/dist/shared'
+import { useCallback, useRef, useState } from 'react'
 import { useSyncExternalStore } from 'use-sync-external-store/shim'
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 import { concurrentWatch, convertThingToString, deepClone } from './utils'
