@@ -28,8 +28,8 @@ runtimes:
     - node@16.14.2
 actions:
   disabled:
-  enabled:
     - trunk-fmt-pre-commit
+  enabled:
     - trunk-announce
     - trunk-check-pre-push
     - trunk-upgrade-available
