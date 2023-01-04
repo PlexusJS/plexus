@@ -18,7 +18,7 @@ import {
 } from './collection/collection'
 import { _event, PlexusEventInstance } from './event'
 import { storage as _storage, StorageOverride } from './storage'
-import { PlexusPlugin, PlexusPluginConfig } from './plugin'
+import { PlexusPlugin, PlexusPluginConfig, createPlexusPlugin } from './plugin'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { LiteralType, AlmostAnything } from '@plexusjs/utils'
 
@@ -143,6 +143,7 @@ export {
 	PlexusPlugin,
 	PlexusActionHooks,
 	PlexusPluginConfig,
+	createPlexusPlugin,
 	PlexusCollectionConfig,
 	PlexusCollectionInstance,
 	PlexusEventInstance,
