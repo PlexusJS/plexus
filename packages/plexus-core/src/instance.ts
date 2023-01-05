@@ -1,5 +1,5 @@
 import { StateInstance } from './state'
-import { PlexusPlugin } from './plugin'
+import { Plugin } from './plugin'
 import { RuntimeInstance, _runtime } from './runtime'
 import { PlexusStorageInstance, storage } from './storage'
 import { CollectionInstance } from './collection/collection'
@@ -29,7 +29,7 @@ export class PlexusInstance {
 
 	_computedStates = new Set<PlexusComputedStateInstance>()
 	_states = new Set<StateInstance<any>>()
-	_plugins = new Map<string, PlexusPlugin>()
+	_plugins = new Map<string, Plugin>()
 	_collections = new Set<CollectionInstance<any, any, any>>()
 	_collectionData = new Set<CollectionData<any>>()
 	_collectionSelectors = new Set<CollectionSelector<any>>()
