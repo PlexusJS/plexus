@@ -158,29 +158,39 @@ export class CollectionData<
 						[newKey]: freshValue,
 					}
 				}
+				// Watcher
 				if (
 					foreignCollectionName &&
 					foreignCollectionName !== this.collection().name &&
 					injectListener
 				) {
-					if (this.watchingForeignData.has(newKey)) {
-						this.watchingForeignData.get(newKey)?.()
-						this.watchingForeignData.delete(newKey)
+					const makeWatcher = (newKey: string, primary: string | number) => {
+						if (this.watchingForeignData.has(newKey)) {
+							this.watchingForeignData.get(newKey)?.()
+							this.watchingForeignData.delete(newKey)
+						}
+						const killWatcher = foreignCollection
+							?.getItem(primary)
+							?.watch((value, pk) => {
+								//
+								if (
+									pk &&
+									value &&
+									this.foreignKeyData &&
+									value[pk] !== this.foreignKeyData[pk]
+								)
+									this.syncForeignKeyData(true)
+							})
+						if (killWatcher) {
+							this.watchingForeignData.set(newKey, killWatcher)
+						}
 					}
-					const killWatcher = foreignCollection
-						?.getItem(this.shallowValue?.[idKey])
-						?.watch((value, pk) => {
-							//
-							if (
-								pk &&
-								value &&
-								this.foreignKeyData &&
-								value[pk] !== this.foreignKeyData[pk]
-							)
-								this.syncForeignKeyData(true)
+					if (isArray) {
+						this.shallowValue?.[idKey]?.forEach((id: string) => {
+							makeWatcher(`${newKey}.${id}`, id)
 						})
-					if (killWatcher) {
-						this.watchingForeignData.set(newKey, killWatcher)
+					} else {
+						makeWatcher(newKey, this.shallowValue?.[idKey] as string)
 					}
 				}
 				// const that = this
