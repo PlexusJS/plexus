@@ -142,9 +142,9 @@ export class CollectionData<
 				// if we have a shallow value, then we can try to get the fresh value from the foreign collection
 				if (this.shallowValue) {
 					const freshValue = isArray
-						? this.shallowValue?.[idKey]?.map(
+						? (this.shallowValue?.[idKey] as string[])?.map(
 								(id: string) => foreignCollection?.getItem(id).shallowValue
-						  ) || undefined
+						  ).filter((x) => (!x)) || undefined
 						: foreignCollection?.getItem(this.shallowValue?.[idKey])
 								.shallowValue || undefined
 					if (
@@ -164,13 +164,13 @@ export class CollectionData<
 					foreignCollectionName !== this.collection().name &&
 					injectListener
 				) {
-					const makeWatcher = (newKey: string, primary: string | number) => {
+					const makeWatcher = (newKey: string, primaryKey: string | number) => {
 						if (this.watchingForeignData.has(newKey)) {
 							this.watchingForeignData.get(newKey)?.()
 							this.watchingForeignData.delete(newKey)
 						}
 						const killWatcher = foreignCollection
-							?.getItem(primary)
+							?.getItem(primaryKey)
 							?.watch((value, pk) => {
 								//
 								if (
