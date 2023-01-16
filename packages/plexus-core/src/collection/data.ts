@@ -144,7 +144,7 @@ export class CollectionData<
 					const freshValue = isArray
 						? (this.shallowValue?.[idKey] as string[])?.map(
 								(id: string) => foreignCollection?.getItem(id).shallowValue
-						  ).filter((x) => (!x)) || undefined
+						  ).filter((x) => (x)) || undefined
 						: foreignCollection?.getItem(this.shallowValue?.[idKey])
 								.shallowValue || undefined
 					if (
