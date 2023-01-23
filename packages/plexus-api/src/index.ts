@@ -425,7 +425,6 @@ export class ApiInstance {
 	setHeaders<HeaderFunction extends () => Record<string, any>>(
 		inputFnOrObj: Record<string, any>
 	): this
-
 	setHeaders<
 		HeaderFunction extends () =>
 			| Record<string, any>

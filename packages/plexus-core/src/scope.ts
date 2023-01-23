@@ -4,7 +4,7 @@ import { FunctionType, _action } from './action'
 import { PlexusCollectionConfig, _collection } from './collection/collection'
 import { _computed } from './computed'
 import { _event } from './event'
-import { instance, PlexusInstance } from './instance'
+import { getPlexusMasterInstance, instance, PlexusInstance } from './instance'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { PlexusStateType, _state } from './state'
 
@@ -22,18 +22,22 @@ export class Scope {
 	// private _internalStore: PlexusScopeStore
 	public instance: () => PlexusInstance
 
-	constructor(name: string, config?: PlexusScopeConfig) {
+	constructor(public name: string, config?: PlexusScopeConfig) {
 		if (!name || name.length === 0) {
-			throw new Error('Plugin name is required')
+			throw new Error('Scope name is required')
 		}
 		// ensure the init function is defined
 
 		if (!config) {
-			console.warn('No init function provided for plugin', name)
-			throw new Error('No init function provided for plugin')
+			console.warn('No init function provided for Scope', name)
+			throw new Error('No init function provided for Scope')
 		}
-		// if the plugin is not already registered, register it
+		// if the scope is not already registered, register it
 		this.instance = () => instance({ id: name })
+	}
+
+	kill() {
+		getPlexusMasterInstance().killScope(this.name)
 	}
 
 	/**
