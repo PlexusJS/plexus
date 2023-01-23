@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/react",
-	"version": "1.5.13",
+	"version": "1.5.14",
 	"description": "React Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -35,7 +35,7 @@
 	},
 	"gitHead": "8b8c644b502cf46aa6f2b39267c11e3cc7f1ada6",
 	"dependencies": {
-		"@plexusjs/utils": "1.5.13",
+		"@plexusjs/utils": "1.5.14",
 		"use-sync-external-store": "^1.2.0"
 	}
 }
