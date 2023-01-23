@@ -1,6 +1,6 @@
 {
 	"name": "plexus-docs",
-	"version": "1.5.12",
+	"version": "1.5.13",
 	"repository": "git@github.com:PlexusJS/plexus-docs.git",
 	"author": "Philippe Clesca <hello@philippec.me>",
 	"license": "MIT",
@@ -22,8 +22,8 @@
 		"@docusaurus/preset-classic": "^2.2.0",
 		"@docusaurus/theme-live-codeblock": "^2.2.0",
 		"@mdx-js/react": "^1.6.22",
-		"@plexusjs/core": "1.5.12",
-		"@plexusjs/react": "1.5.12",
+		"@plexusjs/core": "1.5.13",
+		"@plexusjs/react": "1.5.13",
 		"autoprefixer": "^10.4.5",
 		"clsx": "^1.1.1",
 		"framer-motion": "^6.3.3",

@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/core",
-	"version": "1.5.12",
+	"version": "1.5.13",
 	"description": "A library for building modular interconnected applications",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -22,12 +22,12 @@
 		"build": "tsc --build --force && echo \"Build complete.\"",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "5c7c20114233d1fcbbae72dde893b60272f99afb",
+	"gitHead": "8b8c644b502cf46aa6f2b39267c11e3cc7f1ada6",
 	"devDependencies": {
 		"isomorphic-fetch": "^3.0.0"
 	},
 	"dependencies": {
-		"@plexusjs/api": "1.5.12",
-		"@plexusjs/utils": "1.5.12"
+		"@plexusjs/api": "1.5.13",
+		"@plexusjs/utils": "1.5.13"
 	}
 }
