@@ -22,7 +22,7 @@
 		"build": "tsc --build --force && echo \"Build complete.\"",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "695002a04a87e609abfc2cab78e84d01b7b540fe",
+	"gitHead": "ed2568664de2e4868ff67cea01d0ca4d9de8b494",
 	"devDependencies": {
 		"isomorphic-fetch": "^3.0.0"
 	},

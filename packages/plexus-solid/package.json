@@ -25,7 +25,7 @@
 		"build": "tsc --build --force",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "695002a04a87e609abfc2cab78e84d01b7b540fe",
+	"gitHead": "ed2568664de2e4868ff67cea01d0ca4d9de8b494",
 	"dependencies": {
 		"@plexusjs/utils": "1.5.15",
 		"solid-js": "^1.4.7"
