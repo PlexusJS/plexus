@@ -33,7 +33,6 @@
 	"scripts": {
 		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
 		"build": "tsc --build --force",
-		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
 	"gitHead": "8b8c644b502cf46aa6f2b39267c11e3cc7f1ada6"
