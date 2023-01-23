@@ -18,7 +18,9 @@ import {
 } from './collection/collection'
 import { _event, PlexusEventInstance } from './event'
 import { storage as _storage, StorageOverride } from './storage'
-import { PlexusPlugin, PlexusPluginConfig, createPlexusPlugin } from './plugin'
+import { PlexusScopeConfig, scope } from './scope'
+import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
+
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { LiteralType, AlmostAnything } from '@plexusjs/utils'
 
@@ -121,16 +123,16 @@ export function setGlobalCatch(catcher: (err: any) => unknown) {
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
 function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
 
-export function usePlugin(instance: PlexusInstance, plugin: PlexusPlugin): void
-export function usePlugin(instanceId: string, plugin: PlexusPlugin): void
+export function usePlugin(instance: PlexusInstance, plugin: Plugin): void
+export function usePlugin(instanceId: string, plugin: Plugin): void
 export function usePlugin(
 	instanceOrInstanceId: PlexusInstance | string,
-	plugin: PlexusPlugin
+	plugin: Plugin
 ) {
-	if (typeof instanceOrInstanceId === 'string') {
-		plugin.init((name?: string) => instance({ id: name }))
-	}
-	instance()._plugins.set(plugin.name, plugin)
+	// if (typeof instanceOrInstanceId === 'string') {
+	// 	plugin.init((name) => instance({ id: name }))
+	// }
+	// instance()._plugins.set(plugin.name, plugin)
 }
 
 // export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
@@ -142,7 +144,8 @@ export {
 	PlexusAction,
 	PlexusPlugin,
 	PlexusActionHooks,
-	PlexusPluginConfig,
+	PlexusScopeConfig as PlexusPluginConfig,
+	scope,
 	createPlexusPlugin,
 	PlexusCollectionConfig,
 	PlexusCollectionInstance,

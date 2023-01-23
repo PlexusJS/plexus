@@ -1,59 +1,48 @@
----
-title: batch
----
+--- 
+	title: batch 
+--- 
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
 
-<a name='batch'></a>
+<a name="batch"></a>
 
 ## batch(fn)
+<p>Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.</p>
 
-<p>
-	Run a function. During that function's execution, any state changes will be
-	batched and only applied once the function has finished.
-</p>
 
-| Param | Description                           |
-| ----- | ------------------------------------- |
-| fn    | <p>The function to run in a batch</p> |
+| Param | Description |
+| --- | --- |
+| fn | <p>The function to run in a batch</p> |
 
-<a name='PlexusActionHelpers+batch'></a>
+<a name="PlexusActionHelpers+batch"></a>
 
 ## .batch(fn)
+<p>Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.</p>
 
-<p>
-	Run a function. During that function's execution, any state changes will be
-	batched and only applied once the function has finished.
-</p>
 
-| Param | Description                           |
-| ----- | ------------------------------------- |
-| fn    | <p>The function to run in a batch</p> |
+| Param | Description |
+| --- | --- |
+| fn | <p>The function to run in a batch</p> |
 
-<a name='Plugin+batch'></a>
+<a name="RuntimeInstance+batch"></a>
 
 ## .batch(fn)
+<p>The batch function allows you to run a series of actions in a single transaction</p>
 
-<p>
-	Run a function. During that function's execution, any state changes will be
-	batched and only applied once the function has finished.
-</p>
 
-| Param | Description                           |
-| ----- | ------------------------------------- |
-| fn    | <p>The function to run in a batch</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | <p>The function to run</p> |
 
-<a name='RuntimeInstance+batch'></a>
+<a name="Scope+batch"></a>
 
 ## .batch(fn)
+<p>Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.</p>
 
-<p>
-	The batch function allows you to run a series of actions in a single
-	transaction
-</p>
 
-| Param | Type                  | Description                |
-| ----- | --------------------- | -------------------------- |
-| fn    | <code>function</code> | <p>The function to run</p> |
+| Param | Description |
+| --- | --- |
+| fn | <p>The function to run in a batch</p> |
+

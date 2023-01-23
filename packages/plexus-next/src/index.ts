@@ -2,10 +2,8 @@ import {
 	instance,
 	PlexusCollectionSelector,
 	PlexusInstance,
-	PlexusPlugin,
-	usePlugin,
 } from '@plexusjs/core'
-import { createPlexusPlugin } from '@plexusjs/core/dist/plugin'
+import { createPlexusPlugin } from '@plexusjs/core'
 
 interface PlexusNextData {
 	state: Record<string, any>
