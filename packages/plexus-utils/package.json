@@ -22,5 +22,5 @@
 		"build": "tsc --build --force",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "8b8c644b502cf46aa6f2b39267c11e3cc7f1ada6"
+	"gitHead": "695002a04a87e609abfc2cab78e84d01b7b540fe"
 }
