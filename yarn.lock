@@ -3077,46 +3077,6 @@
     os-homedir "^1.0.1"
     regexpu-core "^4.5.4"
 
-"@plexusjs/api@1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@plexusjs/api/-/api-1.4.1.tgz#cd580f4754245e87924267c71aecf30fe2ce3694"
-  integrity sha512-vS6RLS9i6vd4Gywa7WZVgG5NEkujgJLghLexmObHv1eW6vliowtNMOiuN8f+E69bKuoyHBf0gIZoXfZRmLhiZA==
-  dependencies:
-    "@plexusjs/utils" "1.4.1"
-
-"@plexusjs/api@1.4.1-canary.2+583332e":
-  version "1.4.1-canary.2"
-  resolved "https://registry.yarnpkg.com/@plexusjs/api/-/api-1.4.1-canary.2.tgz#eea5c35d6ab0d81eae5719e089fc6b6ad10b302e"
-  integrity sha512-GuCqhGB8cIX2bm3ZmO/bmYqQSmzAc7VAXoNRGXLryNzDHfpysl1vqEjvYbbfVDKpIWkpqWgUNb25gwp9TLQVzw==
-  dependencies:
-    "@plexusjs/utils" "1.4.1-canary.2+583332e"
-
-"@plexusjs/core@^1.1.0":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@plexusjs/core/-/core-1.4.1.tgz#4ad41531bfce21145c093dfe42209627a9cdc586"
-  integrity sha512-6fyCs0TqDLY+YY9cDEiIUjPvZZz7sbIyiLcmpiz5EXKYRDUS9sBmXJ55UvfvHf6+usBwgkkFCzlJOIN0YXZrbw==
-  dependencies:
-    "@plexusjs/api" "1.4.1"
-    "@plexusjs/utils" "1.4.1"
-
-"@plexusjs/react@^1.1.0":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@plexusjs/react/-/react-1.4.1.tgz#7e954765acdd769c69fddb0e20297e68a77000ea"
-  integrity sha512-De0bZJdzZdLfUixqxlDhdHvhmhkXi650WVEld5F4nOJItCbpvQ1RAtv2NbW9zLEBSlGtSRCvi3fDqW+xvu7B2w==
-  dependencies:
-    "@plexusjs/utils" "1.4.1"
-    use-sync-external-store "^1.2.0"
-
-"@plexusjs/utils@1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@plexusjs/utils/-/utils-1.4.1.tgz#8fea470811825307c8296042794f4783353377eb"
-  integrity sha512-0EOldubxBWioJAIp3LWg6CJOEVfxgjm4oisN6GhHx3Tl7gtLBrUYx6skaBZTpHadCiwhqmCNeTq+bsVlib0xnQ==
-
-"@plexusjs/utils@1.4.1-canary.2+583332e":
-  version "1.4.1-canary.2"
-  resolved "https://registry.yarnpkg.com/@plexusjs/utils/-/utils-1.4.1-canary.2.tgz#614fddcec796c03bc72ad6e74a7d3f63954c35ad"
-  integrity sha512-qQm60QQCbeoLxsr6AxEfdwF2CRx7GYG2XcGDQf8IlLuAQOS+nPnEhJgXsfYVIBJukrG1CVGEys675JC6Etvy8g==
-
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
@@ -13185,9 +13145,9 @@ typical@^6.0.1:
   integrity sha512-+g3NEp7fJLe9DPa1TArHm9QAA7YciZmWnfAqEaFrBihQ7epOv9i99rjtgb6Iz0wh3WuQDjsCTDfgRoGnmHN81A==
 
 ua-parser-js@^0.7.30:
-  version "0.7.32"
-  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.32.tgz#cd8c639cdca949e30fa68c44b7813ef13e36d211"
-  integrity sha512-f9BESNVhzlhEFf2CHMSj40NWOjYPl1YKYbrvIr/hFTDEmLq7SRbWvm7FcdcpCYT95zrOhC7gZSxjdnnTpBcwVw==
+  version "0.7.33"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.33.tgz#1d04acb4ccef9293df6f70f2c3d22f3030d8b532"
+  integrity sha512-s8ax/CeZdK9R/56Sui0WM6y9OFREJarMRHqLB2EwkovemBxNQ+Bqu8GAsUnVcXKgphb++ghr/B2BZx4mahujPw==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
