@@ -51,7 +51,7 @@ export function usePlexus<V extends Watchable[]>(
 					`Re-rendering Component; Dependency (${depsArray
 						.map((v) => v.id)
 						.join(', ')}) updated to ${depsArray
-						.map((v) => convertThingToString(v.value))
+						.map((v) => convertThingToString(v?.value))
 						.join(', ')}`
 				)
 				set({})
@@ -68,7 +68,7 @@ export function usePlexus<V extends Watchable[]>(
 		)
 
 		// If this is the array syntax...
-		const values = depsArray.map((dep) => dep.value!)
+		const values = depsArray.map((dep) => dep?.value!)
 		const compSnapshot = convertThingToString(values)
 		if (!snapshot.current) {
 			snapshot.current = compSnapshot
