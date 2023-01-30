@@ -26,8 +26,8 @@ export const concurrentWatch = (
 		const isWatchable =
 			dep.watch instanceof Function &&
 			typeof dep.watch !== 'function' &&
-			Object.prototype.toString.call(dep.watch) != '[Function watch]' &&
-			Object.prototype.toString.call(dep.watch) != '[object Function]'
+			Object.prototype.toString.call(dep.watch) !== '[Function watch]' &&
+			Object.prototype.toString.call(dep.watch) !== '[object Function]'
 		if (
 			!dep ||
 			!isWatchable
