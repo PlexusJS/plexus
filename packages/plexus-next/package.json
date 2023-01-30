@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/next",
-	"version": "1.5.19",
+	"version": "1.5.20",
 	"description": "Next Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -35,5 +35,5 @@
 		"build": "tsc --build --force",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "520d4646d643d600ed22346236e7f94b887e84d2"
+	"gitHead": "3e5aa6e1e654f0de104aa2c9675492ee53fbd265"
 }
