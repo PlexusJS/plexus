@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/api",
-	"version": "1.5.22",
+	"version": "1.5.23",
 	"description": "A library for building modular interconnected applications",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -27,6 +27,6 @@
 		"isomorphic-fetch": "^3.0.0"
 	},
 	"dependencies": {
-		"@plexusjs/utils": "1.5.22"
+		"@plexusjs/utils": "1.5.23"
 	}
 }
