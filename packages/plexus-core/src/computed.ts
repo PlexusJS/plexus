@@ -204,6 +204,7 @@ export class ComputedStateInstance<
 	 * The value (reactive) of the state
 	 */
 	get value(): ValueType {
+		this.mount()
 		return super.value
 	}
 	/**

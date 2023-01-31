@@ -243,4 +243,14 @@ describe('Test react integration (useDeposit)', () => {
 			)
 		}
 	})
+	test('testing usePlexus ', async () => {
+		render(<RandomComponent />)
+		await act(async () => {
+			await waitFor(() => screen.getByTestId('str'))
+		})
+		expect(screen.getByTestId('str').innerHTML).toBe('yes')
+		expect(screen.getByTestId('group-test').innerHTML).toBe(
+			`[{"id":"poggers","a":2},{"id":"pog","a":1}]`
+		)
+	})
 })
