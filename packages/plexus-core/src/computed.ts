@@ -109,6 +109,7 @@ export class ComputedStateInstance<
 	 * */
 	private refreshDeps() {
 		this._internalStore._depUnsubscribe()
+
 		this.instance().runtime.log(
 			'info',
 			`Mounting Dependencies (${this.deps
@@ -131,8 +132,8 @@ export class ComputedStateInstance<
 			Array.from(this._internalStore._deps),
 			this.id
 		)
-
 		this._internalStore._depUnsubscribe = () => unsubscribe()
+		this.mount()
 	}
 	/**
 	 * Watch for changes on this computed state
