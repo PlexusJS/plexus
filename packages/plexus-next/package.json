@@ -35,5 +35,5 @@
 		"build": "tsc --build --force",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "3e5aa6e1e654f0de104aa2c9675492ee53fbd265"
+	"gitHead": "aad613946af7c158e0971f67765c53f830c16a63"
 }
