@@ -90,17 +90,17 @@ export class ComputedStateInstance<
 	private mount() {
 		// if (isServer()) return
 		if (!this.instance()._computedStates.has(this)) {
+			this.instance()._computedStates.add(this)
 			this.instance().runtime.log(
 				'info',
 				`Hoisting computed state ${this.id} with value`,
 				this.value,
 				` to instance`
 			)
-			this.instance()._computedStates.add(this)
-			this.instance().storage?.sync()
 		}
 		if (this._internalStore._ready) return
 		this._internalStore._ready = true
+		this.refreshDeps()
 		this.instance().runtime.log('info', `Computed state ${this.id} is ready`)
 	}
 	/**

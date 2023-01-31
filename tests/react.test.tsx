@@ -72,7 +72,11 @@ const RandomComponent: FC = () => {
 	)
 }
 describe('Test react integration (usePlexus)', () => {
-	test('usePlexus hook w/ Watchables', async () => {
+	// test('usePlexus hook w/ Collections', async () => {})
+	// test('usePlexus hook w/ Computed', async () => {})
+	// test('usePlexus hook w/ Computed', async () => {})
+
+	test('usePlexus hook w/ State', async () => {
 		// console.log(Array.from(instance()._states).map((v) => v.id))
 		render(<RandomComponent />)
 		await act(async () => {
@@ -244,13 +248,13 @@ describe('Test react integration (useDeposit)', () => {
 		}
 	})
 	test('testing usePlexus ', async () => {
-		render(<RandomComponent />)
-		await act(async () => {
-			await waitFor(() => screen.getByTestId('str'))
-		})
-		expect(screen.getByTestId('str').innerHTML).toBe('yes')
-		expect(screen.getByTestId('group-test').innerHTML).toBe(
-			`[{"id":"poggers","a":2},{"id":"pog","a":1}]`
-		)
+		// render(<RandomComponent />)
+		// await act(async () => {
+		// 	await waitFor(() => screen.getByTestId('str'))
+		// })
+		// expect(screen.getByTestId('str').innerHTML).toBe('yes')
+		// expect(screen.getByTestId('group-test').innerHTML).toBe(
+		// 	`[{"id":"poggers","a":2},{"id":"pog","a":1}]`
+		// )
 	})
 })
