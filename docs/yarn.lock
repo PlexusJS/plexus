@@ -2281,15 +2281,33 @@
     os-homedir "^1.0.1"
     regexpu-core "^4.5.4"
 
-"@plexusjs/core@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@plexusjs/core/-/core-1.1.0.tgz#82ba0acf76f915323bed38be213a24154200e331"
-  integrity sha512-RdzUxMu3n9+DzSpjbl/hcH1WU+gBczx3ENSJSkolkOCIHADXVs6bCXRLP/qCVmJwTyZNHOfAsR32avmH4sLmvA==
+"@plexusjs/api@1.5.10":
+  version "1.5.10"
+  resolved "https://registry.yarnpkg.com/@plexusjs/api/-/api-1.5.10.tgz#b092ce965504ff8609ee388a06151e658b31e5a5"
+  integrity sha512-bF2R/Drvc9k4biv0zlfMML63AQzgLlhRG/j7ASP72wta9Hj00rpBpt0Bm8MMDuAYPcLzaDx5LboNrwI4oFAxIA==
+  dependencies:
+    "@plexusjs/utils" "1.5.10"
 
-"@plexusjs/react@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@plexusjs/react/-/react-1.1.0.tgz#1d6397abec2746ac1f343a7162980883c4b07d2f"
-  integrity sha512-8LyhfroOzkL7FJ1RxGIGHtlfZoe+7r3212vDwTgiLOp9gbxwMxOwweE8pGtKxmgWnJq2WTKMUjYp0sfzGEkapQ==
+"@plexusjs/core@1.5.10":
+  version "1.5.10"
+  resolved "https://registry.yarnpkg.com/@plexusjs/core/-/core-1.5.10.tgz#cfc02becde46551a93bad88202a8ce125968bb5f"
+  integrity sha512-JtUVLvFwC4Ee74vjsf862lPhOcY38+IQZxuWKas3RP8x6cNGKvmt61looEtRMV+VBdbF89n+23KPCqIqGhltJg==
+  dependencies:
+    "@plexusjs/api" "1.5.10"
+    "@plexusjs/utils" "1.5.10"
+
+"@plexusjs/react@1.5.10":
+  version "1.5.10"
+  resolved "https://registry.yarnpkg.com/@plexusjs/react/-/react-1.5.10.tgz#7fc928806f047e7d143c3017d2c91d0988e52d95"
+  integrity sha512-8+cxslXl9QGzHlCKeHjjDorvYlRrCATHT46A6q0EfCtgfeBQ9owlLlZFreX1d9LGV7DbXt+EWh8NuACgz35uhQ==
+  dependencies:
+    "@plexusjs/utils" "1.5.10"
+    use-sync-external-store "^1.2.0"
+
+"@plexusjs/utils@1.5.10":
+  version "1.5.10"
+  resolved "https://registry.yarnpkg.com/@plexusjs/utils/-/utils-1.5.10.tgz#b846e2c970998acc500b061a30f866764c4c12a5"
+  integrity sha512-uYGNzf161gLw0fdzZ9+sG5/wDoau2cOLaOxEvRIdnBObSKAHdQLt8nzo0eyas1Ba2GeyHEt33bVYejKMcA/12A==
 
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
@@ -5093,9 +5111,9 @@ htmlparser2@^8.0.1:
     entities "^4.3.0"
 
 http-cache-semantics@^4.0.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.1.0.tgz#49e91c5cbf36c9b94bcfcd71c23d5249ec74e390"
-  integrity sha512-carPklcUh7ROWRK7Cv27RPtdhYhUsela/ue5/jKzjegVvXDqM2ILE9Q2BGn9JZJh1g87cp56su/FgQSzcWS8cQ==
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.1.1.tgz#abe02fcb2985460bf0323be664436ec3476a6d5a"
+  integrity sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==
 
 http-deceiver@^1.2.7:
   version "1.2.7"
@@ -8305,6 +8323,11 @@ use-latest@^1.2.1:
   integrity sha512-xA+AVm/Wlg3e2P/JiItTziwS7FK92LWrDB0p+hgXloIMuVCeJJ8v6f0eeHyPZaJrM+usM1FkFfbNCrJGs8A/zw==
   dependencies:
     use-isomorphic-layout-effect "^1.1.1"
+
+use-sync-external-store@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
+  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
