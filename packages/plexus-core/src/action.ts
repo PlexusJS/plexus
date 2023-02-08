@@ -122,7 +122,7 @@ export function _action<Fn extends FunctionType>(
 	const helpers = new PlexusActionHelpers(instance)
 
 	if (fn.constructor.name === 'Function') {
-		const newAction = (...args) => {
+		function newAction(...args) {
 			try {
 				// if the instance is not ready, wait for it to be
 				// !NOTE: this is probably not a good way to do this, but it works for now
