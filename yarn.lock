@@ -2757,6 +2757,14 @@
     hey-listen "^1.0.8"
     tslib "^2.3.1"
 
+"@ngneat/falso@^6.4.0":
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/@ngneat/falso/-/falso-6.4.0.tgz#7ed98a95ab2a2dc39b0a0d317fe8c24512869edc"
+  integrity sha512-f6r036h2fX/AoHw1eV2t8+qWQwrbSrozs3zXMhhwoO7SJBc+DGMxRWEhFeYIinfwx0uhUH8ggx5+PDLzYESLOA==
+  dependencies:
+    seedrandom "3.0.5"
+    uuid "8.3.2"
+
 "@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents.3":
   version "2.1.8-no-fsevents.3"
   resolved "https://registry.yarnpkg.com/@nicolo-ribaudo/chokidar-2/-/chokidar-2-2.1.8-no-fsevents.3.tgz#323d72dd25103d0c4fbdce89dadf574a787b1f9b"
@@ -3077,6 +3085,18 @@
     minimist "^1.2.0"
     os-homedir "^1.0.1"
     regexpu-core "^4.5.4"
+
+"@plexusjs/core@1.5.15":
+  version "1.6.1"
+  dependencies:
+    "@plexusjs/api" "1.6.1"
+    "@plexusjs/utils" "1.6.1"
+
+"@plexusjs/react@1.5.15":
+  version "1.6.1"
+  dependencies:
+    "@plexusjs/utils" "1.6.1"
+    use-sync-external-store "^1.2.0"
 
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
@@ -12012,6 +12032,11 @@ section-matter@^1.0.0:
     extend-shallow "^2.0.1"
     kind-of "^6.0.0"
 
+seedrandom@3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/seedrandom/-/seedrandom-3.0.5.tgz#54edc85c95222525b0c7a6f6b3543d8e0b3aa0a7"
+  integrity sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==
+
 select-hose@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/select-hose/-/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
@@ -13442,7 +13467,7 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
 
-uuid@^8.3.2:
+uuid@8.3.2, uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==

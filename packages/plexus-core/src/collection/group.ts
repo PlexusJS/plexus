@@ -93,7 +93,7 @@ export class CollectionGroup<
 		) {
 			this.instance().runtime.log(
 				'debug',
-				`Batching an addToGroups call for collection ${this.instanceId}`
+				`Batching a group watcher rebuild for group ${this.instanceId}`
 			)
 			// store this in the batchedSetters for execution once batching is over
 			this.instance().runtime.batchedCalls.push(() => {
@@ -139,8 +139,12 @@ export class CollectionGroup<
 	 * @param {string|number} key The key of the item to look for
 	 * @returns {this} This Group instance
 	 */
-	add(key: DataKey): this {
-		this._internalStore._includedKeys.add(key)
+	add(keys: DataKey | DataKey[]): this {
+		// normalize the keys
+		const keysArray = Array.isArray(keys) ? keys : [keys]
+		// add the keys to the group
+		keysArray.forEach((key) => this._internalStore._includedKeys.add(key))
+		// this._internalStore._includedKeys.add(key)
 		this.rebuildDataWatchers()
 		return this
 	}
@@ -149,8 +153,12 @@ export class CollectionGroup<
 	 * @param {string|number} key The key of the item to look for
 	 * @returns {this} This Group instance
 	 */
-	remove(key: DataKey): this {
-		this._internalStore._includedKeys.delete(key)
+	remove(keys: DataKey | DataKey[]): this {
+		// normalize the keys
+		const keysArray = Array.isArray(keys) ? keys : [keys]
+		// remove the keys from the group
+		keysArray.forEach((key) => this._internalStore._includedKeys.delete(key))
+		// this._internalStore._includedKeys.delete(key)
 		this.rebuildDataWatchers()
 		return this
 	}

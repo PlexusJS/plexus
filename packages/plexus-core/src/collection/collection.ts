@@ -556,11 +556,11 @@ export class CollectionInstance<
 	 * @returns {this} The new Collection Instance
 	 */
 	addToGroups(
-		key: DataKey,
+		keys: DataKey | DataKey[],
 		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	): this {
 		const addToGroup = (
-			key: DataKey,
+			keys: DataKey[],
 			group: GroupName,
 			startedFromInnerBatch?: boolean
 		) => {
@@ -580,7 +580,7 @@ export class CollectionInstance<
 						'debug',
 						`Collection Batching completed for addToGroups`
 					)
-					return addToGroup(key, group, true)
+					return addToGroup(keys, group, true)
 				})
 				return this
 			}
@@ -594,15 +594,17 @@ export class CollectionInstance<
 				)
 				this._internalStore._groups.set(group as GroupName, g)
 			}
-			g.add(key)
+			g.add(keys)
 		}
 		const parseAndPushGroups = () => {
+			// normalize the keys to an array
+			const keyArray = Array.isArray(keys) ? keys : [keys]
 			if (Array.isArray(groups)) {
 				for (let group of groups) {
-					addToGroup(key, group)
+					addToGroup(keyArray, group)
 				}
 			} else {
-				addToGroup(key, groups)
+				addToGroup(keyArray, groups)
 			}
 		}
 
