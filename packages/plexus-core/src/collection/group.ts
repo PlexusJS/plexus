@@ -86,27 +86,27 @@ export class CollectionGroup<
 		)
 
 		// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
-		if (
-			this.instance().runtime.isBatching &&
-			this.collection().config.useBatching &&
-			!startedFromInnerBatch
-		) {
-			this.instance().runtime.log(
-				'debug',
-				`Batching a group watcher rebuild for group ${this.instanceId}`
-			)
-			// store this in the batchedSetters for execution once batching is over
-			this.instance().runtime.batchedCalls.push(() => {
-				this.instance().runtime.log(
-					'debug',
-					`Batched addToGroups call fulfilled for collection ${this.instanceId}`
-				)
-				// return collectItem(item, groups, true)
+		// if (
+		// 	this.instance().runtime.isBatching &&
+		// 	this.collection().config.useBatching &&
+		// 	!startedFromInnerBatch
+		// ) {
+		// 	this.instance().runtime.log(
+		// 		'debug',
+		// 		`Batching a group watcher rebuild for group ${this.instanceId}`
+		// 	)
+		// 	// store this in the batchedSetters for execution once batching is over
+		// 	this.instance().runtime.batchedCalls.push(() => {
+		// 		this.instance().runtime.log(
+		// 			'debug',
+		// 			`Batched addToGroups call fulfilled for collection ${this.instanceId}`
+		// 		)
+		// 		// return collectItem(item, groups, true)
 
-				this.rebuildDataWatchers(true)
-			})
-			return this
-		}
+		// 		this.rebuildDataWatchers(true)
+		// 	})
+		// 	return this
+		// }
 		// start the process of rebuilding the data watchers
 		this._internalStore._dataWatcherDestroyers.forEach((destroyer) =>
 			destroyer()
@@ -136,16 +136,34 @@ export class CollectionGroup<
 	}
 	/**
 	 * Add an item to the group
-	 * @param {string|number} key The key of the item to look for
+	 * @param {string|number} keys The key or array of keys of the item to look for
 	 * @returns {this} This Group instance
 	 */
 	add(keys: DataKey | DataKey[]): this {
+		if (!keys) return this
+		this.instance().runtime.log(
+			'debug',
+			`Group ${this.instanceId} adding keys ${keys}...`
+		)
 		// normalize the keys
 		const keysArray = Array.isArray(keys) ? keys : [keys]
+		let newKeysAdded = false
 		// add the keys to the group
-		keysArray.forEach((key) => this._internalStore._includedKeys.add(key))
+		keysArray.forEach((key) => {
+			if (this._internalStore._includedKeys.has(key)) {
+				this.instance().runtime.log(
+					'debug',
+					`Group ${this.instanceId} already contains key ${key}...`
+				)
+				return
+			}
+			newKeysAdded = true
+			this._internalStore._includedKeys.add(key)
+		})
 		// this._internalStore._includedKeys.add(key)
-		this.rebuildDataWatchers()
+		if (newKeysAdded) {
+			this.rebuildDataWatchers()
+		}
 		return this
 	}
 	/**
@@ -154,6 +172,10 @@ export class CollectionGroup<
 	 * @returns {this} This Group instance
 	 */
 	remove(keys: DataKey | DataKey[]): this {
+		this.instance().runtime.log(
+			'debug',
+			`Group ${this.instanceId} removing keys ${keys}...`
+		)
 		// normalize the keys
 		const keysArray = Array.isArray(keys) ? keys : [keys]
 		// remove the keys from the group
