@@ -79,11 +79,35 @@ export class CollectionGroup<
 			.filter((v) => v !== undefined) as DataType[]
 		this.instance().runtime.broadcast(this.id, this.value)
 	}
-	private rebuildDataWatchers() {
+	private rebuildDataWatchers(startedFromInnerBatch?: boolean) {
 		this.instance().runtime.log(
 			'info',
 			`Group ${this.instanceId} rebuilding data watcher connections...`
 		)
+
+		// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
+		if (
+			this.instance().runtime.isBatching &&
+			this.collection().config.useBatching &&
+			!startedFromInnerBatch
+		) {
+			this.instance().runtime.log(
+				'debug',
+				`Batching an addToGroups call for collection ${this.instanceId}`
+			)
+			// store this in the batchedSetters for execution once batching is over
+			this.instance().runtime.batchedCalls.push(() => {
+				this.instance().runtime.log(
+					'debug',
+					`Batched addToGroups call fulfilled for collection ${this.instanceId}`
+				)
+				// return collectItem(item, groups, true)
+
+				this.rebuildDataWatchers(true)
+			})
+			return this
+		}
+		// start the process of rebuilding the data watchers
 		this._internalStore._dataWatcherDestroyers.forEach((destroyer) =>
 			destroyer()
 		)

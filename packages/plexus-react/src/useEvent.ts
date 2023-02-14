@@ -7,7 +7,7 @@ export type PlexusValueArray<T> = {
 }
 
 type cleanup = () => void
-export function useEvent<Payload = any>(
+export function usePlexusEvent<Payload = any>(
 	event: PlexusEventInstance<Payload>,
 	callback: (value: Payload) => cleanup | void
 ) {

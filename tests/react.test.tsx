@@ -4,7 +4,7 @@ import '@testing-library/react'
 import { render, act } from './test-utils'
 import { collection, computed, instance, state, event } from '@plexusjs/core'
 import React, { FC, useEffect, useState } from 'react'
-import { useDeposit, useEvent, usePlexus } from '@plexusjs/react'
+import { useDeposit, usePlexusEvent, usePlexus } from '@plexusjs/react'
 // import * as renderer from "react-test-renderer"
 
 // function toJson(component: renderer.ReactTestRenderer) {
@@ -127,7 +127,7 @@ describe('Test react integration (useEvent)', () => {
 	test('test useEvent', () => {
 		const RandomComponent: FC = () => {
 			const [val, setVal] = useState('')
-			useEvent(myEvents, (payload) => {
+			usePlexusEvent(myEvents, (payload) => {
 				setVal(payload.name)
 			})
 
