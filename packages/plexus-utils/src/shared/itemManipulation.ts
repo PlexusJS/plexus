@@ -71,15 +71,9 @@ export function deepMerge<Thing extends object>(
 		for (const key in source) {
 			if (isObject(source[key])) {
 				if (!(key in target)) {
-					// console.log('no key in target', key)
 					Object.assign(output, { [key]: source[key] })
 				} else {
-					// console.log('deepmerging', key)
-					output[key] = deepMerge(
-						target[key] as any,
-						source[key],
-						override
-					) as any
+					output[key] = deepMerge(target[key] as any, source[key], override) as any
 				}
 			} else {
 				if (
