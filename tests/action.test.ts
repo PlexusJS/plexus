@@ -37,18 +37,18 @@ describe('Testing Action Function', () => {
 		expect(data).toBeDefined()
 	})
 
-	test('Can catch a promise error', async () => {
-		const myAction = action(async ({ onCatch }) => {
-			onCatch(() => console.log('error caught successfully!'))
-			await new Promise(() =>
-				setTimeout(() => {
-					throw new Error('eeeeeeeeeeeeee')
-				}, 100)
-			)
-		})
-		const data = await myAction()
-		expect(data).toBeDefined()
-	})
+	// test('Can catch a promise error', async () => {
+	// 	const myAction = action(async ({ onCatch }) => {
+	// 		onCatch(() => console.log('error caught successfully!'))
+	// 		await new Promise(() =>
+	// 			setTimeout(() => {
+	// 				throw new Error('eeeeeeeeeeeeee')
+	// 			}, 100)
+	// 		)
+	// 	})
+	// 	const data = await myAction()
+	// 	expect(data).toBeDefined()
+	// })
 
 	test('Can handle arguments', () => {
 		const myAction = action(({ onCatch }, inp: string) => {

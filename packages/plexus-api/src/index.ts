@@ -1,4 +1,5 @@
 import { deepClone, deepMerge } from '@plexusjs/utils/dist/shared'
+import { Blob } from 'buffer'
 // import { instance } from "./ "
 export interface PlexusApiRes<DataType = any> {
 	status: number
