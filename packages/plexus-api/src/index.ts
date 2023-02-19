@@ -1,5 +1,17 @@
 import { deepClone, deepMerge } from '@plexusjs/utils/dist/shared'
-import { Blob } from 'buffer'
+// let's get Blob from Node.js or browser
+let Blob
+if (typeof window === 'undefined') {
+	// If running in Node.js, import Blob from buffer package
+	const { Blob: NodeBlob } = require('buffer')
+	Blob = NodeBlob
+} else {
+	// If running in browser, use built-in Blob
+	Blob = window.Blob
+}
+
+// Hoist Blob to top level
+globalThis.Blob = Blob
 // import { instance } from "./ "
 export interface PlexusApiRes<DataType = any> {
 	status: number
