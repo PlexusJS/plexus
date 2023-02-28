@@ -1,9 +1,16 @@
 import { AlmostAnything } from '../types'
 
 export function isObject(item: any): item is Object {
-	return (
-		item && item !== null && typeof item === 'object' && !Array.isArray(item)
-	)
+	if (typeof item === 'object' && item !== null) {
+		if (typeof Object.getPrototypeOf === 'function') {
+			const prototype = Object.getPrototypeOf(item)
+			return prototype === Object.prototype || prototype === null
+		}
+
+		return Object.prototype.toString.call(item) === '[object Object]'
+	}
+
+	return false
 }
 
 export const convertThingToString = (input: any) =>
@@ -73,7 +80,11 @@ export function deepMerge<Thing extends object>(
 				if (!(key in target)) {
 					Object.assign(output, { [key]: source[key] })
 				} else {
-					output[key] = deepMerge(target[key] as any, source[key], override) as any
+					output[key] = deepMerge(
+						target[key] as any,
+						source[key],
+						override
+					) as any
 				}
 			} else {
 				if (

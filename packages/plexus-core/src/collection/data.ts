@@ -142,9 +142,11 @@ export class CollectionData<
 				// if we have a shallow value, then we can try to get the fresh value from the foreign collection
 				if (this.shallowValue) {
 					const freshValue = isArray
-						? (this.shallowValue?.[idKey] as string[])?.map(
-								(id: string) => foreignCollection?.getItem(id).shallowValue
-						  ).filter((x) => (x)) || undefined
+						? (this.shallowValue?.[idKey] as string[])
+								?.map(
+									(id: string) => foreignCollection?.getItem(id).shallowValue
+								)
+								.filter((x) => x) || undefined
 						: foreignCollection?.getItem(this.shallowValue?.[idKey])
 								.shallowValue || undefined
 					if (

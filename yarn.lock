@@ -3087,15 +3087,15 @@
     regexpu-core "^4.5.4"
 
 "@plexusjs/core@1.5.15":
-  version "1.6.3"
+  version "1.6.5"
   dependencies:
-    "@plexusjs/api" "1.6.3"
-    "@plexusjs/utils" "1.6.3"
+    "@plexusjs/api" "1.6.5"
+    "@plexusjs/utils" "1.6.5"
 
 "@plexusjs/react@1.5.15":
-  version "1.6.3"
+  version "1.6.5"
   dependencies:
-    "@plexusjs/utils" "1.6.3"
+    "@plexusjs/utils" "1.6.5"
     use-sync-external-store "^1.2.0"
 
 "@polka/url@^1.0.0-next.20":

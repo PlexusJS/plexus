@@ -20,4 +20,19 @@ describe(`Test deepMerge`, () => {
 		expect(mergeValue.level1.level2.length).toBe(2)
 		// expect(mergeValue.level1.level2).toBe(2)
 	})
+	it(`Can handle dates`, () => {
+		const mergeValue = deepMerge(
+			{
+				level1: {
+					level2: new Date(),
+				},
+			},
+			{
+				level1: {
+					level2: new Date(),
+				},
+			}
+		)
+		expect(mergeValue.level1.level2).toBeInstanceOf(Date)
+	})
 })
