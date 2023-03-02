@@ -15,6 +15,7 @@ export interface PlexusActionHooks {
  * The action helpers for a defined plexus action
  */
 class PlexusActionHelpers {
+	public _useGlobalCatch = true
 	private _internalStore = {
 		_errorHandlers: new Set<ErrorHandler>(),
 	}
@@ -24,8 +25,10 @@ class PlexusActionHelpers {
 	/**
 	 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
 	 * @param handler A function that will be called when an error occurs; omit to fail silently.
+	 * @param useGlobal Should the global error handler be used? (default: true)
 	 */
-	onCatch(handler: ErrorHandler = () => {}) {
+	onCatch(handler: ErrorHandler = () => {}, useGlobal = true) {
+		this._useGlobalCatch = useGlobal
 		if (handler) this._internalStore._errorHandlers.add(handler)
 		this.instance().runtime.log(
 			'info',
@@ -38,7 +41,7 @@ class PlexusActionHelpers {
 	 * Run all available error handlers
 	 */
 	runErrorHandlers(e: unknown) {
-		if (this.instance()._globalCatch) {
+		if (this.instance()._globalCatch && this._useGlobalCatch) {
 			this.instance()._globalCatch?.(e)
 			// Don't run other onCatch's
 			if (this.instance().settings.exclusiveGlobalError) return
