@@ -2,7 +2,7 @@ import { PlexusInstance } from './instance'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusActionHooks {
-	onCatch(handler?: ErrorHandler): void
+	onCatch(handler?: ErrorHandler, useGlobal?: boolean): void
 	/**
 	 * Ignore the default hault preActions
 	 */
@@ -81,8 +81,8 @@ class PlexusActionHelpers {
 	 * Eject the external functions object returned to the user in the first argument of the action function
 	 */
 	get hooks(): PlexusActionHooks {
-		const onCatch = (handler?: ErrorHandler): void => {
-			return this.onCatch(handler)
+		const onCatch = (handler?: ErrorHandler, useGlobal = true): void => {
+			return this.onCatch(handler, useGlobal)
 		}
 		const ignoreInit = (): void => {
 			return this.ignoreInit()
