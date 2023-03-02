@@ -144,7 +144,7 @@ export function _action<Fn extends FunctionType>(
 				return fn(helpers.hooks, ...args)
 			} catch (e) {
 				// only return the error if there is no handler
-				if (!helpers.catchError) throw e
+				if (!helpers.catchError && !instance()._globalCatch) throw e
 				helpers.runErrorHandlers(e)
 				// otherwise run the handler and return null
 				return null
@@ -170,7 +170,7 @@ export function _action<Fn extends FunctionType>(
 				return await fn(helpers.hooks, ...args)
 			} catch (e) {
 				// only return the error if there is no handler
-				if (!helpers.catchError) throw e
+				if (!helpers.catchError && !instance()._globalCatch) throw e
 				helpers.runErrorHandlers(e)
 				// otherwise run the handler and return null
 				return null
