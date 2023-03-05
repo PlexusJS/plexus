@@ -15,7 +15,6 @@ const myCollection = collection<{
 	.createSelector('main')
 const myCollectionUndefined = collection<{ thing: string; id: number }>({
 	defaultGroup: true,
-	unfoundKeyReturnsUndefined: true,
 })
 	.createGroups(['group1', 'group2'])
 	.createSelector('main')

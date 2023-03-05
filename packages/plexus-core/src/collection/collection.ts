@@ -54,8 +54,13 @@ export interface PlexusCollectionConfig<DataType> {
 	/**
 	 * When this value is true, using getValue will return undefined rather than an object with only the key. When using get item, you receive a provisional data instance with a value of undefined.
 	 * @warning The type of the returned value WILL NOT change to undefined. Only the literal value will be undefined as this is _technically_ an override. Please beware and plan accordingly.
+	 * @deprecated This is now the default behavior. Use unfoundKeyReturnsProvisional instead
 	 */
 	unfoundKeyReturnsUndefined?: boolean
+	/**
+	 * When this value is true, using getVallue will return a provisional data instance containing just the key instead of undefined. When using get item, you receive a provisional data instance with a value containing the primaryKey only instead of undefined.
+	 */
+	unfoundKeyReturnsProvisional?: boolean
 	/**
 	 * When this value is true, the collection will use batching when running operations (like collections) on array to reduce the number of rerenders. This is useful when you are ingesting a large amount of data at once.
 	 * @default true
@@ -376,14 +381,14 @@ export class CollectionInstance<
 				() => this,
 				this._internalStore._key,
 				dataKey,
-				this.config.unfoundKeyReturnsUndefined
+				!this.config.unfoundKeyReturnsProvisional
 					? (undefined as any as DataTypeInput)
 					: ({
 							[this._internalStore._key]: dataKey,
 					  } as any as DataTypeInput),
 				{
 					prov: true,
-					unfoundKeyIsUndefined: this.config.unfoundKeyReturnsUndefined,
+					unfoundKeyIsUndefined: !this.config.unfoundKeyReturnsProvisional,
 				}
 			)
 			// if we get a valid data instance, add it to the collection
