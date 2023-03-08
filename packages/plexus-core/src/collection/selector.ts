@@ -64,7 +64,7 @@ export class CollectionSelector<
 		this.collection = collection
 
 		// the fallback value if the key or data is not found
-		this.defaultValue = this.collection().config.unfoundKeyReturnsUndefined
+		this.defaultValue = !this.collection().config.unfoundKeyReturnsProvisional
 			? (undefined as any as DataType)
 			: ({} as DataType)
 	}
