@@ -9,3 +9,5 @@ export { useDeposit } from './useDeposit'
 export { useLoader } from './useLoader'
 
 export { useWatcher } from './useWatcher'
+
+export { usePlexusElementEffect } from './usePlexusElementEffect'
