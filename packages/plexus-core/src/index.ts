@@ -50,7 +50,10 @@ export function state<
 		? Literal
 		: TypeOrReturnType<Literal>
 >(item: Fetcher<Value> | Value) {
-	return _state<Value>(() => instance(), item)
+	return _state<TypeOrReturnType<Value>>(
+		() => instance(),
+		item as TypeOrReturnType<Value>
+	)
 }
 /**
  * Generate a Plexus State

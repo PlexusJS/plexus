@@ -56,7 +56,10 @@ export class Scope {
 			? Literal
 			: TypeOrReturnType<Literal>
 	>(item: Fetcher<Value> | Value) {
-		return _state<Value>(this.instance, item)
+		return _state<TypeOrReturnType<Value>>(
+			this.instance,
+			item as TypeOrReturnType<Value>
+		)
 	}
 
 	/**
