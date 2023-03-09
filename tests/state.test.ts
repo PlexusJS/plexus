@@ -241,12 +241,12 @@ describe('Testing State Function', () => {
 		// let's change the fetcher function!
 		stateWithFetchFnTest.defineFetcher(() => {
 			// we can do some sort of calculation here
-			return 'a new string!'
+			return 'a new string!' + stateWithFetchFnTest.value
 		})
 		// awesome! But nothing should change beacuse the state isn't undefined nor did we call `fetch()`
 		expect(stateWithFetchFnTest.value).toBe('new value')
 		// let's force a fetch...
 		stateWithFetchFnTest.fetch()
-		expect(stateWithFetchFnTest.value).toBe('a new string!')
+		expect(stateWithFetchFnTest.value).toBe('a new string!' + 'new value')
 	})
 })
