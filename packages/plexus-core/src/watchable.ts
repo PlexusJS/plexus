@@ -1,7 +1,18 @@
 import { PlexusInstance } from '.'
-import { deepClone, deepMerge, isObject, isEqual } from '@plexusjs/utils'
+import {
+	deepClone,
+	deepMerge,
+	isObject,
+	isEqual,
+	AlmostAnything,
+	LiteralType,
+} from '@plexusjs/utils'
+
+export type PlexusStateType = NonNullable<AlmostAnything>
 export type PlexusWatcher<V extends any = any> = (value: V) => void
-interface WatchableStore<Value = any> {
+
+type Fetcher<Value extends PlexusStateType> = () => Value
+interface WatchableStore<Value extends PlexusStateType = any> {
 	_initialValue: Value
 	_lastValue: Value | null
 	_value: Value
@@ -9,9 +20,10 @@ interface WatchableStore<Value = any> {
 	_nextValue: Value
 	_watchers: Set<PlexusWatcher<Value>>
 	_internalId: string
+	_nullDataFetcher?: Fetcher<Value>
 }
 
-type HistorySeed<ValueType = any> = {
+type HistorySeed<ValueType extends PlexusStateType = any> = {
 	maxLength: number
 	skipArchiveUpdate: boolean
 	start: ValueType
@@ -19,7 +31,7 @@ type HistorySeed<ValueType = any> = {
 	archive_tail: Array<ValueType>
 }
 
-export class Watchable<ValueType = any> {
+export class Watchable<ValueType extends PlexusStateType = any> {
 	protected _watchableStore: WatchableStore<ValueType>
 	protected instance: () => PlexusInstance
 	/**
@@ -28,23 +40,25 @@ export class Watchable<ValueType = any> {
 	get id(): string {
 		return `${this._watchableStore._internalId}`
 	}
-	constructor(instance: () => PlexusInstance, init: ValueType) {
+	constructor(
+		instance: () => PlexusInstance,
+		init: ValueType | Fetcher<ValueType>
+	) {
 		this.instance = instance
+		const initialValue: ValueType = typeof init === 'function' ? init() : init
+
 		this._watchableStore = {
 			_internalId: instance().genId(),
-			_nextValue: init,
-			_value: init,
-			_publicValue: deepClone(init),
-			_initialValue: init,
+			_nextValue: initialValue,
+			_value: initialValue,
+			_publicValue: deepClone(initialValue),
+			_initialValue: initialValue,
 			_lastValue: null,
 			_watchers: new Set(),
 		}
 	}
 
-	watch<Value extends ValueType = ValueType>(
-		callback: PlexusWatcher<ValueType>,
-		from?: string
-	): () => void {
+	watch(callback: PlexusWatcher<ValueType>, from?: string): () => void {
 		const destroyer = this.instance().runtime.subscribe(this.id, callback, from)
 		return () => {
 			destroyer()
@@ -57,10 +71,13 @@ export class Watchable<ValueType = any> {
 }
 
 export class WatchableMutable<
-	ValueType extends NonNullable<any> = any
+	ValueType extends PlexusStateType = AlmostAnything
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
-	constructor(instance: () => PlexusInstance, init: ValueType) {
+	constructor(
+		instance: () => PlexusInstance,
+		init: ValueType | Fetcher<ValueType>
+	) {
 		super(instance, init)
 	}
 
@@ -89,11 +106,11 @@ export class WatchableMutable<
 		// no history, so just try to reset to last value; if null, reset to initial value
 		else {
 			if (this._watchableStore._lastValue !== null) {
-				this.set(this._watchableStore._lastValue)
+				this.set(this._watchableStore._lastValue as ValueType)
 				// last value should now be the current value BEFORE the undo, so set this to next value
 				this._watchableStore._nextValue = this._watchableStore._lastValue
 			} else {
-				this.set(this._watchableStore._initialValue)
+				this.set(this._watchableStore._initialValue as ValueType)
 			}
 			this._watchableStore._lastValue = null
 		}
@@ -171,20 +188,28 @@ export class WatchableMutable<
 			return
 		}
 		const value = deepClone(newValue)
-		this._watchableStore._lastValue = this._watchableStore._value
-		if (isObject(value) && isObject(this._watchableStore._value)) {
-			this._watchableStore._lastValue = deepClone(this._watchableStore._value)
-		} else if (
-			Array.isArray(value) &&
-			Array.isArray(this._watchableStore._value)
-		) {
-			const obj = deepMerge(this._watchableStore._value, value)
-			this._watchableStore._lastValue = Object.values(
-				obj
-			) as unknown as ValueType
-		} else {
-			this._watchableStore._lastValue = this._watchableStore._value
+		if (!value) {
+			this.instance().runtime.log(
+				'warn',
+				`Watchable ${this.id} skipping set() because value is undefined or null.`
+			)
+			return this
 		}
+		this._watchableStore._lastValue = this._watchableStore._value
+		// if (isObject(value) && isObject(this._watchableStore._value)) {
+		// 	this._watchableStore._lastValue = deepClone(this._watchableStore._value)
+		// } else if (
+		// 	Array.isArray(value) &&
+		// 	Array.isArray(this._watchableStore._value)
+		// ) {
+		// 	const obj = deepMerge(this._watchableStore._value, value)
+		// 	this._watchableStore._lastValue = Object.values(
+		// 		obj
+		// 	) as unknown as ValueType
+		// } else {
+		// 	this._watchableStore._lastValue = this._watchableStore._value
+		// }
+		this._watchableStore._lastValue = deepClone(this._watchableStore._value)
 		// apply the next value
 		if (value === undefined) {
 			this._watchableStore._value = this._watchableStore._nextValue

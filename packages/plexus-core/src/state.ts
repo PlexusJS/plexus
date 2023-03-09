@@ -2,9 +2,9 @@ import { deepClone, deepMerge, isEqual, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance'
 import { PlexusWatcher } from './interfaces'
 
-import { WatchableMutable } from './watchable'
+import { PlexusStateType, WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
-export type PlexusStateType = NonNullable<any>
+
 export type PlexusState = <Value extends PlexusStateType = any>(
 	instance: () => PlexusInstance,
 	input: Value
@@ -40,11 +40,7 @@ export class StateInstance<
 	get instanceId(): string {
 		return `ste_${this._watchableStore._internalId}`
 	}
-	constructor(
-		instance: () => PlexusInstance,
-		init: StateValue,
-		fetcher?: (currentValue: StateValue) => StateValue
-	) {
+	constructor(instance: () => PlexusInstance, init: StateValue) {
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {

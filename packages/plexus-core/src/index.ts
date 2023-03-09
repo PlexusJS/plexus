@@ -1,7 +1,7 @@
 import { instance } from './instance'
 import { PlexusInstance } from './instance'
-import { WatchableMutable, Watchable } from './watchable'
-import { _state, PlexusStateInstance, PlexusStateType } from './state'
+import { WatchableMutable, Watchable, PlexusStateType } from './watchable'
+import { _state, PlexusStateInstance } from './state'
 import { _computed, PlexusComputedStateInstance } from './computed'
 import {
 	_action,
@@ -31,9 +31,14 @@ import { LiteralType, AlmostAnything } from '@plexusjs/utils'
  */
 export function state<
 	Literal extends PlexusStateType = any,
-	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
+	Value extends PlexusStateType = Literal extends AlmostAnything
+		? Literal
+		: LiteralType<Literal>
 >(item: Value) {
-	return _state<Value>(() => instance(), item)
+	return _state<LiteralType<Value>>(
+		() => instance(),
+		item as LiteralType<Value>
+	)
 }
 /**
  * Generate a Plexus State
@@ -42,7 +47,9 @@ export function state<
  */
 export function computed<
 	Literal extends PlexusStateType = any,
-	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
+	Value extends PlexusStateType = Literal extends AlmostAnything
+		? Literal
+		: LiteralType<Literal>
 >(
 	item: (value?: Value) => Value,
 	dependencies: Array<Watchable<any>> | Watchable<any>
@@ -50,7 +57,7 @@ export function computed<
 	if (!Array.isArray(dependencies)) {
 		return _computed<Value>(() => instance(), item, [dependencies])
 	}
-	return _computed(() => instance(), item, dependencies)
+	return _computed<Value>(() => instance(), item, dependencies)
 }
 /**
  * Create a new Storage Instance

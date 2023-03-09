@@ -1,7 +1,8 @@
 import { Watchable } from '@plexusjs/core'
+import { PlexusStateType } from '@plexusjs/core/dist/watchable'
 import { useEffect, useState } from 'react'
 
-export function useWatcher<V = any>(
+export function useWatcher<V extends PlexusStateType = any>(
 	watchable: Watchable<V>,
 	callback: (value: V) => void
 ) {

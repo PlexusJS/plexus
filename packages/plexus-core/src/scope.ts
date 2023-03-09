@@ -48,7 +48,9 @@ export class Scope {
 	 */
 	state<
 		Literal extends PlexusStateType = any,
-		Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
+		Value extends PlexusStateType = Literal extends AlmostAnything
+			? Literal
+			: LiteralType<Literal>
 	>(item: Value) {
 		return _state<Value>(this.instance, item)
 	}
@@ -60,7 +62,9 @@ export class Scope {
 	 */
 	computed<
 		Literal extends PlexusStateType = any,
-		Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
+		Value extends PlexusStateType = Literal extends AlmostAnything
+			? Literal
+			: LiteralType<Literal>
 	>(
 		item: (value?: Value) => Value,
 		dependencies: Array<Watchable<any>> | Watchable<any>
