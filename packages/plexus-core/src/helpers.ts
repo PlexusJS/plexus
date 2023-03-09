@@ -1,6 +1,5 @@
 import { Watchable } from './watchable'
 
-// TODO: here temp; only for testing
 export const concurrentWatch = (
 	onChange: (from?: string) => void,
 	depsArray: Watchable[],

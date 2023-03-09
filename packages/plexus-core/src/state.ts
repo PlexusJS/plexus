@@ -1,8 +1,8 @@
 import { deepClone, deepMerge, isEqual, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance/instance'
-import { PlexusInternalWatcher } from './types'
+import { Fetcher, PlexusInternalWatcher, PlexusStateType } from './types'
 
-import { PlexusStateType, WatchableMutable } from './watchable'
+import { WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
 
 export type PlexusState = <Value extends PlexusStateType = any>(
@@ -40,7 +40,10 @@ export class StateInstance<
 	get instanceId(): string {
 		return `ste_${this._watchableStore._internalId}`
 	}
-	constructor(instance: () => PlexusInstance, init: StateValue) {
+	constructor(
+		instance: () => PlexusInstance,
+		init: Fetcher<StateValue> | StateValue
+	) {
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
@@ -219,7 +222,7 @@ export class StateInstance<
 	 * @param value The thing to compare the current value to
 	 * @returns {boolean} A boolean representing if they are equal
 	 */
-	isEqual(value: any) {
+	isEqual(value: any): boolean {
 		return isEqual(value as any, this._watchableStore._value as any)
 	}
 	/**
@@ -288,9 +291,8 @@ export class StateInstance<
 
 export function _state<StateValue extends PlexusStateType>(
 	instance: () => PlexusInstance,
-	_init: StateValue
+	_init: Fetcher<StateValue> | StateValue
 ) {
 	// Returned Object //
-
 	return new StateInstance<StateValue>(instance, _init)
 }

@@ -1,4 +1,3 @@
-import { deepClone } from '@plexusjs/utils'
 import { PlexusCollectionInstance } from '..'
 import { PlexusInstance } from '../instance/instance'
 import { PlexusInternalWatcher } from '../types'

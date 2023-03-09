@@ -7,18 +7,16 @@ import {
 	AlmostAnything,
 	LiteralType,
 } from '@plexusjs/utils'
+import { Fetcher, PlexusStateType } from './types'
 
-export type PlexusStateType = NonNullable<AlmostAnything>
 export type PlexusWatcher<V extends any = any> = (value: V) => void
 
-type Fetcher<Value extends PlexusStateType> = () => Value
-interface WatchableStore<Value extends PlexusStateType = any> {
+type WatchableStore<Value extends PlexusStateType = any> = {
 	_initialValue: Value
 	_lastValue: Value | null
 	_value: Value
 	_publicValue: Value
 	_nextValue: Value
-	_watchers: Set<PlexusWatcher<Value>>
 	_internalId: string
 	_dataFetcher?: Fetcher<Value>
 }
@@ -47,6 +45,7 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 		this.instance = instance
 
 		const getInit = () => (typeof init === 'function' ? init() : init)
+
 		const dataFetcher = () => {
 			const value = getInit()
 			this._watchableStore._publicValue = deepClone(value)
@@ -61,10 +60,9 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 			_publicValue: deepClone(initialValue),
 			_initialValue: initialValue,
 			_lastValue: null,
-			_watchers: new Set(),
 			_dataFetcher: typeof init === 'function' ? dataFetcher : undefined,
 		}
-		// nullDataFetcher()
+		// dataFetcher()
 	}
 
 	watch(callback: PlexusWatcher<ValueType>, from?: string): () => void {
@@ -97,6 +95,7 @@ export class WatchableMutable<
 	/**
 	 * Set the value of the state
 	 * @param newValue The new value of this state
+	 * @returns {this} The state instance
 	 */
 	set(newValue?: ValueType) {
 		if (this.instance().runtime.isBatching) {
@@ -200,7 +199,7 @@ export class WatchableMutable<
 	 * If history is enabled, we traverse the history archive.
 	 * If not, we try to go to the next set value.
 	 * If no next value (`.undo()` was never called), reset to current value.
-	 * @returns this
+	 * @returns {this}
 	 */
 	redo() {
 		if (this._history && this._history.maxLength > 0) {
@@ -235,7 +234,7 @@ export class WatchableMutable<
 	/**
 	 * Enable/Disable history tracker for this watchable by setting the history length.
 	 * @param maxLength - the maximum number of history states to keep. If 0, history is disabled. If undefined, history is enabled with a default length of 10
-	 * @returns this
+	 * @returns {this}
 	 */
 	history(maxLength: number = 10): this {
 		// disable history if maxLength is 0 (can be done at any time)
@@ -260,7 +259,7 @@ export class WatchableMutable<
 	/**
 	 * A function to fetch data from an external source and set it to the watchable.
 	 * @param fetcher - a function to fetch data from an external source (must match initial type)
-	 * @returns this
+	 * @returns {this}
 	 */
 	defineFetcher(fetcher: Fetcher<ValueType>) {
 		this._watchableStore._dataFetcher = fetcher
@@ -269,7 +268,7 @@ export class WatchableMutable<
 
 	/**
 	 * A function to fetch data from an external source and set it to the watchable.
-	 * @returns this
+	 * @returns {this}
 	 */
 	fetch(): this {
 		if (this._watchableStore._dataFetcher) {

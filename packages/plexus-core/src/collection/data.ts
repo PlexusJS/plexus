@@ -2,6 +2,7 @@ import { WatchableMutable } from './../watchable'
 import { PlexusInstance } from '../instance/instance'
 import { ForeignKeyData, PlexusCollectionInstance } from './collection'
 import { deepClone, deepMerge, isEqual } from '@plexusjs/utils'
+import { Fetcher } from '../types'
 
 export type PlexusGroupWatcher<V extends any = any> = (
 	value: V,
@@ -47,7 +48,7 @@ export class CollectionData<
 		public collection: () => PlexusCollectionInstance<DataType>,
 		primaryKey: PK,
 		keyValue: string | number,
-		value: DataType,
+		value: Fetcher<DataType> | DataType,
 		config: CollectionDataConfig = { prov: false }
 	) {
 		super(instance, value)
@@ -370,7 +371,7 @@ export function _data<DataType extends Record<string, any>>(
 	collection: () => PlexusCollectionInstance<DataType>,
 	primaryKey: string,
 	keyValue: number | string,
-	value: DataType,
+	value: Fetcher<DataType> | DataType,
 	config: CollectionDataConfig = { prov: false }
 ) {
 	if (

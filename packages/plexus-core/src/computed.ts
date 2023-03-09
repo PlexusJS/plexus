@@ -2,7 +2,8 @@
 import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
 import { concurrentWatch } from './helpers'
 import { PlexusInstance } from './instance/instance'
-import { PlexusStateType, PlexusWatcher, Watchable } from './watchable'
+import { Fetcher, PlexusStateType } from './types'
+import { PlexusWatcher, Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<
 	ValueType extends PlexusStateType = any
@@ -40,7 +41,7 @@ export class ComputedStateInstance<
 
 	constructor(
 		instance: () => PlexusInstance,
-		computeFn: () => ValueType,
+		computeFn: Fetcher<ValueType>,
 		deps: Watchable<any>[]
 	) {
 		super(instance, computeFn())
@@ -232,7 +233,7 @@ interface Dependency extends Watchable<any> {
 }
 export function _computed<StateValue extends PlexusStateType>(
 	instance: () => PlexusInstance,
-	computeFn: () => StateValue,
+	computeFn: Fetcher<StateValue>,
 	deps: Dependency[]
 ) {
 	return new ComputedStateInstance<StateValue>(instance, computeFn, deps)

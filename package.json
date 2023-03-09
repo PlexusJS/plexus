@@ -23,7 +23,7 @@
 		"dev": "nodemon --exec lerna run build --watch",
 		"prereleaseOnly": "pinst --disable && echo '🚀  Publishing...'",
 		"release-canary": "lerna run build && lerna publish --preid canary --no-private --yes --force-publish --canary",
-		"release-stable": "lerna run build && lerna publish --preid canary --yes --force-publish",
+		"release-stable": "lerna run build && lerna publish --preid canary --no-private --yes --force-publish",
 		"postrelease": "pinst --enable && echo '🎉  Published!'",
 		"test": "vitest",
 		"test-ui": "vitest --ui",

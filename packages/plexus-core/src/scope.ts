@@ -11,7 +11,7 @@ import {
 } from './instance/instance'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { _state } from './state'
-import { PlexusStateType } from './watchable'
+import { PlexusStateType } from './types'
 
 export interface PlexusScopeConfig {}
 

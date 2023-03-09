@@ -1,7 +1,7 @@
 import { instance } from './instance/instance'
 import { PlexusInstance } from './instance/instance'
-import { WatchableMutable, Watchable, PlexusStateType } from './watchable'
-import { _state, PlexusStateInstance } from './state'
+import { WatchableMutable, Watchable } from './watchable'
+import { _state, PlexusStateInstance, StateInstance } from './state'
 import { _computed, PlexusComputedStateInstance } from './computed'
 import {
 	_action,
@@ -24,7 +24,21 @@ import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { LiteralType, AlmostAnything } from '@plexusjs/utils'
 import { TypeOrReturnType } from '@plexusjs/utils'
+import { Fetcher, PlexusStateType } from './types'
 
+// export function state<
+// 	Literal extends PlexusStateType = any,
+// 	Value extends PlexusStateType = Literal extends AlmostAnything
+// 		? Literal
+// 		: TypeOrReturnType<Literal>
+// >(item: Fetcher<Value>): TypeOrReturnType<Value>
+
+// export function state<
+// 	Literal extends PlexusStateType = any,
+// 	Value extends PlexusStateType = Literal extends AlmostAnything
+// 		? Literal
+// 		: TypeOrReturnType<Literal>
+// >(item: Value): StateInstance<Value>
 /**
  * Generate a Plexus State
  * @param item The default value to use when we generate the state
@@ -34,8 +48,8 @@ export function state<
 	Literal extends PlexusStateType = any,
 	Value extends PlexusStateType = Literal extends AlmostAnything
 		? Literal
-		: LiteralType<Literal>
->(item: Value) {
+		: TypeOrReturnType<Literal>
+>(item: Fetcher<Value> | Value) {
 	return _state<TypeOrReturnType<Value>>(
 		() => instance(),
 		item as TypeOrReturnType<Value>
