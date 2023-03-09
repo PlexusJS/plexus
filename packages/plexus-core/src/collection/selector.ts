@@ -1,7 +1,7 @@
 import { deepClone } from '@plexusjs/utils'
 import { PlexusCollectionInstance } from '..'
-import { PlexusInstance } from '../instance'
-import { PlexusWatcher } from '../interfaces'
+import { PlexusInstance } from '../instance/instance'
+import { PlexusInternalWatcher } from '../types'
 import { WatchableMutable } from '../watchable'
 
 import { DataKey, PlexusDataInstance } from './data'
@@ -199,7 +199,7 @@ export class CollectionSelector<
 	 * @param {watcher} callback The callback to run when the state changes
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<DataType>, from?: string) {
+	watch(callback: PlexusInternalWatcher<DataType>, from?: string) {
 		return this.instance().runtime.subscribe(
 			this.id,
 			(v, from) => {

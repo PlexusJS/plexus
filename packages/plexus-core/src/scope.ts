@@ -4,7 +4,11 @@ import { FunctionType, _action } from './action'
 import { PlexusCollectionConfig, _collection } from './collection/collection'
 import { _computed } from './computed'
 import { _event } from './event'
-import { getPlexusMasterInstance, instance, PlexusInstance } from './instance'
+import {
+	getPlexusMasterInstance,
+	instance,
+	PlexusInstance,
+} from './instance/instance'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { _state } from './state'
 import { PlexusStateType } from './watchable'

@@ -5,7 +5,7 @@ import {
 	isEqual,
 	isObject,
 } from '@plexusjs/utils'
-import { PlexusInstance } from './instance'
+import { PlexusInstance } from './instance/instance'
 import { Watchable, WatchableMutable } from './watchable'
 
 type ExtendedWatchable = Watchable<any> & Record<string, any>

@@ -1,4 +1,4 @@
-import { instance, PlexusInstance } from './instance'
+import { instance, PlexusInstance } from './instance/instance'
 import { Scope } from './scope'
 import { WatchableMutable, Watchable } from './watchable'
 

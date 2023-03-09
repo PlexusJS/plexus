@@ -1,6 +1,6 @@
 import { EventEngine } from './engine'
 import { PlexusInstance } from './instance'
-import { PlexusStateType } from './watchable'
+import { PlexusStateType } from '../watchable'
 
 export type PlexusRuntime = RuntimeInstance
 interface RuntimeConfig {

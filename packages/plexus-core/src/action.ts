@@ -1,4 +1,4 @@
-import { PlexusInstance } from './instance'
+import { PlexusInstance } from './instance/instance'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusActionHooks {

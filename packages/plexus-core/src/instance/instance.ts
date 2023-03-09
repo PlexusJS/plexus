@@ -1,13 +1,13 @@
-import { StateInstance } from './state'
-import { Plugin } from './plugin'
+import { StateInstance } from '../state'
+import { Plugin } from '../plugin'
 import { RuntimeInstance, _runtime } from './runtime'
-import { PlexusStorageInstance, storage } from './storage'
-import { CollectionInstance } from './collection/collection'
+import { PlexusStorageInstance, storage } from '../storage'
+import { CollectionInstance } from '../collection/collection'
 import { deepMerge, genUID, isEqual } from '@plexusjs/utils'
-import { PlexusPreAction } from './preaction'
-import { CollectionData } from './collection/data'
-import { PlexusComputedStateInstance } from './computed'
-import { CollectionSelector } from './collection/selector'
+import { PlexusPreAction } from '../preaction'
+import { CollectionData } from '../collection/data'
+import { PlexusComputedStateInstance } from '../computed'
+import { CollectionSelector } from '../collection/selector'
 
 /**
  * Get the correctly formatted instance name

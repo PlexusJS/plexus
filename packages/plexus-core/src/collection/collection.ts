@@ -1,5 +1,5 @@
-import { PlexusInstance } from '../instance'
-import { PlexusWatcher } from '../interfaces'
+import { PlexusInstance } from '../instance/instance'
+import { PlexusInternalWatcher } from '../types'
 
 import { _data, PlexusDataInstance, DataKey } from './data'
 import {
@@ -644,21 +644,7 @@ export class CollectionInstance<
 		}
 		return this
 	}
-	watchGroup(name: KeyOfMap<Groups>, callback: PlexusWatcher<DataTypeInput[]>)
-	watchGroup(name: string, callback: PlexusWatcher<DataTypeInput[]>)
-	watchGroup(
-		name: KeyOfMap<Groups> | string,
-		callback: PlexusWatcher<DataTypeInput[]>
-	) {
-		const group = this.getGroup(name)
-		if (this.isCreatedGroup(name) && group) {
-			return group.watch(callback)
-		} else {
-			// TODO Replace with runtime log
-			console.warn(`Group ${name} not found`)
-			return () => {}
-		}
-	}
+
 	/**
 	 * Delete a data item completely from the collection.
 	 * @param {string|number} keys The data key(s) to use for lookup

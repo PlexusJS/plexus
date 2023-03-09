@@ -32,7 +32,7 @@ const core = {
 		return states.stringState.value.length
 	}, [states.stringState, collections.books.selectors.READING]),
 	readingBookComputation: computed(() => {
-		return collections.books.selectors.READING.value.pages
+		return collections.books.selectors.READING.value?.pages
 	}, [collections.books.selectors.READING]),
 }
 

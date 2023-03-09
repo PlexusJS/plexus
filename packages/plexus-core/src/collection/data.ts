@@ -1,5 +1,5 @@
 import { WatchableMutable } from './../watchable'
-import { PlexusInstance } from '../instance'
+import { PlexusInstance } from '../instance/instance'
 import { ForeignKeyData, PlexusCollectionInstance } from './collection'
 import { deepClone, deepMerge, isEqual } from '@plexusjs/utils'
 

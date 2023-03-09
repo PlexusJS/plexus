@@ -17,7 +17,7 @@ A trackable State
     * [.initialValue](#StateInstance+initialValue)
     * [.set(value)](#StateInstance+set)
     * [.patch(value)](#StateInstance+patch)
-    * [.watch(callback)](#StateInstance+watch) ⇒
+    * [.watch(callback, from)](#StateInstance+watch) ⇒
     * [.persist(name)](#StateInstance+persist)
     * [.reset()](#StateInstance+reset)
     * [.interval(setterFunction, ms)](#StateInstance+interval)
@@ -88,7 +88,7 @@ state.set(); // The state will be { foo: "bar" }
 
 <a name="StateInstance+watch"></a>
 
-### .watch(callback) ⇒
+### .watch(callback, from) ⇒
 <p>Watch for changes on this state</p>
 
 **Returns**: <p>The remove function to stop watching</p>  
@@ -96,6 +96,7 @@ state.set(); // The state will be { foo: "bar" }
 | Param | Description |
 | --- | --- |
 | callback | <p>The callback to run when the state changes</p> |
+| from | <p>(optional) The id of the watcher</p> |
 
 <a name="StateInstance+persist"></a>
 

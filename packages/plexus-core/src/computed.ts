@@ -1,38 +1,12 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
 import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
-import { PlexusInstance } from './instance'
+import { concurrentWatch } from './helpers'
+import { PlexusInstance } from './instance/instance'
 import { PlexusStateType, PlexusWatcher, Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<
 	ValueType extends PlexusStateType = any
 > = ComputedStateInstance<ValueType>
-
-// TODO: here temp; only for testing
-export const concurrentWatch = (
-	onChange: (from?: string) => void,
-	depsArray: Watchable[],
-	from?: string
-) => {
-	const depUnsubs: Array<() => void> = []
-
-	for (let dep of depsArray) {
-		// if not a watchable, then we can't watch it, skip to next iteration
-		if (!(dep instanceof Watchable)) continue
-
-		const unsubscribe = dep.watch((depValue) => {
-			onChange(dep.id)
-		}, from)
-		depUnsubs.push(() => unsubscribe())
-	}
-
-	// unsubscribe on component destroy
-	return () => {
-		for (let unsub of depUnsubs) {
-			unsub()
-		}
-		depUnsubs.length = 0
-	}
-}
 
 /**
  * A computed state is a state that is derived from other states

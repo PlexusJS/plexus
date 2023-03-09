@@ -1,6 +1,6 @@
 import { PlexusCollectionInstance } from '..'
-import { PlexusInstance } from '../instance'
-import { PlexusWatcher } from '../interfaces'
+import { PlexusInstance } from '../instance/instance'
+import { PlexusInternalWatcher } from '../types'
 import { Watchable } from '../watchable'
 
 import { DataKey, PlexusDataInstance } from './data'
@@ -230,7 +230,10 @@ export class CollectionGroup<
 	 * @param callback The callback to run when the state changes
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<DataType[]>, from?: string): () => void {
+	watch(
+		callback: PlexusInternalWatcher<DataType[]>,
+		from?: string
+	): () => void {
 		return this.instance().runtime.subscribe(this.id, callback, from)
 	}
 }

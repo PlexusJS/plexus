@@ -1,6 +1,6 @@
 import { deepClone, deepMerge, isEqual, isObject } from '@plexusjs/utils'
-import { PlexusInstance } from './instance'
-import { PlexusWatcher } from './interfaces'
+import { PlexusInstance } from './instance/instance'
+import { PlexusInternalWatcher } from './types'
 
 import { PlexusStateType, WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
@@ -138,9 +138,13 @@ export class StateInstance<
 	/**
 	 * Watch for changes on this state
 	 * @param callback The callback to run when the state changes
+	 * @param from (optional) The id of the watcher
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<StateValue>, from?: string): () => void {
+	watch(
+		callback: PlexusInternalWatcher<StateValue>,
+		from?: string
+	): () => void {
 		const destroyer = super.watch(callback, from)
 		return () => {
 			this.instance().runtime.log(
