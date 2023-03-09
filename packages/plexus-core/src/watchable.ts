@@ -256,4 +256,25 @@ export class WatchableMutable<
 
 		return this
 	}
+
+	/**
+	 * A function to fetch data from an external source and set it to the watchable.
+	 * @param fetcher - a function to fetch data from an external source (must match initial type)
+	 * @returns this
+	 */
+	defineFetcher(fetcher: Fetcher<ValueType>) {
+		this._watchableStore._dataFetcher = fetcher
+		return this
+	}
+
+	/**
+	 * A function to fetch data from an external source and set it to the watchable.
+	 * @returns this
+	 */
+	fetch(): this {
+		if (this._watchableStore._dataFetcher) {
+			this.set(this._watchableStore._dataFetcher())
+		}
+		return this
+	}
 }
