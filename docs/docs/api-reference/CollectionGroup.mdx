@@ -1,99 +1,90 @@
----
-title: CollectionGroup
----
+--- 
+	title: CollectionGroup 
+--- 
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 A group of data
 
-- [CollectionGroup](#CollectionGroup)
-  - [.id](#CollectionGroup+id) : <code>string</code>
-  - [.instanceId](#CollectionGroup+instanceId) : <code>string</code>
-  - [.index](#CollectionGroup+index) : <code>Set.&lt;(string\|number)&gt;</code>
-  - [.value](#CollectionGroup+value) : <code>Array.&lt;DataType&gt;</code>
-  - [.data](#CollectionGroup+data) : <code>Array.&lt;PlexusDataInstance&gt;</code>
-  - [.size](#CollectionGroup+size) : <code>number</code>
-  - [.has(key)](#CollectionGroup+has) ⇒ <code>boolean</code>
-  - [.add(keys)](#CollectionGroup+add) ⇒ <code>this</code>
-  - [.remove(key)](#CollectionGroup+remove) ⇒ <code>this</code>
-  - [.clear()](#CollectionGroup+clear) ⇒ <code>this</code>
 
-<a name='CollectionGroup+id'></a>
+* [CollectionGroup](#CollectionGroup)
+    * [.id](#CollectionGroup+id) : <code>string</code>
+    * [.instanceId](#CollectionGroup+instanceId) : <code>string</code>
+    * [.index](#CollectionGroup+index) : <code>Set.&lt;(string\|number)&gt;</code>
+    * [.value](#CollectionGroup+value) : <code>Array.&lt;DataType&gt;</code>
+    * [.data](#CollectionGroup+data) : <code>Array.&lt;PlexusDataInstance&gt;</code>
+    * [.size](#CollectionGroup+size) : <code>number</code>
+    * [.has(key)](#CollectionGroup+has) ⇒ <code>boolean</code>
+    * [.add(keys)](#CollectionGroup+add) ⇒ <code>this</code>
+    * [.remove(key)](#CollectionGroup+remove) ⇒ <code>this</code>
+    * [.clear()](#CollectionGroup+clear) ⇒ <code>this</code>
+
+<a name="CollectionGroup+id"></a>
 
 ### .id : <code>string</code>
-
 <p>The internal ID of the Group</p>
 
-<a name='CollectionGroup+instanceId'></a>
+<a name="CollectionGroup+instanceId"></a>
 
 ### .instanceId : <code>string</code>
-
 <p>The internal id of the group with an instance prefix</p>
 
-<a name='CollectionGroup+index'></a>
+<a name="CollectionGroup+index"></a>
 
 ### .index : <code>Set.&lt;(string\|number)&gt;</code>
-
 <p>Peek at the index of the group (get all of the lookup keys for the group)</p>
 
-<a name='CollectionGroup+value'></a>
+<a name="CollectionGroup+value"></a>
 
 ### .value : <code>Array.&lt;DataType&gt;</code>
-
 <p>The data values of the items in the group</p>
 
-<a name='CollectionGroup+data'></a>
+<a name="CollectionGroup+data"></a>
 
 ### .data : <code>Array.&lt;PlexusDataInstance&gt;</code>
-
 <p>The data Items in the group</p>
 
-<a name='CollectionGroup+size'></a>
+<a name="CollectionGroup+size"></a>
 
 ### .size : <code>number</code>
-
 <p>The number of things in the group (length of the index array)</p>
 
-<a name='CollectionGroup+has'></a>
+<a name="CollectionGroup+has"></a>
 
 ### .has(key) ⇒ <code>boolean</code>
-
 <p>Check if the group contains the given item</p>
 
-**Returns**: <code>boolean</code> <p>Whether or not the group contains the item</p>
+**Returns**: <code>boolean</code> <p>Whether or not the group contains the item</p>  
 
-| Param | Type                                       | Description                            |
-| ----- | ------------------------------------------ | -------------------------------------- |
-| key   | <code>string</code> \| <code>number</code> | <p>The key of the item to look for</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> \| <code>number</code> | <p>The key of the item to look for</p> |
 
-<a name='CollectionGroup+add'></a>
+<a name="CollectionGroup+add"></a>
 
 ### .add(keys) ⇒ <code>this</code>
-
 <p>Add an item to the group</p>
 
-**Returns**: <code>this</code> <p>This Group instance</p>
+**Returns**: <code>this</code> <p>This Group instance</p>  
 
-| Param | Type                                       | Description                                             |
-| ----- | ------------------------------------------ | ------------------------------------------------------- |
-| keys  | <code>string</code> \| <code>number</code> | <p>The key or array of keys of the item to look for</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| keys | <code>string</code> \| <code>number</code> | <p>The key or array of keys of the item to look for</p> |
 
-<a name='CollectionGroup+remove'></a>
+<a name="CollectionGroup+remove"></a>
 
 ### .remove(key) ⇒ <code>this</code>
-
 <p>Remove an item from the group</p>
 
-**Returns**: <code>this</code> <p>This Group instance</p>
+**Returns**: <code>this</code> <p>This Group instance</p>  
 
-| Param | Type                                       | Description                            |
-| ----- | ------------------------------------------ | -------------------------------------- |
-| key   | <code>string</code> \| <code>number</code> | <p>The key of the item to look for</p> |
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> \| <code>number</code> | <p>The key of the item to look for</p> |
 
-<a name='CollectionGroup+clear'></a>
+<a name="CollectionGroup+clear"></a>
 
 ### .clear() ⇒ <code>this</code>
-
 <p>Clears the group of all items</p>
 
-**Returns**: <code>this</code> <p>This Group instance</p>
+**Returns**: <code>this</code> <p>This Group instance</p>  

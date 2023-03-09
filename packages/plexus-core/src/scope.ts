@@ -6,7 +6,8 @@ import { _computed } from './computed'
 import { _event } from './event'
 import { getPlexusMasterInstance, instance, PlexusInstance } from './instance'
 import { PlexusPreActionConfig, _preaction } from './preaction'
-import { PlexusStateType, _state } from './state'
+import { _state } from './state'
+import { PlexusStateType } from './watchable'
 
 export interface PlexusScopeConfig {}
 

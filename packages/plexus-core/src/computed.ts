@@ -1,8 +1,7 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
 import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance'
-import { PlexusStateType } from './state'
-import { PlexusWatcher, Watchable } from './watchable'
+import { PlexusStateType, PlexusWatcher, Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<
 	ValueType extends PlexusStateType = any
