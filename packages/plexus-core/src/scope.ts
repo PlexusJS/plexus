@@ -1,4 +1,4 @@
-import { AlmostAnything, LiteralType } from '@plexusjs/utils'
+import { AlmostAnything, LiteralType, TypeOrReturnType } from '@plexusjs/utils'
 import { Watchable } from '.'
 import { FunctionType, _action } from './action'
 import { PlexusCollectionConfig, _collection } from './collection/collection'
@@ -11,7 +11,7 @@ import {
 } from './instance/instance'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { _state } from './state'
-import { PlexusStateType } from './types'
+import { Fetcher, PlexusStateType } from './types'
 
 export interface PlexusScopeConfig {}
 
@@ -54,9 +54,12 @@ export class Scope {
 		Literal extends PlexusStateType = any,
 		Value extends PlexusStateType = Literal extends AlmostAnything
 			? Literal
-			: LiteralType<Literal>
-	>(item: Value) {
-		return _state<Value>(this.instance, item)
+			: TypeOrReturnType<Literal>
+	>(item: Fetcher<Value> | Value) {
+		return _state<TypeOrReturnType<Value>>(
+			this.instance,
+			item as TypeOrReturnType<Value>
+		)
 	}
 
 	/**
@@ -68,7 +71,7 @@ export class Scope {
 		Literal extends PlexusStateType = any,
 		Value extends PlexusStateType = Literal extends AlmostAnything
 			? Literal
-			: LiteralType<Literal>
+			: TypeOrReturnType<Literal>
 	>(
 		item: (value?: Value) => Value,
 		dependencies: Array<Watchable<any>> | Watchable<any>

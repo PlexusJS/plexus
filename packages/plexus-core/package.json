@@ -24,7 +24,8 @@
 	},
 	"gitHead": "aad613946af7c158e0971f67765c53f830c16a63",
 	"devDependencies": {
-		"isomorphic-fetch": "^3.0.0"
+		"isomorphic-fetch": "^3.0.0",
+		"typescript": "^4.9.5"
 	},
 	"dependencies": {
 		"@plexusjs/api": "1.7.4",

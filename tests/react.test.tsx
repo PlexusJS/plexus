@@ -1,6 +1,6 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { screen, waitFor, within } from '@testing-library/react'
 import '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { render, act } from './test-utils'
 import { collection, computed, instance, state, event } from '@plexusjs/core'
 import React, { FC, useEffect, useState } from 'react'
