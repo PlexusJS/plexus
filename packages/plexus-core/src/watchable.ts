@@ -7,9 +7,7 @@ import {
 	AlmostAnything,
 	LiteralType,
 } from '@plexusjs/utils'
-import { Fetcher, PlexusStateType } from './types'
-
-export type PlexusWatcher<V extends any = any> = (value: V) => void
+import { Fetcher, PlexusStateType, PlexusWatcher } from './types'
 
 type WatchableStore<Value extends PlexusStateType = any> = {
 	_initialValue: Value
@@ -82,7 +80,7 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 }
 
 export class WatchableMutable<
-	ValueType extends PlexusStateType = AlmostAnything
+	ValueType extends PlexusStateType = any
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
 	constructor(

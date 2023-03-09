@@ -2,8 +2,8 @@
 import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
 import { concurrentWatch } from './helpers'
 import { PlexusInstance } from './instance/instance'
-import { Fetcher, PlexusStateType } from './types'
-import { PlexusWatcher, Watchable } from './watchable'
+import { Fetcher, PlexusStateType, PlexusWatcher } from './types'
+import { Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<
 	ValueType extends PlexusStateType = any
