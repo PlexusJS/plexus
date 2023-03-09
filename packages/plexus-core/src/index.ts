@@ -23,6 +23,7 @@ import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
 
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { LiteralType, AlmostAnything } from '@plexusjs/utils'
+import { TypeOrReturnType } from '@plexusjs/utils'
 
 /**
  * Generate a Plexus State
@@ -35,9 +36,9 @@ export function state<
 		? Literal
 		: LiteralType<Literal>
 >(item: Value) {
-	return _state<LiteralType<Value>>(
+	return _state<TypeOrReturnType<Value>>(
 		() => instance(),
-		item as LiteralType<Value>
+		item as TypeOrReturnType<Value>
 	)
 }
 /**
@@ -49,7 +50,7 @@ export function computed<
 	Literal extends PlexusStateType = any,
 	Value extends PlexusStateType = Literal extends AlmostAnything
 		? Literal
-		: LiteralType<Literal>
+		: TypeOrReturnType<Literal>
 >(
 	item: (value?: Value) => Value,
 	dependencies: Array<Watchable<any>> | Watchable<any>

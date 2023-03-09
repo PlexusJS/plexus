@@ -24,6 +24,10 @@ const objectState = state<ObjectStateExample>(initialValue.object)
 const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(
 	initialValue.array
 )
+
+const stateWithFetchFnTest = state(() => {
+	return 'some sort of data'
+})
 // TODO Disallow null as initial value
 
 beforeEach(() => {
@@ -230,5 +234,8 @@ describe('Testing State Function', () => {
 		instance({ logLevel: undefined })
 	})
 
-	
+	test('Check null initializer functionality', () => {
+		expect(stateWithFetchFnTest.value).toBe('some sort of data')
+		stateWithFetchFnTest.set('new value')
+	})
 })

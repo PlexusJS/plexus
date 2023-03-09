@@ -10,12 +10,12 @@ export type LiteralType<T> = T extends string
 	? undefined
 	: T extends null
 	? null
+	: T extends Function
+	? T
 	: T extends Array<infer U>
 	? Array<U>
 	: T extends Record<infer K, infer V>
 	? Record<K, V>
-	: T extends Function
-	? T
 	: T
 
 export type AlmostAnything =
@@ -25,3 +25,7 @@ export type AlmostAnything =
 	| Record<any, any>
 	| Array<any>
 	| Object
+
+export type TypeOrReturnType<T> = T extends (...args: any[]) => infer R
+	? LiteralType<R>
+	: LiteralType<T>

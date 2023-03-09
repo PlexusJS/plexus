@@ -20,7 +20,7 @@ interface WatchableStore<Value extends PlexusStateType = any> {
 	_nextValue: Value
 	_watchers: Set<PlexusWatcher<Value>>
 	_internalId: string
-	_nullDataFetcher?: Fetcher<Value>
+	_dataFetcher?: Fetcher<Value>
 }
 
 type HistorySeed<ValueType extends PlexusStateType = any> = {
@@ -42,11 +42,18 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 	}
 	constructor(
 		instance: () => PlexusInstance,
-		init: ValueType | Fetcher<ValueType>
+		init: Fetcher<ValueType> | ValueType
 	) {
 		this.instance = instance
-		const initialValue: ValueType = typeof init === 'function' ? init() : init
 
+		const getInit = () => (typeof init === 'function' ? init() : init)
+		const dataFetcher = () => {
+			const value = getInit()
+			this._watchableStore._publicValue = deepClone(value)
+			return value
+		}
+
+		const initialValue = getInit()
 		this._watchableStore = {
 			_internalId: instance().genId(),
 			_nextValue: initialValue,
@@ -55,7 +62,9 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 			_initialValue: initialValue,
 			_lastValue: null,
 			_watchers: new Set(),
+			_dataFetcher: typeof init === 'function' ? dataFetcher : undefined,
 		}
+		// nullDataFetcher()
 	}
 
 	watch(callback: PlexusWatcher<ValueType>, from?: string): () => void {
@@ -66,7 +75,11 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 	}
 
 	get value(): ValueType {
-		return this._watchableStore._publicValue
+		const value = this._watchableStore._publicValue
+		if (!value && this._watchableStore._dataFetcher) {
+			return this._watchableStore._dataFetcher()
+		}
+		return value
 	}
 }
 
@@ -76,9 +89,75 @@ export class WatchableMutable<
 	private _history: HistorySeed | undefined
 	constructor(
 		instance: () => PlexusInstance,
-		init: ValueType | Fetcher<ValueType>
+		init: Fetcher<ValueType> | ValueType
 	) {
 		super(instance, init)
+	}
+
+	/**
+	 * Set the value of the state
+	 * @param newValue The new value of this state
+	 */
+	set(newValue?: ValueType) {
+		if (this.instance().runtime.isBatching) {
+			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
+			return
+		}
+		const value = deepClone(newValue)
+		// if (!value) {
+		// 	this.instance().runtime.log(
+		// 		'warn',
+		// 		`Watchable ${this.id} skipping set() because value is undefined or null.`
+		// 	)
+		// 	return this
+		// }
+		this._watchableStore._lastValue = this._watchableStore._value
+		this._watchableStore._lastValue = deepClone(this._watchableStore._value)
+		// apply the next value
+		if (value === undefined) {
+			this._watchableStore._value = this._watchableStore._nextValue
+		} else {
+			this._watchableStore._value = value
+		}
+		this._watchableStore._publicValue = deepClone(this._watchableStore._value)
+		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
+
+		// update the runtime conductor
+
+		this.instance().runtime.log(
+			'debug',
+			`Watchable ${this.id} broadcasting to change to subscribers`
+		)
+		this.instance().runtime.broadcast(this.id, value)
+
+		// if history, add to archive
+		if (
+			this._history &&
+			this._history.maxLength > 0 &&
+			!this._history.skipArchiveUpdate
+		) {
+			if (
+				isEqual(this._watchableStore._lastValue, this._watchableStore._value)
+			) {
+				return
+			}
+			this.instance().runtime.log(
+				'debug',
+				`Watchable ${this.id} set caused its History to shift`
+			)
+			this._history.archive_head.push(this._watchableStore._lastValue)
+			// if we are setting a new value and the tail has any values, remove them
+			// NOTE: this is needed because if we set new value, but are in the middle of the history somewhere, we need to remove the subsequent values
+			if (this._history.archive_tail.length) {
+				this._history.archive_tail.length = 0
+			}
+			// if archive is too long, remove oldest
+			if (this._history.archive_head.length > this._history.maxLength) {
+				if (this._history.archive_head.length > 0) {
+					this._history.archive_head.shift()
+				}
+			}
+		}
 	}
 
 	/**
@@ -176,84 +255,5 @@ export class WatchableMutable<
 		this.instance().runtime.log('debug', `History enabled for ${this.id}`)
 
 		return this
-	}
-
-	/**
-	 * Set the value of the state
-	 * @param newValue The new value of this state
-	 */
-	set(newValue?: ValueType) {
-		if (this.instance().runtime.isBatching) {
-			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
-			return
-		}
-		const value = deepClone(newValue)
-		// if (!value) {
-		// 	this.instance().runtime.log(
-		// 		'warn',
-		// 		`Watchable ${this.id} skipping set() because value is undefined or null.`
-		// 	)
-		// 	return this
-		// }
-		this._watchableStore._lastValue = this._watchableStore._value
-		// if (isObject(value) && isObject(this._watchableStore._value)) {
-		// 	this._watchableStore._lastValue = deepClone(this._watchableStore._value)
-		// } else if (
-		// 	Array.isArray(value) &&
-		// 	Array.isArray(this._watchableStore._value)
-		// ) {
-		// 	const obj = deepMerge(this._watchableStore._value, value)
-		// 	this._watchableStore._lastValue = Object.values(
-		// 		obj
-		// 	) as unknown as ValueType
-		// } else {
-		// 	this._watchableStore._lastValue = this._watchableStore._value
-		// }
-		this._watchableStore._lastValue = deepClone(this._watchableStore._value)
-		// apply the next value
-		if (value === undefined) {
-			this._watchableStore._value = this._watchableStore._nextValue
-		} else {
-			this._watchableStore._value = value
-		}
-		this._watchableStore._publicValue = deepClone(this._watchableStore._value)
-		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
-
-		// update the runtime conductor
-
-		this.instance().runtime.log(
-			'debug',
-			`Watchable ${this.id} broadcasting to change to subscribers`
-		)
-		this.instance().runtime.broadcast(this.id, value)
-
-		// if history, add to archive
-		if (
-			this._history &&
-			this._history.maxLength > 0 &&
-			!this._history.skipArchiveUpdate
-		) {
-			if (
-				isEqual(this._watchableStore._lastValue, this._watchableStore._value)
-			) {
-				return
-			}
-			this.instance().runtime.log(
-				'debug',
-				`Watchable ${this.id} set caused its History to shift`
-			)
-			this._history.archive_head.push(this._watchableStore._lastValue)
-			// if we are setting a new value and the tail has any values, remove them
-			// NOTE: this is needed because if we set new value, but are in the middle of the history somewhere, we need to remove the subsequent values
-			if (this._history.archive_tail.length) {
-				this._history.archive_tail.length = 0
-			}
-			// if archive is too long, remove oldest
-			if (this._history.archive_head.length > this._history.maxLength) {
-				if (this._history.archive_head.length > 0) {
-					this._history.archive_head.shift()
-				}
-			}
-		}
 	}
 }
