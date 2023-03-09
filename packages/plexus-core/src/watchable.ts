@@ -188,13 +188,13 @@ export class WatchableMutable<
 			return
 		}
 		const value = deepClone(newValue)
-		if (!value) {
-			this.instance().runtime.log(
-				'warn',
-				`Watchable ${this.id} skipping set() because value is undefined or null.`
-			)
-			return this
-		}
+		// if (!value) {
+		// 	this.instance().runtime.log(
+		// 		'warn',
+		// 		`Watchable ${this.id} skipping set() because value is undefined or null.`
+		// 	)
+		// 	return this
+		// }
 		this._watchableStore._lastValue = this._watchableStore._value
 		// if (isObject(value) && isObject(this._watchableStore._value)) {
 		// 	this._watchableStore._lastValue = deepClone(this._watchableStore._value)

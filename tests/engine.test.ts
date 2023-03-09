@@ -1,6 +1,6 @@
 // this one is a test of internal systems
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { EventEngine } from '@plexusjs/core/src/engine'
+import { EventEngine } from '@plexusjs/core/src/instance/engine'
 
 const engine = new EventEngine()
 describe('INTERNAL: Engine test', () => {

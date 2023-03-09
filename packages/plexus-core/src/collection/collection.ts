@@ -644,7 +644,33 @@ export class CollectionInstance<
 		}
 		return this
 	}
-
+	/**
+	 * A shortcut to watch a group for changes
+	 * @param name The name of the group you are watching
+	 * @param callback The callback to run when the group data changes
+	 * @returns {function} A function to stop watching the group
+	 */
+	watchGroup(
+		name: KeyOfMap<Groups>,
+		callback: PlexusInternalWatcher<DataTypeInput[]>
+	)
+	watchGroup(name: string, callback: PlexusInternalWatcher<DataTypeInput[]>)
+	watchGroup(
+		name: KeyOfMap<Groups> | string,
+		callback: PlexusInternalWatcher<DataTypeInput[]>
+	) {
+		const group = this.getGroup(name)
+		if (this.isCreatedGroup(name) && group) {
+			return group.watch(callback)
+		} else {
+			// TODO Replace with runtime log
+			this.instance().runtime.log(
+				'warn',
+				`Group ${name} not found when trying to watch via collection shorthand.`
+			)
+			return () => {}
+		}
+	}
 	/**
 	 * Delete a data item completely from the collection.
 	 * @param {string|number} keys The data key(s) to use for lookup

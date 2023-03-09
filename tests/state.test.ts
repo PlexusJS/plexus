@@ -229,4 +229,6 @@ describe('Testing State Function', () => {
 		expect(complexObj.value.obj.arr[0].item1).toBe('2')
 		instance({ logLevel: undefined })
 	})
+
+	
 })

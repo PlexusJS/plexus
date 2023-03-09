@@ -30,6 +30,7 @@ A Collection Instance
     * [.getGroup(name)](#CollectionInstance+getGroup) ⇒ <code>this</code>
     * [.getGroupsOf(key)](#CollectionInstance+getGroupsOf) ⇒ <code>Array.&lt;string&gt;</code>
     * [.addToGroups(key, groups)](#CollectionInstance+addToGroups) ⇒ <code>this</code>
+    * [.watchGroup(name, callback)](#CollectionInstance+watchGroup) ⇒ <code>function</code>
     * [.delete(keys)](#CollectionInstance+delete) ⇒ <code>this</code>
     * [.removeFromGroup(keys, groups)](#CollectionInstance+removeFromGroup) ⇒ <code>this</code>
     * [.clear(groupNames)](#CollectionInstance+clear) ⇒ <code>this</code>
@@ -226,6 +227,18 @@ This is like collect but will not add new items, and can can be used to patch ex
 | --- | --- | --- |
 | key | <code>string</code> \| <code>number</code> | <p>The key of the item to add</p> |
 | groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>The group(s) to add the item to</p> |
+
+<a name="CollectionInstance+watchGroup"></a>
+
+### .watchGroup(name, callback) ⇒ <code>function</code>
+<p>A shortcut to watch a group for changes</p>
+
+**Returns**: <code>function</code> <p>A function to stop watching the group</p>  
+
+| Param | Description |
+| --- | --- |
+| name | <p>The name of the group you are watching</p> |
+| callback | <p>The callback to run when the group data changes</p> |
 
 <a name="CollectionInstance+delete"></a>
 
