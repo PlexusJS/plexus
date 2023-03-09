@@ -30,6 +30,7 @@ type HistorySeed<ValueType extends PlexusStateType = any> = {
 export class Watchable<ValueType extends PlexusStateType = any> {
 	protected _watchableStore: WatchableStore<ValueType>
 	protected instance: () => PlexusInstance
+	loading: boolean = false
 	/**
 	 * The internal id of the computed state
 	 */
@@ -45,8 +46,10 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 		const getInit = () => (typeof init === 'function' ? init() : init)
 
 		const dataFetcher = () => {
+			this.loading = true
 			const value = getInit()
 			this._watchableStore._publicValue = deepClone(value)
+			this.loading = false
 			return value
 		}
 
@@ -100,6 +103,7 @@ export class WatchableMutable<
 			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
 			return
 		}
+		this.loading = true
 		const value = deepClone(newValue)
 		// if (!value) {
 		// 	this.instance().runtime.log(
@@ -136,6 +140,7 @@ export class WatchableMutable<
 			if (
 				isEqual(this._watchableStore._lastValue, this._watchableStore._value)
 			) {
+				this.loading = false
 				return
 			}
 			this.instance().runtime.log(
@@ -155,6 +160,7 @@ export class WatchableMutable<
 				}
 			}
 		}
+		this.loading = false
 	}
 
 	/**
