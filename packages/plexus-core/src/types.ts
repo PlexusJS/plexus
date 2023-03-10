@@ -11,5 +11,5 @@ export type PlexusInternalWatcher<V extends any = any> = (
 	from?: string
 ) => void
 
-export type PlexusStateType = NonNullable<AlmostAnything>
-export type Fetcher<Value extends PlexusStateType> = () => Value
+export type PlexusValidStateTypes = NonNullable<AlmostAnything>
+export type Fetcher<Value> = () => Value

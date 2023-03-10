@@ -1,4 +1,4 @@
-import { PlexusStateType } from '../types'
+import { PlexusValidStateTypes } from '../types'
 import { EventEngine } from './engine'
 import { PlexusInstance } from './instance'
 
@@ -34,7 +34,7 @@ export class RuntimeInstance {
 	/**
 	 * track a change and propagate to all listening children in instance
 	 *  */
-	broadcast<Value = PlexusStateType>(key: string, value: Value) {
+	broadcast<Value = PlexusValidStateTypes>(key: string, value: Value) {
 		this.log('debug', `Broadcasting a change to ${key}`)
 		if (this.batching) {
 			this.batchedCalls.push(() => this.engine.emit(key, { key, value }))
@@ -48,7 +48,7 @@ export class RuntimeInstance {
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
 	 */
-	subscribe<Value = PlexusStateType>(
+	subscribe<Value = PlexusValidStateTypes>(
 		_key: string,
 		_callback: ListenerFn<Value>,
 		from?: string

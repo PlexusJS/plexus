@@ -2,18 +2,18 @@
 import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
 import { concurrentWatch } from './helpers'
 import { PlexusInstance } from './instance/instance'
-import { Fetcher, PlexusStateType, PlexusWatcher } from './types'
+import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
 import { Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<
-	ValueType extends PlexusStateType = any
+	ValueType extends PlexusValidStateTypes = any
 > = ComputedStateInstance<ValueType>
 
 /**
  * A computed state is a state that is derived from other states
  */
 export class ComputedStateInstance<
-	ValueType extends PlexusStateType = any
+	ValueType extends PlexusValidStateTypes = any
 > extends Watchable<ValueType> {
 	private _internalStore: {
 		_name: string
@@ -231,7 +231,7 @@ export class ComputedStateInstance<
 interface Dependency extends Watchable<any> {
 	[key: string]: any
 }
-export function _computed<StateValue extends PlexusStateType>(
+export function _computed<StateValue extends PlexusValidStateTypes>(
 	instance: () => PlexusInstance,
 	computeFn: Fetcher<StateValue>,
 	deps: Dependency[]

@@ -1,13 +1,13 @@
 import { HTMLProps, MutableRefObject, useEffect, useState } from 'react'
 
 import { Watchable } from '@plexusjs/core'
-import { PlexusStateType } from '@plexusjs/core/dist/types'
+// import { PlexusStateType } from '@plexusjs/core/dist/types'
 
 type HTMLDivElementPropKeys = keyof HTMLProps<HTMLElement>
 
 export function usePlexusElementEffect<
 	ElementType extends HTMLElement,
-	PlexusType extends PlexusStateType = any,
+	PlexusType = any,
 	PropertyKey extends HTMLProps<HTMLElement>[HTMLDivElementPropKeys] = HTMLProps<HTMLElement>[HTMLDivElementPropKeys]
 >(
 	elRef: MutableRefObject<ElementType>,

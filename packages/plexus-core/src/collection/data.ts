@@ -13,7 +13,7 @@ interface CollectionDataConfig {
 	prov: boolean
 	unfoundKeyIsUndefined?: boolean
 }
-interface PlexusDataStore<DataType extends Record<string, any>> {
+interface PlexusDataStore {
 	primaryKey: string
 	_wDestroyers: Set<() => void>
 	_config: CollectionDataConfig
@@ -39,7 +39,7 @@ export class CollectionData<
 	private primaryKey: PK
 	readonly key: string | number
 	provisional: boolean
-	private _internalStore: PlexusDataStore<DataType>
+	private _internalStore: PlexusDataStore
 	private foreignKeyData: Record<string | number | symbol, any> = {}
 	private watchingForeignData: Map<string, () => void>
 

@@ -18,18 +18,17 @@ export type LiteralType<T> = T extends string
 	? Record<K, V>
 	: T
 
+export type Primitives = string | number | boolean | symbol
 export type AlmostAnything =
 	| string
 	| number
 	| boolean
 	| symbol
-	| Record<any, any>
-	| Array<any>
+	| Primitives[]
+	| Record<any, Primitives>
 	| Object
 
-export type TypeOrReturnType<T> = T extends (...args: any[]) => infer R
-	? LiteralType<R>
-	: LiteralType<T>
+export type TypeOrReturnType<T> = T extends (...args: any[]) => infer R ? R : T
 
 export type UnionToIntersection<U> = (
 	U extends any ? (k: U) => void : never

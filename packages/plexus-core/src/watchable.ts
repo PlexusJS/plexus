@@ -6,10 +6,19 @@ import {
 	isEqual,
 	AlmostAnything,
 	LiteralType,
+	TypeOrReturnType,
 } from '@plexusjs/utils'
-import { Fetcher, PlexusStateType, PlexusWatcher } from './types'
+import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
 
-type WatchableStore<Value extends PlexusStateType = any> = {
+const getFetcher = function <ValueType>(
+	subject: ValueType | (() => ValueType)
+) {
+	return typeof subject === 'function'
+		? (subject as () => ValueType)()
+		: subject
+}
+
+type WatchableStore<Value = any> = {
 	_initialValue: Value
 	_lastValue: Value | null
 	_value: Value
@@ -19,7 +28,7 @@ type WatchableStore<Value extends PlexusStateType = any> = {
 	_dataFetcher?: Fetcher<Value>
 }
 
-type HistorySeed<ValueType extends PlexusStateType = any> = {
+type HistorySeed<ValueType = any> = {
 	maxLength: number
 	skipArchiveUpdate: boolean
 	start: ValueType
@@ -27,7 +36,10 @@ type HistorySeed<ValueType extends PlexusStateType = any> = {
 	archive_tail: Array<ValueType>
 }
 
-export class Watchable<ValueType extends PlexusStateType = any> {
+export class Watchable<
+	ValueType = any
+	// ValueType extends AlmostAnything = Input extends Fetcher<infer V> ? V : Input
+> {
 	protected _watchableStore: WatchableStore<ValueType>
 	protected instance: () => PlexusInstance
 	loading: boolean = false
@@ -37,26 +49,10 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 	get id(): string {
 		return `${this._watchableStore._internalId}`
 	}
-	constructor(instance: () => PlexusInstance, init: Fetcher<ValueType>)
-	constructor(instance: () => PlexusInstance, init: ValueType)
-	constructor(
-		instance: () => PlexusInstance,
-		init: Fetcher<ValueType> | ValueType
-	) {
+	constructor(instance: () => PlexusInstance, init: ValueType) {
 		this.instance = instance
 
-		const getInit = () =>
-			(typeof init === 'function' ? init() : init) as ValueType
-
-		const dataFetcher = () => {
-			this.loading = true
-			const value = getInit()
-			this._watchableStore._publicValue = deepClone(value)
-			this.loading = false
-			return value
-		}
-
-		const initialValue = getInit()
+		const initialValue = getFetcher(init) as ValueType
 		this._watchableStore = {
 			_internalId: instance().genId(),
 			_nextValue: initialValue,
@@ -64,7 +60,7 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 			_publicValue: deepClone(initialValue),
 			_initialValue: initialValue,
 			_lastValue: null,
-			_dataFetcher: typeof init === 'function' ? dataFetcher : undefined,
+			_dataFetcher: undefined,
 		}
 		// dataFetcher()
 	}
@@ -85,12 +81,16 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 	}
 }
 
-export class WatchableMutable<
-	ValueType extends PlexusStateType = any
-> extends Watchable<ValueType> {
+export class WatchableMutable<Input = never, ValueType = any> extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
-	constructor(instance: () => PlexusInstance, init: ValueType) {
-		super(instance, init)
+	constructor(instance: () => PlexusInstance, init: () => ValueType)
+	constructor(instance: () => PlexusInstance, init: ValueType)
+	constructor(
+		instance: () => PlexusInstance,
+		init: ValueType | (() => ValueType)
+	) {
+		super(instance, getFetcher(init))
+		this._watchableStore._dataFetcher = () => getFetcher(init)
 	}
 
 	/**
@@ -115,11 +115,8 @@ export class WatchableMutable<
 		this._watchableStore._lastValue = this._watchableStore._value
 		this._watchableStore._lastValue = deepClone(this._watchableStore._value)
 		// apply the next value
-		if (value === undefined) {
-			this._watchableStore._value = this._watchableStore._nextValue
-		} else {
-			this._watchableStore._value = value
-		}
+		this._watchableStore._value =
+			value === undefined ? this._watchableStore._nextValue : value
 		this._watchableStore._publicValue = deepClone(this._watchableStore._value)
 		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
 
@@ -161,6 +158,7 @@ export class WatchableMutable<
 			}
 		}
 		this.loading = false
+		return this
 	}
 
 	/**
@@ -265,7 +263,7 @@ export class WatchableMutable<
 	 * @param fetcher - a function to fetch data from an external source (must match initial type)
 	 * @returns {this}
 	 */
-	defineFetcher(fetcher: Fetcher<ValueType>) {
+	defineFetcher(fetcher: Fetcher<ValueType>): this {
 		this._watchableStore._dataFetcher = fetcher
 		return this
 	}
@@ -276,7 +274,9 @@ export class WatchableMutable<
 	 */
 	fetch(): this {
 		if (this._watchableStore._dataFetcher) {
+			this.loading = true
 			this.set(this._watchableStore._dataFetcher())
+			this.loading = false
 		}
 		return this
 	}

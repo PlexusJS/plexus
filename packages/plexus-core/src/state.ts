@@ -1,33 +1,31 @@
 import { deepClone, deepMerge, isEqual, isObject } from '@plexusjs/utils'
 import { PlexusInstance } from './instance/instance'
-import { Fetcher, PlexusInternalWatcher, PlexusStateType } from './types'
+import { Fetcher, PlexusInternalWatcher, PlexusValidStateTypes } from './types'
 
 import { WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
 
-export type PlexusState = <Value extends PlexusStateType = any>(
+export type PlexusState = <Value extends PlexusValidStateTypes = any>(
 	instance: () => PlexusInstance,
 	input: Value
 ) => StateInstance<Value>
 
 type DestroyFn = () => void
 
-export interface StateStore<Value> {
+export interface StateStore {
 	_name: string
 	_persist: boolean
 	_interval: NodeJS.Timer | null
 	_ready: boolean
 	_isSetting: boolean
 }
-export type PlexusStateInstance<Value extends PlexusStateType = any> =
+export type PlexusStateInstance<Value extends PlexusValidStateTypes = any> =
 	StateInstance<Value>
 /**
  * A trackable State
  */
-export class StateInstance<
-	StateValue extends PlexusStateType
-> extends WatchableMutable<StateValue> {
-	private _internalStore: StateStore<StateValue>
+export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
+	private _internalStore: StateStore
 	/**
 	 * The internal id of the state
 	 */
@@ -286,10 +284,10 @@ export class StateInstance<
 	}
 }
 
-export function _state<StateValue extends PlexusStateType>(
+export function _state<StateValue>(
 	instance: () => PlexusInstance,
 	_init: StateValue
 ) {
 	// Returned Object //
-	return new StateInstance<StateValue>(instance, _init)
+	return new StateInstance(instance, _init)
 }

@@ -24,7 +24,7 @@ import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { LiteralType, AlmostAnything } from '@plexusjs/utils'
 import { TypeOrReturnType } from '@plexusjs/utils'
-import { Fetcher, PlexusStateType } from './types'
+import { Fetcher, PlexusValidStateTypes } from './types'
 
 // export function state<
 // 	Literal extends PlexusStateType = any,
@@ -45,12 +45,10 @@ import { Fetcher, PlexusStateType } from './types'
  * @returns A Plexus State Instance
  */
 export function state<
-	Override extends PlexusStateType = never,
-	Value extends PlexusStateType = Override extends AlmostAnything
-		? Override
-		: LiteralType<Override>
->(item: Override) {
-	return _state<Value>(() => instance(), item as unknown as Value)
+	Override extends PlexusValidStateTypes = never,
+	Value = Override extends AlmostAnything ? Override : any
+>(item: Value) {
+	return _state(() => instance(), item)
 }
 /**
  * Generate a Plexus State
@@ -58,10 +56,10 @@ export function state<
  * @returns A Plexus State Instance
  */
 export function computed<
-	Override extends PlexusStateType = any,
-	Value extends PlexusStateType = Override extends AlmostAnything
+	Override extends PlexusValidStateTypes = never,
+	Value extends PlexusValidStateTypes = Override extends AlmostAnything
 		? Override
-		: LiteralType<Override>
+		: any
 >(
 	item: (value?: Value) => Value,
 	dependencies: Array<Watchable<any>> | Watchable<any>

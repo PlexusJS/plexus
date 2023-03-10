@@ -11,7 +11,7 @@ import {
 } from './instance/instance'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { _state } from './state'
-import { Fetcher, PlexusStateType } from './types'
+import { Fetcher, PlexusValidStateTypes } from './types'
 
 export interface PlexusScopeConfig {}
 
@@ -51,12 +51,12 @@ export class Scope {
 	 * @returns A Plexus State Instance
 	 */
 	state<
-		Literal extends PlexusStateType = any,
-		Value extends PlexusStateType = Literal extends AlmostAnything
+		Literal extends PlexusValidStateTypes = any,
+		Value extends PlexusValidStateTypes = Literal extends AlmostAnything
 			? Literal
 			: TypeOrReturnType<Literal>
-	>(item: Fetcher<Value> | Value) {
-		return _state(this.instance, item)
+	>(item: Value) {
+		return _state<Value>(this.instance, item)
 	}
 
 	/**
@@ -65,8 +65,8 @@ export class Scope {
 	 * @returns A Plexus State Instance
 	 */
 	computed<
-		Literal extends PlexusStateType = any,
-		Value extends PlexusStateType = Literal extends AlmostAnything
+		Literal extends PlexusValidStateTypes = any,
+		Value extends PlexusValidStateTypes = Literal extends AlmostAnything
 			? Literal
 			: TypeOrReturnType<Literal>
 	>(
