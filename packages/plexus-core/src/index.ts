@@ -50,10 +50,7 @@ export function state<
 		? Literal
 		: TypeOrReturnType<Literal>
 >(item: Fetcher<Value> | Value) {
-	return _state<TypeOrReturnType<Value>>(
-		() => instance(),
-		item as TypeOrReturnType<Value>
-	)
+	return _state(() => instance(), item)
 }
 /**
  * Generate a Plexus State
@@ -70,9 +67,9 @@ export function computed<
 	dependencies: Array<Watchable<any>> | Watchable<any>
 ) {
 	if (!Array.isArray(dependencies)) {
-		return _computed<Value>(() => instance(), item, [dependencies])
+		return _computed(() => instance(), item, [dependencies])
 	}
-	return _computed<Value>(() => instance(), item, dependencies)
+	return _computed(() => instance(), item, dependencies)
 }
 /**
  * Create a new Storage Instance

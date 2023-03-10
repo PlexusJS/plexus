@@ -56,10 +56,7 @@ export class Scope {
 			? Literal
 			: TypeOrReturnType<Literal>
 	>(item: Fetcher<Value> | Value) {
-		return _state<TypeOrReturnType<Value>>(
-			this.instance,
-			item as TypeOrReturnType<Value>
-		)
+		return _state(this.instance, item)
 	}
 
 	/**
@@ -77,7 +74,7 @@ export class Scope {
 		dependencies: Array<Watchable<any>> | Watchable<any>
 	) {
 		if (!Array.isArray(dependencies)) {
-			return _computed<Value>(this.instance, item, [dependencies])
+			return _computed(this.instance, item, [dependencies])
 		}
 		return _computed(this.instance, item, dependencies)
 	}

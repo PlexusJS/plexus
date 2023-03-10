@@ -7,6 +7,7 @@ type ObjectStateExample = Partial<{
 	b: boolean
 	c: { b?: boolean }
 }>
+type UnionString = 'a' | 'b' | 'c'
 
 const initialValue = {
 	boolean: true,
@@ -39,6 +40,7 @@ beforeEach(() => {
 describe('Testing State Function', () => {
 	test('Can save a value', () => {
 		const value = state(1)
+		const value2 = state<UnionString>('a')
 		expect(value.value).toBe(1)
 	})
 
