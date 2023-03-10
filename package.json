@@ -20,7 +20,7 @@
 		"bootstrap": "lerna bootstrap --use-workspaces",
 		"build": "lerna run build",
 		"postbuild": "yarn docs:generate:ref",
-		"dev": "nodemon --exec lerna run build --watch",
+		"dev": "lerna watch -- lerna run build --since",
 		"prereleaseOnly": "pinst --disable && echo '🚀  Publishing...'",
 		"release-canary": "lerna run build && lerna publish --preid canary --no-private --yes --force-publish --canary",
 		"release-stable": "lerna run build && lerna publish --preid canary --no-private --yes --force-publish",
