@@ -40,10 +40,7 @@ export class StateInstance<
 	get instanceId(): string {
 		return `ste_${this._watchableStore._internalId}`
 	}
-	constructor(
-		instance: () => PlexusInstance,
-		init: Fetcher<StateValue> | StateValue
-	) {
+	constructor(instance: () => PlexusInstance, init: StateValue) {
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
@@ -291,7 +288,7 @@ export class StateInstance<
 
 export function _state<StateValue extends PlexusStateType>(
 	instance: () => PlexusInstance,
-	_init: Fetcher<StateValue> | StateValue
+	_init: StateValue
 ) {
 	// Returned Object //
 	return new StateInstance<StateValue>(instance, _init)

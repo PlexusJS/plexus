@@ -1,11 +1,11 @@
 export type LiteralType<T> = T extends string
-	? string
+	? T & string
 	: T extends number
-	? number
+	? T & number
 	: T extends boolean
 	? boolean
 	: T extends symbol
-	? symbol
+	? T & symbol
 	: T extends undefined
 	? undefined
 	: T extends null
@@ -21,6 +21,7 @@ export type LiteralType<T> = T extends string
 export type AlmostAnything =
 	| string
 	| number
+	| boolean
 	| symbol
 	| Record<any, any>
 	| Array<any>
@@ -29,3 +30,10 @@ export type AlmostAnything =
 export type TypeOrReturnType<T> = T extends (...args: any[]) => infer R
 	? LiteralType<R>
 	: LiteralType<T>
+
+export type UnionToIntersection<U> = (
+	U extends any ? (k: U) => void : never
+) extends (k: infer I) => void
+	? I
+	: never
+export type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true

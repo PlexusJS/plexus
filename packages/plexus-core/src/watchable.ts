@@ -37,13 +37,16 @@ export class Watchable<ValueType extends PlexusStateType = any> {
 	get id(): string {
 		return `${this._watchableStore._internalId}`
 	}
+	constructor(instance: () => PlexusInstance, init: Fetcher<ValueType>)
+	constructor(instance: () => PlexusInstance, init: ValueType)
 	constructor(
 		instance: () => PlexusInstance,
 		init: Fetcher<ValueType> | ValueType
 	) {
 		this.instance = instance
 
-		const getInit = () => (typeof init === 'function' ? init() : init)
+		const getInit = () =>
+			(typeof init === 'function' ? init() : init) as ValueType
 
 		const dataFetcher = () => {
 			this.loading = true
@@ -86,10 +89,7 @@ export class WatchableMutable<
 	ValueType extends PlexusStateType = any
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
-	constructor(
-		instance: () => PlexusInstance,
-		init: Fetcher<ValueType> | ValueType
-	) {
+	constructor(instance: () => PlexusInstance, init: ValueType) {
 		super(instance, init)
 	}
 

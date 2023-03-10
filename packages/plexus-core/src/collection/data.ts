@@ -48,7 +48,7 @@ export class CollectionData<
 		public collection: () => PlexusCollectionInstance<DataType>,
 		primaryKey: PK,
 		keyValue: string | number,
-		value: Fetcher<DataType> | DataType,
+		value: DataType,
 		config: CollectionDataConfig = { prov: false }
 	) {
 		super(instance, value)
@@ -371,7 +371,7 @@ export function _data<DataType extends Record<string, any>>(
 	collection: () => PlexusCollectionInstance<DataType>,
 	primaryKey: string,
 	keyValue: number | string,
-	value: Fetcher<DataType> | DataType,
+	value: DataType,
 	config: CollectionDataConfig = { prov: false }
 ) {
 	if (

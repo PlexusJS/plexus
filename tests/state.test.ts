@@ -29,8 +29,8 @@ const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(
 const stateWithFetchFnTest = state(() => {
 	return 'some sort of data'
 })
-// TODO Disallow null as initial value
 
+// TODO Disallow null as initial value
 beforeEach(() => {
 	booleanState.reset()
 	stringState.reset()
