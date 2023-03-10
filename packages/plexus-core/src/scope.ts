@@ -51,12 +51,10 @@ export class Scope {
 	 * @returns A Plexus State Instance
 	 */
 	state<
-		Literal extends PlexusValidStateTypes = any,
-		Value extends PlexusValidStateTypes = Literal extends AlmostAnything
-			? Literal
-			: TypeOrReturnType<Literal>
+		Override extends PlexusValidStateTypes = never,
+		Value = Override extends AlmostAnything ? Override : any
 	>(item: Value) {
-		return _state<Value>(this.instance, item)
+		return _state(this.instance, item)
 	}
 
 	/**
@@ -65,10 +63,10 @@ export class Scope {
 	 * @returns A Plexus State Instance
 	 */
 	computed<
-		Literal extends PlexusValidStateTypes = any,
-		Value extends PlexusValidStateTypes = Literal extends AlmostAnything
-			? Literal
-			: TypeOrReturnType<Literal>
+		Override extends PlexusValidStateTypes = never,
+		Value extends PlexusValidStateTypes = Override extends AlmostAnything
+			? Override
+			: any
 	>(
 		item: (value?: Value) => Value,
 		dependencies: Array<Watchable<any>> | Watchable<any>
