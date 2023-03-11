@@ -41,7 +41,7 @@ export class ComputedStateInstance<
 
 	constructor(
 		instance: () => PlexusInstance,
-		computeFn: Fetcher<ValueType>,
+		computeFn: () => ValueType,
 		deps: Watchable<any>[]
 	) {
 		super(instance, computeFn())
@@ -233,7 +233,7 @@ interface Dependency extends Watchable<any> {
 }
 export function _computed<StateValue extends PlexusValidStateTypes>(
 	instance: () => PlexusInstance,
-	computeFn: Fetcher<StateValue>,
+	computeFn: () => StateValue,
 	deps: Dependency[]
 ) {
 	return new ComputedStateInstance<StateValue>(instance, computeFn, deps)

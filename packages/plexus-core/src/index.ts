@@ -60,14 +60,12 @@ export function computed<
 	Value extends PlexusValidStateTypes = Override extends AlmostAnything
 		? Override
 		: any
->(
-	item: (value?: Value) => Value,
-	dependencies: Array<Watchable<any>> | Watchable<any>
-) {
-	if (!Array.isArray(dependencies)) {
-		return _computed(() => instance(), item, [dependencies])
-	}
-	return _computed(() => instance(), item, dependencies)
+>(item: (value?: Value) => Value, dependencies: Array<Watchable> | Watchable) {
+	return _computed(
+		() => instance(),
+		item,
+		!Array.isArray(dependencies) ? [dependencies] : dependencies
+	)
 }
 /**
  * Create a new Storage Instance
