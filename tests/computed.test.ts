@@ -36,18 +36,6 @@ const core = {
 	}, [collections.books.selectors.READING]),
 }
 
-const initialValue = {
-	boolean: false,
-	string: 'Hello Plexus!',
-	object: { a: { a: true, b: true }, b: true },
-	array: [
-		{ item: 'Hello', item2: { subitem: 'World' } },
-		{ item: 'Goodbye', item2: { subitem: 'People' } },
-	],
-	null: null,
-
-	number: 1,
-}
 
 beforeEach(() => {
 	core.state.stringState.set('Hello Plexus! (initialized)')

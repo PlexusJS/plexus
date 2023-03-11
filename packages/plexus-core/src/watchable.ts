@@ -74,14 +74,17 @@ export class Watchable<
 
 	get value(): ValueType {
 		const value = this._watchableStore._publicValue
-		if (!value && this._watchableStore._dataFetcher) {
+		if (value === undefined && this._watchableStore._dataFetcher) {
 			return this._watchableStore._dataFetcher()
 		}
 		return value
 	}
 }
 
-export class WatchableMutable<Input = never, ValueType = any> extends Watchable<ValueType> {
+export class WatchableMutable<
+	Input = never,
+	ValueType = any
+> extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
 	constructor(instance: () => PlexusInstance, init: () => ValueType)
 	constructor(instance: () => PlexusInstance, init: ValueType)
@@ -98,10 +101,10 @@ export class WatchableMutable<Input = never, ValueType = any> extends Watchable<
 	 * @param newValue The new value of this state
 	 * @returns {this} The state instance
 	 */
-	set(newValue?: ValueType) {
+	set(newValue?: ValueType): this {
 		if (this.instance().runtime.isBatching) {
 			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
-			return
+			return this
 		}
 		this.loading = true
 		const value = deepClone(newValue)
@@ -112,11 +115,13 @@ export class WatchableMutable<Input = never, ValueType = any> extends Watchable<
 		// 	)
 		// 	return this
 		// }
-		this._watchableStore._lastValue = this._watchableStore._value
+		// this._watchableStore._lastValue = this._watchableStore._value
 		this._watchableStore._lastValue = deepClone(this._watchableStore._value)
+
 		// apply the next value
 		this._watchableStore._value =
 			value === undefined ? this._watchableStore._nextValue : value
+
 		this._watchableStore._publicValue = deepClone(this._watchableStore._value)
 		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
 
@@ -138,7 +143,7 @@ export class WatchableMutable<Input = never, ValueType = any> extends Watchable<
 				isEqual(this._watchableStore._lastValue, this._watchableStore._value)
 			) {
 				this.loading = false
-				return
+				return this
 			}
 			this.instance().runtime.log(
 				'debug',

@@ -116,7 +116,7 @@ export function deepClone<Type = AlmostAnything>(thing: Type): Type {
 		return new RegExp(thing) as any as Type
 	}
 	// must be an object
-	if (typeof thing === 'object' && thing && thing !== null) {
+	if (typeof thing === 'object' && thing !== undefined && thing !== null) {
 		const cloned: Type = Array.isArray(thing)
 			? (Array.from(thing) as unknown as Type)
 			: ({ ...thing } as unknown as Type)
