@@ -82,7 +82,7 @@ export class Watchable<
 }
 
 export class WatchableMutable<
-	Input = never,
+	// Input = never,
 	ValueType = any
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
