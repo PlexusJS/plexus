@@ -2538,6 +2538,34 @@
     os-homedir "^1.0.1"
     regexpu-core "^4.5.4"
 
+"@plexusjs/api@1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@plexusjs/api/-/api-1.7.4.tgz#50f17def2ca71248183063217f5f01233da6ca64"
+  integrity sha512-1gDM2lxQOXMioOhguwoM9Hcrfr+6Swn21+9LvdcsLi125hwLZAiyzfzoeHp33kVUog2H6Cx/2eFiOq3s1LNqJA==
+  dependencies:
+    "@plexusjs/utils" "1.7.4"
+
+"@plexusjs/core@1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@plexusjs/core/-/core-1.7.4.tgz#65cb51de5d4ed64350dd00d7ecd65909678a08bb"
+  integrity sha512-aBRxM9iQ2tijNhR9qcg99pbHnjMSukav6QFuw9hkqDk4x8jGxYPDcZPcIsnRQ3K3gdUgX4nwSDPeSQp/VmaLCg==
+  dependencies:
+    "@plexusjs/api" "1.7.4"
+    "@plexusjs/utils" "1.7.4"
+
+"@plexusjs/react@1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@plexusjs/react/-/react-1.7.4.tgz#d310101d35b127b6348a7023fee5f3bd39f0e2bb"
+  integrity sha512-5U6jPdSBCohAb60iK8r2W8u/LaS5KUmRkhx+OAv7flwbKMuw7h/ktENEvzackxscUReQVsmzxzrdRlELGs5eOw==
+  dependencies:
+    "@plexusjs/utils" "1.7.4"
+    use-sync-external-store "^1.2.0"
+
+"@plexusjs/utils@1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@plexusjs/utils/-/utils-1.7.4.tgz#487796a9f018ed38873f42cf9a3e62a1612dbb0b"
+  integrity sha512-BE24X/qLSQm37hDK42pc4/mEq8hBLTprzyFO1sErOBqPLMv6t21/Q31V+Vy3+7MuLzJnIsVzQIKjuvNYxGxgGQ==
+
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
@@ -12797,10 +12825,15 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-"typescript@^3 || ^4", typescript@^4.6.3, typescript@^4.9.3, typescript@^4.9.5:
+"typescript@^3 || ^4", typescript@^4.6.3, typescript@^4.9.5:
   version "4.9.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
+
+typescript@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.2.tgz#891e1a90c5189d8506af64b9ef929fca99ba1ee5"
+  integrity sha512-wVORMBGO/FAs/++blGNeAVdbNKtIh1rbBL2EyQ1+J9lClJ93KiiKe8PmFIVdXhHcyv44SL9oglmfeSsndo0jRw==
 
 typical@^2.4.2, typical@^2.6.0, typical@^2.6.1:
   version "2.6.1"
