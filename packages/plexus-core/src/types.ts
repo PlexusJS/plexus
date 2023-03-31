@@ -13,3 +13,8 @@ export type PlexusInternalWatcher<V extends any = any> = (
 
 export type PlexusValidStateTypes = NonNullable<AlmostAnything>
 export type Fetcher<Value> = () => Value
+export type PlexusWatchableValueInterpreter<Value> = Value extends (
+	...args: any
+) => any
+	? ReturnType<Value>
+	: Value

@@ -8,7 +8,12 @@ import {
 	LiteralType,
 	TypeOrReturnType,
 } from '@plexusjs/utils'
-import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
+import {
+	Fetcher,
+	PlexusValidStateTypes,
+	PlexusWatchableValueInterpreter,
+	PlexusWatcher,
+} from './types'
 
 const getFetcher = function <ValueType>(
 	subject: ValueType | (() => ValueType)
@@ -40,7 +45,9 @@ export class Watchable<
 	ValueType = any
 	// ValueType extends AlmostAnything = Input extends Fetcher<infer V> ? V : Input
 > {
-	protected _watchableStore: WatchableStore<ValueType>
+	protected _watchableStore: WatchableStore<
+		PlexusWatchableValueInterpreter<ValueType>
+	>
 	protected instance: () => PlexusInstance
 	loading: boolean = false
 	/**
@@ -52,7 +59,9 @@ export class Watchable<
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		this.instance = instance
 
-		const initialValue = getFetcher(init) as ValueType
+		const initialValue = getFetcher(
+			init
+		) as PlexusWatchableValueInterpreter<ValueType>
 		this._watchableStore = {
 			_internalId: instance().genId(),
 			_nextValue: initialValue,
@@ -65,14 +74,17 @@ export class Watchable<
 		// dataFetcher()
 	}
 
-	watch(callback: PlexusWatcher<ValueType>, from?: string): () => void {
+	watch(
+		callback: PlexusWatcher<PlexusWatchableValueInterpreter<ValueType>>,
+		from?: string
+	): () => void {
 		const destroyer = this.instance().runtime.subscribe(this.id, callback, from)
 		return () => {
 			destroyer()
 		}
 	}
 
-	get value(): ValueType {
+	get value(): PlexusWatchableValueInterpreter<ValueType> {
 		const value = this._watchableStore._publicValue
 		if (value === undefined && this._watchableStore._dataFetcher) {
 			return this._watchableStore._dataFetcher()
@@ -86,14 +98,12 @@ export class WatchableMutable<
 	ValueType = any
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
-	constructor(instance: () => PlexusInstance, init: () => ValueType)
-	constructor(instance: () => PlexusInstance, init: ValueType)
-	constructor(
-		instance: () => PlexusInstance,
-		init: ValueType | (() => ValueType)
-	) {
-		super(instance, getFetcher(init))
-		this._watchableStore._dataFetcher = () => getFetcher(init)
+	// constructor(instance: () => PlexusInstance, init: () => ValueType)
+	// constructor(instance: () => PlexusInstance, init: ValueType)
+	constructor(instance: () => PlexusInstance, init: ValueType) {
+		super(instance, init)
+		// this._watchableStore._dataFetcher = () =>
+		// 	getFetcher(init) as PlexusWatchableValueInterpreter<ValueType>
 	}
 
 	/**
@@ -101,7 +111,7 @@ export class WatchableMutable<
 	 * @param newValue The new value of this state
 	 * @returns {this} The state instance
 	 */
-	set(newValue?: ValueType): this {
+	set(newValue?: PlexusWatchableValueInterpreter<ValueType>): this {
 		if (this.instance().runtime.isBatching) {
 			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
 			return this
@@ -173,7 +183,7 @@ export class WatchableMutable<
 	 * If no previous value (either `.set()` was never called or we previously used `.undo()`), reset to initial value.
 	 * @returns {this}
 	 */
-	undo() {
+	undo(): this {
 		if (this._history && this._history.maxLength > 0) {
 			this._history.skipArchiveUpdate = true
 			// if we have any previous history, undo the last set value
@@ -191,11 +201,17 @@ export class WatchableMutable<
 		// no history, so just try to reset to last value; if null, reset to initial value
 		else {
 			if (this._watchableStore._lastValue !== null) {
-				this.set(this._watchableStore._lastValue as ValueType)
+				this.set(
+					this._watchableStore
+						._lastValue as PlexusWatchableValueInterpreter<ValueType>
+				)
 				// last value should now be the current value BEFORE the undo, so set this to next value
 				this._watchableStore._nextValue = this._watchableStore._lastValue
 			} else {
-				this.set(this._watchableStore._initialValue as ValueType)
+				this.set(
+					this._watchableStore
+						._initialValue as PlexusWatchableValueInterpreter<ValueType>
+				)
 			}
 			this._watchableStore._lastValue = null
 		}
@@ -208,7 +224,7 @@ export class WatchableMutable<
 	 * If no next value (`.undo()` was never called), reset to current value.
 	 * @returns {this}
 	 */
-	redo() {
+	redo(): this {
 		if (this._history && this._history.maxLength > 0) {
 			this._history.skipArchiveUpdate = true
 			//  if we hae any upcoming history, redo the next set value
@@ -268,7 +284,9 @@ export class WatchableMutable<
 	 * @param fetcher - a function to fetch data from an external source (must match initial type)
 	 * @returns {this}
 	 */
-	defineFetcher(fetcher: Fetcher<ValueType>): this {
+	defineFetcher(
+		fetcher: Fetcher<PlexusWatchableValueInterpreter<ValueType>>
+	): this {
 		this._watchableStore._dataFetcher = fetcher
 		return this
 	}

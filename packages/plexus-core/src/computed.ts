@@ -2,7 +2,12 @@
 import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
 import { concurrentWatch } from './helpers'
 import { PlexusInstance } from './instance/instance'
-import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
+import {
+	Fetcher,
+	PlexusValidStateTypes,
+	PlexusWatchableValueInterpreter,
+	PlexusWatcher,
+} from './types'
 import { Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<
@@ -25,7 +30,7 @@ export class ComputedStateInstance<
 		_ready: boolean
 	}
 	// private instance: () => PlexusInstance
-	private computeFn: () => ValueType
+	private computeFn: ValueType & ((...args) => any)
 	/**
 	 * The internal id of the computed state
 	 */
@@ -41,10 +46,13 @@ export class ComputedStateInstance<
 
 	constructor(
 		instance: () => PlexusInstance,
-		computeFn: () => ValueType,
+		computeFn: ValueType,
 		deps: Watchable<any>[]
 	) {
-		super(instance, computeFn())
+		if (typeof computeFn !== 'function') {
+			throw new Error('Computed state must be a function')
+		}
+		super(instance, computeFn)
 		this.instance = instance
 		this.computeFn = computeFn
 
@@ -114,7 +122,9 @@ export class ComputedStateInstance<
 	 * @param callback The callback to run when the state changes
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<ValueType>): () => void {
+	watch(
+		callback: PlexusWatcher<PlexusWatchableValueInterpreter<ValueType>>
+	): () => void {
 		const destroyer = super.watch(callback)
 		this.refreshDeps()
 		this.instance().runtime.log(
@@ -132,7 +142,7 @@ export class ComputedStateInstance<
 	 * This would normally be passed from WatchableValue, but Watchable value has a set function that is public. We are not allowing the user to set the value of the state explicitly, so we recreate this function and make it private
 	 * @param value The value to set the state to
 	 */
-	private set(value?: ValueType) {
+	private set(value?: PlexusWatchableValueInterpreter<ValueType>) {
 		this._watchableStore._lastValue = this._watchableStore._value
 		if (isObject(value) && isObject(this._watchableStore._value)) {
 			this._watchableStore._lastValue = deepClone(this._watchableStore._value)
@@ -143,7 +153,7 @@ export class ComputedStateInstance<
 			const obj = deepMerge(this._watchableStore._value, value)
 			this._watchableStore._lastValue = Object.values(
 				obj
-			) as unknown as ValueType
+			) as unknown as PlexusWatchableValueInterpreter<ValueType>
 		} else {
 			this._watchableStore._lastValue = this._watchableStore._value
 		}
@@ -178,7 +188,7 @@ export class ComputedStateInstance<
 	/**
 	 * The value (reactive) of the state
 	 */
-	get value(): ValueType {
+	get value(): PlexusWatchableValueInterpreter<ValueType> {
 		this.mount()
 		return super.value
 	}
@@ -233,7 +243,7 @@ interface Dependency extends Watchable<any> {
 }
 export function _computed<StateValue extends PlexusValidStateTypes>(
 	instance: () => PlexusInstance,
-	computeFn: () => StateValue,
+	computeFn: StateValue,
 	deps: Dependency[]
 ) {
 	return new ComputedStateInstance<StateValue>(instance, computeFn, deps)

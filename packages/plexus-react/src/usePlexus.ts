@@ -4,13 +4,18 @@ import { useCallback, useRef, useState } from 'react'
 import { useSyncExternalStore } from 'use-sync-external-store/shim'
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 import { concurrentWatch, convertThingToString, deepClone } from './utils'
+import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 
 const normalizeDeps = (deps: Watchable | Watchable[]) =>
 	Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable]
 
-export type PlexusValue<T> = T extends Watchable<infer U> ? U : never
+export type PlexusValue<T> = T extends Watchable<infer U>
+	? PlexusWatchableValueInterpreter<U>
+	: never
 export type PlexusValueArray<T> = {
-	[K in keyof T]: T[K] extends Watchable<infer U> ? U : never
+	[K in keyof T]: T[K] extends Watchable<infer U>
+		? PlexusWatchableValueInterpreter<U>
+		: never
 }
 
 // Singleton argument

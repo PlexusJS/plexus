@@ -1,7 +1,12 @@
 import { WatchableMutable } from './../watchable'
 import { PlexusInstance } from '../instance/instance'
 import { ForeignKeyData, PlexusCollectionInstance } from './collection'
-import { deepClone, deepMerge, isEqual } from '@plexusjs/utils'
+import {
+	PlexusWatchableValueInterpreter,
+	deepClone,
+	deepMerge,
+	isEqual,
+} from '@plexusjs/utils'
 import { Fetcher } from '../types'
 
 export type PlexusGroupWatcher<V extends any = any> = (
@@ -22,7 +27,7 @@ interface PlexusDataStore {
 export type PlexusDataInstance<
 	DataType extends Record<string, any> = Record<string, any>
 > = CollectionData<DataType>
-export type DataKey = string | number
+export type DataKey = string
 
 // TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
 type DataObjectType<PK extends string = 'id'> = Record<string, any> & {
@@ -37,7 +42,7 @@ export class CollectionData<
 	PK extends string = string
 > extends WatchableMutable<DataType> {
 	private primaryKey: PK
-	readonly key: string | number
+	readonly key: string
 	provisional: boolean
 	private _internalStore: PlexusDataStore
 	private foreignKeyData: Record<string | number | symbol, any> = {}
@@ -54,7 +59,7 @@ export class CollectionData<
 		super(instance, value)
 		this.provisional = config.prov
 		this.primaryKey = primaryKey
-		this.key = keyValue
+		this.key = keyValue + ''
 		this.watchingForeignData = new Map()
 
 		this._internalStore = {
@@ -94,14 +99,16 @@ export class CollectionData<
 		}
 	}
 
-	private checkIfHasKey(value?: Partial<DataType>): boolean {
+	private checkIfHasKey(
+		value?: Partial<PlexusWatchableValueInterpreter<DataType>>
+	): boolean {
 		// if the value is undefined/null
-		if (!value || !value[this._internalStore.primaryKey as PK]) {
+		if (!value || !value[this._internalStore.primaryKey]) {
 			return false
 		}
 		// Check if the value has the primary key, and verify the key is the same as the data instance
 		const isCurrentKey =
-			value[this._internalStore.primaryKey as PK].toString().trim() ===
+			value[this._internalStore.primaryKey].toString().trim() ===
 			this.key.toString().trim()
 		// if the key is not the same, then we can't use this value
 		const valid =
@@ -127,7 +134,7 @@ export class CollectionData<
 			)
 			// get the previous foreign key data stored for this data instance
 
-			let idKey: keyof DataType
+			let idKey: string
 
 			// loop through the foreign keys
 			for (idKey of Object.keys(foreignKeys ?? {})) {
@@ -145,11 +152,11 @@ export class CollectionData<
 					const freshValue = isArray
 						? (this.shallowValue?.[idKey] as string[])
 								?.map(
-									(id: string) => foreignCollection?.getItem(id).shallowValue
+									(id: string) => foreignCollection?.getItem(id)?.shallowValue
 								)
 								.filter((x) => x) || undefined
 						: foreignCollection?.getItem(this.shallowValue?.[idKey])
-								.shallowValue || undefined
+								?.shallowValue
 					if (
 						freshValue &&
 						foreignCollection?.config.foreignKeys?.[idKey]?.newKey
@@ -167,7 +174,7 @@ export class CollectionData<
 					foreignCollectionName !== this.collection().name &&
 					injectListener
 				) {
-					const makeWatcher = (newKey: string, primaryKey: string | number) => {
+					const makeWatcher = (newKey: string, primaryKey: string) => {
 						if (this.watchingForeignData.has(newKey)) {
 							this.watchingForeignData.get(newKey)?.()
 							this.watchingForeignData.delete(newKey)
@@ -218,7 +225,7 @@ export class CollectionData<
 			// this.foreignKeyData = value
 		}
 	}
-	private genValue(incomingValue?: DataType) {
+	private genValue(incomingValue?: PlexusWatchableValueInterpreter<DataType>) {
 		const value = incomingValue
 			? {
 					...incomingValue,
@@ -227,21 +234,31 @@ export class CollectionData<
 			: undefined
 
 		// console.log('generated value:', value)
-		return value as DataType & { [key: string]: any }
+		return value as PlexusWatchableValueInterpreter<DataType> & {
+			[key: string]: any
+		}
 	}
 	/**
 	 * Get the value of the data instance
 	 * @type {!DataType}
 	 */
 	get value() {
-		return this.genValue(super.value) as DataType & { [key: string]: any }
+		return this.genValue(
+			super.value
+		) as PlexusWatchableValueInterpreter<DataType> & { [key: string]: any }
 	}
 	/**
 	 * Get the shallow value of the data instance (no foreign key values injected)
 	 * @type {DataType}
 	 */
-	get shallowValue(): DataType & { [key: string]: any } {
-		return deepClone(super.value)
+	get shallowValue(): PlexusWatchableValueInterpreter<DataType> & {
+		[key: string]: any
+	} {
+		return deepClone(
+			super.value
+		) as PlexusWatchableValueInterpreter<DataType> & {
+			[key: string]: any
+		}
 	}
 	/**
 	 * The previous (reactive) value of the state
@@ -262,7 +279,7 @@ export class CollectionData<
 	 * @param {DataType} value The value to set
 	 * @returns {this} The data instance
 	 */
-	set(value?: Partial<DataType>): this {
+	set(value?: Partial<PlexusWatchableValueInterpreter<DataType>>): this {
 		if (!value) return this
 
 		// if this is provisional, mount to the collection & instance
@@ -275,12 +292,20 @@ export class CollectionData<
 			this.provisional = false
 		}
 
-		if (!isEqual(value as DataType, this._watchableStore._value)) {
+		if (
+			!isEqual(
+				value as PlexusWatchableValueInterpreter<DataType>,
+				this._watchableStore._value
+			)
+		) {
 			if (this.checkIfHasKey(value)) {
-				super.set(value as DataType)
+				super.set(value as PlexusWatchableValueInterpreter<DataType>)
 			} else {
 				// give the id to the new value if it's missing
-				super.set({ ...value, [this.primaryKey]: this.key } as DataType)
+				super.set({
+					...value,
+					[this.primaryKey]: this.key,
+				} as PlexusWatchableValueInterpreter<DataType>)
 			}
 			// in order to sync foreign keys, we need to check if the value has changed
 			const foreignKeys = this.collection().config.foreignKeys
@@ -314,7 +339,7 @@ export class CollectionData<
 	 * @param {DataType} value A value of the state to merge with the current value
 	 * @returns {this} The data instance
 	 */
-	patch(value: Partial<DataType>): this {
+	patch(value: Partial<PlexusWatchableValueInterpreter<DataType>>): this {
 		this.set(deepMerge(this._watchableStore._value, value, true))
 
 		this.collection().lastUpdatedKey = this.key
@@ -355,12 +380,16 @@ export class CollectionData<
 	 * @param {WatchCallback} callback The callback to run when the state changes
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
-	watch(callback: PlexusGroupWatcher<DataType>, from?: string) {
+	watch(
+		callback: PlexusGroupWatcher<PlexusWatchableValueInterpreter<DataType>>,
+		from?: string
+	) {
 		// this.syncForeignKeyData()
 		const destroyer = super.watch((value) => {
 			this.syncForeignKeyData(true)
 
-			return callback(value, this.primaryKey)
+			// TODO - Fix the type casting here. This is a hack to get around the fact that the callback is not typed correctly
+			return callback(value, this.primaryKey as any)
 		}, from)
 		return destroyer
 	}

@@ -36,3 +36,9 @@ export type UnionToIntersection<U> = (
 	? I
 	: never
 export type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true
+
+export type PlexusWatchableValueInterpreter<Value> = Value extends (
+	...args: any
+) => any
+	? ReturnType<Value>
+	: Value

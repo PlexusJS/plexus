@@ -89,7 +89,7 @@ describe('Testing Collection', () => {
 			watcherCalled = true
 		})
 		expect(watcherCalled).toBe(false)
-		myCollection.update(5, { thing: 'lol2', id: 5 })
+		myCollection.update('5', { thing: 'lol2', id: 5 })
 
 		expect(watcherCalled).toBe(true)
 	})
@@ -105,7 +105,7 @@ describe('Testing Collection', () => {
 		)
 		expect(myCollection.value.length).toBe(3)
 
-		myCollection.getItem(1).delete()
+		myCollection.getItem('1')?.delete()
 
 		expect(myCollection.value.length).toBe(2)
 		expect(myCollection.getGroup('group1').value.length).toBe(2)
@@ -123,9 +123,9 @@ describe('Testing Collection', () => {
 
 		expect(myCollection.value.length).toBe(3)
 
-		myCollection.update(2, { thing: 'lol2' })
+		myCollection.update('2', { thing: 'lol2' })
 		expect(myCollection.lastUpdatedKey).toBe(2)
-		myCollection.update(1, { thing: 'lol5' })
+		myCollection.update('1', { thing: 'lol5' })
 		expect(myCollection.lastUpdatedKey).toBe(1)
 		expect(myCollection.value.length).toBe(3)
 	})
@@ -141,7 +141,7 @@ describe('Testing Collection', () => {
 		)
 
 		expect(myCollection.value.length).toBe(3)
-		myCollection.selectors.main.select(1)
+		myCollection.selectors.main.select('1')
 		myCollection.selectors.main.data?.patch({ thing: 'lol2' })
 		expect(myCollection.value.length).toBe(3)
 		expect(myCollection.getSelector('main').value.thing).toBe('lol2')
@@ -150,13 +150,13 @@ describe('Testing Collection', () => {
 	test('Can a provisional Data item stay reactive', () => {
 		console.log('Check...')
 		instance({ logLevel: 'debug' })
-		myCollection.getItem(15).watch((v) => {
+		myCollection.getItem('15')?.watch((v) => {
 			console.log(`new data`, v)
 		})
-		console.log(myCollection.getItem(15).value)
-		myCollection.getItem(15).set({ thing: 'provisional no more' })
+		console.log(myCollection.getItem('15')?.value)
+		myCollection.getItem('15')?.set({ thing: 'provisional no more' })
 		console.log('wtf')
-		console.log(myCollection.getItem(15).value)
+		console.log(myCollection.getItemValue('15'))
 		instance({ logLevel: undefined })
 	})
 })
@@ -186,10 +186,10 @@ describe('testing collection groups', () => {
 
 		// can add to groups
 		myCollection.collect({ thing: 'lol', id: 5 }, 'group1')
-		expect(myCollection.getGroupsOf(5)).toEqual(['default', 'group1'])
+		expect(myCollection.getGroupsOf('5')).toEqual(['default', 'group1'])
 
 		myCollection.collect({ thing: 'yay', id: 12 }, ['group1'])
-		expect(myCollection.getGroupsOf(12)).toEqual(['default', 'group1'])
+		expect(myCollection.getGroupsOf('12')).toEqual(['default', 'group1'])
 		// console.log(myCollection.getGroupsOf(5))
 		// console.log(myCollection.getGroup('group1').index)
 		// console.log(myCollection.groups.group1.index)

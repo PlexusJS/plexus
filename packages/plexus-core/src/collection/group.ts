@@ -1,3 +1,4 @@
+import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 import { PlexusCollectionInstance } from '..'
 import { PlexusInstance } from '../instance/instance'
 import { PlexusInternalWatcher } from '../types'
@@ -6,7 +7,7 @@ import { Watchable } from '../watchable'
 import { DataKey, PlexusDataInstance } from './data'
 
 export interface PlexusCollectionGroupConfig<DataType> {
-	addWhen?: (item: DataType) => boolean
+	addWhen?: (item: PlexusWatchableValueInterpreter<DataType>) => boolean
 }
 export type GroupName = string
 
@@ -14,10 +15,10 @@ export type PlexusCollectionGroup<DataType extends Record<string, any> = any> =
 	CollectionGroup<DataType>
 
 interface CollectionGroupStore<DataType = any> {
-	addWhen: (value: DataType) => boolean
+	addWhen: (value: PlexusWatchableValueInterpreter<DataType>) => boolean
 	_name: string
 	_collectionId: string
-	_includedKeys: Set<string | number>
+	_includedKeys: Set<string>
 	_dataWatcherDestroyers: Set<() => void>
 }
 
@@ -231,7 +232,9 @@ export class CollectionGroup<
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
 	watch(
-		callback: PlexusInternalWatcher<DataType[]>,
+		callback: PlexusInternalWatcher<
+			PlexusWatchableValueInterpreter<DataType>[]
+		>,
 		from?: string
 	): () => void {
 		return this.instance().runtime.subscribe(this.id, callback, from)

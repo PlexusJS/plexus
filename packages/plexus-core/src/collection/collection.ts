@@ -1,7 +1,8 @@
+import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 import { PlexusInstance } from '../instance/instance'
 import { PlexusInternalWatcher } from '../types'
 
-import { _data, PlexusDataInstance, DataKey } from './data'
+import { _data, PlexusDataInstance, DataKey, CollectionData } from './data'
 import {
 	_group,
 	PlexusCollectionGroup,
@@ -76,10 +77,10 @@ interface PlexusCollectionStore<
 	Selectors
 > {
 	_internalId: string
-	_lastChanged: number | string
+	_lastChanged: string
 	_lookup: Map<string, string>
 	_key: string
-	_data: Map<string | number, PlexusDataInstance<DataType>>
+	_data: Map<string, PlexusDataInstance<DataType>>
 	_groups: GroupMap<DataType>
 	_selectors: SelectorMap<DataType>
 	_name: string
@@ -88,7 +89,9 @@ interface PlexusCollectionStore<
 	_persist: boolean
 	_internalCalledGroupCollect?: boolean
 	set persist(value: boolean)
-	_computeFn?: (data: DataType) => DataType
+	_computeFn?: (
+		data: PlexusWatchableValueInterpreter<DataType>
+	) => PlexusWatchableValueInterpreter<DataType>
 }
 
 export type PlexusCollectionInstance<
@@ -221,20 +224,32 @@ export class CollectionInstance<
 	 * @returns {this} The collection instance
 	 */
 	collect(
-		data: DataTypeInput[] | DataTypeInput,
+		data:
+			| PlexusWatchableValueInterpreter<DataTypeInput>[]
+			| PlexusWatchableValueInterpreter<DataTypeInput>,
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	): void
 	collect(
-		data: DataTypeInput,
+		data: PlexusWatchableValueInterpreter<DataTypeInput>,
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	): void
-	collect(data: DataTypeInput[], groups?: GroupName[] | GroupName): void
-	collect(data: DataTypeInput, groups?: GroupName[] | GroupName): void
 	collect(
-		data: DataTypeInput | DataTypeInput[],
+		data: PlexusWatchableValueInterpreter<DataTypeInput>[],
+		groups?: GroupName[] | GroupName
+	): void
+	collect(
+		data: PlexusWatchableValueInterpreter<DataTypeInput>,
+		groups?: GroupName[] | GroupName
+	): void
+	collect(
+		data:
+			| PlexusWatchableValueInterpreter<DataTypeInput>
+			| PlexusWatchableValueInterpreter<DataTypeInput>[],
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	) {
-		const collectItems = (items: DataTypeInput[] = []) => {
+		const collectItems = (
+			items: PlexusWatchableValueInterpreter<DataTypeInput>[] = []
+		) => {
 			if (!items.length) return []
 			const addedKeys = new Set<string | number>()
 			for (let item of items) {
@@ -275,7 +290,9 @@ export class CollectionInstance<
 			return Array.from(addedKeys.values())
 		}
 		const collectFn = (
-			data: DataTypeInput | DataTypeInput[],
+			data:
+				| PlexusWatchableValueInterpreter<DataTypeInput>
+				| PlexusWatchableValueInterpreter<DataTypeInput>[],
 			groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>,
 			startedFromInnerBatch?: boolean
 		) => {
@@ -345,7 +362,7 @@ export class CollectionInstance<
 	 */
 	update(
 		key: DataKey,
-		data: Partial<DataTypeInput>,
+		data: Partial<PlexusWatchableValueInterpreter<DataTypeInput>>,
 		config: { deep: boolean } = { deep: true }
 	) {
 		key = key
@@ -354,13 +371,15 @@ export class CollectionInstance<
 				this._internalStore._data.get(key)?.patch({
 					...data,
 					[this._internalStore._key]: key,
-				} as Partial<DataTypeInput>)
+				} as Partial<PlexusWatchableValueInterpreter<DataTypeInput>>)
 			} else {
 				console.warn('no data found for key', key)
 			}
 		} else {
 			if (this._internalStore._data.has(key)) {
-				this._internalStore._data.get(key)?.set(data as DataTypeInput)
+				this._internalStore._data
+					.get(key)
+					?.set(data as PlexusWatchableValueInterpreter<DataTypeInput>)
 			} else {
 				console.warn('no data found for key', key)
 			}
@@ -373,7 +392,7 @@ export class CollectionInstance<
 	 * @param {string|number} dataKey The key of the data item to get
 	 * @returns {this} The new Collection Instance
 	 */
-	getItem(dataKey: DataKey): PlexusDataInstance<DataTypeInput> {
+	getItem(dataKey: DataKey): CollectionData<DataTypeInput> | null {
 		const data = this._internalStore._data.get(dataKey)
 		if (!data) {
 			const dataInstance = _data(
@@ -395,7 +414,7 @@ export class CollectionInstance<
 			if (dataInstance) {
 				this._internalStore._data.set(dataKey, dataInstance)
 			}
-			return dataInstance as PlexusDataInstance<DataTypeInput>
+			return dataInstance
 		}
 		// this.mount()
 		return data
@@ -405,8 +424,10 @@ export class CollectionInstance<
 	 * @param {string|number} key The key of the item to get
 	 * @returns {DataTypeInput} The value of the item
 	 */
-	getItemValue(key: DataKey): DataTypeInput {
-		const value = this.getItem(key).value
+	getItemValue(
+		key: DataKey
+	): PlexusWatchableValueInterpreter<DataTypeInput> | undefined {
+		const value = this.getItem(key)?.value
 		if (
 			typeof this._internalStore._computeFn === 'function' &&
 			this.config.computeLocations?.includes('getValue') &&
@@ -456,7 +477,7 @@ export class CollectionInstance<
 			Groups,
 			Selectors &
 				Map<
-					typeof selectorNames[number],
+					(typeof selectorNames)[number],
 					PlexusCollectionSelector<DataTypeInput>
 				>
 		>
@@ -529,7 +550,7 @@ export class CollectionInstance<
 		return this as CollectionInstance<
 			DataTypeInput,
 			Groups &
-				Map<typeof groupNames[number], PlexusCollectionGroup<DataTypeInput>>,
+				Map<(typeof groupNames)[number], PlexusCollectionGroup<DataTypeInput>>,
 			Selectors
 		>
 	}
@@ -762,7 +783,11 @@ export class CollectionInstance<
 	 * @param {function(Object): Object} fn A function that takes in the data and returns the formatted data
 	 * @returns {this} The new Collection Instance
 	 */
-	compute(fn: (value: DataTypeInput) => DataTypeInput): this {
+	compute(
+		fn: (
+			value: PlexusWatchableValueInterpreter<DataTypeInput>
+		) => PlexusWatchableValueInterpreter<DataTypeInput>
+	): this {
 		this._internalStore._computeFn = fn
 		return this
 	}
@@ -792,7 +817,7 @@ export class CollectionInstance<
 				data.patch({
 					...(this._internalStore._computeFn?.(data.value) ?? {}),
 					[this._internalStore._key]: id,
-				} as Partial<DataTypeInput>)
+				} as Partial<PlexusWatchableValueInterpreter<DataTypeInput>>)
 			}
 		})
 		return this
@@ -907,9 +932,9 @@ export class CollectionInstance<
 	 * @type {Record<SelectorNames, DataTypeInput[]>}
 	 */
 	get selectorsValue() {
-		const selectors: Record<KeyOfMap<Selectors>, DataTypeInput> = {} as Record<
+		const selectors = {} as Record<
 			KeyOfMap<Selectors>,
-			DataTypeInput
+			PlexusWatchableValueInterpreter<DataTypeInput>
 		>
 		for (let selector of this._internalStore._selectors.entries()) {
 			if (selector[1].value)
@@ -925,13 +950,13 @@ export class CollectionInstance<
 		return this._internalStore._name
 	}
 
-	set lastUpdatedKey(value: string | number) {
+	set lastUpdatedKey(value: string) {
 		this._internalStore._lastChanged = value
 	}
 
 	/**
 	 * Get the last updated key of the collection
-	 * @type {string|number}
+	 * @type {string}
 	 */
 	get lastUpdatedKey() {
 		return this._internalStore._lastChanged
