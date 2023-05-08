@@ -1,13 +1,13 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
-import { deepClone, deepMerge, isObject } from '@plexusjs/utils'
+import {
+	PlexusWatchableValueInterpreter,
+	deepClone,
+	deepMerge,
+	isObject,
+} from '@plexusjs/utils'
 import { concurrentWatch } from './helpers'
 import { PlexusInstance } from './instance/instance'
-import {
-	Fetcher,
-	PlexusValidStateTypes,
-	PlexusWatchableValueInterpreter,
-	PlexusWatcher,
-} from './types'
+import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
 import { Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<

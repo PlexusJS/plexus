@@ -8,6 +8,7 @@ const myCollection = collection<{
 	obj?: {
 		arr: {
 			item1: string
+			name?: string
 		}[]
 	}
 }>({ defaultGroup: true })
@@ -36,23 +37,24 @@ describe('Testing Collection', () => {
 			{ thing: 'lol3', id: 2 },
 			{ thing: 'lols', id: 1 },
 		])
+		console.log('reeeee, myCollection.value', myCollection.value)
 		// can return the data values as an array
 		expect(myCollection.value[0].thing).toBe('lol')
 		expect(myCollection.value[1].thing).toBe('lol3')
 		expect(myCollection.value[2].thing).toBe('lols')
 
 		// can properly retrieve data values
-		expect(myCollection.getItemValue(0)?.thing).toBe('lol')
-		expect(myCollection.getItemValue(2)?.thing).toBe('lol3')
-		expect(myCollection.getItemValue(1)?.thing).toBe('lols')
+		expect(myCollection.getItemValue('0')?.thing).toBe('lol')
+		expect(myCollection.getItemValue('2')?.thing).toBe('lol3')
+		expect(myCollection.getItemValue('1')?.thing).toBe('lols')
 
 		// does the unfoundKeyReturnsUndefined configuration work
-		expect(myCollectionUndefined.getItemValue(1)).toBeUndefined()
-		console.log('an undefined object', myCollectionUndefined.getItemValue(1))
+		expect(myCollectionUndefined.getItemValue('1')).toBeUndefined()
+		console.log('an undefined object', myCollectionUndefined.getItemValue('1'))
 	})
 
 	test('ingest multiple values in collect', () => {
-		expect(myCollectionUndefined.getItemValue(1)).toBeUndefined()
+		expect(myCollectionUndefined.getItemValue('1')).toBeUndefined()
 		myCollectionUndefined.collect([
 			{ thing: 'lol3', id: 2 },
 			{ thing: 'lols', id: 1 },
@@ -62,7 +64,7 @@ describe('Testing Collection', () => {
 	})
 	test('Does it pass the vibe check ?', () => {
 		myCollection.collect({ thing: 'xqcL', id: 0 })
-		expect(myCollection.getItem(0).value?.thing).toBe('xqcL')
+		expect(myCollection.getItem('0').value?.thing).toBe('xqcL')
 	})
 
 	test('Watching Data', () => {
@@ -75,7 +77,7 @@ describe('Testing Collection', () => {
 		// can add to groups
 		// console.log(myCollection.getGroupsOf(5))
 		myCollection.collect({ thing: 'lol', id: 5 }, 'group1')
-		myCollection.getSelector('main').select(5)
+		myCollection.getSelector('main').select('5')
 
 		let watcherCalled = false
 		// watch for any change on group1
@@ -124,27 +126,41 @@ describe('Testing Collection', () => {
 		expect(myCollection.value.length).toBe(3)
 
 		myCollection.update('2', { thing: 'lol2' })
-		expect(myCollection.lastUpdatedKey).toBe(2)
+		expect(myCollection.lastUpdatedKey).toBe('2')
 		myCollection.update('1', { thing: 'lol5' })
-		expect(myCollection.lastUpdatedKey).toBe(1)
+		expect(myCollection.lastUpdatedKey).toBe('1')
 		expect(myCollection.value.length).toBe(3)
 	})
 
-	test('Checking if you can patch a data item', () => {
+	test('Can patch a data item', () => {
 		myCollection.collect(
 			[
 				{ thing: 'lol', id: 0 },
 				{ thing: 'lol3', id: 2 },
-				{ thing: 'lols', id: 1 },
+				{ 
+					id: 1, 
+					thing: 'lols', 
+					obj: {
+						arr: [{ item1: 'item1' }, { item1: 'item2' }]
+					} 
+				},
 			],
 			'group1'
 		)
 
 		expect(myCollection.value.length).toBe(3)
 		myCollection.selectors.main.select('1')
-		myCollection.selectors.main.data?.patch({ thing: 'lol2' })
+		myCollection.selectors.main.data?.patch({ thing: 'lol2', obj: { arr: [{ item1: 'item3', name: 'yes'  }] } })
 		expect(myCollection.value.length).toBe(3)
 		expect(myCollection.getSelector('main').value.thing).toBe('lol2')
+		expect(myCollection.getSelector('main').value.obj?.arr[0].item1).toBe('item3')
+		expect(myCollection.getSelector('main').value.obj?.arr[0].name).toBe('yes')
+
+		// patch with a thinner object
+		myCollection.selectors.main.data?.patch({ thing: 'lol3' }) 
+		expect(myCollection.getSelector('main').value.thing).toBe('lol3')
+		expect(myCollection.getSelector('main').value.obj?.arr[0].item1).toBe('item3')
+		expect(myCollection.getSelector('main').value.obj?.arr[0].name).toBe('yes')
 	})
 
 	test('Can a provisional Data item stay reactive', () => {
@@ -203,9 +219,9 @@ describe('testing collection groups', () => {
 		// console.log(myCollection.getGroup('group1').value)
 
 		// we should be able to update a data item and see it in all places we can get the item (in the collection, in the groups, etc)
-		myCollection.update(5, { thing: 'idk' })
+		myCollection.update('5', { thing: 'idk' })
 		// console.log(myCollection.getGroup('group1').value)
-		expect(myCollection.getItemValue(5).thing).toBe('idk')
+		expect(myCollection.getItemValue('5')?.thing).toBe('idk')
 		expect(myCollection.getGroup('group1')).toBeDefined()
 		expect(myCollection.getGroup('group1').value[0].thing).toBe('idk')
 
@@ -227,7 +243,7 @@ describe('testing collection groups', () => {
 		expect(myCollection.getGroup('default').index.size).toBe(3)
 
 		expect(myCollection.value.length).toBe(3)
-		myCollection.delete(1)
+		myCollection.delete("1")
 		expect(myCollection.getGroup('default').value.length).toBe(2)
 	})
 	test('Watching Groups', () => {
@@ -260,7 +276,7 @@ describe('testing collection groups', () => {
 		})
 		console.log(myCollection.getGroup('group1').index)
 		expect(watcherCalled).toBe(false)
-		myCollection.update(2, { thing: 'lol2' })
+		myCollection.update('2', { thing: 'lol2' })
 
 		expect(watcherCalled).toBe(true)
 
@@ -278,7 +294,7 @@ describe('testing collection groups', () => {
 		})
 
 		expect(watcherCalled).toBe(false)
-		myCollection.update(1, { thing: 'lol3' })
+		myCollection.update('1', { thing: 'lol3' })
 
 		expect(watcherCalled).toBe(true)
 
@@ -312,7 +328,7 @@ describe('testing collection groups', () => {
 		)
 		expect(myCollection.value.length).toBe(3)
 
-		myCollection.removeFromGroup(1, 'group1')
+		myCollection.removeFromGroup('1', 'group1')
 
 		expect(myCollection.value.length).toBe(3)
 
@@ -331,7 +347,7 @@ describe('testing collection groups', () => {
 		expect(myCollection.getGroup('default').index.size).toBe(3)
 
 		expect(myCollection.value.length).toBe(3)
-		myCollection.delete(1)
+		myCollection.delete('1')
 		expect(myCollection.getGroup('default').value.length).toBe(2)
 	})
 
@@ -348,7 +364,7 @@ describe('testing collection groups', () => {
 			id: 'x',
 			name: 'jack',
 		})
-		expect(computedCollection.getItemValue('x').backwards).toBe('kcaj')
+		expect(computedCollection.getItemValue('x')?.backwards).toBe('kcaj')
 	})
 
 	test('Collecting into a group, then ensuring the group is up to date', () => {
@@ -369,10 +385,10 @@ describe('testing collection groups', () => {
 			'group1'
 		)
 		expect(collected).toBe(true)
-		myCollection.delete(1)
+		myCollection.delete('1')
 		expect(deleted).toBe(true)
 
-		myCollection.update(2, { thing: 'lol2' })
+		myCollection.update('2', { thing: 'lol2' })
 		expect(updated).toBe(true)
 
 		expect(myCollection.getGroup('default').value.length).toBe(2)
@@ -398,23 +414,23 @@ describe('testing collection selectors', () => {
 			{ thing: 'lols', id: 1 },
 		])
 		instance().settings.logLevel = 'debug'
-		myCollection.getSelector('main').select(0)
+		myCollection.getSelector('main').select('0')
 		expect(ref.numOfLoops).toBe(1)
 		// console.log(myCollection.getSelector("main").key)
 
-		expect(myCollection.selectors.main.value?.id).toBe(0)
+		expect(myCollection.selectors.main.value?.id).toBe('0')
 		expect(myCollection.selectors.main.value?.thing).toBe('lol')
 
 		console.log(myCollection.selectors.main.value?.thing)
-		myCollection.update(0, { thing: 'haha' })
+		myCollection.update('0', { thing: 'haha' })
 		expect(ref.numOfLoops).toBe(2)
 		console.log(myCollection.selectors.main.value?.thing)
-		expect(myCollection.selectors.main.key).toBe(0)
+		expect(myCollection.selectors.main.key).toBe('0')
 		expect(myCollection.selectors.main.value?.thing).toBe('haha')
 
-		myCollection.selectors.main.select(1)
+		myCollection.selectors.main.select('1')
 		console.log(myCollection.selectors.main.value?.thing)
-		expect(myCollection.selectors.main.value?.id).toBe(1)
+		expect(myCollection.selectors.main.value?.id).toBe('1')
 		expect(myCollection.selectors.main.value?.thing).toBe('lols')
 		expect(ref.numOfLoops).toBe(3)
 
@@ -446,8 +462,8 @@ describe('testing collection selectors', () => {
 
 		expect(watcherCalled).toBe(false)
 		// does update cause the watcher to be called?
-		myCollection.getSelector('main').select(5)
-		myCollection.update(5, { thing: 'lol2', id: 5 })
+		myCollection.getSelector('main').select('5')
+		myCollection.update('5', { thing: 'lol2', id: 5 })
 
 		expect(watcherCalled).toBe(true)
 		watcherCalled = false
@@ -466,7 +482,7 @@ describe('testing collection selectors', () => {
 			{ thing: 'lols', id: 1 },
 		])
 
-		myCollection.selectors.main.select(0)
+		myCollection.selectors.main.select('0')
 		myCollection.selectors.main.history()
 
 		myCollection.selectors.main.watch((v) => {
@@ -478,7 +494,7 @@ describe('testing collection selectors', () => {
 		// console.log("1: checking", objectState.value, "vs.", { a: { b: false } })
 		expect(myCollection.selectors.main.value).toStrictEqual({
 			thing: 'new',
-			id: 0,
+			id: '0',
 		})
 		console.log('undoing...')
 		myCollection.selectors.main.undo()
@@ -486,7 +502,7 @@ describe('testing collection selectors', () => {
 		// console.log("2: checking", objectState.value, "vs.", initialValue.object)
 		expect(myCollection.selectors.main.value).toStrictEqual({
 			thing: 'lol',
-			id: 0,
+			id: '0',
 		})
 		console.log('redoing...')
 		myCollection.selectors.main.redo()
@@ -494,7 +510,7 @@ describe('testing collection selectors', () => {
 
 		expect(myCollection.selectors.main.value).toStrictEqual({
 			thing: 'new',
-			id: 0,
+			id: '0',
 		})
 
 		console.log('undoing...')
@@ -503,7 +519,7 @@ describe('testing collection selectors', () => {
 		// console.log("2: checking", objectState.value, "vs.", initialValue.object)
 		expect(myCollection.selectors.main.value).toStrictEqual({
 			thing: 'lol',
-			id: 0,
+			id: '0',
 		})
 		console.log('redoing...')
 		myCollection.selectors.main.redo()
@@ -511,7 +527,7 @@ describe('testing collection selectors', () => {
 
 		expect(myCollection.selectors.main.value).toStrictEqual({
 			thing: 'new',
-			id: 0,
+			id: '0',
 		})
 		instance({ logLevel: undefined })
 
@@ -590,8 +606,8 @@ describe('testing collection relations', () => {
 		console.log(appointments.value)
 
 		// does the unfoundKeyReturnsUndefined configuration work
-		expect(users.getItemValue(3)).toBeUndefined()
-		console.log('an undefined object', users.getItemValue(3))
+		expect(users.getItemValue('3')).toBeUndefined()
+		console.log('an undefined object', users.getItemValue('3'))
 	})
 	test('shallow array injecting', () => {
 		const c1 = collection<{
@@ -621,8 +637,8 @@ describe('testing collection relations', () => {
 			{ id: '1', c1ids: ['1', '2'] },
 			{ id: '2', c1ids: ['1'] },
 		])
-		expect(c2.getItemValue('1').c1s?.length).toBe(2)
-		expect(c2.getItemValue('1').c1s?.[0]).toMatchObject({
+		expect(c2.getItemValue('1')?.c1s?.length).toBe(2)
+		expect(c2.getItemValue('1')?.c1s?.[0]).toMatchObject({
 			id: '1',
 			name: 'c1-1',
 		})

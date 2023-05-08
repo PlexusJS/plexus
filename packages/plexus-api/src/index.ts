@@ -26,6 +26,7 @@ export interface PlexusApiConfig {
 	defaultOptions?: PlexusApiOptions
 	timeout?: number
 	silentFail?: boolean
+
 	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
 	headers?:
 		| Record<string, string>
@@ -142,7 +143,7 @@ export class ApiInstance {
 				matches && matches?.length > 0
 					? path
 					: `${this._internalStore._baseURL}${
-							path.startsWith('/') ? path : `/${path}`
+							path.startsWith('/') || path?.length === 0 ? path : `/${path}`
 					  }`
 			const requestObject = {
 				...this._internalStore._options,

@@ -261,10 +261,12 @@ export class CollectionInstance<
 					if (
 						typeof this._internalStore._computeFn === 'function' &&
 						this.config.computeLocations?.includes('collect')
-					)
+					) {
+
 						item = this._internalStore._computeFn(item)
+					}
 					// normalizing the key type to string
-					const dataKey = item[this._internalStore._key]
+					const dataKey = `${item[this._internalStore._key]}`
 					// if there is already a state for that key, update it
 					if (this._internalStore._data.has(dataKey)) {
 						this._internalStore._data.get(dataKey)?.set(item)
@@ -276,7 +278,7 @@ export class CollectionInstance<
 							() => this,
 							this._internalStore._key,
 							dataKey,
-							item
+							{...item, [this._internalStore._key]: dataKey},
 						)
 						// if we get a valid data instance, add it to the collection
 						if (dataInstance) {
@@ -365,7 +367,7 @@ export class CollectionInstance<
 		data: Partial<PlexusWatchableValueInterpreter<DataTypeInput>>,
 		config: { deep: boolean } = { deep: true }
 	) {
-		key = key
+		key = `${key}`
 		if (config.deep) {
 			if (this._internalStore._data.has(key)) {
 				this._internalStore._data.get(key)?.patch({
@@ -388,11 +390,19 @@ export class CollectionInstance<
 		return this
 	}
 	/**
+	 * Check if the collection has a data item with the given key
+	 * @param {string} dataKey The key of the data item to  look for
+	 * @returns {boolean} Whether the collection has a data item with the given key
+	 */
+	has(dataKey: DataKey): boolean {
+		return this._internalStore._data.has(dataKey)
+	}
+	/**
 	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
 	 * @param {string|number} dataKey The key of the data item to get
 	 * @returns {this} The new Collection Instance
 	 */
-	getItem(dataKey: DataKey): CollectionData<DataTypeInput> | null {
+	getItem(dataKey: DataKey): CollectionData<DataTypeInput> {
 		const data = this._internalStore._data.get(dataKey)
 		if (!data) {
 			const dataInstance = _data(
@@ -410,10 +420,16 @@ export class CollectionInstance<
 					unfoundKeyIsUndefined: !this.config.unfoundKeyReturnsProvisional,
 				}
 			)
-			// if we get a valid data instance, add it to the collection
-			if (dataInstance) {
-				this._internalStore._data.set(dataKey, dataInstance)
+			// if we get an invalid data instance, return undefined
+			if (!dataInstance) {
+				this.instance().runtime.log(
+					'warn',
+					`Invalid data instance returned for key ${dataKey} in collection ${this.instanceId}`
+				)
+				return undefined as any
 			}
+			// if we get a valid data instance, add it to the collection
+			this._internalStore._data.set(dataKey, dataInstance)
 			return dataInstance
 		}
 		// this.mount()

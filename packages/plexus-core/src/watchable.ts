@@ -7,13 +7,9 @@ import {
 	AlmostAnything,
 	LiteralType,
 	TypeOrReturnType,
-} from '@plexusjs/utils'
-import {
-	Fetcher,
-	PlexusValidStateTypes,
 	PlexusWatchableValueInterpreter,
-	PlexusWatcher,
-} from './types'
+} from '@plexusjs/utils'
+import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
 
 const getFetcher = function <ValueType>(
 	subject: ValueType | (() => ValueType)

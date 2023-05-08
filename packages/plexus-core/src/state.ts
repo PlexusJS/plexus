@@ -1,11 +1,12 @@
-import { deepClone, deepMerge, isEqual, isObject } from '@plexusjs/utils'
-import { PlexusInstance } from './instance/instance'
 import {
-	Fetcher,
-	PlexusInternalWatcher,
-	PlexusValidStateTypes,
 	PlexusWatchableValueInterpreter,
-} from './types'
+	deepClone,
+	deepMerge,
+	isEqual,
+	isObject,
+} from '@plexusjs/utils'
+import { PlexusInstance } from './instance/instance'
+import { Fetcher, PlexusInternalWatcher, PlexusValidStateTypes } from './types'
 
 import { WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"

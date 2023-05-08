@@ -2538,6 +2538,13 @@
     os-homedir "^1.0.1"
     regexpu-core "^4.5.4"
 
+"@plexusjs/api@1.7.10":
+  version "1.7.10"
+  resolved "https://registry.yarnpkg.com/@plexusjs/api/-/api-1.7.10.tgz#4a60ee4ca1efa3a4259f77adc4980d4be38fdacd"
+  integrity sha512-VXBSrM1RWpFG9koHhbYNQyuQu1mwatJbyMlo2ePcLEQCFdBo0gy5fNI0RXierQaSznmm3UGbvRAHudfrYRwisg==
+  dependencies:
+    "@plexusjs/utils" "1.7.10"
+
 "@plexusjs/api@1.7.4":
   version "1.7.4"
   resolved "https://registry.yarnpkg.com/@plexusjs/api/-/api-1.7.4.tgz#50f17def2ca71248183063217f5f01233da6ca64"

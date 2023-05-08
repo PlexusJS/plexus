@@ -4,7 +4,7 @@ import { instance } from '@plexusjs/core/src/instance/instance'
 
 const initialValue = {
 	boolean: true,
-	string: 'Hello Pulse!',
+	string: 'Hello Plexus!',
 	object: { a: { a: true, b: true }, b: true },
 	array: [
 		{ item: 'Hello', item2: { subitem: 'World' } },
