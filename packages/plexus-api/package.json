@@ -27,6 +27,6 @@
 		"isomorphic-fetch": "^3.0.0"
 	},
 	"dependencies": {
-		"@plexusjs/utils": "1.7.10"
+		"@plexusjs/utils": "1.7.11"
 	}
 }
