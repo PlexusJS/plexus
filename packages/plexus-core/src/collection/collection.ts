@@ -243,7 +243,7 @@ export class CollectionInstance<
 			items: PlexusWatchableValueInterpreter<DataTypeInput>[] = []
 		) => {
 			if (!items.length) return []
-			const addedKeys = new Set<string | number>()
+			const addedKeys = new Set<string>()
 			for (let item of items) {
 				if (
 					item[this._internalStore._key] !== undefined &&
@@ -871,7 +871,7 @@ export class CollectionInstance<
 	 * @type {string[]|number[]}
 	 */
 	get keys() {
-		const keys: (string | number)[] = []
+		const keys: string[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {
 				keys.push(item.key)
