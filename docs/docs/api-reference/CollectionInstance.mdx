@@ -20,6 +20,7 @@ A Collection Instance
     * [.lastUpdatedKey](#CollectionInstance+lastUpdatedKey) : <code>string</code>
     * [.collect(data, groups)](#CollectionInstance+collect) ⇒ <code>this</code>
     * [.update(key, data, config)](#CollectionInstance+update)
+    * [.has(dataKey)](#CollectionInstance+has) ⇒ <code>boolean</code>
     * [.getItem(dataKey)](#CollectionInstance+getItem) ⇒ <code>this</code>
     * [.getItemValue(key)](#CollectionInstance+getItemValue) ⇒ <code>DataTypeInput</code>
     * [.createSelector(selectorName)](#CollectionInstance+createSelector) ⇒ <code>this</code>
@@ -115,6 +116,17 @@ This is like collect but will not add new items, and can can be used to patch ex
 | data | <code>DataTypeInput</code> | <p>The data to update the item with</p> |
 | config |  | <p>The configuration to use for the update</p> |
 | config.deep | <code>boolean</code> | <p>Should the update be deep or shallow</p> |
+
+<a name="CollectionInstance+has"></a>
+
+### .has(dataKey) ⇒ <code>boolean</code>
+<p>Check if the collection has a data item with the given key</p>
+
+**Returns**: <code>boolean</code> <p>Whether the collection has a data item with the given key</p>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dataKey | <code>string</code> | <p>The key of the data item to  look for</p> |
 
 <a name="CollectionInstance+getItem"></a>
 

@@ -71,11 +71,7 @@ export interface PlexusCollectionConfig<DataType> {
 	foreignKeys?: ForeignKeyData<DataType>
 	computeLocations?: Array<'collect' | 'getValue'>
 }
-interface PlexusCollectionStore<
-	DataType extends Record<string, any>,
-	Groups,
-	Selectors
-> {
+interface PlexusCollectionStore<DataType extends Record<string, any>> {
 	_internalId: string
 	_lastChanged: string
 	_lookup: Map<string, string>
@@ -109,11 +105,7 @@ export class CollectionInstance<
 	Selectors extends SelectorMap<DataTypeInput>
 	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
-	private _internalStore: PlexusCollectionStore<
-		DataTypeInput,
-		Groups,
-		Selectors
-	>
+	private _internalStore: PlexusCollectionStore<DataTypeInput>
 	private instance: () => PlexusInstance
 	/**
 	 * Get the config
@@ -228,19 +220,19 @@ export class CollectionInstance<
 			| PlexusWatchableValueInterpreter<DataTypeInput>[]
 			| PlexusWatchableValueInterpreter<DataTypeInput>,
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
-	): void
+	): this
 	collect(
 		data: PlexusWatchableValueInterpreter<DataTypeInput>,
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
-	): void
+	): this
 	collect(
 		data: PlexusWatchableValueInterpreter<DataTypeInput>[],
 		groups?: GroupName[] | GroupName
-	): void
+	): this
 	collect(
 		data: PlexusWatchableValueInterpreter<DataTypeInput>,
 		groups?: GroupName[] | GroupName
-	): void
+	): this
 	collect(
 		data:
 			| PlexusWatchableValueInterpreter<DataTypeInput>
@@ -262,13 +254,12 @@ export class CollectionInstance<
 						typeof this._internalStore._computeFn === 'function' &&
 						this.config.computeLocations?.includes('collect')
 					) {
-
 						item = this._internalStore._computeFn(item)
 					}
 					// normalizing the key type to string
 					const dataKey = `${item[this._internalStore._key]}`
 					// if there is already a state for that key, update it
-					if (this._internalStore._data.has(dataKey)) {
+					if (this.has(dataKey)) {
 						this._internalStore._data.get(dataKey)?.set(item)
 					}
 					// if there is no data instance for that key, create it
@@ -278,7 +269,7 @@ export class CollectionInstance<
 							() => this,
 							this._internalStore._key,
 							dataKey,
-							{...item, [this._internalStore._key]: dataKey},
+							{ ...item, [this._internalStore._key]: dataKey }
 						)
 						// if we get a valid data instance, add it to the collection
 						if (dataInstance) {
@@ -292,9 +283,7 @@ export class CollectionInstance<
 			return Array.from(addedKeys.values())
 		}
 		const collectFn = (
-			data:
-				| PlexusWatchableValueInterpreter<DataTypeInput>
-				| PlexusWatchableValueInterpreter<DataTypeInput>[],
+			data_: typeof data,
 			groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>,
 			startedFromInnerBatch?: boolean
 		) => {
@@ -314,15 +303,15 @@ export class CollectionInstance<
 						'debug',
 						`Batched collect call fulfilled for collection ${this.instanceId}`
 					)
-					return collectFn(data, groups, true)
+					return collectFn(data_, groups, true)
 				})
 				return this
 			}
 			let addedKeys: any[] = []
-			if (Array.isArray(data)) {
-				addedKeys = collectItems(data)
+			if (Array.isArray(data_)) {
+				addedKeys = collectItems(data_)
 			} else {
-				addedKeys = collectItems([data])
+				addedKeys = collectItems([data_])
 			}
 
 			const defaultGroupName =
@@ -368,23 +357,23 @@ export class CollectionInstance<
 		config: { deep: boolean } = { deep: true }
 	) {
 		key = `${key}`
-		if (config.deep) {
-			if (this._internalStore._data.has(key)) {
+		if (this.has(key)) {
+			if (config.deep) {
 				this._internalStore._data.get(key)?.patch({
 					...data,
 					[this._internalStore._key]: key,
 				} as Partial<PlexusWatchableValueInterpreter<DataTypeInput>>)
 			} else {
-				console.warn('no data found for key', key)
+				if (this.has(key)) {
+					this._internalStore._data
+						.get(key)
+						?.set(data as PlexusWatchableValueInterpreter<DataTypeInput>)
+				} else {
+					console.warn('no data found for key', key)
+				}
 			}
 		} else {
-			if (this._internalStore._data.has(key)) {
-				this._internalStore._data
-					.get(key)
-					?.set(data as PlexusWatchableValueInterpreter<DataTypeInput>)
-			} else {
-				console.warn('no data found for key', key)
-			}
+			console.warn('no data found for key', key)
 		}
 		this.mount()
 		return this
@@ -395,7 +384,8 @@ export class CollectionInstance<
 	 * @returns {boolean} Whether the collection has a data item with the given key
 	 */
 	has(dataKey: DataKey): boolean {
-		return this._internalStore._data.has(dataKey)
+		const key = `${dataKey}`
+		return this._internalStore._data.has(key)
 	}
 	/**
 	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one

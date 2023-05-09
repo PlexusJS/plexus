@@ -23,7 +23,7 @@ import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
 
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { LiteralType, AlmostAnything } from '@plexusjs/utils'
-import { TypeOrReturnType } from '@plexusjs/utils'
+export { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 import { Fetcher, PlexusValidStateTypes } from './types'
 
 // export function state<

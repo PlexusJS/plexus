@@ -137,12 +137,12 @@ describe('Testing Collection', () => {
 			[
 				{ thing: 'lol', id: 0 },
 				{ thing: 'lol3', id: 2 },
-				{ 
-					id: 1, 
-					thing: 'lols', 
+				{
+					id: 1,
+					thing: 'lols',
 					obj: {
-						arr: [{ item1: 'item1' }, { item1: 'item2' }]
-					} 
+						arr: [{ item1: 'item1' }, { item1: 'item2' }],
+					},
 				},
 			],
 			'group1'
@@ -150,16 +150,29 @@ describe('Testing Collection', () => {
 
 		expect(myCollection.value.length).toBe(3)
 		myCollection.selectors.main.select('1')
-		myCollection.selectors.main.data?.patch({ thing: 'lol2', obj: { arr: [{ item1: 'item3', name: 'yes'  }] } })
+		myCollection.selectors.main.data?.patch({
+			thing: 'lol2',
+			obj: { arr: [{ item1: 'item3', name: 'yes' }] },
+		})
 		expect(myCollection.value.length).toBe(3)
 		expect(myCollection.getSelector('main').value.thing).toBe('lol2')
-		expect(myCollection.getSelector('main').value.obj?.arr[0].item1).toBe('item3')
+		expect(myCollection.getSelector('main').value.obj?.arr[0].item1).toBe(
+			'item3'
+		)
 		expect(myCollection.getSelector('main').value.obj?.arr[0].name).toBe('yes')
 
 		// patch with a thinner object
-		myCollection.selectors.main.data?.patch({ thing: 'lol3' }) 
+		myCollection.update(
+			'1',
+			{ thing: 'lol3' },
+			{
+				deep: true,
+			}
+		)
 		expect(myCollection.getSelector('main').value.thing).toBe('lol3')
-		expect(myCollection.getSelector('main').value.obj?.arr[0].item1).toBe('item3')
+		expect(myCollection.getSelector('main').value.obj?.arr[0].item1).toBe(
+			'item3'
+		)
 		expect(myCollection.getSelector('main').value.obj?.arr[0].name).toBe('yes')
 	})
 
@@ -243,7 +256,7 @@ describe('testing collection groups', () => {
 		expect(myCollection.getGroup('default').index.size).toBe(3)
 
 		expect(myCollection.value.length).toBe(3)
-		myCollection.delete("1")
+		myCollection.delete('1')
 		expect(myCollection.getGroup('default').value.length).toBe(2)
 	})
 	test('Watching Groups', () => {
