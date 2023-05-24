@@ -59,13 +59,17 @@ describe('Test helper functions from the utils module', () => {
 		expect(merged2.b.c).not.toBe(obj3.b.c)
 
 		// Test with deep arrays holding objects and arrays
-		const obj5 = { a: 1, b: { c: [1, 2, { d: 1, e: [1, 2, 3] }] } }
-		const obj6 = { a: 2, b: { c: [4, 5, { d: 2, e: [4, 5, 6] }] } }
+		const obj5 = { a: 1, b: { c: [{ d: 1, e: [1, 2, 3] }] } }
+		const obj6 = { a: 2, b: { c: [{ d: 2, e: [4, 5, 6] }] } }
 		const merged3 = deepMerge(obj5, obj6)
-		expect(merged3).toEqual({ a: 2, b: { c: [4, 5, { d: 2, e: [4, 5, 6] }] } })
+		expect(merged3).toEqual({ a: 2, b: { c: [{ d: 2, e: [4, 5, 6] }] } })
 		expect(merged3).not.toBe(obj5)
 		expect(merged3.b).not.toBe(obj5.b)
 		expect(merged3.b).not.toBe(obj6.b)
+		const obj7 = { a: 2, b: { c: [{ d: 2 }] } }
+		const merged4 = deepMerge(merged3, obj7)
+		expect(merged4).toEqual({ a: 2, b: { c: [{ d: 2, e: [4, 5, 6] }] } })
+
 
 	})
 	test('Test isAsyncFunction', () => {

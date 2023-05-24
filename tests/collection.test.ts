@@ -188,6 +188,12 @@ describe('Testing Collection', () => {
 		console.log(myCollection.getItemValue('15'))
 		instance({ logLevel: undefined })
 	})
+
+	test('Does the has method work properly', () => {
+		myCollection.getItem('678i2')
+		expect(myCollection.getItemValue('678i2')).toBeUndefined()
+		expect(myCollection.has('678i2')).toBe(false)
+	})
 })
 describe('testing collection groups', () => {
 	test('Do Groups Work?', () => {
@@ -605,11 +611,12 @@ describe('testing collection relations', () => {
 			userId: '1',
 		})
 
+		// users.getItem('1').syncForeignKeyData()
 		// Checking foreign
 		expect(users.getItem('1').value).toBeDefined()
 		console.log('found appointment', users.getItem('1').value.appointment)
-		expect(users.value[0].appointment.name).toBe('test')
-		expect(users.getItem('1').value.appointment.name).toBe('test')
+		expect(users.value[0].appointment?.name).toBe('test')
+		expect(users.getItem('1').value.appointment?.name).toBe('test')
 
 		// Checking foreign
 		expect(appointments.getItem('1').value.user).toBeDefined()
