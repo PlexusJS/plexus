@@ -385,14 +385,15 @@ export class CollectionInstance<
 	 */
 	has(dataKey: DataKey): boolean {
 		const key = `${dataKey}`
-		return this._internalStore._data.has(key)
+		return this._internalStore._data.has(key) && !this.getItem(key)?.provisional
 	}
 	/**
 	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
-	 * @param {string|number} dataKey The key of the data item to get
+	 * @param {string} dataKey The key of the data item to get
 	 * @returns {this} The new Collection Instance
 	 */
 	getItem(dataKey: DataKey): CollectionData<DataTypeInput> {
+		dataKey = `${dataKey}`
 		const data = this._internalStore._data.get(dataKey)
 		if (!data) {
 			const dataInstance = _data(
@@ -427,7 +428,7 @@ export class CollectionInstance<
 	}
 	/**
 	 * Get the value of an item in the collection
-	 * @param {string|number} key The key of the item to get
+	 * @param {string} key The key of the item to get
 	 * @returns {DataTypeInput} The value of the item
 	 */
 	getItemValue(
@@ -565,9 +566,9 @@ export class CollectionInstance<
 	 * @param {string} name The Group Name to search for
 	 * @returns {this} The new Collection Instance
 	 */
-	getGroup(name: string): PlexusCollectionGroup<DataTypeInput>
+	getGroup(name: GroupName): PlexusCollectionGroup<DataTypeInput>
 	getGroup(name: KeyOfMap<Groups>): PlexusCollectionGroup<DataTypeInput>
-	getGroup(name: KeyOfMap<Groups> | string) {
+	getGroup(name: KeyOfMap<Groups> | GroupName) {
 		if (this.isCreatedGroup(name)) {
 			const group = this._internalStore._groups.get(
 				name
@@ -604,10 +605,15 @@ export class CollectionInstance<
 	}
 	/**
 	 * Add a data item to a group or groups
-	 * @param {string|number} key The key of the item to add
+	 * @param {string} key The key of the item to add
 	 * @param {string[]|string} groups The group(s) to add the item to
 	 * @returns {this} The new Collection Instance
 	 */
+	addToGroups(keys: DataKey | DataKey[], groups: GroupName[] | GroupName): this
+	addToGroups(
+		keys: DataKey | DataKey[],
+		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
+	): this
 	addToGroups(
 		keys: DataKey | DataKey[],
 		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
@@ -700,12 +706,14 @@ export class CollectionInstance<
 	}
 	/**
 	 * Delete a data item completely from the collection.
-	 * @param {string|number} keys The data key(s) to use for lookup
+	 * @param {string} keys The data key(s) to use for lookup
 	 * @returns {this} The new Collection Instance
 	 */
 	delete(keys: DataKey | DataKey[]): this {
 		// the function to remove the data
 		const rm = (key: DataKey) => {
+			// key = this.config.keyTransform(key)
+			key = `${key}`
 			this._internalStore._data.get(key)?.clean()
 
 			for (let groupName of this.getGroupsOf(key)) {
@@ -724,7 +732,7 @@ export class CollectionInstance<
 	}
 	/**
 	 * Remove a data item from a set of groups
-	 * @param {string|number} keys The data key(s) to use for lookup
+	 * @param {string | string[]} keys The data key(s) to use for lookup
 	 * @param {string[]|string} groups Either a single group or an array of groups to remove the data from
 	 * @returns {this} The new Collection Instance
 	 */
@@ -734,6 +742,7 @@ export class CollectionInstance<
 	): this {
 		this.mount()
 		const rm = (key) => {
+			key = `${key}`
 			if (Array.isArray(groups)) {
 				for (let groupName of groups) {
 					if (this.isCreatedGroup(groupName)) {
@@ -868,7 +877,7 @@ export class CollectionInstance<
 	}
 	/**
 	 * Get all of the collection data keys as an array
-	 * @type {string[]|number[]}
+	 * @type {string[]}
 	 */
 	get keys() {
 		const keys: string[] = []
