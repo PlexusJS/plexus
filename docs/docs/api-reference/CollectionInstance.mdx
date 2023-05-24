@@ -11,7 +11,7 @@ A Collection Instance
     * [.id](#CollectionInstance+id) : <code>string</code>
     * [.instanceId](#CollectionInstance+instanceId) : <code>string</code>
     * [.value](#CollectionInstance+value) : <code>Array.&lt;DataTypeInput&gt;</code>
-    * [.keys](#CollectionInstance+keys) : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+    * [.keys](#CollectionInstance+keys) : <code>Array.&lt;string&gt;</code>
     * [.groups](#CollectionInstance+groups) : <code>Record.&lt;string, GroupInstance&gt;</code>
     * [.groupsValue](#CollectionInstance+groupsValue) : <code>Record.&lt;GroupNames, Array.&lt;DataTypeInput&gt;&gt;</code>
     * [.selectors](#CollectionInstance+selectors) : <code>Record.&lt;SelectorNames, PlexusCollectionSelector&gt;</code>
@@ -57,7 +57,7 @@ A Collection Instance
 
 <a name="CollectionInstance+keys"></a>
 
-### .keys : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+### .keys : <code>Array.&lt;string&gt;</code>
 <p>Get all of the collection data keys as an array</p>
 
 <a name="CollectionInstance+groups"></a>
@@ -137,7 +137,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| dataKey | <code>string</code> \| <code>number</code> | <p>The key of the data item to get</p> |
+| dataKey | <code>string</code> | <p>The key of the data item to get</p> |
 
 <a name="CollectionInstance+getItemValue"></a>
 
@@ -148,7 +148,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| key | <code>string</code> \| <code>number</code> | <p>The key of the item to get</p> |
+| key | <code>string</code> | <p>The key of the item to get</p> |
 
 <a name="CollectionInstance+createSelector"></a>
 
@@ -237,7 +237,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| key | <code>string</code> \| <code>number</code> | <p>The key of the item to add</p> |
+| key | <code>string</code> | <p>The key of the item to add</p> |
 | groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>The group(s) to add the item to</p> |
 
 <a name="CollectionInstance+watchGroup"></a>
@@ -261,7 +261,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| keys | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
+| keys | <code>string</code> | <p>The data key(s) to use for lookup</p> |
 
 <a name="CollectionInstance+removeFromGroup"></a>
 
@@ -272,7 +272,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| keys | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
+| keys | <code>string</code> \| <code>Array.&lt;string&gt;</code> | <p>The data key(s) to use for lookup</p> |
 | groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>Either a single group or an array of groups to remove the data from</p> |
 
 <a name="CollectionInstance+clear"></a>
