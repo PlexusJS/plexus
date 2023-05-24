@@ -52,7 +52,7 @@ export class CollectionData<
 		instance: () => PlexusInstance,
 		public collection: () => PlexusCollectionInstance<DataType>,
 		primaryKey: PK,
-		keyValue: string | number,
+		keyValue: string,
 		value: DataType,
 		config: CollectionDataConfig = { prov: false }
 	) {
@@ -124,7 +124,7 @@ export class CollectionData<
 		return valid
 	}
 
-	private syncForeignKeyData(injectListener: boolean = false) {
+	syncForeignKeyData(injectListener: boolean = false) {
 		// extract the foreign keys from the collection
 		const foreignKeys = this.collection().config.foreignKeys
 		if (foreignKeys && Object.keys(foreignKeys).length) {
@@ -226,6 +226,7 @@ export class CollectionData<
 		}
 	}
 	private genValue(incomingValue?: PlexusWatchableValueInterpreter<DataType>) {
+		this.syncForeignKeyData()
 		const value = incomingValue
 			? {
 					...incomingValue,
@@ -399,7 +400,7 @@ export function _data<DataType extends Record<string, any>>(
 	instance: () => PlexusInstance,
 	collection: () => PlexusCollectionInstance<DataType>,
 	primaryKey: string,
-	keyValue: number | string,
+	keyValue: string,
 	value: DataType,
 	config: CollectionDataConfig = { prov: false }
 ) {

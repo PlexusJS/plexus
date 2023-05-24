@@ -129,7 +129,7 @@ export class CollectionGroup<
 	}
 	/**
 	 * Check if the group contains the given item
-	 * @param {string|number} key The key of the item to look for
+	 * @param {string} key The key of the item to look for
 	 * @returns {boolean} Whether or not the group contains the item
 	 */
 	has(key: DataKey): boolean {
@@ -169,7 +169,7 @@ export class CollectionGroup<
 	}
 	/**
 	 * Remove an item from the group
-	 * @param {string|number} key The key of the item to look for
+	 * @param {string | string[]} key The key of the item to look for
 	 * @returns {this} This Group instance
 	 */
 	remove(keys: DataKey | DataKey[]): this {
@@ -196,7 +196,7 @@ export class CollectionGroup<
 	}
 	/**
 	 * Peek at the index of the group (get all of the lookup keys for the group)
-	 * @type {Set<string | number>}
+	 * @type {Set<string>}
 	 */
 	get index() {
 		return this._internalStore._includedKeys
