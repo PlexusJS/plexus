@@ -55,6 +55,7 @@ export interface PlexusApiOptions {
 }
 
 export type PlexusApi = ApiInstance
+
 interface ApiStore {
 	_options: PlexusApiOptions
 	_optionsInit: PlexusApiOptions

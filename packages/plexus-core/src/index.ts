@@ -1,5 +1,4 @@
-import { instance } from './instance/instance'
-import { PlexusInstance } from './instance/instance'
+import { instance, PlexusInstance } from './instance/instance'
 import { WatchableMutable, Watchable } from './watchable'
 import { _state, PlexusStateInstance, StateInstance } from './state'
 import { _computed, PlexusComputedStateInstance } from './computed'
