@@ -237,6 +237,13 @@ export class ComputedStateInstance<
 		this._internalStore._name = `cState_${key}`
 		return this
 	}
+
+	/**
+	 * Recompute the value of the computed state
+	 */
+	recompute(){
+		this.refreshDeps()
+	}
 }
 interface Dependency extends Watchable<any> {
 	[key: string]: any
