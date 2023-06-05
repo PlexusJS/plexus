@@ -348,14 +348,6 @@ export class CollectionData<
 	}
 
 	/**
-	 * Compare a thing to the current value, if they are equal, returns true
-	 * @param value The thing to compare the current value to
-	 * @returns {boolean} A boolean representing if they are equal
-	 */
-	isEqual(value: any): boolean {
-		return isEqual(value, super._watchableStore._value)
-	}
-	/**
 	 * Delete the data instance
 	 * @returns {this} The data instance
 	 */

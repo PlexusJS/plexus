@@ -1,12 +1,7 @@
 import { PlexusInstance } from '.'
 import {
 	deepClone,
-	deepMerge,
-	isObject,
 	isEqual,
-	AlmostAnything,
-	LiteralType,
-	TypeOrReturnType,
 	PlexusWatchableValueInterpreter,
 } from '@plexusjs/utils'
 import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
@@ -70,6 +65,12 @@ export class Watchable<
 		// dataFetcher()
 	}
 
+	/**
+	 * Subscribe to changes to this state
+	 * @param callback The callback to run when the state changes
+	 * @param {string}from The id of the something that  that triggered the change
+	 * @returns
+	 */
 	watch(
 		callback: PlexusWatcher<PlexusWatchableValueInterpreter<ValueType>>,
 		from?: string
@@ -80,12 +81,24 @@ export class Watchable<
 		}
 	}
 
+	/**
+	 * Retrieve the current value of the state
+	 */
 	get value(): PlexusWatchableValueInterpreter<ValueType> {
 		const value = this._watchableStore._publicValue
 		if (value === undefined && this._watchableStore._dataFetcher) {
 			return this._watchableStore._dataFetcher()
 		}
 		return value
+	}
+
+	/**
+	 * Compare a thing to the current value, if they are equal, returns true
+	 * @param value The thing to compare the current value to
+	 * @returns {boolean} A boolean representing if they are equal
+	 */
+	isEqual(value: any): boolean {
+		return isEqual(value as any, this._watchableStore._value as any)
 	}
 }
 
@@ -114,14 +127,6 @@ export class WatchableMutable<
 		}
 		this.loading = true
 		const value = deepClone(newValue)
-		// if (!value) {
-		// 	this.instance().runtime.log(
-		// 		'warn',
-		// 		`Watchable ${this.id} skipping set() because value is undefined or null.`
-		// 	)
-		// 	return this
-		// }
-		// this._watchableStore._lastValue = this._watchableStore._value
 		this._watchableStore._lastValue = deepClone(this._watchableStore._value)
 
 		// apply the next value
