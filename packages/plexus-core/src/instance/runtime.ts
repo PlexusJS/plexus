@@ -235,7 +235,7 @@ export class RuntimeInstance {
 
 	/**
 	 * The batching flag
-	 * @type {boolean} true if the runtime is batching
+	 * @returns {boolean} true if the runtime is batching
 	 */
 	get isBatching() {
 		return this.batching

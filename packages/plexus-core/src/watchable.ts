@@ -69,7 +69,7 @@ export class Watchable<
 	 * Subscribe to changes to this state
 	 * @param callback The callback to run when the state changes
 	 * @param {string}from The id of the something that  that triggered the change
-	 * @returns
+	 * @returns {DestroyFn} A function to remove the watcher
 	 */
 	watch(
 		callback: PlexusWatcher<PlexusWatchableValueInterpreter<ValueType>>,
