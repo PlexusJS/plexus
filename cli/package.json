@@ -6,12 +6,7 @@
 	"bin": "./out/bin.js",
 	"main": "./out/bin.js",
 	"type": "module",
-	"dependencies": {
-		"@plexusjs/core": "^1.7.4",
-		"chalk": "^5.0.1",
-		"glob": "^10.2.6",
-		"yargs": "^17.4.1"
-	},
+	"private": false,
 	"scripts": {
 		"precli:build": "rm -rf ./out/bin.js",
 		"build": "rollup --config ./rollup.config.js",
@@ -19,16 +14,23 @@
 		"preexecute": "yarn build",
 		"execute": "npx .",
 		"prepublish": "yarn build",
-		"publish-stable": "yarn publish"
+		"publish-stable": "yarn publish",
+		"local-install": "yarn build && npm link"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/PlexusJS/plexus.git",
 		"directory": "cli"
 	},
-	"private": false,
+	"dependencies": {
+		"@plexusjs/core": "^1.7.4",
+		"chalk": "^5.0.1",
+		"glob": "^10.2.6",
+		"yargs": "^17.4.1"
+	},
 	"devDependencies": {
 		"@rollup/plugin-typescript": "^10.0.1",
+		"@types/node": "^20.2.5",
 		"rollup": "^2.72.1",
 		"tslib": "^2.4.1"
 	},

@@ -77,7 +77,8 @@
 	"workspaces": {
 		"packages": [
 			"packages/*",
-			"docs/"
+			"docs/",
+			"plexus-cli"
 		]
 	},
 	"publishConfig": {

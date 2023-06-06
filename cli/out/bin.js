@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 import chalk from 'chalk';
 import yArgs from 'yargs';
-import * as fs from 'fs';
 import { execSync } from 'child_process';
+import * as fs from 'fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs';
+import * as path from 'path';
+import * as glob from 'glob';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -28,6 +31,34 @@ function __spreadArray(to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 }
+
+var __dirname$2 = process.cwd();
+function tryIt(fn) {
+    try {
+        if (fn instanceof Function) {
+            var val = fn();
+            if (val !== undefined && val !== null) {
+                return val;
+            }
+        }
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+}
+// make the core directory in the root folder
+var lookForCore = function () {
+    return tryIt(function () {
+        return !fs.existsSync("".concat(__dirname$2, "/core")) && fs.mkdirSync("".concat(__dirname$2, "/core"));
+    });
+};
+// fetch the most recent version of the packages given the tag using the cli command `npm view @plexusjs/core version`
+var fetchLatestVersion = function (tag) {
+    return execSync("npm view @plexusjs/core@".concat(tag, " version"), {
+        encoding: 'utf8',
+    }).trim();
+};
 
 var TEMPLATES = {
     basic: {
@@ -192,30 +223,8 @@ var TEMPLATES = {
     },
 };
 
-function tryIt(fn) {
-    try {
-        if (fn instanceof Function) {
-            var val = fn();
-            if (val !== undefined && val !== null) {
-                return val;
-            }
-        }
-        return true;
-    }
-    catch (e) {
-        return false;
-    }
-}
-// make the core directory in the root folder
-var lookForCore = function () {
-    return tryIt(function () {
-        return !fs.existsSync("".concat(__dirname, "/core")) && fs.mkdirSync("".concat(__dirname, "/core"));
-    });
-};
-
-var yargs = yArgs(process.argv);
+var yargs$2 = yArgs(process.argv);
 var __dirname$1 = process.cwd();
-var helpString = "\n\tUsage:\n\t\t$ npx create-plexus-core <command> <options>\n\n\tCommands:\n\t\t\n\t\tmodule <name>\t\t\tCreate a new module in your plexus core\n\t\tupdate --<tag>\t\t\tUpdate your plexus install\n\n\tOptions:\n\t\t--canary\t\t\t\tUse the canary version of plexus\n\t\t--dev\t\t\t\t\tUse the dev version of plexus\n\t    --skip-install\t\t\tSkip the install of the PlexusJS packages\n\t\t--typescript\t\t\tCreate TypeScript files\n\t\t--react\t\t\t\t\tInstall the React package\n\t\t--next\t\t\t\t\tInstall the Next package\n\t\t--template=<template>\tChoose the template to use to generate a PlexusJS core\n\n";
 var genFileOrDir = function (arr, path) {
     if (path === void 0) { path = '/core'; }
     if (!Array.isArray(arr)) {
@@ -230,14 +239,14 @@ var genFileOrDir = function (arr, path) {
         // if we are creating a file
         if (obj.type === 'file') {
             process.stdout.write("Creating ".concat(chalk.cyan("\"".concat(path, "/").concat(fileName, "\"")), "... ::"));
-            tryIt(function () { return fs.writeFileSync("".concat(__dirname$1).concat(filePath), obj.content); })
+            tryIt(function () { return writeFileSync("".concat(__dirname$1).concat(filePath), obj.content); })
                 ? process.stdout.write(chalk.green("Success!\n"))
                 : process.stdout.write(chalk.yellow("Failure!\n"));
         }
         // if we are creating a directory
         else if (obj.type === 'dir') {
             process.stdout.write("Creating ".concat(chalk.cyan("\"".concat(path, "/").concat(obj.name, "/\"")), "... ::"));
-            tryIt(function () { return fs.mkdirSync("".concat(__dirname$1).concat(path, "/").concat(obj.name)); })
+            tryIt(function () { return mkdirSync("".concat(__dirname$1).concat(path, "/").concat(obj.name)); })
                 ? process.stdout.write(chalk.green("Success\n"))
                 : process.stdout.write(chalk.yellow("Failed\n"));
             // recurse into the directory
@@ -249,35 +258,6 @@ var genFileOrDir = function (arr, path) {
         _loop_1(obj);
     }
     return true;
-};
-var installPlexus = function (tag) {
-    if (tag === void 0) { tag = ''; }
-    if (!yargs.argv['skip-install']) {
-        // initialize the prefix with npm install syntax
-        var prefix_1 = 'npm install --save';
-        // if we have a yarn.lock file, use yarn to install
-        if (fs.existsSync("".concat(__dirname$1, "/yarn.lock"))) {
-            console.log(chalk.cyan.bgWhite("Using Yarn Package Manager"));
-            prefix_1 = 'yarn add';
-        }
-        else {
-            console.log(chalk.cyan.bgWhite('Using NPM Package Manager'));
-        }
-        // install the packages
-        var tagFinal_1 = tag && ['canary', 'latest'].includes(tag) ? "@".concat(tag) : '';
-        tryIt(function () {
-            return execSync("".concat(prefix_1, " @plexusjs/core").concat(tagFinal_1).concat(yargs.argv.react
-                ? " @plexusjs/react".concat(tagFinal_1)
-                : yargs.argv.next
-                    ? " @plexusjs/react".concat(tagFinal_1, " @plexusjs/next").concat(tagFinal_1)
-                    : ''), { stdio: 'inherit' });
-        })
-            ? console.log(chalk.bgGreen.black("Plexus".concat(tag ? "(".concat(tag, ")") : "", " installed successfully!")))
-            : console.error(chalk.bgRed.black('Failed to install Plexus Packages. 😞'));
-    }
-    else {
-        console.log('Skipping Install...');
-    }
 };
 var genFiles = function (template) {
     var _a, _b;
@@ -293,7 +273,7 @@ var genFiles = function (template) {
     // const structRaw = fs.readFileSync(`./data/${template}.json`, { encoding: 'utf8' })
     // const struct = JSON.parse(structRaw)
     var struct = TEMPLATES[template];
-    if (yargs.argv.typescript || yargs.argv.ts) {
+    if (yargs$2.argv.typescript || yargs$2.argv.ts) {
         console.log(chalk.bgWhite.black('Creating TS Files...'));
         genFileOrDir((_a = struct === null || struct === void 0 ? void 0 : struct.$schema) === null || _a === void 0 ? void 0 : _a.ts);
     }
@@ -302,6 +282,84 @@ var genFiles = function (template) {
         genFileOrDir((_b = struct === null || struct === void 0 ? void 0 : struct.$schema) === null || _b === void 0 ? void 0 : _b.js);
     }
 };
+
+var yargs$1 = yArgs(process.argv);
+var __dirname = process.cwd();
+// a function that iterates through the execution directory, finds all of the `package.json` files, and returns their full paths
+function findPackageJsons() {
+    return glob.sync(path.join(process.cwd(), '**/package.json'), {
+        ignore: ['**/node_modules/**', '**/dist/**'],
+    });
+}
+// a function that finds all of the `package.json` files, and updates their `dependencies` and `devDependencies` all plexusjs packages to the specified version
+function updatePackageJsons(tag) {
+    if (tag === void 0) { tag = ''; }
+    var packageJsons = findPackageJsons();
+    for (var _i = 0, packageJsons_1 = packageJsons; _i < packageJsons_1.length; _i++) {
+        var packageJson = packageJsons_1[_i];
+        // read & parse the package.json file
+        var packageJsonData = JSON.parse(readFileSync(packageJson, { encoding: 'utf8' }));
+        // extract the `dependencies` and `devDependencies` fields
+        var dependencies = packageJsonData.dependencies, devDependencies = packageJsonData.devDependencies;
+        // if the package.json file doesn't have a `dependencies` or `devDependencies` field, skip it
+        if (!dependencies && !devDependencies) {
+            continue;
+        }
+        var foundSome = false;
+        if (dependencies) {
+            for (var dependency in dependencies) {
+                if (dependency.startsWith('@plexusjs')) {
+                    dependencies[dependency] = tag;
+                    foundSome = true;
+                }
+            }
+            packageJsonData.dependencies = dependencies;
+        }
+        if (devDependencies) {
+            for (var dependency in devDependencies) {
+                if (dependency.startsWith('@plexusjs')) {
+                    devDependencies[dependency] = tag;
+                    foundSome = true;
+                }
+            }
+            packageJsonData.devDependencies = devDependencies;
+        }
+        if (foundSome) {
+            writeFileSync(packageJson, JSON.stringify(packageJsonData, null, 2));
+        }
+    }
+}
+var installPlexus = function (tag) {
+    if (tag === void 0) { tag = ''; }
+    if (yargs$1.argv['skip-install']) {
+        console.log('Skipping Install...');
+        return;
+    }
+    // initialize the prefix with npm install syntax
+    var installCommand = 'npm install --save';
+    // if we have a yarn.lock file or the yarn flag, use yarn to install
+    if (existsSync("".concat(__dirname, "/yarn.lock")) || yargs$1.argv.yarn) {
+        console.log(chalk.cyan.bgWhite("Using Yarn Package Manager"));
+        installCommand = 'yarn install';
+    }
+    else {
+        console.log(chalk.cyan.bgWhite('Using NPM Package Manager'));
+    }
+    // install the packages
+    var tagFinal = tag && ['canary', 'latest'].includes(tag)
+        ? tag
+        : 'latest';
+    var version = fetchLatestVersion(tagFinal);
+    updatePackageJsons(version);
+    tryIt(function () { return execSync("".concat(installCommand), { stdio: 'inherit' }); })
+        ? console.log(chalk.bgGreen.black("Plexus".concat(tag ? "(".concat(tag, ")") : "", " installed successfully!")))
+        : console.error(chalk.bgRed.black('Failed to install Plexus Packages. 😞'));
+};
+
+// import { genFileOrDir } from './fsManagement'
+var yargs = yArgs(process.argv);
+process.cwd();
+var helpString = "\n\tUsage:\n\t\t$ npx plexus-cli <command> <options>\n\n\tCommands:\n\t\t\n\t\tmodule <name>\t\t\tCreate a new module in your plexus core\n\t\tupdate <version>\t\tUpdate your plexus install\n\n\tOptions:\n\t\t--yarn\t\t\t\t\tUse Yarn as the package manager\n\t\t--canary\t\t\t\tUse the canary version of plexus\n\t\t--dev\t\t\t\t\tUse the dev version of plexus\n\t    --skip-install\t\t\tSkip the install of the PlexusJS packages\n\t\t--typescript\t\t\tCreate TypeScript files\n\t\t--react\t\t\t\t\tInstall the React package\n\t\t--next\t\t\t\t\tInstall the Next package\n\t\t--template=<template>\tChoose the template to use to generate a PlexusJS core\n\n";
 function run() {
     var commandRan = false;
     if (yargs.argv._[2] === 'module') {
