@@ -229,14 +229,6 @@ export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
 		}, ms ?? 3000)
 		return this
 	}
-	// /**
-	//  * Compare a thing to the current value, if they are equal, returns true
-	//  * @param value The thing to compare the current value to
-	//  * @returns {boolean} A boolean representing if they are equal
-	//  */
-	// isEqual(value: any): boolean {
-	// 	return isEqual(value as any, this._watchableStore._value as any)
-	// }
 	/**
 	 * Stop the state interval
 	 */

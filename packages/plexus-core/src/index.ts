@@ -150,7 +150,13 @@ export function usePlugin(
 }
 
 // export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
-export * from './api'
+export {
+	api,
+	PlexusApi,
+	PlexusApiConfig,
+	PlexusApiRes,
+	ApiInstance,
+} from '@plexusjs/api'
 export { gql } from './gql'
 
 export {

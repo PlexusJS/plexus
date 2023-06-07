@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { api, PlexusApi } from '@plexusjs/core'
+import { api, PlexusApi } from '@plexusjs/api'
 import 'isomorphic-fetch'
 
 // if(globalThis.fetch === undefined) globalThis.fetch = fetch as any as (input: RequestInfo, init?: RequestInit) => Promise<Response>;
@@ -44,6 +44,47 @@ describe('Testing Api Function', () => {
 
 		const res = await apiUsingOnResponse.get('https://google.com')
 		expect(res?.status).toBeGreaterThan(0)
+	})
+	test('can throw an error', async () => {
+		// const value = state(1)
+		const apiUsingOnResponse = api('', {
+			throws: true,
+		})
+
+		apiUsingOnResponse.options({
+			headers: {
+				custom: 'header',
+			},
+		})
+		// console.log(myApi.config)
+		expect(apiUsingOnResponse.config).toBeDefined()
+		expect(apiUsingOnResponse.config.headers).toBeDefined()
+		expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
+
+		await expect(
+			apiUsingOnResponse.post('https://google.com/this/url/doesnt/exist')
+		).rejects.toThrow()
+	})
+	test('can set a timeout', async () => {
+		// const value = state(1)
+		const apiUsingOnResponse = api('', {
+			timeout: 100,
+			throws: true,
+		})
+
+		apiUsingOnResponse.options({
+			headers: {
+				custom: 'header',
+			},
+		})
+		// console.log(myApi.config)
+		expect(apiUsingOnResponse.config).toBeDefined()
+		expect(apiUsingOnResponse.config.headers).toBeDefined()
+		expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
+
+		await expect(
+			apiUsingOnResponse.post('https://google.com/this/url/doesnt/exist')
+		).rejects.toThrow()
 	})
 })
 describe("Test the API's baseURL capabilities", () => {
