@@ -71,6 +71,7 @@ export class CollectionData<
 			this.mount()
 			this.syncForeignKeyData(true)
 		}
+		// this.syncForeignKeyData(!this.provisional)
 	}
 	/**
 	 * The internal id of the state with an instance prefix
@@ -114,10 +115,10 @@ export class CollectionData<
 		const valid =
 			value[this._internalStore.primaryKey] !== undefined && isCurrentKey
 		this.instance().runtime.log(
-			'warn',
-			`The incoming value key does ${
-				valid ? '' : 'NOT'
-			} match the stored key...`,
+			valid ? 'info' : 'warn',
+			`The incoming value key ${
+				valid ? 'matches' : 'does NOT match'
+			} the stored key...`,
 			this.key,
 			value[this._internalStore.primaryKey] === this.key
 		)
@@ -130,7 +131,9 @@ export class CollectionData<
 		if (foreignKeys && Object.keys(foreignKeys).length) {
 			this.instance().runtime.log(
 				'info',
-				`Data ${this.instanceId} is syncing foreign key data`
+				`Syncing foreign key data for Data instance ${this.instanceId} ${
+					injectListener ? '(with listener injection)' : ''
+				}`
 			)
 			// get the previous foreign key data stored for this data instance
 
@@ -168,7 +171,8 @@ export class CollectionData<
 						[newKey]: freshValue,
 					}
 				}
-				// Watcher
+				// foreignCollection?.getItem(this.shallowValue?.[idKey])?.set()
+				// Create a watcher for the foreign data
 				if (
 					foreignCollectionName &&
 					foreignCollectionName !== this.collection().name &&

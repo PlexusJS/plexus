@@ -259,11 +259,15 @@ export class CollectionInstance<
 					// normalizing the key type to string
 					const dataKey = `${item[this._internalStore._key]}`
 					// if there is already a state for that key, update it
-					if (this.has(dataKey)) {
+					if (this.has(dataKey, true)) {
 						this._internalStore._data.get(dataKey)?.set(item)
 					}
 					// if there is no data instance for that key, create it
 					else {
+						this.instance().runtime.log(
+							'debug',
+							`Couldn't find data instance for key ${dataKey} in collection ${this.instanceId}; creating a new data instance...`
+						)
 						const dataInstance = _data(
 							() => this.instance(),
 							() => this,
@@ -307,12 +311,10 @@ export class CollectionInstance<
 				})
 				return this
 			}
-			let addedKeys: any[] = []
-			if (Array.isArray(data_)) {
-				addedKeys = collectItems(data_)
-			} else {
-				addedKeys = collectItems([data_])
-			}
+
+			const addedKeys: any[] = collectItems(
+				Array.isArray(data_) ? data_ : [data_]
+			)
 
 			const defaultGroupName =
 				typeof this.config.defaultGroup === 'string'
@@ -357,14 +359,14 @@ export class CollectionInstance<
 		config: { deep: boolean } = { deep: true }
 	) {
 		key = `${key}`
-		if (this.has(key)) {
+		if (this.has(key, true)) {
 			if (config.deep) {
 				this._internalStore._data.get(key)?.patch({
 					...data,
 					[this._internalStore._key]: key,
 				} as Partial<PlexusWatchableValueInterpreter<DataTypeInput>>)
 			} else {
-				if (this.has(key)) {
+				if (this.has(key, true)) {
 					this._internalStore._data
 						.get(key)
 						?.set(data as PlexusWatchableValueInterpreter<DataTypeInput>)
@@ -381,11 +383,15 @@ export class CollectionInstance<
 	/**
 	 * Check if the collection has a data item with the given key
 	 * @param {string} dataKey The key of the data item to  look for
+	 * @param {boolean} includeProvisional Whether to include provisional data items in the search. This may be useful if you are using a collection to store data that is not yet available
 	 * @returns {boolean} Whether the collection has a data item with the given key
 	 */
-	has(dataKey: DataKey): boolean {
+	has(dataKey: DataKey, includeProvisional?: boolean): boolean {
 		const key = `${dataKey}`
-		return this._internalStore._data.has(key) && !this.getItem(key)?.provisional
+		const secondCondition = includeProvisional
+			? true
+			: !this.getItem(key)?.provisional
+		return this._internalStore._data.has(key) && secondCondition
 	}
 	/**
 	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one

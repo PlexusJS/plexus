@@ -126,7 +126,8 @@ export class WatchableMutable<
 			return this
 		}
 		this.loading = true
-		const value = deepClone(newValue)
+
+		const value = deepClone(newValue ?? this._watchableStore._nextValue)
 		this._watchableStore._lastValue = deepClone(this._watchableStore._value)
 
 		// apply the next value

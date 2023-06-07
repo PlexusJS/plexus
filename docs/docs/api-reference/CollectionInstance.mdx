@@ -20,7 +20,7 @@ A Collection Instance
     * [.lastUpdatedKey](#CollectionInstance+lastUpdatedKey) : <code>string</code>
     * [.collect(data, groups)](#CollectionInstance+collect) ⇒ <code>this</code>
     * [.update(key, data, config)](#CollectionInstance+update)
-    * [.has(dataKey)](#CollectionInstance+has) ⇒ <code>boolean</code>
+    * [.has(dataKey, includeProvisional)](#CollectionInstance+has) ⇒ <code>boolean</code>
     * [.getItem(dataKey)](#CollectionInstance+getItem) ⇒ <code>this</code>
     * [.getItemValue(key)](#CollectionInstance+getItemValue) ⇒ <code>DataTypeInput</code>
     * [.createSelector(selectorName)](#CollectionInstance+createSelector) ⇒ <code>this</code>
@@ -119,7 +119,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 <a name="CollectionInstance+has"></a>
 
-### .has(dataKey) ⇒ <code>boolean</code>
+### .has(dataKey, includeProvisional) ⇒ <code>boolean</code>
 <p>Check if the collection has a data item with the given key</p>
 
 **Returns**: <code>boolean</code> <p>Whether the collection has a data item with the given key</p>  
@@ -127,6 +127,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 | Param | Type | Description |
 | --- | --- | --- |
 | dataKey | <code>string</code> | <p>The key of the data item to  look for</p> |
+| includeProvisional | <code>boolean</code> | <p>Whether to include provisional data items in the search. This may be useful if you are using a collection to store data that is not yet available</p> |
 
 <a name="CollectionInstance+getItem"></a>
 

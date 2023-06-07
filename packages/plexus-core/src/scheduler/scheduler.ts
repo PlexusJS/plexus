@@ -1,34 +1,53 @@
-import { Task } from './task'
+import { Task, TaskOptions } from './task'
 
 export class Scheduler {
-	static schedule: Array<Task> = []
-	private static taskRunning: boolean = false
+	schedule: Array<Task> = []
+	private taskRunning: boolean = false
+	promises: Array<Promise<any>> = []
 	name: string
 	constructor(name: string) {
 		this.name = name
 	}
-	static addTask(task: Task) {
+	addTask(taskAction: () => void, options: TaskOptions) {
+		const task = new Task(taskAction, options)
 		this.schedule.push(task)
+		return task
 	}
-	static run() {
+	run() {
 		if (this.taskRunning) {
 			return
 		}
 		this.taskRunning = true
 		const task = this.schedule.shift()
 		if (task) {
-			;(async () => await task.action())().then(() => {
+			// this worked but it was not allowing sync tasks to run until async tasks were done
+			// ;(async () => await task.action())().then(() => {
+			// 	this.taskRunning = false
+			// 	this.run()
+			// })
+			// this is the new way
+			const promise = task.action()
+			if (promise instanceof Promise) {
+				this.promises.push(promise)
+				promise.then(() => {
+					this.promises = this.promises.filter((p) => p !== promise)
+					if (this.promises.length === 0) {
+						this.taskRunning = false
+					}
+					this.run()
+				})
+			} else {
 				this.taskRunning = false
 				this.run()
-			})
+			}
 		} else {
 			this.taskRunning = false
 		}
 	}
-	static clear() {
+	clear() {
 		this.schedule = []
 	}
-	static removeTask(task: Task) {
+	removeTask(task: Task) {
 		this.schedule = this.schedule.filter((t) => t !== task)
 	}
 }

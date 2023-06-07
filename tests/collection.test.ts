@@ -663,4 +663,58 @@ describe('testing collection relations', () => {
 			name: 'c1-1',
 		})
 	})
+	test('do relations work with provisional data?', () => {
+		instance({ logLevel: 'debug' })
+
+		const c1 = collection<{
+			id: string
+			name: string
+		}>({
+			name: 'c1',
+		})
+
+		let watcherCalled = 0
+
+		const c2 = collection<{
+			id: string
+			c1id: string
+			c1s?: { id: string; name: string }[]
+		}>({
+			name: 'c2',
+			foreignKeys: {
+				c1id: {
+					reference: 'c1',
+					newKey: 'c1s',
+				},
+			},
+		})
+
+		expect(watcherCalled).toBe(0)
+
+		console.log(c1.getItemValue('1'))
+		c1.getItem('1').watch((v) => {
+			console.log('new data', v)
+			watcherCalled = watcherCalled + 1
+		})
+
+		c2.collect([{ id: '1', c1id: '1' }])
+
+		c1.collect([
+			{ id: '1', name: 'c1-1' },
+			{ id: '2', name: 'c1-2' },
+		])
+		console.log(c1.getItemValue('1'))
+
+		console.log('watcher called', watcherCalled)
+		console.log('c2', c2.getItemValue('1'))
+		instance({ logLevel: undefined })
+		expect(watcherCalled).toBe(1)
+
+		expect(c2.getItemValue('1')?.c1s).toMatchObject({
+			id: '1',
+			name: 'c1-1',
+		})
+		c1.collect({ id: '3', name: 'c1-3' })
+		// expect(watcherCalled).toBe(2)
+	})
 })
