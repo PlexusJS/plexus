@@ -1,0 +1,122 @@
+--- 
+	title: ComputedStateInstance 
+--- 
+
+[![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
+
+A computed state is a state that is derived from other states
+
+
+* [ComputedStateInstance](#ComputedStateInstance)
+    * [.id](#ComputedStateInstance+id)
+    * [.instanceId](#ComputedStateInstance+instanceId)
+    * [.value](#ComputedStateInstance+value)
+    * [.lastValue](#ComputedStateInstance+lastValue)
+    * [.name](#ComputedStateInstance+name)
+    * [.deps](#ComputedStateInstance+deps)
+    * [.refreshDeps()](#ComputedStateInstance+refreshDeps)
+    * [.watch(callback)](#ComputedStateInstance+watch) ⇒
+    * [.set(value)](#ComputedStateInstance+set)
+    * [.addDep(dep)](#ComputedStateInstance+addDep)
+    * [.removeDep(dep)](#ComputedStateInstance+removeDep)
+    * [.undo()](#ComputedStateInstance+undo)
+    * [.reset()](#ComputedStateInstance+reset)
+    * [.key()](#ComputedStateInstance+key)
+    * [.recompute()](#ComputedStateInstance+recompute)
+
+<a name="ComputedStateInstance+id"></a>
+
+### .id
+<p>The internal id of the computed state</p>
+
+<a name="ComputedStateInstance+instanceId"></a>
+
+### .instanceId
+<p>The internal id of the computed state with an instance prefix</p>
+
+<a name="ComputedStateInstance+value"></a>
+
+### .value
+<p>The value (reactive) of the state</p>
+
+<a name="ComputedStateInstance+lastValue"></a>
+
+### .lastValue
+<p>The previous value of the state</p>
+
+<a name="ComputedStateInstance+name"></a>
+
+### .name
+<p>The name of the state (NOTE: set with the <code>.key()</code> function)</p>
+
+<a name="ComputedStateInstance+deps"></a>
+
+### .deps
+<p>Returns a list of dependencies for the computed state</p>
+
+<a name="ComputedStateInstance+refreshDeps"></a>
+
+### .refreshDeps()
+<p>Internal Helper Function; for each dependency, add a watcher to the state that will update the computed state when a dependency changes</p>
+
+**Internal**:   
+<a name="ComputedStateInstance+watch"></a>
+
+### .watch(callback) ⇒
+<p>Watch for changes on this computed state</p>
+
+**Returns**: <p>The remove function to stop watching</p>  
+
+| Param | Description |
+| --- | --- |
+| callback | <p>The callback to run when the state changes</p> |
+
+<a name="ComputedStateInstance+set"></a>
+
+### .set(value)
+**Internal**: This would normally be passed from WatchableValue, but Watchable value has a set function that is public. We are not allowing the user to set the value of the state explicitly, so we recreate this function and make it private  
+
+| Param | Description |
+| --- | --- |
+| value | <p>The value to set the state to</p> |
+
+<a name="ComputedStateInstance+addDep"></a>
+
+### .addDep(dep)
+<p>Adds a dependency to the computed state</p>
+
+
+| Param |
+| --- |
+| dep | 
+
+<a name="ComputedStateInstance+removeDep"></a>
+
+### .removeDep(dep)
+<p>Removes a dependency from the computed state</p>
+
+
+| Param |
+| --- |
+| dep | 
+
+<a name="ComputedStateInstance+undo"></a>
+
+### .undo()
+<p>Reset the state to the previous value</p>
+
+<a name="ComputedStateInstance+reset"></a>
+
+### .reset()
+<p>Reset the state to the initial value</p>
+
+<a name="ComputedStateInstance+key"></a>
+
+### .key()
+<p>Set the key of the state for enhanced internal tracking</p>
+
+<a name="ComputedStateInstance+recompute"></a>
+
+### .recompute()
+<p>Recompute the value of the computed state</p>
+

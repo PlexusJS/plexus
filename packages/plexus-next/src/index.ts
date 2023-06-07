@@ -2,9 +2,8 @@ import {
 	instance,
 	PlexusCollectionSelector,
 	PlexusInstance,
-	PlexusPlugin,
-	usePlugin,
 } from '@plexusjs/core'
+import { createPlexusPlugin } from '@plexusjs/core'
 
 interface PlexusNextData {
 	state: Record<string, any>
@@ -130,11 +129,8 @@ export function isServer() {
 	return typeof process !== 'undefined' && process?.release?.name === 'node'
 }
 
-const PlexusNext: PlexusPlugin = {
-	name: 'NextJS',
-	init: () => {
-		loadServerState()
-	},
-}
+const PlexusNext = createPlexusPlugin('NextJS', () => {
+	loadServerState()
+})
 
 export default PlexusNext

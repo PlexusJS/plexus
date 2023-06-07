@@ -10,18 +10,19 @@ A Collection Instance
 * [CollectionInstance](#CollectionInstance)
     * [.id](#CollectionInstance+id) : <code>string</code>
     * [.instanceId](#CollectionInstance+instanceId) : <code>string</code>
-    * [.value](#CollectionInstance+value) : <code>Array.&lt;DataType&gt;</code>
-    * [.keys](#CollectionInstance+keys) : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+    * [.value](#CollectionInstance+value) : <code>Array.&lt;DataTypeInput&gt;</code>
+    * [.keys](#CollectionInstance+keys) : <code>Array.&lt;string&gt;</code>
     * [.groups](#CollectionInstance+groups) : <code>Record.&lt;string, GroupInstance&gt;</code>
-    * [.groupsValue](#CollectionInstance+groupsValue) : <code>Record.&lt;GroupNames, Array.&lt;DataType&gt;&gt;</code>
+    * [.groupsValue](#CollectionInstance+groupsValue) : <code>Record.&lt;GroupNames, Array.&lt;DataTypeInput&gt;&gt;</code>
     * [.selectors](#CollectionInstance+selectors) : <code>Record.&lt;SelectorNames, PlexusCollectionSelector&gt;</code>
-    * [.selectorsValue](#CollectionInstance+selectorsValue) : <code>Record.&lt;SelectorNames, Array.&lt;DataType&gt;&gt;</code>
+    * [.selectorsValue](#CollectionInstance+selectorsValue) : <code>Record.&lt;SelectorNames, Array.&lt;DataTypeInput&gt;&gt;</code>
     * [.name](#CollectionInstance+name) : <code>string</code>
-    * [.lastUpdatedKey](#CollectionInstance+lastUpdatedKey) : <code>string</code> \| <code>number</code>
+    * [.lastUpdatedKey](#CollectionInstance+lastUpdatedKey) : <code>string</code>
     * [.collect(data, groups)](#CollectionInstance+collect) ⇒ <code>this</code>
     * [.update(key, data, config)](#CollectionInstance+update)
+    * [.has(dataKey, includeProvisional)](#CollectionInstance+has) ⇒ <code>boolean</code>
     * [.getItem(dataKey)](#CollectionInstance+getItem) ⇒ <code>this</code>
-    * [.getItemValue(key)](#CollectionInstance+getItemValue) ⇒ <code>DataType</code>
+    * [.getItemValue(key)](#CollectionInstance+getItemValue) ⇒ <code>DataTypeInput</code>
     * [.createSelector(selectorName)](#CollectionInstance+createSelector) ⇒ <code>this</code>
     * [.createSelectors(selectorNames)](#CollectionInstance+createSelectors) ⇒ <code>this</code>
     * [.getSelector(name)](#CollectionInstance+getSelector) ⇒ <code>this</code> \| <code>undefined</code>
@@ -30,6 +31,7 @@ A Collection Instance
     * [.getGroup(name)](#CollectionInstance+getGroup) ⇒ <code>this</code>
     * [.getGroupsOf(key)](#CollectionInstance+getGroupsOf) ⇒ <code>Array.&lt;string&gt;</code>
     * [.addToGroups(key, groups)](#CollectionInstance+addToGroups) ⇒ <code>this</code>
+    * [.watchGroup(name, callback)](#CollectionInstance+watchGroup) ⇒ <code>function</code>
     * [.delete(keys)](#CollectionInstance+delete) ⇒ <code>this</code>
     * [.removeFromGroup(keys, groups)](#CollectionInstance+removeFromGroup) ⇒ <code>this</code>
     * [.clear(groupNames)](#CollectionInstance+clear) ⇒ <code>this</code>
@@ -50,12 +52,12 @@ A Collection Instance
 
 <a name="CollectionInstance+value"></a>
 
-### .value : <code>Array.&lt;DataType&gt;</code>
+### .value : <code>Array.&lt;DataTypeInput&gt;</code>
 <p>Get all of the collection data values as an array</p>
 
 <a name="CollectionInstance+keys"></a>
 
-### .keys : <code>Array.&lt;string&gt;</code> \| <code>Array.&lt;number&gt;</code>
+### .keys : <code>Array.&lt;string&gt;</code>
 <p>Get all of the collection data keys as an array</p>
 
 <a name="CollectionInstance+groups"></a>
@@ -65,7 +67,7 @@ A Collection Instance
 
 <a name="CollectionInstance+groupsValue"></a>
 
-### .groupsValue : <code>Record.&lt;GroupNames, Array.&lt;DataType&gt;&gt;</code>
+### .groupsValue : <code>Record.&lt;GroupNames, Array.&lt;DataTypeInput&gt;&gt;</code>
 <p>Get all the groups and their children's data values as an object</p>
 
 <a name="CollectionInstance+selectors"></a>
@@ -75,7 +77,7 @@ A Collection Instance
 
 <a name="CollectionInstance+selectorsValue"></a>
 
-### .selectorsValue : <code>Record.&lt;SelectorNames, Array.&lt;DataType&gt;&gt;</code>
+### .selectorsValue : <code>Record.&lt;SelectorNames, Array.&lt;DataTypeInput&gt;&gt;</code>
 <p>Get all the groups and their children's data values as an object</p>
 
 <a name="CollectionInstance+name"></a>
@@ -85,7 +87,7 @@ A Collection Instance
 
 <a name="CollectionInstance+lastUpdatedKey"></a>
 
-### .lastUpdatedKey : <code>string</code> \| <code>number</code>
+### .lastUpdatedKey : <code>string</code>
 <p>Get the last updated key of the collection</p>
 
 <a name="CollectionInstance+collect"></a>
@@ -98,7 +100,7 @@ A Collection Instance
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | <code>Array.&lt;DataType&gt;</code> \| <code>DataType</code> | <p>The data to collect</p> |
+| data | <code>Array.&lt;DataTypeInput&gt;</code> \| <code>DataTypeInput</code> | <p>The data to collect</p> |
 | groups | <code>string</code> \| <code>Array.&lt;string&gt;</code> | <p>The groups to add the items to</p> |
 
 <a name="CollectionInstance+update"></a>
@@ -111,9 +113,21 @@ This is like collect but will not add new items, and can can be used to patch ex
 | Param | Type | Description |
 | --- | --- | --- |
 | key | <code>string</code> \| <code>number</code> | <p>The key of the item to update</p> |
-| data | <code>DataType</code> | <p>The data to update the item with</p> |
+| data | <code>DataTypeInput</code> | <p>The data to update the item with</p> |
 | config |  | <p>The configuration to use for the update</p> |
 | config.deep | <code>boolean</code> | <p>Should the update be deep or shallow</p> |
+
+<a name="CollectionInstance+has"></a>
+
+### .has(dataKey, includeProvisional) ⇒ <code>boolean</code>
+<p>Check if the collection has a data item with the given key</p>
+
+**Returns**: <code>boolean</code> <p>Whether the collection has a data item with the given key</p>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dataKey | <code>string</code> | <p>The key of the data item to  look for</p> |
+| includeProvisional | <code>boolean</code> | <p>Whether to include provisional data items in the search. This may be useful if you are using a collection to store data that is not yet available</p> |
 
 <a name="CollectionInstance+getItem"></a>
 
@@ -124,18 +138,18 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| dataKey | <code>string</code> \| <code>number</code> | <p>The key of the data item to get</p> |
+| dataKey | <code>string</code> | <p>The key of the data item to get</p> |
 
 <a name="CollectionInstance+getItemValue"></a>
 
-### .getItemValue(key) ⇒ <code>DataType</code>
+### .getItemValue(key) ⇒ <code>DataTypeInput</code>
 <p>Get the value of an item in the collection</p>
 
-**Returns**: <code>DataType</code> <p>The value of the item</p>  
+**Returns**: <code>DataTypeInput</code> <p>The value of the item</p>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| key | <code>string</code> \| <code>number</code> | <p>The key of the item to get</p> |
+| key | <code>string</code> | <p>The key of the item to get</p> |
 
 <a name="CollectionInstance+createSelector"></a>
 
@@ -224,8 +238,20 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| key | <code>string</code> \| <code>number</code> | <p>The key of the item to add</p> |
+| key | <code>string</code> | <p>The key of the item to add</p> |
 | groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>The group(s) to add the item to</p> |
+
+<a name="CollectionInstance+watchGroup"></a>
+
+### .watchGroup(name, callback) ⇒ <code>function</code>
+<p>A shortcut to watch a group for changes</p>
+
+**Returns**: <code>function</code> <p>A function to stop watching the group</p>  
+
+| Param | Description |
+| --- | --- |
+| name | <p>The name of the group you are watching</p> |
+| callback | <p>The callback to run when the group data changes</p> |
 
 <a name="CollectionInstance+delete"></a>
 
@@ -236,7 +262,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| keys | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
+| keys | <code>string</code> | <p>The data key(s) to use for lookup</p> |
 
 <a name="CollectionInstance+removeFromGroup"></a>
 
@@ -247,7 +273,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 | Param | Type | Description |
 | --- | --- | --- |
-| keys | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
+| keys | <code>string</code> \| <code>Array.&lt;string&gt;</code> | <p>The data key(s) to use for lookup</p> |
 | groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>Either a single group or an array of groups to remove the data from</p> |
 
 <a name="CollectionInstance+clear"></a>

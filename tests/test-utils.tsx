@@ -22,6 +22,10 @@ export type User = {
 	firstName: string
 	appointmentId: string
 }
+export type UserLite = {
+	id: string
+	firstName: string
+}
 export type Appointment = {
 	id: string
 	name: string
@@ -31,7 +35,6 @@ export type Appointment = {
 export const users = collection<User>({
 	primaryKey: 'id',
 	name: 'users',
-	unfoundKeyReturnsUndefined: true,
 	foreignKeys: {
 		appointmentId: {
 			newKey: 'appointment',
@@ -39,6 +42,12 @@ export const users = collection<User>({
 		},
 	},
 }).createSelector('batched')
+
+export const usersLite = collection<UserLite>({
+	primaryKey: 'id',
+	name: 'userslite',
+}).createSelector('batched')
+
 export const appointments = collection<Appointment>({
 	primaryKey: 'id',
 	name: 'appointments',

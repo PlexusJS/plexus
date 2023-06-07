@@ -1,4 +1,4 @@
-import { PlexusInstance } from './instance'
+import { PlexusInstance } from './instance/instance'
 import { FunctionType, _action } from './action'
 import { genUID } from '@plexusjs/utils'
 type ErrorHandler = (error: any) => unknown

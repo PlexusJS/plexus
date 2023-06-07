@@ -1,12 +1,12 @@
-import { deepClone } from '@plexusjs/utils'
+import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 import { PlexusCollectionInstance } from '..'
-import { PlexusInstance } from '../instance'
-import { PlexusWatcher } from '../interfaces'
+import { PlexusInstance } from '../instance/instance'
+import { PlexusInternalWatcher } from '../types'
 import { WatchableMutable } from '../watchable'
 
 import { DataKey, PlexusDataInstance } from './data'
 export type SelectorName = string
-interface CollectionSelectorStore<ValueType = any> {
+interface CollectionSelectorStore {
 	_name: string
 	_key: DataKey | null
 	_collectionId: string
@@ -29,9 +29,9 @@ export type PlexusCollectionSelector<
 export class CollectionSelector<
 	DataType extends Record<string, any>
 > extends WatchableMutable<DataType> {
-	private _internalStore: CollectionSelectorStore<DataType>
+	private _internalStore: CollectionSelectorStore
 	private collection: () => PlexusCollectionInstance<DataType>
-	private defaultValue: DataType
+	private defaultValue: PlexusWatchableValueInterpreter<DataType>
 	// private instance: () => PlexusInstance
 
 	/**
@@ -64,9 +64,9 @@ export class CollectionSelector<
 		this.collection = collection
 
 		// the fallback value if the key or data is not found
-		this.defaultValue = this.collection().config.unfoundKeyReturnsUndefined
-			? (undefined as any as DataType)
-			: ({} as DataType)
+		this.defaultValue = !this.collection().config.unfoundKeyReturnsProvisional
+			? (undefined as any as PlexusWatchableValueInterpreter<DataType>)
+			: ({} as PlexusWatchableValueInterpreter<DataType>)
 	}
 	private runWatchers() {
 		this.instance().runtime.log(
@@ -141,7 +141,7 @@ export class CollectionSelector<
 	 * @param {DataType} value The value to set
 	 * @returns {this} The selector instance
 	 */
-	set(value: DataType): this {
+	set(value: PlexusWatchableValueInterpreter<DataType>): this {
 		this.instance().runtime.log(
 			'info',
 			`Selector ${this.instanceId} has a data instance ${
@@ -160,7 +160,7 @@ export class CollectionSelector<
 	 * @param {DataType} value The value to set
 	 * @returns {this} The selector instance
 	 */
-	patch(value: Partial<DataType>): this {
+	patch(value: Partial<PlexusWatchableValueInterpreter<DataType>>): this {
 		// TODO add a warning here if the key is not set
 		if (this.data) {
 			this.data.patch(value)
@@ -199,7 +199,10 @@ export class CollectionSelector<
 	 * @param {watcher} callback The callback to run when the state changes
 	 * @returns {killWatcher} The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<DataType>, from?: string) {
+	watch(
+		callback: PlexusInternalWatcher<PlexusWatchableValueInterpreter<DataType>>,
+		from?: string
+	) {
 		return this.instance().runtime.subscribe(
 			this.id,
 			(v, from) => {

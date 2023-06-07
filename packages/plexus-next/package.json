@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/next",
-	"version": "1.5.10",
+	"version": "1.7.20",
 	"description": "Next Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -33,8 +33,7 @@
 	"scripts": {
 		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
 		"build": "tsc --build --force",
-		"prepublish": "yarn build",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "5c7c20114233d1fcbbae72dde893b60272f99afb"
+	"gitHead": "aad613946af7c158e0971f67765c53f830c16a63"
 }

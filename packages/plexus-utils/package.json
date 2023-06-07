@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/utils",
-	"version": "1.5.10",
+	"version": "1.7.20",
 	"description": "Useful utils by the PlexusJS Team.",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -22,5 +22,5 @@
 		"build": "tsc --build --force",
 		"dev": "tsc --watch"
 	},
-	"gitHead": "5c7c20114233d1fcbbae72dde893b60272f99afb"
+	"gitHead": "aad613946af7c158e0971f67765c53f830c16a63"
 }

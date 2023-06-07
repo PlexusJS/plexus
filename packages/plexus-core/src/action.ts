@@ -1,8 +1,8 @@
-import { PlexusInstance } from './instance'
+import { PlexusInstance } from './instance/instance'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusActionHooks {
-	onCatch(handler?: ErrorHandler): void
+	onCatch(handler?: ErrorHandler, useGlobal?: boolean): void
 	/**
 	 * Ignore the default hault preActions
 	 */
@@ -15,6 +15,7 @@ export interface PlexusActionHooks {
  * The action helpers for a defined plexus action
  */
 class PlexusActionHelpers {
+	public _useGlobalCatch = true
 	private _internalStore = {
 		_errorHandlers: new Set<ErrorHandler>(),
 	}
@@ -24,8 +25,10 @@ class PlexusActionHelpers {
 	/**
 	 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
 	 * @param handler A function that will be called when an error occurs; omit to fail silently.
+	 * @param useGlobal Should the global error handler be used? (default: true)
 	 */
-	onCatch(handler: ErrorHandler = () => {}) {
+	onCatch(handler: ErrorHandler = () => {}, useGlobal = true) {
+		this._useGlobalCatch = useGlobal
 		if (handler) this._internalStore._errorHandlers.add(handler)
 		this.instance().runtime.log(
 			'info',
@@ -38,7 +41,7 @@ class PlexusActionHelpers {
 	 * Run all available error handlers
 	 */
 	runErrorHandlers(e: unknown) {
-		if (this.instance()._globalCatch) {
+		if (this.instance()._globalCatch && this._useGlobalCatch) {
 			this.instance()._globalCatch?.(e)
 			// Don't run other onCatch's
 			if (this.instance().settings.exclusiveGlobalError) return
@@ -78,8 +81,8 @@ class PlexusActionHelpers {
 	 * Eject the external functions object returned to the user in the first argument of the action function
 	 */
 	get hooks(): PlexusActionHooks {
-		const onCatch = (handler?: ErrorHandler): void => {
-			return this.onCatch(handler)
+		const onCatch = (handler?: ErrorHandler, useGlobal = true): void => {
+			return this.onCatch(handler, useGlobal)
 		}
 		const ignoreInit = (): void => {
 			return this.ignoreInit()
@@ -122,7 +125,7 @@ export function _action<Fn extends FunctionType>(
 	const helpers = new PlexusActionHelpers(instance)
 
 	if (fn.constructor.name === 'Function') {
-		const newAction = (...args) => {
+		function newAction(...args) {
 			try {
 				// if the instance is not ready, wait for it to be
 				// !NOTE: this is probably not a good way to do this, but it works for now
@@ -144,7 +147,7 @@ export function _action<Fn extends FunctionType>(
 				return fn(helpers.hooks, ...args)
 			} catch (e) {
 				// only return the error if there is no handler
-				if (!helpers.catchError) throw e
+				if (!helpers.catchError && !instance()._globalCatch) throw e
 				helpers.runErrorHandlers(e)
 				// otherwise run the handler and return null
 				return null
@@ -170,7 +173,7 @@ export function _action<Fn extends FunctionType>(
 				return await fn(helpers.hooks, ...args)
 			} catch (e) {
 				// only return the error if there is no handler
-				if (!helpers.catchError) throw e
+				if (!helpers.catchError && !instance()._globalCatch) throw e
 				helpers.runErrorHandlers(e)
 				// otherwise run the handler and return null
 				return null

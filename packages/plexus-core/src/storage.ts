@@ -5,7 +5,7 @@ import {
 	isEqual,
 	isObject,
 } from '@plexusjs/utils'
-import { PlexusInstance } from './instance'
+import { PlexusInstance } from './instance/instance'
 import { Watchable, WatchableMutable } from './watchable'
 
 type ExtendedWatchable = Watchable<any> & Record<string, any>
@@ -57,6 +57,11 @@ export class StorageInstance {
 				'warn',
 				'No localstorage available, cannot get persisted value'
 			)
+			return null
+		}
+		if (!key) {
+			this.instance().runtime.log('warn', `Cannot get value for key ${key}`)
+
 			return null
 		}
 		this.instance().runtime.log(

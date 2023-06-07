@@ -1,12 +1,13 @@
 'use strict'
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { instance, PlexusStateInstance, state } from '@plexusjs/core'
-// import { PlexusState, PlexusStateInstance } from '../src/interfaces';
+import { instance, state } from '@plexusjs/core'
+
 type ObjectStateExample = Partial<{
 	a: { a?: boolean; b?: boolean }
 	b: boolean
 	c: { b?: boolean }
 }>
+type UnionString = 'a' | 'b' | 'c'
 
 const initialValue = {
 	boolean: true,
@@ -24,8 +25,12 @@ const objectState = state<ObjectStateExample>(initialValue.object)
 const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(
 	initialValue.array
 )
-// TODO Disallow null as initial value
 
+const stateWithFetchFnTest = state(() => {
+	return 'some sort of data'
+})
+
+// TODO Disallow null as initial value
 beforeEach(() => {
 	booleanState.reset()
 	stringState.reset()
@@ -35,6 +40,7 @@ beforeEach(() => {
 describe('Testing State Function', () => {
 	test('Can save a value', () => {
 		const value = state(1)
+		const value2 = state<UnionString>('a')
 		expect(value.value).toBe(1)
 	})
 
@@ -228,5 +234,21 @@ describe('Testing State Function', () => {
 		complexObj.redo()
 		expect(complexObj.value.obj.arr[0].item1).toBe('2')
 		instance({ logLevel: undefined })
+	})
+
+	test('Check null initializer functionality', () => {
+		expect(stateWithFetchFnTest.value).toBe('some sort of data')
+		stateWithFetchFnTest.set('new value')
+		expect(stateWithFetchFnTest.value).toBe('new value')
+		// let's change the fetcher function!
+		stateWithFetchFnTest.defineFetcher(() => {
+			// we can do some sort of calculation here
+			return 'a new string!' + stateWithFetchFnTest.value
+		})
+		// awesome! But nothing should change beacuse the state isn't undefined nor did we call `fetch()`
+		expect(stateWithFetchFnTest.value).toBe('new value')
+		// let's force a fetch...
+		stateWithFetchFnTest.fetch()
+		expect(stateWithFetchFnTest.value).toBe('a new string!' + 'new value')
 	})
 })

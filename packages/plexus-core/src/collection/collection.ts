@@ -1,7 +1,8 @@
-import { PlexusInstance } from '../instance'
-import { PlexusWatcher } from '../interfaces'
+import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
+import { PlexusInstance } from '../instance/instance'
+import { PlexusInternalWatcher } from '../types'
 
-import { _data, PlexusDataInstance, DataKey } from './data'
+import { _data, PlexusDataInstance, DataKey, CollectionData } from './data'
 import {
 	_group,
 	PlexusCollectionGroup,
@@ -54,8 +55,13 @@ export interface PlexusCollectionConfig<DataType> {
 	/**
 	 * When this value is true, using getValue will return undefined rather than an object with only the key. When using get item, you receive a provisional data instance with a value of undefined.
 	 * @warning The type of the returned value WILL NOT change to undefined. Only the literal value will be undefined as this is _technically_ an override. Please beware and plan accordingly.
+	 * @deprecated This is now the default behavior. Use unfoundKeyReturnsProvisional instead
 	 */
 	unfoundKeyReturnsUndefined?: boolean
+	/**
+	 * When this value is true, using getVallue will return a provisional data instance containing just the key instead of undefined. When using get item, you receive a provisional data instance with a value containing the primaryKey only instead of undefined.
+	 */
+	unfoundKeyReturnsProvisional?: boolean
 	/**
 	 * When this value is true, the collection will use batching when running operations (like collections) on array to reduce the number of rerenders. This is useful when you are ingesting a large amount of data at once.
 	 * @default true
@@ -65,16 +71,12 @@ export interface PlexusCollectionConfig<DataType> {
 	foreignKeys?: ForeignKeyData<DataType>
 	computeLocations?: Array<'collect' | 'getValue'>
 }
-interface PlexusCollectionStore<
-	DataType extends Record<string, any>,
-	Groups,
-	Selectors
-> {
+interface PlexusCollectionStore<DataType extends Record<string, any>> {
 	_internalId: string
-	_lastChanged: number | string
+	_lastChanged: string
 	_lookup: Map<string, string>
 	_key: string
-	_data: Map<string | number, PlexusDataInstance<DataType>>
+	_data: Map<string, PlexusDataInstance<DataType>>
 	_groups: GroupMap<DataType>
 	_selectors: SelectorMap<DataType>
 	_name: string
@@ -83,7 +85,9 @@ interface PlexusCollectionStore<
 	_persist: boolean
 	_internalCalledGroupCollect?: boolean
 	set persist(value: boolean)
-	_computeFn?: (data: DataType) => DataType
+	_computeFn?: (
+		data: PlexusWatchableValueInterpreter<DataType>
+	) => PlexusWatchableValueInterpreter<DataType>
 }
 
 export type PlexusCollectionInstance<
@@ -96,17 +100,17 @@ export type PlexusCollectionInstance<
  *
  */
 export class CollectionInstance<
-	DataType extends Record<string, any>,
-	Groups extends GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType>
+	DataTypeInput extends Record<string, any>,
+	Groups extends GroupMap<DataTypeInput>,
+	Selectors extends SelectorMap<DataTypeInput>
 	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
-	private _internalStore: PlexusCollectionStore<DataType, Groups, Selectors>
+	private _internalStore: PlexusCollectionStore<DataTypeInput>
 	private instance: () => PlexusInstance
 	/**
 	 * Get the config
 	 */
-	config: PlexusCollectionConfig<DataType>
+	config: PlexusCollectionConfig<DataTypeInput>
 	/**
 	 * The internal ID of the collection
 	 * @type {string}
@@ -124,7 +128,7 @@ export class CollectionInstance<
 	}
 	constructor(
 		instance: () => PlexusInstance,
-		config: PlexusCollectionConfig<DataType> = {
+		config: PlexusCollectionConfig<DataTypeInput> = {
 			primaryKey: 'id',
 			defaultGroup: false,
 		} as const
@@ -143,11 +147,14 @@ export class CollectionInstance<
 			_lookup: new Map<string, string>(),
 			_lastChanged: '',
 			_key: config?.primaryKey || 'id',
-			_data: new Map<string, PlexusDataInstance<DataType>>(),
-			_groups: new Map<GroupName, PlexusCollectionGroup<DataType>>() as Groups,
+			_data: new Map<string, PlexusDataInstance<DataTypeInput>>(),
+			_groups: new Map<
+				GroupName,
+				PlexusCollectionGroup<DataTypeInput>
+			>() as Groups,
 			_selectors: new Map<
 				SelectorName,
-				PlexusCollectionSelector<DataType>
+				PlexusCollectionSelector<DataTypeInput>
 			>() as Selectors,
 			_name: config?.name || '',
 			_externalName: '',
@@ -204,113 +211,136 @@ export class CollectionInstance<
 	/**
 	 * Collect An item of data (or many items of data using an array) into the collection.
 	 * @requires: Each data item must have the primary key as a property
-	 * @param {DataType[]|DataType} data  The data to collect
+	 * @param {DataTypeInput[]|DataTypeInput} data  The data to collect
 	 * @param {string | string[]} groups The groups to add the items to
 	 * @returns {this} The collection instance
 	 */
 	collect(
-		data: DataType[] | DataType,
+		data:
+			| PlexusWatchableValueInterpreter<DataTypeInput>[]
+			| PlexusWatchableValueInterpreter<DataTypeInput>,
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
-	): void
-	collect(data: DataType, groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>): void
-	collect(data: DataType[], groups?: GroupName[] | GroupName): void
-	collect(data: DataType, groups?: GroupName[] | GroupName): void
+	): this
 	collect(
-		data: DataType | DataType[],
+		data: PlexusWatchableValueInterpreter<DataTypeInput>,
+		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
+	): this
+	collect(
+		data: PlexusWatchableValueInterpreter<DataTypeInput>[],
+		groups?: GroupName[] | GroupName
+	): this
+	collect(
+		data: PlexusWatchableValueInterpreter<DataTypeInput>,
+		groups?: GroupName[] | GroupName
+	): this
+	collect(
+		data:
+			| PlexusWatchableValueInterpreter<DataTypeInput>
+			| PlexusWatchableValueInterpreter<DataTypeInput>[],
 		groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	) {
-		const collectItem = (
-			item: DataType,
+		const collectItems = (
+			items: PlexusWatchableValueInterpreter<DataTypeInput>[] = []
+		) => {
+			if (!items.length) return []
+			const addedKeys = new Set<string>()
+			for (let item of items) {
+				if (
+					item[this._internalStore._key] !== undefined &&
+					item[this._internalStore._key] !== null
+				) {
+					// Compute item before setting/storing
+					if (
+						typeof this._internalStore._computeFn === 'function' &&
+						this.config.computeLocations?.includes('collect')
+					) {
+						item = this._internalStore._computeFn(item)
+					}
+					// normalizing the key type to string
+					const dataKey = `${item[this._internalStore._key]}`
+					// if there is already a state for that key, update it
+					if (this.has(dataKey, true)) {
+						this._internalStore._data.get(dataKey)?.set(item)
+					}
+					// if there is no data instance for that key, create it
+					else {
+						this.instance().runtime.log(
+							'debug',
+							`Couldn't find data instance for key ${dataKey} in collection ${this.instanceId}; creating a new data instance...`
+						)
+						const dataInstance = _data(
+							() => this.instance(),
+							() => this,
+							this._internalStore._key,
+							dataKey,
+							{ ...item, [this._internalStore._key]: dataKey }
+						)
+						// if we get a valid data instance, add it to the collection
+						if (dataInstance) {
+							this._internalStore._data.set(dataKey, dataInstance)
+						}
+					}
+					// add the key to the addedKeys set
+					addedKeys.add(dataKey)
+				}
+			}
+			return Array.from(addedKeys.values())
+		}
+		const collectFn = (
+			data_: typeof data,
 			groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>,
 			startedFromInnerBatch?: boolean
 		) => {
-			if (!item) return
-
+			// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
 			if (
-				item[this._internalStore._key] !== undefined &&
-				item[this._internalStore._key] !== null
+				this.instance().runtime.isBatching &&
+				this.config.useBatching &&
+				!startedFromInnerBatch
 			) {
-				// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
-				if (
-					this.instance().runtime.isBatching &&
-					this.config.useBatching &&
-					!startedFromInnerBatch
-				) {
+				this.instance().runtime.log(
+					'debug',
+					`Batching an collect call for collection ${this.instanceId}`
+				)
+				// store this in the batchedSetters for execution once batching is over
+				this.instance().runtime.batchedCalls.push(() => {
 					this.instance().runtime.log(
 						'debug',
-						`Batching an addToGroups call for collection ${this.instanceId}`
+						`Batched collect call fulfilled for collection ${this.instanceId}`
 					)
-					// store this in the batchedSetters for execution once batching is over
-					this.instance().runtime.batchedCalls.push(() => {
-						this.instance().runtime.log(
-							'debug',
-							`Batched addToGroups call fulfilled for collection ${this.instanceId}`
-						)
-						return collectItem(item, groups, true)
-					})
-					return this
-				}
-				// Compute item before setting/storing
-				if (
-					typeof this._internalStore._computeFn === 'function' &&
-					this.config.computeLocations?.includes('collect')
+					return collectFn(data_, groups, true)
+				})
+				return this
+			}
+
+			const addedKeys: any[] = collectItems(
+				Array.isArray(data_) ? data_ : [data_]
+			)
+
+			const defaultGroupName =
+				typeof this.config.defaultGroup === 'string'
+					? this.config.defaultGroup
+					: 'default'
+			// if a group (or groups) is provided, add the item to the group
+			if (groups) {
+				const groupsNorm = Array.isArray(groups) ? groups : [groups]
+				this._internalStore._internalCalledGroupCollect = true
+				this.addToGroups(
+					addedKeys,
+					groupsNorm.filter((name) => name !== defaultGroupName)
 				)
-					item = this._internalStore._computeFn(item)
-				// normalizing the key type to string
-				const dataKey = item[this._internalStore._key]
-				// if there is already a state for that key, update it
-				if (this._internalStore._data.has(dataKey)) {
-					this._internalStore._data.get(dataKey)?.set(item)
-				}
-				// if there is no data instance for that key, create it
-				else {
-					const dataInstance = _data(
-						() => this.instance(),
-						() => this,
-						this._internalStore._key,
-						dataKey,
-						item
-					)
-					// if we get a valid data instance, add it to the collection
-					if (dataInstance) {
-						this._internalStore._data.set(dataKey, dataInstance)
-					}
-				}
-				const defaultGroupName =
-					typeof this.config.defaultGroup === 'string'
-						? this.config.defaultGroup
-						: 'default'
-				// if a group (or groups) is provided, add the item to the group
-				if (groups) {
-					const groupsNorm = Array.isArray(groups) ? groups : [groups]
-					this._internalStore._internalCalledGroupCollect = true
-					this.addToGroups(
-						dataKey,
-						groupsNorm.filter((name) => name !== defaultGroupName)
-					)
-				}
-				if (this.config.defaultGroup) {
-					this._internalStore._internalCalledGroupCollect = true
-					// if it is not (undefined or some other string), add to group
-					this.addToGroups(dataKey, defaultGroupName as any)
-				}
-				this._internalStore._internalCalledGroupCollect = false
 			}
-		}
-		const collectFn = () => {
-			if (Array.isArray(data)) {
-				for (let item of data) {
-					collectItem(item, groups)
-				}
-			} else {
-				collectItem(data, groups)
+			if (this.config.defaultGroup) {
+				this._internalStore._internalCalledGroupCollect = true
+				// if it is not (undefined or some other string), add to group
+				this.addToGroups(addedKeys, defaultGroupName as any)
 			}
+			this._internalStore._internalCalledGroupCollect = false
 		}
 		// we only need to call back if the instance is not batching
 		if (this.config.useBatching) {
-			this.instance().runtime.batch(collectFn)
+			this.instance().runtime.batch(() => collectFn(data, groups))
 		} else {
-			collectFn()
+			collectFn(data, groups)
 		}
 		this.mount()
 		return this
@@ -319,41 +349,57 @@ export class CollectionInstance<
 	 * Update the collection with data;
 	 * This is like collect but will not add new items, and can can be used to patch existing items
 	 * @param {string|number} key The key of the item to update
-	 * @param {DataType} data The data to update the item with
+	 * @param {DataTypeInput} data The data to update the item with
 	 * @param config The configuration to use for the update
 	 * @param {boolean} config.deep Should the update be deep or shallow
 	 */
 	update(
 		key: DataKey,
-		data: Partial<DataType>,
+		data: Partial<PlexusWatchableValueInterpreter<DataTypeInput>>,
 		config: { deep: boolean } = { deep: true }
 	) {
-		key = key
-		if (config.deep) {
-			if (this._internalStore._data.has(key)) {
+		key = `${key}`
+		if (this.has(key, true)) {
+			if (config.deep) {
 				this._internalStore._data.get(key)?.patch({
 					...data,
 					[this._internalStore._key]: key,
-				} as Partial<DataType>)
+				} as Partial<PlexusWatchableValueInterpreter<DataTypeInput>>)
 			} else {
-				console.warn('no data found for key', key)
+				if (this.has(key, true)) {
+					this._internalStore._data
+						.get(key)
+						?.set(data as PlexusWatchableValueInterpreter<DataTypeInput>)
+				} else {
+					console.warn('no data found for key', key)
+				}
 			}
 		} else {
-			if (this._internalStore._data.has(key)) {
-				this._internalStore._data.get(key)?.set(data as DataType)
-			} else {
-				console.warn('no data found for key', key)
-			}
+			console.warn('no data found for key', key)
 		}
 		this.mount()
 		return this
 	}
 	/**
+	 * Check if the collection has a data item with the given key
+	 * @param {string} dataKey The key of the data item to  look for
+	 * @param {boolean} includeProvisional Whether to include provisional data items in the search. This may be useful if you are using a collection to store data that is not yet available
+	 * @returns {boolean} Whether the collection has a data item with the given key
+	 */
+	has(dataKey: DataKey, includeProvisional?: boolean): boolean {
+		const key = `${dataKey}`
+		const secondCondition = includeProvisional
+			? true
+			: !this.getItem(key)?.provisional
+		return this._internalStore._data.has(key) && secondCondition
+	}
+	/**
 	 * Get the Value of the data item with the provided key (the raw data). If there is not an existing data item, this will return a _provisional_ one
-	 * @param {string|number} dataKey The key of the data item to get
+	 * @param {string} dataKey The key of the data item to get
 	 * @returns {this} The new Collection Instance
 	 */
-	getItem(dataKey: DataKey): PlexusDataInstance<DataType> {
+	getItem(dataKey: DataKey): CollectionData<DataTypeInput> {
+		dataKey = `${dataKey}`
 		const data = this._internalStore._data.get(dataKey)
 		if (!data) {
 			const dataInstance = _data(
@@ -361,32 +407,40 @@ export class CollectionInstance<
 				() => this,
 				this._internalStore._key,
 				dataKey,
-				this.config.unfoundKeyReturnsUndefined
-					? (undefined as any as DataType)
+				!this.config.unfoundKeyReturnsProvisional
+					? (undefined as any as DataTypeInput)
 					: ({
 							[this._internalStore._key]: dataKey,
-					  } as any as DataType),
+					  } as any as DataTypeInput),
 				{
 					prov: true,
-					unfoundKeyIsUndefined: this.config.unfoundKeyReturnsUndefined,
+					unfoundKeyIsUndefined: !this.config.unfoundKeyReturnsProvisional,
 				}
 			)
-			// if we get a valid data instance, add it to the collection
-			if (dataInstance) {
-				this._internalStore._data.set(dataKey, dataInstance)
+			// if we get an invalid data instance, return undefined
+			if (!dataInstance) {
+				this.instance().runtime.log(
+					'warn',
+					`Invalid data instance returned for key ${dataKey} in collection ${this.instanceId}`
+				)
+				return undefined as any
 			}
-			return dataInstance as PlexusDataInstance<DataType>
+			// if we get a valid data instance, add it to the collection
+			this._internalStore._data.set(dataKey, dataInstance)
+			return dataInstance
 		}
 		// this.mount()
 		return data
 	}
 	/**
 	 * Get the value of an item in the collection
-	 * @param {string|number} key The key of the item to get
-	 * @returns {DataType} The value of the item
+	 * @param {string} key The key of the item to get
+	 * @returns {DataTypeInput} The value of the item
 	 */
-	getItemValue(key: DataKey): DataType {
-		const value = this.getItem(key).value
+	getItemValue(
+		key: DataKey
+	): PlexusWatchableValueInterpreter<DataTypeInput> | undefined {
+		const value = this.getItem(key)?.value
 		if (
 			typeof this._internalStore._computeFn === 'function' &&
 			this.config.computeLocations?.includes('getValue') &&
@@ -415,9 +469,9 @@ export class CollectionInstance<
 		)
 		this.mount()
 		return this as CollectionInstance<
-			DataType,
+			DataTypeInput,
 			Groups,
-			Selectors & Map<Name, PlexusCollectionSelector<DataType>>
+			Selectors & Map<Name, PlexusCollectionSelector<DataTypeInput>>
 		>
 	}
 	/**
@@ -432,10 +486,13 @@ export class CollectionInstance<
 			this.createSelector(selectorName)
 		}
 		return this as CollectionInstance<
-			DataType,
+			DataTypeInput,
 			Groups,
 			Selectors &
-				Map<typeof selectorNames[number], PlexusCollectionSelector<DataType>>
+				Map<
+					(typeof selectorNames)[number],
+					PlexusCollectionSelector<DataTypeInput>
+				>
 		>
 	}
 	/**
@@ -443,14 +500,16 @@ export class CollectionInstance<
 	 * @param name {string} The Selector Name to search for
 	 * @returns {this|undefined} Either a Selector Instance or undefined
 	 */
-	getSelector(name: string): PlexusCollectionSelector<DataType>
-	getSelector(name: KeyOfMap<Selectors>): PlexusCollectionSelector<DataType>
+	getSelector(name: string): PlexusCollectionSelector<DataTypeInput>
+	getSelector(
+		name: KeyOfMap<Selectors>
+	): PlexusCollectionSelector<DataTypeInput>
 	getSelector(name: KeyOfMap<Selectors> | string) {
 		const selector = this._internalStore._selectors.get(name)
 		if (this.isCreatedSelector(name) && selector) {
 			return selector
 		} else {
-			const s = _selector<DataType>(
+			const s = _selector<DataTypeInput>(
 				() => this.instance(),
 				() => this,
 				name
@@ -469,7 +528,7 @@ export class CollectionInstance<
 	 */
 	createGroup<Name extends GroupName>(
 		groupName: Name,
-		config?: PlexusCollectionGroupConfig<DataType>
+		config?: PlexusCollectionGroupConfig<DataTypeInput>
 	) {
 		this.mount()
 		if (this._internalStore._groups.has(groupName)) return this
@@ -485,8 +544,8 @@ export class CollectionInstance<
 		)
 
 		return this as CollectionInstance<
-			DataType,
-			Groups & Map<Name, PlexusCollectionGroup<DataType>>,
+			DataTypeInput,
+			Groups & Map<Name, PlexusCollectionGroup<DataTypeInput>>,
 			Selectors
 		>
 	}
@@ -502,8 +561,9 @@ export class CollectionInstance<
 		}
 
 		return this as CollectionInstance<
-			DataType,
-			Groups & Map<typeof groupNames[number], PlexusCollectionGroup<DataType>>,
+			DataTypeInput,
+			Groups &
+				Map<(typeof groupNames)[number], PlexusCollectionGroup<DataTypeInput>>,
 			Selectors
 		>
 	}
@@ -512,13 +572,13 @@ export class CollectionInstance<
 	 * @param {string} name The Group Name to search for
 	 * @returns {this} The new Collection Instance
 	 */
-	getGroup(name: string): PlexusCollectionGroup<DataType>
-	getGroup(name: KeyOfMap<Groups>): PlexusCollectionGroup<DataType>
-	getGroup(name: KeyOfMap<Groups> | string) {
+	getGroup(name: GroupName): PlexusCollectionGroup<DataTypeInput>
+	getGroup(name: KeyOfMap<Groups>): PlexusCollectionGroup<DataTypeInput>
+	getGroup(name: KeyOfMap<Groups> | GroupName) {
 		if (this.isCreatedGroup(name)) {
 			const group = this._internalStore._groups.get(
 				name
-			) as PlexusCollectionGroup<DataType>
+			) as PlexusCollectionGroup<DataTypeInput>
 
 			return group
 		} else {
@@ -551,16 +611,21 @@ export class CollectionInstance<
 	}
 	/**
 	 * Add a data item to a group or groups
-	 * @param {string|number} key The key of the item to add
+	 * @param {string} key The key of the item to add
 	 * @param {string[]|string} groups The group(s) to add the item to
 	 * @returns {this} The new Collection Instance
 	 */
+	addToGroups(keys: DataKey | DataKey[], groups: GroupName[] | GroupName): this
 	addToGroups(
-		key: DataKey,
+		keys: DataKey | DataKey[],
+		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
+	): this
+	addToGroups(
+		keys: DataKey | DataKey[],
 		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
 	): this {
 		const addToGroup = (
-			key: DataKey,
+			keys: DataKey[],
 			group: GroupName,
 			startedFromInnerBatch?: boolean
 		) => {
@@ -580,7 +645,7 @@ export class CollectionInstance<
 						'debug',
 						`Collection Batching completed for addToGroups`
 					)
-					return addToGroup(key, group, true)
+					return addToGroup(keys, group, true)
 				})
 				return this
 			}
@@ -594,15 +659,17 @@ export class CollectionInstance<
 				)
 				this._internalStore._groups.set(group as GroupName, g)
 			}
-			g.add(key)
+			g.add(keys)
 		}
 		const parseAndPushGroups = () => {
+			// normalize the keys to an array
+			const keyArray = Array.isArray(keys) ? keys : [keys]
 			if (Array.isArray(groups)) {
 				for (let group of groups) {
-					addToGroup(key, group)
+					addToGroup(keyArray, group)
 				}
 			} else {
-				addToGroup(key, groups)
+				addToGroup(keyArray, groups)
 			}
 		}
 
@@ -616,29 +683,43 @@ export class CollectionInstance<
 		}
 		return this
 	}
-	watchGroup(name: KeyOfMap<Groups>, callback: PlexusWatcher<DataType[]>)
-	watchGroup(name: string, callback: PlexusWatcher<DataType[]>)
+	/**
+	 * A shortcut to watch a group for changes
+	 * @param name The name of the group you are watching
+	 * @param callback The callback to run when the group data changes
+	 * @returns {function} A function to stop watching the group
+	 */
+	watchGroup(
+		name: KeyOfMap<Groups>,
+		callback: PlexusInternalWatcher<DataTypeInput[]>
+	)
+	watchGroup(name: string, callback: PlexusInternalWatcher<DataTypeInput[]>)
 	watchGroup(
 		name: KeyOfMap<Groups> | string,
-		callback: PlexusWatcher<DataType[]>
+		callback: PlexusInternalWatcher<DataTypeInput[]>
 	) {
 		const group = this.getGroup(name)
 		if (this.isCreatedGroup(name) && group) {
 			return group.watch(callback)
 		} else {
 			// TODO Replace with runtime log
-			console.warn(`Group ${name} not found`)
+			this.instance().runtime.log(
+				'warn',
+				`Group ${name} not found when trying to watch via collection shorthand.`
+			)
 			return () => {}
 		}
 	}
 	/**
 	 * Delete a data item completely from the collection.
-	 * @param {string|number} keys The data key(s) to use for lookup
+	 * @param {string} keys The data key(s) to use for lookup
 	 * @returns {this} The new Collection Instance
 	 */
 	delete(keys: DataKey | DataKey[]): this {
 		// the function to remove the data
 		const rm = (key: DataKey) => {
+			// key = this.config.keyTransform(key)
+			key = `${key}`
 			this._internalStore._data.get(key)?.clean()
 
 			for (let groupName of this.getGroupsOf(key)) {
@@ -657,7 +738,7 @@ export class CollectionInstance<
 	}
 	/**
 	 * Remove a data item from a set of groups
-	 * @param {string|number} keys The data key(s) to use for lookup
+	 * @param {string | string[]} keys The data key(s) to use for lookup
 	 * @param {string[]|string} groups Either a single group or an array of groups to remove the data from
 	 * @returns {this} The new Collection Instance
 	 */
@@ -667,6 +748,7 @@ export class CollectionInstance<
 	): this {
 		this.mount()
 		const rm = (key) => {
+			key = `${key}`
 			if (Array.isArray(groups)) {
 				for (let groupName of groups) {
 					if (this.isCreatedGroup(groupName)) {
@@ -722,7 +804,11 @@ export class CollectionInstance<
 	 * @param {function(Object): Object} fn A function that takes in the data and returns the formatted data
 	 * @returns {this} The new Collection Instance
 	 */
-	compute(fn: (value: DataType) => DataType): this {
+	compute(
+		fn: (
+			value: PlexusWatchableValueInterpreter<DataTypeInput>
+		) => PlexusWatchableValueInterpreter<DataTypeInput>
+	): this {
 		this._internalStore._computeFn = fn
 		return this
 	}
@@ -752,7 +838,7 @@ export class CollectionInstance<
 				data.patch({
 					...(this._internalStore._computeFn?.(data.value) ?? {}),
 					[this._internalStore._key]: id,
-				} as Partial<DataType>)
+				} as Partial<PlexusWatchableValueInterpreter<DataTypeInput>>)
 			}
 		})
 		return this
@@ -783,11 +869,11 @@ export class CollectionInstance<
 	}
 	/**
 	 * Get all of the collection data values as an array
-	 * @type {DataType[]}
+	 * @type {DataTypeInput[]}
 	 */
-	get value(): (DataType & { [key: string]: any })[] {
+	get value(): (DataTypeInput & { [key: string]: any })[] {
 		this.mount()
-		const keys: (DataType & { [key: string]: any })[] = []
+		const keys: (DataTypeInput & { [key: string]: any })[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {
 				keys.push(item.value)
@@ -797,10 +883,10 @@ export class CollectionInstance<
 	}
 	/**
 	 * Get all of the collection data keys as an array
-	 * @type {string[]|number[]}
+	 * @type {string[]}
 	 */
 	get keys() {
-		const keys: (string | number)[] = []
+		const keys: string[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {
 				keys.push(item.key)
@@ -815,8 +901,8 @@ export class CollectionInstance<
 	get groups() {
 		const groups: Record<
 			KeyOfMap<Groups>,
-			PlexusCollectionGroup<DataType>
-		> = {} as Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataType>>
+			PlexusCollectionGroup<DataTypeInput>
+		> = {} as Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataTypeInput>>
 		for (let group of this._internalStore._groups.entries()) {
 			groups[group[0] as KeyOfMap<Groups>] = group[1]
 		}
@@ -824,13 +910,13 @@ export class CollectionInstance<
 	}
 	/**
 	 * Get all the groups and their children's data values as an object
-	 * @type {Record<GroupNames, DataType[]>}
+	 * @type {Record<GroupNames, DataTypeInput[]>}
 	 */
 	get groupsValue() {
 		// holder for groups values
-		const groups: Record<KeyOfMap<Groups>, DataType[]> = {} as Record<
+		const groups: Record<KeyOfMap<Groups>, DataTypeInput[]> = {} as Record<
 			KeyOfMap<Groups>,
-			DataType[]
+			DataTypeInput[]
 		>
 
 		// iterate through the groups
@@ -852,8 +938,11 @@ export class CollectionInstance<
 	get selectors() {
 		const selectors: Record<
 			KeyOfMap<Selectors>,
-			PlexusCollectionSelector<DataType>
-		> = {} as Record<KeyOfMap<Selectors>, PlexusCollectionSelector<DataType>>
+			PlexusCollectionSelector<DataTypeInput>
+		> = {} as Record<
+			KeyOfMap<Selectors>,
+			PlexusCollectionSelector<DataTypeInput>
+		>
 		for (let selector of this._internalStore._selectors.entries()) {
 			selectors[selector[0]] = selector[1]
 		}
@@ -861,12 +950,12 @@ export class CollectionInstance<
 	}
 	/**
 	 * Get all the groups and their children's data values as an object
-	 * @type {Record<SelectorNames, DataType[]>}
+	 * @type {Record<SelectorNames, DataTypeInput[]>}
 	 */
 	get selectorsValue() {
-		const selectors: Record<KeyOfMap<Selectors>, DataType> = {} as Record<
+		const selectors = {} as Record<
 			KeyOfMap<Selectors>,
-			DataType
+			PlexusWatchableValueInterpreter<DataTypeInput>
 		>
 		for (let selector of this._internalStore._selectors.entries()) {
 			if (selector[1].value)
@@ -882,13 +971,13 @@ export class CollectionInstance<
 		return this._internalStore._name
 	}
 
-	set lastUpdatedKey(value: string | number) {
+	set lastUpdatedKey(value: string) {
 		this._internalStore._lastChanged = value
 	}
 
 	/**
 	 * Get the last updated key of the collection
-	 * @type {string|number}
+	 * @type {string}
 	 */
 	get lastUpdatedKey() {
 		return this._internalStore._lastChanged

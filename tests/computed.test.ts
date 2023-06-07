@@ -20,7 +20,9 @@ const collections = {
 		name: string
 		pages: number
 		sku: string
-	}>({ primaryKey: 'sku' }).createSelector('READING'),
+	}>({ primaryKey: 'sku' })
+		.createSelector('READING')
+		.createGroup('READING'),
 }
 const core = {
 	state: states,
@@ -31,22 +33,14 @@ const core = {
 		// console.log(`computed to: ${booleanState.value}`)
 		return states.stringState.value.length
 	}, [states.stringState, collections.books.selectors.READING]),
+
 	readingBookComputation: computed(() => {
-		return collections.books.selectors.READING.value.pages
+		return collections.books.selectors.READING.value?.pages
 	}, [collections.books.selectors.READING]),
-}
 
-const initialValue = {
-	boolean: false,
-	string: 'Hello Plexus!',
-	object: { a: { a: true, b: true }, b: true },
-	array: [
-		{ item: 'Hello', item2: { subitem: 'World' } },
-		{ item: 'Goodbye', item2: { subitem: 'People' } },
-	],
-	null: null,
-
-	number: 1,
+	numOfReading: computed(() => {
+		return collections.books.groupsValue.READING.length
+	}, [collections.books.groups.READING]),
 }
 
 beforeEach(() => {
@@ -101,5 +95,24 @@ describe('Testing Computed State Function', () => {
 		})
 
 		expect(core.readingBookComputation.value).toBe(12)
+	})
+	test('Computed can watch a collection group', () => {
+		core.numOfReading.watch((v) => {
+			console.log('numOfReading.value changed to: ', v)
+		})
+		core.collections.books.collect(
+			{
+				name: 'James Bond',
+				pages: 12,
+				sku: 't6sawo4bjhkv47839d3',
+			},
+			['READING']
+		)
+
+		expect(core.numOfReading.value).toBe(1)
+
+		core.collections.books.delete('t6sawo4bjhkv47839d3')
+
+		expect(core.numOfReading.value).toBe(0)
 	})
 })

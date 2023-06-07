@@ -1,13 +1,13 @@
-import { StateInstance } from './state'
-import { PlexusPlugin } from './plugin'
+import { StateInstance } from '../state'
+import { Plugin } from '../plugin'
 import { RuntimeInstance, _runtime } from './runtime'
-import { PlexusStorageInstance, storage } from './storage'
-import { CollectionInstance } from './collection/collection'
+import { PlexusStorageInstance, storage } from '../storage'
+import { CollectionInstance } from '../collection/collection'
 import { deepMerge, genUID, isEqual } from '@plexusjs/utils'
-import { PlexusPreAction } from './preaction'
-import { CollectionData } from './collection/data'
-import { PlexusComputedStateInstance } from './computed'
-import { CollectionSelector } from './collection/selector'
+import { PlexusPreAction } from '../preaction'
+import { CollectionData } from '../collection/data'
+import { PlexusComputedStateInstance } from '../computed'
+import { CollectionSelector } from '../collection/selector'
 
 /**
  * Get the correctly formatted instance name
@@ -29,7 +29,7 @@ export class PlexusInstance {
 
 	_computedStates = new Set<PlexusComputedStateInstance>()
 	_states = new Set<StateInstance<any>>()
-	_plugins = new Map<string, PlexusPlugin>()
+	_plugins = new Map<string, Plugin>()
 	_collections = new Set<CollectionInstance<any, any, any>>()
 	_collectionData = new Set<CollectionData<any>>()
 	_collectionSelectors = new Set<CollectionSelector<any>>()
@@ -47,7 +47,7 @@ export class PlexusInstance {
 	constructor(config?: Partial<PlexusInstanceConfig>) {
 		this._internalStore = {
 			_nonce: 0,
-			_id: config?.instanceId || ``,
+			_id: config?.id || ``,
 			_selectedStorage: undefined,
 			_settings: { ...config },
 			_ready: false,
@@ -122,21 +122,10 @@ export class PlexusInstance {
 }
 
 interface PlexusInstanceConfig {
-	instanceId: string
+	id: string
 	logLevel: 'debug' | 'warn' | 'error' | 'silent'
 	exclusiveGlobalError: boolean
 }
-interface PlexusMaster {
-	_ready: false
-	_instances: Map<string, () => PlexusInstance>
-	_settings: Partial<PlexusInstanceConfig>
-}
-/**
- * Get the master instance
- * @returns The master of PlexusJS; oversees all instances of PlexusJS
- */
-export const getPlexusMasterInstance = () =>
-	globalThis.__plexusMaster__ as PlexusMaster
 
 /**
  * Get the reference to the instance with a given name, if no name is provided, the master instance is returned
@@ -145,6 +134,33 @@ export const getPlexusMasterInstance = () =>
  */
 export const getPlexusInstance = (name: string = 'default') =>
 	globalThis[getInstanceName(name)] as PlexusInstance
+/**
+ * Get the master instance
+ * @returns The master of PlexusJS; oversees all instances of PlexusJS
+ */
+export const getPlexusMasterInstance = () =>
+	(globalThis.__plexusMaster__ as PlexusMaster) || undefined
+class PlexusMaster {
+	private _instances: Map<string, () => PlexusInstance>
+	_ready: boolean
+	_settings: Partial<{}>
+
+	constructor(settings: Partial<{}> = {}) {
+		if (getPlexusMasterInstance())
+			throw new Error('PlexusJS Master Instance already exists')
+		this._ready = false
+		this._instances = new Map()
+		this._settings = settings
+	}
+	killScope(scopeName: string) {
+		// delete th reference to the instance. THis should kill reactivity until an instance item is used again
+		this._instances.delete(scopeName)
+		delete globalThis[getInstanceName(scopeName)]
+	}
+	addScope(scopeName: string, instance: () => PlexusInstance) {
+		this._instances.set(scopeName, instance)
+	}
+}
 
 /**
  * Generate a new instance (or pull the existing instance) of PlexusJS
@@ -154,23 +170,20 @@ export const getPlexusInstance = (name: string = 'default') =>
 export function instance(
 	config?: Partial<PlexusInstanceConfig>
 ): PlexusInstance {
+	// if the config is a string, then it is the instanceId
+
 	// if the master is not created, create it
 	if (globalThis['__plexusMaster__'] === undefined) {
-		const plexusMaster: PlexusMaster = {
-			_ready: false,
-			_settings: {},
-			_instances: new Map<string, () => PlexusInstance>(),
-		}
-		globalThis['__plexusMaster__'] = plexusMaster
+		globalThis['__plexusMaster__'] = new PlexusMaster()
 	}
-	const instanceName = getInstanceName(config?.instanceId)
+	const instanceName = getInstanceName(config?.id)
 	// if the instance is not created, create it
 	if (globalThis[instanceName] === undefined) {
 		const newInstance: PlexusInstance = new PlexusInstance(config)
 
 		globalThis[instanceName] = newInstance
 		// add the instance to the master
-		getPlexusMasterInstance()._instances.set(instanceName, () =>
+		getPlexusMasterInstance().addScope(instanceName, () =>
 			getPlexusInstance(newInstance.name)
 		)
 
@@ -190,14 +203,14 @@ export function instance(
 		)
 	} else if (
 		config &&
-		!isEqual(config, getPlexusInstance(config?.instanceId || '').settings)
+		!isEqual(config, getPlexusInstance(config?.id || '').settings)
 	) {
-		getPlexusInstance(config?.instanceId || '').settings = deepMerge(
-			getPlexusInstance(config?.instanceId || '').settings,
+		getPlexusInstance(config?.id || '').settings = deepMerge(
+			getPlexusInstance(config?.id || '').settings,
 			config
 		)
 		// getPlexusInstance(config?.instanceId || "").runtime
 	}
 	// return the instance
-	return getPlexusInstance(config?.instanceId || '') as PlexusInstance
+	return getPlexusInstance(config?.id || '') as PlexusInstance
 }

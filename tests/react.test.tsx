@@ -1,10 +1,10 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { screen, waitFor, within } from '@testing-library/react'
 import '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { render, act } from './test-utils'
 import { collection, computed, instance, state, event } from '@plexusjs/core'
 import React, { FC, useEffect, useState } from 'react'
-import { useDeposit, useEvent, usePlexus } from '@plexusjs/react'
+import { useDeposit, usePlexusEvent, usePlexus } from '@plexusjs/react'
 // import * as renderer from "react-test-renderer"
 
 // function toJson(component: renderer.ReactTestRenderer) {
@@ -72,7 +72,11 @@ const RandomComponent: FC = () => {
 	)
 }
 describe('Test react integration (usePlexus)', () => {
-	test('usePlexus hook w/ Watchables', async () => {
+	// test('usePlexus hook w/ Collections', async () => {})
+	// test('usePlexus hook w/ Computed', async () => {})
+	// test('usePlexus hook w/ Computed', async () => {})
+
+	test('usePlexus hook w/ State', async () => {
 		// console.log(Array.from(instance()._states).map((v) => v.id))
 		render(<RandomComponent />)
 		await act(async () => {
@@ -95,7 +99,7 @@ describe('Test react integration (usePlexus)', () => {
 			`{"id":"3","a":2}`
 		)
 		// instance({ logLevel: "debug" })
-		instance({ logLevel: 'debug', instanceId: 'react' })
+		instance({ logLevel: 'debug', id: 'react' })
 		expect(screen.getByTestId('compu').innerHTML).toBe('6')
 		await act(async () => {
 			// test computed render
@@ -114,7 +118,7 @@ describe('Test react integration (usePlexus)', () => {
 			await waitFor(() => screen.getByTestId('str'))
 		})
 		expect(screen.getByTestId('compu').innerHTML).toBe('4')
-		instance({ logLevel: 'silent', instanceId: 'react' })
+		instance({ logLevel: 'silent', id: 'react' })
 		expect(screen.getByTestId('str').innerHTML).toBe('no')
 	})
 })
@@ -123,7 +127,7 @@ describe('Test react integration (useEvent)', () => {
 	test('test useEvent', () => {
 		const RandomComponent: FC = () => {
 			const [val, setVal] = useState('')
-			useEvent(myEvents, (payload) => {
+			usePlexusEvent(myEvents, (payload) => {
 				setVal(payload.name)
 			})
 
@@ -242,5 +246,15 @@ describe('Test react integration (useDeposit)', () => {
 				</div>
 			)
 		}
+	})
+	test('testing usePlexus ', async () => {
+		// render(<RandomComponent />)
+		// await act(async () => {
+		// 	await waitFor(() => screen.getByTestId('str'))
+		// })
+		// expect(screen.getByTestId('str').innerHTML).toBe('yes')
+		// expect(screen.getByTestId('group-test').innerHTML).toBe(
+		// 	`[{"id":"poggers","a":2},{"id":"pog","a":1}]`
+		// )
 	})
 })

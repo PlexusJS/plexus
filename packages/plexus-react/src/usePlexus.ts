@@ -1,16 +1,21 @@
 import { instance, Watchable } from '@plexusjs/core'
-import { isEqual, deepMerge } from '@plexusjs/utils/dist/shared'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { isEqual } from '@plexusjs/utils/dist/shared'
+import { useCallback, useRef, useState } from 'react'
 import { useSyncExternalStore } from 'use-sync-external-store/shim'
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 import { concurrentWatch, convertThingToString, deepClone } from './utils'
+import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 
 const normalizeDeps = (deps: Watchable | Watchable[]) =>
 	Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable]
 
-export type PlexusValue<T> = T extends Watchable<infer U> ? U : never
+export type PlexusValue<T> = T extends Watchable<infer U>
+	? PlexusWatchableValueInterpreter<U>
+	: never
 export type PlexusValueArray<T> = {
-	[K in keyof T]: T[K] extends Watchable<infer U> ? U : never
+	[K in keyof T]: T[K] extends Watchable<infer U>
+		? PlexusWatchableValueInterpreter<U>
+		: never
 }
 
 // Singleton argument
@@ -40,18 +45,18 @@ export function usePlexus<V extends Watchable[]>(
 	// TODO: Consider using unstable_batchedUpdates for batching updates to prevent unnecessary rerenders
 	const subscribe = useCallback(
 		(onChange: () => void) => {
-			instance({ instanceId: 'react' }).runtime.log(
+			instance({ id: 'react' }).runtime.log(
 				'info',
 				`Component subscribing to ${id.current}`
 			)
 			const depsArray = normalizeDeps(deps)
 			return concurrentWatch(() => {
-				instance({ instanceId: 'react' }).runtime.log(
+				instance({ id: 'react' }).runtime.log(
 					'info',
 					`Re-rendering Component; Dependency (${depsArray
 						.map((v) => v.id)
 						.join(', ')}) updated to ${depsArray
-						.map((v) => convertThingToString(v.value))
+						.map((v) => convertThingToString(v?.value))
 						.join(', ')}`
 				)
 				set({})
@@ -62,13 +67,13 @@ export function usePlexus<V extends Watchable[]>(
 	)
 	const fetchValues = useCallback(() => {
 		const depsArray = normalizeDeps(deps)
-		instance({ instanceId: 'react' }).runtime.log(
+		instance({ id: 'react' }).runtime.log(
 			'info',
 			`${id.current} Fetching (${snapshot.current})`
 		)
 
 		// If this is the array syntax...
-		const values = depsArray.map((dep) => dep.value!)
+		const values = depsArray.map((dep) => dep?.value!)
 		const compSnapshot = convertThingToString(values)
 		if (!snapshot.current) {
 			snapshot.current = compSnapshot

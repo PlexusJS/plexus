@@ -1,33 +1,37 @@
-import { deepClone, deepMerge, isEqual, isObject } from '@plexusjs/utils'
-import { PlexusInstance } from './instance'
-import { PlexusWatcher } from './interfaces'
+import {
+	PlexusWatchableValueInterpreter,
+	deepClone,
+	deepMerge,
+	isEqual,
+	isObject,
+} from '@plexusjs/utils'
+import { PlexusInstance } from './instance/instance'
+import { Fetcher, PlexusInternalWatcher, PlexusValidStateTypes } from './types'
 
 import { WatchableMutable } from './watchable'
 // import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
-export type PlexusStateType = NonNullable<any>
-export type PlexusState = <Value extends PlexusStateType = any>(
+
+export type PlexusState = <Value extends PlexusValidStateTypes = any>(
 	instance: () => PlexusInstance,
 	input: Value
 ) => StateInstance<Value>
 
 type DestroyFn = () => void
 
-export interface StateStore<Value> {
+export interface StateStore {
 	_name: string
 	_persist: boolean
 	_interval: NodeJS.Timer | null
 	_ready: boolean
 	_isSetting: boolean
 }
-export type PlexusStateInstance<Value extends PlexusStateType = any> =
+export type PlexusStateInstance<Value extends PlexusValidStateTypes = any> =
 	StateInstance<Value>
 /**
  * A trackable State
  */
-export class StateInstance<
-	StateValue extends PlexusStateType
-> extends WatchableMutable<StateValue> {
-	private _internalStore: StateStore<StateValue>
+export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
+	private _internalStore: StateStore
 	/**
 	 * The internal id of the state
 	 */
@@ -40,11 +44,7 @@ export class StateInstance<
 	get instanceId(): string {
 		return `ste_${this._watchableStore._internalId}`
 	}
-	constructor(
-		instance: () => PlexusInstance,
-		init: StateValue,
-		fetcher?: (currentValue: StateValue) => StateValue
-	) {
+	constructor(instance: () => PlexusInstance, init: StateValue) {
 		super(instance, init)
 		this.instance = instance
 		this._internalStore = {
@@ -60,17 +60,21 @@ export class StateInstance<
 	}
 
 	private persistSync() {
-		if (this._internalStore._persist) {
-			this.instance().storage?.monitor(this.name, this)
-			this.instance().storage?.sync(this._watchableStore._value)
+		if (!this._internalStore._persist) {
+			return
 		}
+		this.instance().storage?.monitor(this.name, this)
+		this.instance().storage?.sync(this._watchableStore._value)
 	}
 
 	private async syncPersistToValue() {
+		if (!this._internalStore._persist) {
+			return
+		}
 		if (this._internalStore._isSetting) return
 		const storedValue = (await this.instance().storage?.get(
 			this._internalStore._name
-		)) as StateValue
+		)) as PlexusWatchableValueInterpreter<StateValue>
 		if (storedValue) {
 			if (this.isEqual(storedValue)) return
 			this.set(storedValue)
@@ -95,7 +99,7 @@ export class StateInstance<
 	 * Set the value of the state
 	 * @param value The new value of this state
 	 */
-	set(value?: StateValue) {
+	set(value?: PlexusWatchableValueInterpreter<StateValue>) {
 		this._internalStore._isSetting = true
 		super.set(value)
 		if (this._internalStore._persist)
@@ -110,11 +114,15 @@ export class StateInstance<
 	 * Patch the current value of the state
 	 * @param value A value of the state to merge with the current value
 	 */
-	patch(value: StateValue) {
+	patch(value: PlexusWatchableValueInterpreter<StateValue>) {
 		if (isObject(value) && isObject(this._watchableStore._value)) {
 			// ! Shitty type casting, should be fixed
 			this.set(
-				deepMerge(this._watchableStore._value as any, value) as StateValue
+				deepMerge(
+					this._watchableStore._value as any,
+					value,
+					true
+				) as PlexusWatchableValueInterpreter<StateValue>
 			)
 		}
 		// if the deep merge is on an array type, we need to convert the merged object back to an array
@@ -122,8 +130,10 @@ export class StateInstance<
 			Array.isArray(value) &&
 			Array.isArray(this._watchableStore._value)
 		) {
-			const obj = deepMerge(this._watchableStore._value, value)
-			this.set(Object.values(obj) as StateValue)
+			const obj = deepMerge(this._watchableStore._value, value, true)
+			this.set(
+				Object.values(obj) as PlexusWatchableValueInterpreter<StateValue>
+			)
 		} else {
 			this.set(value)
 		}
@@ -138,9 +148,15 @@ export class StateInstance<
 	/**
 	 * Watch for changes on this state
 	 * @param callback The callback to run when the state changes
+	 * @param from (optional) The id of the watcher
 	 * @returns The remove function to stop watching
 	 */
-	watch(callback: PlexusWatcher<StateValue>, from?: string): () => void {
+	watch(
+		callback: PlexusInternalWatcher<
+			PlexusWatchableValueInterpreter<StateValue>
+		>,
+		from?: string
+	): () => void {
 		const destroyer = super.watch(callback, from)
 		return () => {
 			this.instance().runtime.log(
@@ -170,7 +186,7 @@ export class StateInstance<
 				this.instance().storage?.monitor(this._internalStore._name, this)
 				const storedValue = (await this.instance().storage?.get(
 					this._internalStore._name
-				)) as StateValue
+				)) as PlexusWatchableValueInterpreter<StateValue>
 				storedValue && this.set(storedValue)
 				this._internalStore._persist = true
 			})()
@@ -194,8 +210,11 @@ export class StateInstance<
 	 */
 	interval(
 		intervalCallback: (
-			value: StateValue
-		) => StateValue | Promise<StateValue> | void,
+			value: PlexusWatchableValueInterpreter<StateValue>
+		) =>
+			| PlexusWatchableValueInterpreter<StateValue>
+			| Promise<PlexusWatchableValueInterpreter<StateValue>>
+			| void,
 		ms?: number
 	) {
 		if (this._internalStore._interval)
@@ -209,14 +228,6 @@ export class StateInstance<
 			}
 		}, ms ?? 3000)
 		return this
-	}
-	/**
-	 * Compare a thing to the current value, if they are equal, returns true
-	 * @param value The thing to compare the current value to
-	 * @returns {boolean} A boolean representing if they are equal
-	 */
-	isEqual(value: any) {
-		return isEqual(value as any, this._watchableStore._value as any)
 	}
 	/**
 	 * Stop the state interval
@@ -271,7 +282,7 @@ export class StateInstance<
 	get nextValue() {
 		return this._watchableStore._nextValue
 	}
-	set nextValue(value: StateValue) {
+	set nextValue(value: PlexusWatchableValueInterpreter<StateValue>) {
 		this._watchableStore._nextValue = value
 	}
 	/**
@@ -282,11 +293,10 @@ export class StateInstance<
 	}
 }
 
-export function _state<StateValue extends PlexusStateType>(
+export function _state<StateValue>(
 	instance: () => PlexusInstance,
 	_init: StateValue
 ) {
 	// Returned Object //
-
-	return new StateInstance<StateValue>(instance, _init)
+	return new StateInstance(instance, _init)
 }

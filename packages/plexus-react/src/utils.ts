@@ -1,11 +1,5 @@
 import { instance, Watchable } from '@plexusjs/core'
-export type AlmostAnything =
-	| string
-	| number
-	| symbol
-	| Record<any, any>
-	| Array<any>
-	| Object
+import { AlmostAnything } from '@plexusjs/utils'
 
 export const normalizeDeps = (deps: Watchable | Watchable[]) =>
 	Array.isArray(deps) ? (deps as Watchable[]) : [deps as Watchable]
@@ -23,14 +17,16 @@ export const concurrentWatch = (
 
 	for (let dep of depsArray) {
 		// if not a watchable, then we can't watch it, skip to next iteration
+		const isWatchable =
+			(dep && dep.watch instanceof Function) ||
+			typeof dep.watch === 'function' ||
+			Object.prototype.toString.call(dep.watch) === '[Function watch]' ||
+			Object.prototype.toString.call(dep.watch) === '[object Function]'
 		if (
-			!(dep.watch instanceof Function) &&
-			typeof dep.watch !== 'function' &&
-			Object.prototype.toString.call(dep.watch) != '[Function watch]' &&
-			Object.prototype.toString.call(dep.watch) != '[object Function]'
+			!isWatchable
 			// && !(dep instanceof Watchable)
 		) {
-			instance({ instanceId: 'react' }).runtime.log(
+			instance({ id: 'react' }).runtime.log(
 				'debug',
 				`Skipping watch because the dependency isn't watchable`,
 				dep?.watch,

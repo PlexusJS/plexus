@@ -1,12 +1,12 @@
 // import { PlexusInstance } from "./interfaces"
 
-import { PlexusInstance } from './instance'
+import { PlexusInstance } from './instance/instance'
 
 type EventHandler = (v: any) => void
 
 export type PlexusEventInstance<PayloadType = any> = EventInstance<PayloadType>
 interface EventStore {
-	_events: Map<string | number, Map<string | Number, EventHandler>>
+	_events: Map<string, Map<string, EventHandler>>
 	_destroyers: Map<string, () => unknown>
 	_once_destroyers: Map<string, () => unknown>
 	_name: string
@@ -24,7 +24,7 @@ export class EventInstance<PayloadType = any> {
 	constructor(instance: () => PlexusInstance) {
 		this.instance = instance
 		this._internalStore = {
-			_events: new Map<string | number, Map<string | Number, EventHandler>>(),
+			_events: new Map<string, Map<string, EventHandler>>(),
 			_destroyers: new Map<string, () => unknown>(),
 			_once_destroyers: new Map<string, () => unknown>(),
 			_name: `evt_${instance().genId()}`,

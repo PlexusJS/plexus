@@ -1,14 +1,27 @@
 import { PlexusInstance } from '.'
-import { deepClone, deepMerge, isObject, isEqual } from '@plexusjs/utils'
-export type PlexusWatcher<V extends any = any> = (value: V) => void
-interface WatchableStore<Value = any> {
+import {
+	deepClone,
+	isEqual,
+	PlexusWatchableValueInterpreter,
+} from '@plexusjs/utils'
+import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
+
+const getFetcher = function <ValueType>(
+	subject: ValueType | (() => ValueType)
+) {
+	return typeof subject === 'function'
+		? (subject as () => ValueType)()
+		: subject
+}
+
+type WatchableStore<Value = any> = {
 	_initialValue: Value
 	_lastValue: Value | null
 	_value: Value
 	_publicValue: Value
 	_nextValue: Value
-	_watchers: Set<PlexusWatcher<Value>>
 	_internalId: string
+	_dataFetcher?: Fetcher<Value>
 }
 
 type HistorySeed<ValueType = any> = {
@@ -19,9 +32,15 @@ type HistorySeed<ValueType = any> = {
 	archive_tail: Array<ValueType>
 }
 
-export class Watchable<ValueType = any> {
-	protected _watchableStore: WatchableStore<ValueType>
+export class Watchable<
+	ValueType = any
+	// ValueType extends AlmostAnything = Input extends Fetcher<infer V> ? V : Input
+> {
+	protected _watchableStore: WatchableStore<
+		PlexusWatchableValueInterpreter<ValueType>
+	>
 	protected instance: () => PlexusInstance
+	loading: boolean = false
 	/**
 	 * The internal id of the computed state
 	 */
@@ -30,19 +49,30 @@ export class Watchable<ValueType = any> {
 	}
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		this.instance = instance
+
+		const initialValue = getFetcher(
+			init
+		) as PlexusWatchableValueInterpreter<ValueType>
 		this._watchableStore = {
 			_internalId: instance().genId(),
-			_nextValue: init,
-			_value: init,
-			_publicValue: deepClone(init),
-			_initialValue: init,
+			_nextValue: initialValue,
+			_value: initialValue,
+			_publicValue: deepClone(initialValue),
+			_initialValue: initialValue,
 			_lastValue: null,
-			_watchers: new Set(),
+			_dataFetcher: undefined,
 		}
+		// dataFetcher()
 	}
 
-	watch<Value extends ValueType = ValueType>(
-		callback: PlexusWatcher<ValueType>,
+	/**
+	 * Subscribe to changes to this state
+	 * @param callback The callback to run when the state changes
+	 * @param {string}from The id of the something that  that triggered the change
+	 * @returns {DestroyFn} A function to remove the watcher
+	 */
+	watch(
+		callback: PlexusWatcher<PlexusWatchableValueInterpreter<ValueType>>,
 		from?: string
 	): () => void {
 		const destroyer = this.instance().runtime.subscribe(this.id, callback, from)
@@ -51,17 +81,101 @@ export class Watchable<ValueType = any> {
 		}
 	}
 
-	get value(): ValueType {
-		return this._watchableStore._publicValue
+	/**
+	 * Retrieve the current value of the state
+	 */
+	get value(): PlexusWatchableValueInterpreter<ValueType> {
+		const value = this._watchableStore._publicValue
+		if (value === undefined && this._watchableStore._dataFetcher) {
+			return this._watchableStore._dataFetcher()
+		}
+		return value
+	}
+
+	/**
+	 * Compare a thing to the current value, if they are equal, returns true
+	 * @param value The thing to compare the current value to
+	 * @returns {boolean} A boolean representing if they are equal
+	 */
+	isEqual(value: any): boolean {
+		return isEqual(value as any, this._watchableStore._value as any)
 	}
 }
 
 export class WatchableMutable<
-	ValueType extends NonNullable<any> = any
+	// Input = never,
+	ValueType = any
 > extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
+	// constructor(instance: () => PlexusInstance, init: () => ValueType)
+	// constructor(instance: () => PlexusInstance, init: ValueType)
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		super(instance, init)
+		// this._watchableStore._dataFetcher = () =>
+		// 	getFetcher(init) as PlexusWatchableValueInterpreter<ValueType>
+	}
+
+	/**
+	 * Set the value of the state
+	 * @param newValue The new value of this state
+	 * @returns {this} The state instance
+	 */
+	set(newValue?: PlexusWatchableValueInterpreter<ValueType>): this {
+		if (this.instance().runtime.isBatching) {
+			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
+			return this
+		}
+		this.loading = true
+
+		const value = deepClone(newValue ?? this._watchableStore._nextValue)
+		this._watchableStore._lastValue = deepClone(this._watchableStore._value)
+
+		// apply the next value
+		this._watchableStore._value =
+			value === undefined ? this._watchableStore._nextValue : value
+
+		this._watchableStore._publicValue = deepClone(this._watchableStore._value)
+		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
+
+		// update the runtime conductor
+
+		this.instance().runtime.log(
+			'debug',
+			`Watchable ${this.id} broadcasting to change to subscribers`
+		)
+		this.instance().runtime.broadcast(this.id, value)
+
+		// if history, add to archive
+		if (
+			this._history &&
+			this._history.maxLength > 0 &&
+			!this._history.skipArchiveUpdate
+		) {
+			if (
+				isEqual(this._watchableStore._lastValue, this._watchableStore._value)
+			) {
+				this.loading = false
+				return this
+			}
+			this.instance().runtime.log(
+				'debug',
+				`Watchable ${this.id} set caused its History to shift`
+			)
+			this._history.archive_head.push(this._watchableStore._lastValue)
+			// if we are setting a new value and the tail has any values, remove them
+			// NOTE: this is needed because if we set new value, but are in the middle of the history somewhere, we need to remove the subsequent values
+			if (this._history.archive_tail.length) {
+				this._history.archive_tail.length = 0
+			}
+			// if archive is too long, remove oldest
+			if (this._history.archive_head.length > this._history.maxLength) {
+				if (this._history.archive_head.length > 0) {
+					this._history.archive_head.shift()
+				}
+			}
+		}
+		this.loading = false
+		return this
 	}
 
 	/**
@@ -71,7 +185,7 @@ export class WatchableMutable<
 	 * If no previous value (either `.set()` was never called or we previously used `.undo()`), reset to initial value.
 	 * @returns {this}
 	 */
-	undo() {
+	undo(): this {
 		if (this._history && this._history.maxLength > 0) {
 			this._history.skipArchiveUpdate = true
 			// if we have any previous history, undo the last set value
@@ -89,11 +203,17 @@ export class WatchableMutable<
 		// no history, so just try to reset to last value; if null, reset to initial value
 		else {
 			if (this._watchableStore._lastValue !== null) {
-				this.set(this._watchableStore._lastValue)
+				this.set(
+					this._watchableStore
+						._lastValue as PlexusWatchableValueInterpreter<ValueType>
+				)
 				// last value should now be the current value BEFORE the undo, so set this to next value
 				this._watchableStore._nextValue = this._watchableStore._lastValue
 			} else {
-				this.set(this._watchableStore._initialValue)
+				this.set(
+					this._watchableStore
+						._initialValue as PlexusWatchableValueInterpreter<ValueType>
+				)
 			}
 			this._watchableStore._lastValue = null
 		}
@@ -104,9 +224,9 @@ export class WatchableMutable<
 	 * If history is enabled, we traverse the history archive.
 	 * If not, we try to go to the next set value.
 	 * If no next value (`.undo()` was never called), reset to current value.
-	 * @returns this
+	 * @returns {this}
 	 */
-	redo() {
+	redo(): this {
 		if (this._history && this._history.maxLength > 0) {
 			this._history.skipArchiveUpdate = true
 			//  if we hae any upcoming history, redo the next set value
@@ -139,7 +259,7 @@ export class WatchableMutable<
 	/**
 	 * Enable/Disable history tracker for this watchable by setting the history length.
 	 * @param maxLength - the maximum number of history states to keep. If 0, history is disabled. If undefined, history is enabled with a default length of 10
-	 * @returns this
+	 * @returns {this}
 	 */
 	history(maxLength: number = 10): this {
 		// disable history if maxLength is 0 (can be done at any time)
@@ -162,73 +282,27 @@ export class WatchableMutable<
 	}
 
 	/**
-	 * Set the value of the state
-	 * @param newValue The new value of this state
+	 * A function to fetch data from an external source and set it to the watchable.
+	 * @param fetcher - a function to fetch data from an external source (must match initial type)
+	 * @returns {this}
 	 */
-	set(newValue?: ValueType) {
-		if (this.instance().runtime.isBatching) {
-			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
-			return
-		}
-		const value = deepClone(newValue)
-		this._watchableStore._lastValue = this._watchableStore._value
-		if (isObject(value) && isObject(this._watchableStore._value)) {
-			this._watchableStore._lastValue = deepClone(this._watchableStore._value)
-		} else if (
-			Array.isArray(value) &&
-			Array.isArray(this._watchableStore._value)
-		) {
-			const obj = deepMerge(this._watchableStore._value, value)
-			this._watchableStore._lastValue = Object.values(
-				obj
-			) as unknown as ValueType
-		} else {
-			this._watchableStore._lastValue = this._watchableStore._value
-		}
-		// apply the next value
-		if (value === undefined) {
-			this._watchableStore._value = this._watchableStore._nextValue
-		} else {
-			this._watchableStore._value = value
-		}
-		this._watchableStore._publicValue = deepClone(this._watchableStore._value)
-		this._watchableStore._nextValue = deepClone(this._watchableStore._value)
+	defineFetcher(
+		fetcher: Fetcher<PlexusWatchableValueInterpreter<ValueType>>
+	): this {
+		this._watchableStore._dataFetcher = fetcher
+		return this
+	}
 
-		// update the runtime conductor
-
-		this.instance().runtime.log(
-			'debug',
-			`Watchable ${this.id} broadcasting to change to subscribers`
-		)
-		this.instance().runtime.broadcast(this.id, value)
-
-		// if history, add to archive
-		if (
-			this._history &&
-			this._history.maxLength > 0 &&
-			!this._history.skipArchiveUpdate
-		) {
-			if (
-				isEqual(this._watchableStore._lastValue, this._watchableStore._value)
-			) {
-				return
-			}
-			this.instance().runtime.log(
-				'debug',
-				`Watchable ${this.id} set caused its History to shift`
-			)
-			this._history.archive_head.push(this._watchableStore._lastValue)
-			// if we are setting a new value and the tail has any values, remove them
-			// NOTE: this is needed because if we set new value, but are in the middle of the history somewhere, we need to remove the subsequent values
-			if (this._history.archive_tail.length) {
-				this._history.archive_tail.length = 0
-			}
-			// if archive is too long, remove oldest
-			if (this._history.archive_head.length > this._history.maxLength) {
-				if (this._history.archive_head.length > 0) {
-					this._history.archive_head.shift()
-				}
-			}
+	/**
+	 * A function to fetch data from an external source and set it to the watchable.
+	 * @returns {this}
+	 */
+	fetch(): this {
+		if (this._watchableStore._dataFetcher) {
+			this.loading = true
+			this.set(this._watchableStore._dataFetcher())
+			this.loading = false
 		}
+		return this
 	}
 }

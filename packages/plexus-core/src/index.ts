@@ -1,7 +1,6 @@
-import { instance } from './instance'
-import { PlexusInstance } from './instance'
+import { instance, PlexusInstance } from './instance/instance'
 import { WatchableMutable, Watchable } from './watchable'
-import { _state, PlexusStateInstance, PlexusStateType } from './state'
+import { _state, PlexusStateInstance, StateInstance } from './state'
 import { _computed, PlexusComputedStateInstance } from './computed'
 import {
 	_action,
@@ -18,20 +17,37 @@ import {
 } from './collection/collection'
 import { _event, PlexusEventInstance } from './event'
 import { storage as _storage, StorageOverride } from './storage'
-import { PlexusPlugin, PlexusPluginConfig } from './plugin'
+import { PlexusScopeConfig, scope } from './scope'
+import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
+
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { LiteralType, AlmostAnything } from '@plexusjs/utils'
+export { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
+import { Fetcher, PlexusValidStateTypes } from './types'
 
+// export function state<
+// 	Literal extends PlexusStateType = any,
+// 	Value extends PlexusStateType = Literal extends AlmostAnything
+// 		? Literal
+// 		: TypeOrReturnType<Literal>
+// >(item: Fetcher<Value>): TypeOrReturnType<Value>
+
+// export function state<
+// 	Literal extends PlexusStateType = any,
+// 	Value extends PlexusStateType = Literal extends AlmostAnything
+// 		? Literal
+// 		: TypeOrReturnType<Literal>
+// >(item: Value): StateInstance<Value>
 /**
  * Generate a Plexus State
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
 export function state<
-	Literal extends PlexusStateType = any,
-	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
+	Override extends PlexusValidStateTypes = never,
+	Value = Override extends AlmostAnything ? Override : any
 >(item: Value) {
-	return _state<Value>(() => instance(), item)
+	return _state(() => instance(), item)
 }
 /**
  * Generate a Plexus State
@@ -39,16 +55,16 @@ export function state<
  * @returns A Plexus State Instance
  */
 export function computed<
-	Literal extends PlexusStateType = any,
-	Value = Literal extends AlmostAnything ? Literal : LiteralType<Literal>
->(
-	item: (value?: Value) => Value,
-	dependencies: Array<Watchable<any>> | Watchable<any>
-) {
-	if (!Array.isArray(dependencies)) {
-		return _computed<Value>(() => instance(), item, [dependencies])
-	}
-	return _computed(() => instance(), item, dependencies)
+	Override extends PlexusValidStateTypes = never,
+	Value extends PlexusValidStateTypes = Override extends AlmostAnything
+		? Override
+		: any
+>(item: (value?: Value) => Value, dependencies: Array<Watchable> | Watchable) {
+	return _computed(
+		() => instance(),
+		item,
+		!Array.isArray(dependencies) ? [dependencies] : dependencies
+	)
 }
 /**
  * Create a new Storage Instance
@@ -121,20 +137,26 @@ export function setGlobalCatch(catcher: (err: any) => unknown) {
 // TODO I don't think this is used or needed anywhere, so I'm not exporting this yet
 function setCore<CoreObj = Record<string, any>>(coreObj: CoreObj) {}
 
-export function usePlugin(instance: PlexusInstance, plugin: PlexusPlugin): void
-export function usePlugin(instanceId: string, plugin: PlexusPlugin): void
+export function usePlugin(instance: PlexusInstance, plugin: Plugin): void
+export function usePlugin(instanceId: string, plugin: Plugin): void
 export function usePlugin(
 	instanceOrInstanceId: PlexusInstance | string,
-	plugin: PlexusPlugin
+	plugin: Plugin
 ) {
-	if (typeof instanceOrInstanceId === 'string') {
-		plugin.init((name?: string) => instance({ instanceId: name }))
-	}
-	instance()._plugins.set(plugin.name, plugin)
+	// if (typeof instanceOrInstanceId === 'string') {
+	// 	plugin.init((name) => instance({ id: name }))
+	// }
+	// instance()._plugins.set(plugin.name, plugin)
 }
 
 // export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
-export * from './api'
+export {
+	api,
+	PlexusApi,
+	PlexusApiConfig,
+	PlexusApiRes,
+	ApiInstance,
+} from '@plexusjs/api'
 export { gql } from './gql'
 
 export {
@@ -142,7 +164,9 @@ export {
 	PlexusAction,
 	PlexusPlugin,
 	PlexusActionHooks,
-	PlexusPluginConfig,
+	PlexusScopeConfig as PlexusPluginConfig,
+	scope,
+	createPlexusPlugin,
 	PlexusCollectionConfig,
 	PlexusCollectionInstance,
 	PlexusEventInstance,

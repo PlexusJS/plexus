@@ -1,27 +1,42 @@
 export type LiteralType<T> = T extends string
-	? string
+	? T & string
 	: T extends number
-	? number
+	? T & number
 	: T extends boolean
 	? boolean
 	: T extends symbol
-	? symbol
-	: T extends undefined
-	? undefined
-	: T extends null
-	? null
+	? T & symbol
+	: T extends Function
+	? T
 	: T extends Array<infer U>
 	? Array<U>
 	: T extends Record<infer K, infer V>
 	? Record<K, V>
-	: T extends Function
-	? T
-	: T
+	: T;
 
+export type Primitives = string | number | boolean | symbol;
 export type AlmostAnything =
 	| string
 	| number
+	| boolean
 	| symbol
-	| Record<any, any>
-	| Array<any>
-	| Object
+	| Primitives[]
+	| Record<string, Primitives>
+	| Object;
+
+export type TypeOrReturnType<T> = T extends (...args: any[]) => infer R ? R : T;
+
+export type UnionToIntersection<U> = (
+	U extends any
+		? (k: U) => void
+		: never
+) extends (k: infer I) => void
+	? I
+	: never;
+export type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true;
+
+export type PlexusWatchableValueInterpreter<Value> = Value extends (
+	...args: any
+) => any
+	? ReturnType<Value>
+	: Value;

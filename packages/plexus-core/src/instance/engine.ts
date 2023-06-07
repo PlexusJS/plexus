@@ -1,8 +1,8 @@
 import { deepClone, deepMerge } from '@plexusjs/utils'
-import { PlexusWatcher } from './interfaces'
+import { PlexusInternalWatcher } from '../types'
 export interface EngineEventReceiver {
 	from: string
-	listener: PlexusWatcher
+	listener: PlexusInternalWatcher
 }
 export class EventEngine {
 	private batching: boolean = false
@@ -28,7 +28,7 @@ export class EventEngine {
 		}
 	}
 
-	on(eventId: string, listener: PlexusWatcher, origin?: string) {
+	on(eventId: string, listener: PlexusInternalWatcher, origin?: string) {
 		if (!eventId || eventId === '') {
 			console.warn('Event Engine: Missing an eventId')
 			return () => null

@@ -10,7 +10,7 @@ The action helpers for a defined plexus action
 * [PlexusActionHelpers](#PlexusActionHelpers)
     * [.catchError](#PlexusActionHelpers+catchError)
     * [.hooks](#PlexusActionHelpers+hooks)
-    * [.onCatch(handler)](#PlexusActionHelpers+onCatch)
+    * [.onCatch(handler, useGlobal)](#PlexusActionHelpers+onCatch)
     * [.runErrorHandlers()](#PlexusActionHelpers+runErrorHandlers)
     * [.ignoreInit()](#PlexusActionHelpers+ignoreInit)
     * [.batch(fn)](#PlexusActionHelpers+batch)
@@ -25,13 +25,14 @@ The action helpers for a defined plexus action
 **Internal**: Eject the external functions object returned to the user in the first argument of the action function  
 <a name="PlexusActionHelpers+onCatch"></a>
 
-### .onCatch(handler)
+### .onCatch(handler, useGlobal)
 <p>Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.</p>
 
 
-| Param | Description |
-| --- | --- |
-| handler | <p>A function that will be called when an error occurs; omit to fail silently.</p> |
+| Param | Default | Description |
+| --- | --- | --- |
+| handler |  | <p>A function that will be called when an error occurs; omit to fail silently.</p> |
+| useGlobal | <code>true</code> | <p>Should the global error handler be used? (default: true)</p> |
 
 <a name="PlexusActionHelpers+runErrorHandlers"></a>
 
