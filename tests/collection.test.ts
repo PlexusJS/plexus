@@ -572,15 +572,17 @@ describe('testing collection selectors', () => {
 		instance({ logLevel: undefined })
 	})
 	test('checking if we can initialize a selector with a default primary key', () => {
-		const myCollection = collection<{ id: string; name: string }>({
-			primaryKey: 'id',
-		}).createSelector('main', '1')
+		const myCollection = collection<{
+			id: string
+			name: string
+		}>().createSelector('main', '1')
 		expect(myCollection.selectors.main.data).toBeDefined()
 		myCollection.collect([
 			{ id: '1', name: 'jack' },
 			{ id: '2', name: 'jill' },
 		])
 		expect(myCollection.selectors.main.value?.id).toBe('1')
+		expect(myCollection.selectors.main.value).toEqual({ id: '1', name: 'jack' })
 	})
 })
 
