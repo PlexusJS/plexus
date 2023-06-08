@@ -995,6 +995,8 @@ export class CollectionInstance<
 	 * @type {number}
 	 */
 	get size() {
+		// should we remove provisional items from the count? If so this is a prototype of how to do it
+		// return this._internalStore._data.size - this._internalStore._provisionalCount
 		return this._internalStore._data.size
 	}
 }

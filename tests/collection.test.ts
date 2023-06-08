@@ -194,6 +194,12 @@ describe('Testing Collection', () => {
 		expect(myCollection.getItemValue('678i2')).toBeUndefined()
 		expect(myCollection.has('678i2')).toBe(false)
 	})
+	test('Does the size property work properly', () => {
+		myCollection.getItem('678i2')
+		expect(myCollection.size).toBe(1)
+		myCollection.collect({ thing: 'lol', id: 0 })
+		expect(myCollection.size).toBe(2)
+	})
 })
 describe('testing collection groups', () => {
 	test('Do Groups Work?', () => {
