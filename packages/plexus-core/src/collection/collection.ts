@@ -454,9 +454,13 @@ export class CollectionInstance<
 	/**
 	 * Create a Selector instance for a given selector name
 	 * @param {string} selectorName The name of the selector
+	 * @param {string} defaultPk The default primaryKey to select
 	 * @returns {this} The new Collection Instance
 	 */
-	createSelector<Name extends SelectorName>(selectorName: Name) {
+	createSelector<Name extends SelectorName>(
+		selectorName: Name,
+		defaultPk?: string
+	) {
 		if (this._internalStore._selectors.has(selectorName)) return this
 		if (selectorName.length === 0) return this
 		this._internalStore._selectors.set(
@@ -467,6 +471,9 @@ export class CollectionInstance<
 				selectorName
 			)
 		)
+		if (defaultPk) {
+			this._internalStore._selectors.get(selectorName)?.select(defaultPk)
+		}
 		this.mount()
 		return this as CollectionInstance<
 			DataTypeInput,
