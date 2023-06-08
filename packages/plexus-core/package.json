@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/core",
-	"version": "1.7.22",
+	"version": "1.7.23",
 	"description": "A library for building modular interconnected applications",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -29,6 +29,6 @@
 	},
 	"dependencies": {
 		"@plexusjs/api": "1.7.10",
-		"@plexusjs/utils": "1.7.22"
+		"@plexusjs/utils": "1.7.23"
 	}
 }
