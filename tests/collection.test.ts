@@ -459,33 +459,42 @@ describe('testing collection selectors', () => {
 	test('Watching Selectors', () => {
 		myCollection.collect([
 			{ thing: 'lol', id: 0 },
-			{ thing: 'lol3', id: 2 },
-			{ thing: 'lols', id: 1 },
+			{ thing: 'lol2', id: 2 },
+			{ thing: 'lol1', id: 1 },
 		])
 
 		// can add to groups
 		// console.log(myCollection.getGroupsOf(5))
 		myCollection.collect({ thing: 'lol', id: 5 }, 'group1')
+		myCollection.collect({ thing: 'lol3', id: 3 }, 'group1')
 
-		let watcherCalled = false
+		let watcherCalled = 0
 		// watch for any change on selector main
-		const kill = myCollection.getSelector('main').watch((value) => {
+		const kill = myCollection.selectors.main.watch((value) => {
 			console.log(
 				'selector changed\n%o\n%o',
 				value,
 				myCollection.getSelector('main').value
 			)
 			expect(value).toBeDefined()
-			watcherCalled = true
+			watcherCalled = watcherCalled + 1
 		})
 
-		expect(watcherCalled).toBe(false)
+		expect(watcherCalled).toBe(0)
 		// does update cause the watcher to be called?
 		myCollection.getSelector('main').select('5')
 		myCollection.update('5', { thing: 'lol2', id: 5 })
 
-		expect(watcherCalled).toBe(true)
-		watcherCalled = false
+		expect(watcherCalled).toBe(2)
+
+		myCollection.getSelector('main').patch({ thing: 'lolUpdated' })
+		expect(myCollection.getSelector('main').value?.thing).toBe('lolUpdated')
+		expect(watcherCalled).toBe(3)
+
+		// does delete cause the watcher to be called?
+		myCollection.delete('5')
+
+		expect(watcherCalled).toBe(3)
 
 		// // does `collect` cause the watcher fire?
 		// myCollection.collect({ thing: "lol2", id: 9 }, "group1")

@@ -989,6 +989,14 @@ export class CollectionInstance<
 	get lastUpdatedKey() {
 		return this._internalStore._lastChanged
 	}
+
+	/**
+	 * Get the size of the collection (the number of data items in the collection))
+	 * @type {number}
+	 */
+	get size() {
+		return this._internalStore._data.size
+	}
 }
 export function _collection<
 	DataType extends { [key: string]: any },
