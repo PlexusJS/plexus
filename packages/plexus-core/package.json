@@ -28,7 +28,7 @@
 		"typescript": "^4.9.5"
 	},
 	"dependencies": {
-		"@plexusjs/api": "1.7.10",
+		"@plexusjs/api": "1.7.23",
 		"@plexusjs/utils": "1.7.23"
 	}
 }
