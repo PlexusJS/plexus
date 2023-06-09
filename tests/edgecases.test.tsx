@@ -72,7 +72,7 @@ describe('Collection Relations', () => {
 	})
 
 	test('Batching race condition with selectors', () => {
-		batch(() => { })
+		batch(() => {})
 	})
 })
 
@@ -80,7 +80,8 @@ describe('Weird Edge Cases', () => {
 	test('Computed instance watching a selector with provisional data', () => {
 		const myCollection = collection().createSelector('main', '1')
 		const myComputed = computed(
-			() => myCollection.selectors.main.value?.name, [myCollection.selectors.main]
+			() => myCollection.selectors.main.value?.name,
+			[myCollection.selectors.main]
 		)
 
 		myCollection.collect({ id: '1', name: 'test' })

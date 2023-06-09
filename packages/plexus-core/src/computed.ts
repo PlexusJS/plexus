@@ -241,7 +241,7 @@ export class ComputedStateInstance<
 	/**
 	 * Recompute the value of the computed state
 	 */
-	recompute(){
+	recompute() {
 		this.refreshDeps()
 	}
 }

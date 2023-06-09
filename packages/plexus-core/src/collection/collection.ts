@@ -497,7 +497,7 @@ export class CollectionInstance<
 			Groups,
 			Selectors &
 				Map<
-					(typeof selectorNames)[number],
+					typeof selectorNames[number],
 					PlexusCollectionSelector<DataTypeInput>
 				>
 		>
@@ -570,7 +570,7 @@ export class CollectionInstance<
 		return this as CollectionInstance<
 			DataTypeInput,
 			Groups &
-				Map<(typeof groupNames)[number], PlexusCollectionGroup<DataTypeInput>>,
+				Map<typeof groupNames[number], PlexusCollectionGroup<DataTypeInput>>,
 			Selectors
 		>
 	}

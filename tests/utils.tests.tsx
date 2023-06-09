@@ -1,5 +1,11 @@
 import { collection, computed, instance, state } from '@plexusjs/core'
-import { deepClone, deepMerge, isAsyncFunction, convertStringToThing, convertThingToString } from '@plexusjs/utils'
+import {
+	deepClone,
+	deepMerge,
+	isAsyncFunction,
+	convertStringToThing,
+	convertThingToString,
+} from '@plexusjs/utils'
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 
 const myState = state('')
@@ -69,12 +75,10 @@ describe('Test helper functions from the utils module', () => {
 		const obj7 = { a: 2, b: { c: [{ d: 2 }] } }
 		const merged4 = deepMerge(merged3, obj7)
 		expect(merged4).toEqual({ a: 2, b: { c: [{ d: 2, e: [4, 5, 6] }] } })
-
-
 	})
 	test('Test isAsyncFunction', () => {
-		expect(isAsyncFunction(async () => { })).toBe(true)
-		expect(isAsyncFunction(() => { })).toBe(false)
+		expect(isAsyncFunction(async () => {})).toBe(true)
+		expect(isAsyncFunction(() => {})).toBe(false)
 	})
 	test('Test convertStringToThing', () => {
 		expect(convertStringToThing('{"a":1}')).toEqual({ a: 1 })
@@ -85,4 +89,3 @@ describe('Test helper functions from the utils module', () => {
 		expect(convertThingToString({ a: 1 })).not.toBe('{"a":1}')
 	})
 })
-
