@@ -1,27 +1,24 @@
----
-title: useDeposit
----
+--- 
+	title: useDeposit 
+--- 
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 A hook that accepts an original object, then allows you to edit it and run a save callback.
 
-<a name='useDeposit'></a>
+<a name="useDeposit"></a>
 
 ## useDeposit(original, settings) ⇒
+<p>A hook that accepts an original object, then allows you to edit it and run a save callback.</p>
 
-<p>
-	A hook that accepts an original object, then allows you to edit it and run a
-	save callback.
-</p>
+**Returns**: <p>DepositControls - The controls of the deposit</p>  
 
-**Returns**: <p>DepositControls - The controls of the deposit</p>
+| Param | Type | Description |
+| --- | --- | --- |
+| original |  | <p>the original value to edit</p> |
+| settings |  | <p>The settings of this deposit</p> |
+| settings.onSave | <code>function</code> | <p>A callback function that will be called when the save function is called. NOTE: Must return a boolean indicating whether the save action was successful. NOTE: The param of this function ONLY returns the CHANGES to the original object. Any unchanged properties/values will not be included.</p> |
+| settings.onEdit | <code>function</code> | <p>A callback function that will be called when the edit function is called.</p> |
+| settings.Discard | <code>function</code> | <p>A callback function that will be called when the discard function is called.</p> |
+| settings.autoSave | <code>number</code> | <p>The number of milliseconds to wait before saving.</p> |
 
-| Param             | Type                  | Description                                                                                                                                                                                                                                                                                             |
-| ----------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| original          |                       | <p>the original value to edit</p>                                                                                                                                                                                                                                                                       |
-| settings          |                       | <p>The settings of this deposit</p>                                                                                                                                                                                                                                                                     |
-| settings.onSave   | <code>function</code> | <p>A callback function that will be called when the save function is called. NOTE: Must return a boolean indicating whether the save action was successful. NOTE: The param of this function ONLY returns the CHANGES to the original object. Any unchanged properties/values will not be included.</p> |
-| settings.onEdit   | <code>function</code> | <p>A callback function that will be called when the edit function is called.</p>                                                                                                                                                                                                                        |
-| settings.Discard  | <code>function</code> | <p>A callback function that will be called when the discard function is called.</p>                                                                                                                                                                                                                     |
-| settings.autoSave | <code>number</code>   | <p>The number of milliseconds to wait before saving.</p>                                                                                                                                                                                                                                                |

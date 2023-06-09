@@ -1,3 +1,4 @@
+import { Scheduler } from '../scheduler/scheduler'
 import { PlexusValidStateTypes } from '../types'
 import { EventEngine } from './engine'
 import { PlexusInstance } from './instance'
@@ -5,6 +6,7 @@ import { PlexusInstance } from './instance'
 export type PlexusRuntime = RuntimeInstance
 interface RuntimeConfig {
 	logLevel: 'debug' | 'warn' | 'error' | 'silent'
+	name: string
 }
 type ListenerFn<Value> = (value: Value, from?: string) => void
 type LogLevels = Exclude<RuntimeConfig['logLevel'], 'silent'> | 'info'
@@ -24,12 +26,15 @@ export class RuntimeInstance {
 	private batching: boolean = false
 	batchedCalls: Array<() => any> = []
 
+	schedule: Scheduler
+
 	constructor(
 		instance: () => PlexusInstance,
 		protected config: Partial<RuntimeConfig> = {}
 	) {
 		this.instance = instance
 		this._engine = new EventEngine()
+		this.schedule = new Scheduler(`${config.name}_runtime`)
 	}
 	/**
 	 * track a change and propagate to all listening children in instance

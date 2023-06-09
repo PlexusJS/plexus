@@ -179,6 +179,41 @@ export class WatchableMutable<
 	}
 
 	/**
+	 * The previous (reactive) value of the state
+	 */
+	get lastValue() {
+		return deepClone(this._watchableStore._lastValue)
+	}
+	/**
+	 * The next value to apply to the state
+	 * This is normally managed internally, but you can use it to "prepare" the state before applying the value.
+	 * @example state.nextValue = { foo: "bar" };
+	 * state.set(); // The state will be { foo: "bar" }
+	 */
+	get nextValue() {
+		return this._watchableStore._nextValue
+	}
+	set nextValue(value: PlexusWatchableValueInterpreter<ValueType>) {
+		this._watchableStore._nextValue = value
+	}
+	/**
+	 * The initial (default) value of the state
+	 */
+	get initialValue() {
+		return deepClone(this._watchableStore._initialValue)
+	}
+
+	/**
+	 * Reset the state to the initial value
+	 */
+	reset() {
+		this.set(this._watchableStore._initialValue)
+		// disable history if enabled
+		this.history(0)
+		return this
+	}
+
+	/**
 	 * Undo the last state change.
 	 * If history is enabled, we traverse the history archive.
 	 * if not, we try to go to the last set value.

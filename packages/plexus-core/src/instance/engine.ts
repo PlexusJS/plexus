@@ -73,6 +73,7 @@ export class EventEngine {
 		}
 	}
 	emit(eventId: string, args: any) {
+		// this.schedule.addTask(() => {
 		// if we're batching, store the event payload
 		if (this.batching) {
 			this.pendingEventPayloads.set(
@@ -90,6 +91,7 @@ export class EventEngine {
 		this.events
 			.get(eventId)
 			?.forEach((callbackObj) => callbackObj.listener(args))
+		// })
 	}
 	once(eventId: string, eventWatcher: EngineEventReceiver) {
 		const remove = this.on(eventId, (...args) => {
