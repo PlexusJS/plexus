@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import clsx from 'clsx'
 import Layout from '@theme/Layout'
 import Link from '@docusaurus/Link'
@@ -10,6 +10,9 @@ import Head from '@docusaurus/Head'
 
 function HomepageHeader() {
 	const { siteConfig } = useDocusaurusContext()
+	useEffect(() => {
+		window.location.href = '/docs'
+	}, [])
 	return (
 		<header
 			className={`flex flex-col items-center justify-center w-full transition-all duration-75`}
