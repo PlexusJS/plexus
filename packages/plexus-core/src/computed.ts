@@ -95,7 +95,7 @@ export class ComputedStateInstance<
 		this.instance().runtime.log(
 			'info',
 			`Mounting Dependencies (${this.deps
-				.map((v) => v.id)
+				.map((v) => v?.id ?? 'unknown')
 				.join(', ')}) to Computed state ${this.instanceId}`
 		)
 		const unsubscribe = concurrentWatch(
@@ -241,7 +241,7 @@ export class ComputedStateInstance<
 	/**
 	 * Recompute the value of the computed state
 	 */
-	recompute(){
+	recompute() {
 		this.refreshDeps()
 	}
 }

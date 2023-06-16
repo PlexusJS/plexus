@@ -4,16 +4,20 @@ export class Scheduler {
 	schedule: Array<Task> = []
 	private taskRunning: boolean = false
 	promises: Array<Promise<any>> = []
+	paused: boolean = false
 	name: string
 	constructor(name: string) {
 		this.name = name
 	}
-	addTask(taskAction: () => void, options: TaskOptions) {
+	addTask(taskAction: () => void, options?: TaskOptions) {
 		const task = new Task(taskAction, options)
 		this.schedule.push(task)
+		if (!this.paused && !this.taskRunning) {
+			this.start()
+		}
 		return task
 	}
-	run() {
+	start() {
 		if (this.taskRunning) {
 			return
 		}
@@ -34,15 +38,18 @@ export class Scheduler {
 					if (this.promises.length === 0) {
 						this.taskRunning = false
 					}
-					this.run()
+					this.start()
 				})
 			} else {
 				this.taskRunning = false
-				this.run()
+				this.start()
 			}
 		} else {
 			this.taskRunning = false
 		}
+	}
+	stop() {
+		this.paused = true
 	}
 	clear() {
 		this.schedule = []

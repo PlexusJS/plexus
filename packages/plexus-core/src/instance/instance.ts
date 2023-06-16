@@ -55,6 +55,7 @@ export class PlexusInstance {
 		}
 		this.runtime = _runtime(() => instance(this._internalStore._settings), {
 			logLevel: this._internalStore._settings?.logLevel,
+			name: this._internalStore._id || 'default',
 		})
 	}
 

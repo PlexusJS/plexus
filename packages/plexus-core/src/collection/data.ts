@@ -265,20 +265,7 @@ export class CollectionData<
 			[key: string]: any
 		}
 	}
-	/**
-	 * The previous (reactive) value of the state
-	 * @type {DataType}
-	 */
-	get lastValue() {
-		return deepClone(this._watchableStore._lastValue)
-	}
-	/**
-	 * The initial (default) value of the state
-	 * @type {DataType}
-	 */
-	get initialValue() {
-		return deepClone(this._watchableStore._initialValue)
-	}
+
 	/**
 	 * Set the value of the data instance
 	 * @param {DataType} value The value to set
@@ -390,6 +377,8 @@ export class CollectionData<
 		}, from)
 		return destroyer
 	}
+
+
 }
 
 export function _data<DataType extends Record<string, any>>(

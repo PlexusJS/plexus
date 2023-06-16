@@ -371,10 +371,10 @@ export class ApiInstance {
 	 * @param {string} token The token to use for authentication
 	 * @returns {this} The current instance
 	 */
-	auth(type: (typeof AuthTypes)[number], token: string): this
+	auth(type: typeof AuthTypes[number], token: string): this
 	auth(token: string): this
 	auth(
-		typeOrToken: (typeof AuthTypes)[number] | string = 'bearer',
+		typeOrToken: typeof AuthTypes[number] | string = 'bearer',
 		token?: string
 	) {
 		if (!token) {

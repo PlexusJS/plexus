@@ -454,9 +454,13 @@ export class CollectionInstance<
 	/**
 	 * Create a Selector instance for a given selector name
 	 * @param {string} selectorName The name of the selector
+	 * @param {string} defaultPk The default primaryKey to select
 	 * @returns {this} The new Collection Instance
 	 */
-	createSelector<Name extends SelectorName>(selectorName: Name) {
+	createSelector<Name extends SelectorName>(
+		selectorName: Name,
+		defaultPk?: string
+	) {
 		if (this._internalStore._selectors.has(selectorName)) return this
 		if (selectorName.length === 0) return this
 		this._internalStore._selectors.set(
@@ -467,6 +471,9 @@ export class CollectionInstance<
 				selectorName
 			)
 		)
+		if (defaultPk) {
+			this._internalStore._selectors.get(selectorName)?.select(defaultPk)
+		}
 		this.mount()
 		return this as CollectionInstance<
 			DataTypeInput,
@@ -490,7 +497,7 @@ export class CollectionInstance<
 			Groups,
 			Selectors &
 				Map<
-					(typeof selectorNames)[number],
+					typeof selectorNames[number],
 					PlexusCollectionSelector<DataTypeInput>
 				>
 		>
@@ -563,7 +570,7 @@ export class CollectionInstance<
 		return this as CollectionInstance<
 			DataTypeInput,
 			Groups &
-				Map<(typeof groupNames)[number], PlexusCollectionGroup<DataTypeInput>>,
+				Map<typeof groupNames[number], PlexusCollectionGroup<DataTypeInput>>,
 			Selectors
 		>
 	}
@@ -981,6 +988,16 @@ export class CollectionInstance<
 	 */
 	get lastUpdatedKey() {
 		return this._internalStore._lastChanged
+	}
+
+	/**
+	 * Get the size of the collection (the number of data items in the collection))
+	 * @type {number}
+	 */
+	get size() {
+		// should we remove provisional items from the count? If so this is a prototype of how to do it
+		// return this._internalStore._data.size - this._internalStore._provisionalCount
+		return this._internalStore._data.size
 	}
 }
 export function _collection<

@@ -18,12 +18,13 @@ A Collection Instance
     * [.selectorsValue](#CollectionInstance+selectorsValue) : <code>Record.&lt;SelectorNames, Array.&lt;DataTypeInput&gt;&gt;</code>
     * [.name](#CollectionInstance+name) : <code>string</code>
     * [.lastUpdatedKey](#CollectionInstance+lastUpdatedKey) : <code>string</code>
+    * [.size](#CollectionInstance+size) : <code>number</code>
     * [.collect(data, groups)](#CollectionInstance+collect) ⇒ <code>this</code>
     * [.update(key, data, config)](#CollectionInstance+update)
     * [.has(dataKey, includeProvisional)](#CollectionInstance+has) ⇒ <code>boolean</code>
     * [.getItem(dataKey)](#CollectionInstance+getItem) ⇒ <code>this</code>
     * [.getItemValue(key)](#CollectionInstance+getItemValue) ⇒ <code>DataTypeInput</code>
-    * [.createSelector(selectorName)](#CollectionInstance+createSelector) ⇒ <code>this</code>
+    * [.createSelector(selectorName, defaultPk)](#CollectionInstance+createSelector) ⇒ <code>this</code>
     * [.createSelectors(selectorNames)](#CollectionInstance+createSelectors) ⇒ <code>this</code>
     * [.getSelector(name)](#CollectionInstance+getSelector) ⇒ <code>this</code> \| <code>undefined</code>
     * [.createGroup(groupName, config)](#CollectionInstance+createGroup) ⇒ <code>this</code>
@@ -90,6 +91,11 @@ A Collection Instance
 ### .lastUpdatedKey : <code>string</code>
 <p>Get the last updated key of the collection</p>
 
+<a name="CollectionInstance+size"></a>
+
+### .size : <code>number</code>
+<p>Get the size of the collection (the number of data items in the collection))</p>
+
 <a name="CollectionInstance+collect"></a>
 
 ### .collect(data, groups) ⇒ <code>this</code>
@@ -153,7 +159,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 <a name="CollectionInstance+createSelector"></a>
 
-### .createSelector(selectorName) ⇒ <code>this</code>
+### .createSelector(selectorName, defaultPk) ⇒ <code>this</code>
 <p>Create a Selector instance for a given selector name</p>
 
 **Returns**: <code>this</code> <p>The new Collection Instance</p>  
@@ -161,6 +167,7 @@ This is like collect but will not add new items, and can can be used to patch ex
 | Param | Type | Description |
 | --- | --- | --- |
 | selectorName | <code>string</code> | <p>The name of the selector</p> |
+| defaultPk | <code>string</code> | <p>The default primaryKey to select</p> |
 
 <a name="CollectionInstance+createSelectors"></a>
 
