@@ -270,29 +270,28 @@ export class ApiInstance {
 			}
 		)
 	}
+
 	/**
 	 * Send a post request
 	 * @param {string} path The url to send the request to
 	 * @param {Record<string, any> | string} body The body of the request (can be a string or object)
 	 * @returns {Promise<PlexusApiRes<unknown>>} The response from the server
 	 */
-	async post<ResponseType = any>(
+	async post<ResponseType = any, BodyType extends Record<string, any> | string = {}>(
 		path: string,
-		body: Record<string, any> | string = {}
+		body: BodyType = {} as BodyType
 	) {
-		if (typeof body !== 'string') {
-			body = JSON.stringify(body)
-		}
+		const bodyString = typeof body === 'string' ? body : JSON.stringify(body)
 		const options = {
 			method: 'POST',
-			body,
+			bodyString,
 		} as const
 		const headers = await this.headerGetter()
 		if (
 			headers &&
 			headers['Content-Type'] === 'application/x-www-form-urlencoded'
 		) {
-			const params = new URLSearchParams(body)
+			const params = new URLSearchParams(bodyString)
 			return this.preSend<ResponseType>(
 				`${path}${params.toString().length > 0 ? `?${params.toString()}` : ''}`,
 				options
