@@ -1,0 +1,71 @@
+# Usage
+
+## Basic Usage
+
+```typescript
+import { api } from '@plexusjs/api';
+// or import it from the core package
+// import { api } from '@plexusjs/core';
+
+interface User {
+  id: string;
+  name: string;
+}
+
+const client = api('http://localhost:3000');
+
+const { data, status, ok } = await api.get<User>(`/users`);
+
+if (ok) {
+  console.log(data); // data is typed as User
+} else {
+  console.log(`Request failed with status ${status}`);
+}
+
+// POST
+
+// The first generic is our return path, the second is the body type. Both are optional.
+const { data, status, ok } = await api.post<User, {
+  name: string;
+}>(`/users`, {
+  name: 'John Doe',
+}); // the second argument is our body
+
+// ...
+```
+
+## Using "throws"
+
+If you want to throw an error when the request fails, you can use the `throws` option in the client.
+This is useful when you want fetch-like behavior.
+
+```typescript
+import { api } from '@plexusjs/api';
+
+const client = api('http://localhost:3000', { throws: true });
+
+try {
+  const { data } = await api.get<User>(`/users`);
+  console.log(data);
+} catch (error) {
+  console.log(error);
+}
+```
+
+## Authentication
+
+The client provides a `.auth()` util to handle common authentication methods.
+It supports `Bearer`, `JWT` and `Basic` authentication.
+
+```typescript
+import { api } from '@plexusjs/api';
+
+const client = api('http://localhost:3000');
+
+// JWT
+client.auth('jwt', 'token');
+
+// Bearer
+client.auth('bearer', 'my token')
+
+```
