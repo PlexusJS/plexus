@@ -284,7 +284,7 @@ export class ApiInstance {
 		const bodyString = typeof body === 'string' ? body : JSON.stringify(body)
 		const options = {
 			method: 'POST',
-			bodyString,
+			body: bodyString,
 		} as const
 		const headers = await this.headerGetter()
 		if (
