@@ -377,8 +377,6 @@ export class CollectionData<
 		}, from)
 		return destroyer
 	}
-
-
 }
 
 export function _data<DataType extends Record<string, any>>(
