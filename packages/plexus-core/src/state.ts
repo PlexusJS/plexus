@@ -114,7 +114,7 @@ export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
 	 * Patch the current value of the state
 	 * @param value A value of the state to merge with the current value
 	 */
-	patch(value: PlexusWatchableValueInterpreter<StateValue>) {
+	patch(value: Partial<PlexusWatchableValueInterpreter<StateValue>>) {
 		if (isObject(value) && isObject(this._watchableStore._value)) {
 			// ! Shitty type casting, should be fixed
 			this.set(
@@ -135,7 +135,7 @@ export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
 				Object.values(obj) as PlexusWatchableValueInterpreter<StateValue>
 			)
 		} else {
-			this.set(value)
+			this.set(value as PlexusWatchableValueInterpreter<StateValue>)
 		}
 		if (this._internalStore._persist)
 			this.instance().storage?.set(
