@@ -17,44 +17,48 @@ States are data storage instances that can be subscribed to and updated. They ar
 ## Basic usage
 
 ```tsx
-import { state } from '@plexusjs/core';
-import { usePlexus } from '@plexusjs/react';
+import { state } from '@plexusjs/core'
+import { usePlexus } from '@plexusjs/react'
 
-const counterState = state(0);
+const counterState = state(0)
 
 function Counter() {
-  const count = usePlexus(counterState);
+	const count = usePlexus(counterState)
 
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => {
-        counterState.set(count + 1);
-        // functions are also supported in .set
-        // counterState.set((prev) => prev + 1);
-      }}>Increment</button>
-    </div>
-  );
+	return (
+		<div>
+			<p>Count: {count}</p>
+			<button
+				onClick={() => {
+					counterState.set(count + 1)
+					// functions are also supported in .set
+					// counterState.set((prev) => prev + 1);
+				}}
+			>
+				Increment
+			</button>
+		</div>
+	)
 }
 ```
 
 A more "react like" syntax is available through the `usePlexusState` hook:
 
 ```tsx
-import { state } from '@plexusjs/core';
-import { usePlexusState } from '@plexusjs/react';
+import { state } from '@plexusjs/core'
+import { usePlexusState } from '@plexusjs/react'
 
-const counterState = state(0);
+const counterState = state(0)
 
 function Counter() {
-  const [count, setCount] = usePlexusState(counterState);
+	const [count, setCount] = usePlexusState(counterState)
 
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </div>
-  );
+	return (
+		<div>
+			<p>Count: {count}</p>
+			<button onClick={() => setCount(count + 1)}>Increment</button>
+		</div>
+	)
 }
 ```
 
@@ -64,42 +68,42 @@ States can be used across components, and even across files. This is useful for 
 
 ```tsx
 // counter.tsx
-import { state } from '@plexusjs/core';
-import { usePlexus } from '@plexusjs/react';
+import { state } from '@plexusjs/core'
+import { usePlexus } from '@plexusjs/react'
 
-export const counterState = state(0);
+export const counterState = state(0)
 
 export function Counter() {
-  const count = usePlexus(counterState);
+	const count = usePlexus(counterState)
 
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => counterState.set(count + 1)}>Increment</button>
-    </div>
-  );
+	return (
+		<div>
+			<p>Count: {count}</p>
+			<button onClick={() => counterState.set(count + 1)}>Increment</button>
+		</div>
+	)
 }
 ```
 
 ```tsx
 // admin.tsx
-import { counterState } from './counter';
-import { usePlexus } from '@plexusjs/react';
+import { counterState } from './counter'
+import { usePlexus } from '@plexusjs/react'
 
 export function Admin() {
-  const count = usePlexus(counterState);
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button
-        onClick={() => {
-          counterState.set(0);
-        }}
-        >
-        Reset
-      </button>
-    </div>
-  );
+	const count = usePlexus(counterState)
+	return (
+		<div>
+			<p>Count: {count}</p>
+			<button
+				onClick={() => {
+					counterState.set(0)
+				}}
+			>
+				Reset
+			</button>
+		</div>
+	)
 }
 ```
 
@@ -110,11 +114,11 @@ You can also use .reset to reset the state to its initial value (the one passed 
 
 // ...
 <button
-  onClick={() => {
-    counterState.reset();
-  }}
+	onClick={() => {
+		counterState.reset()
+	}}
 >
-  Reset
+	Reset
 </button>
 // ...
 ```
@@ -124,32 +128,32 @@ You can also use .reset to reset the state to its initial value (the one passed 
 You can pass any value into states - including objects. To make your life easier, Plexus provides a `.patch()` method that allows you to update only a part of the object.
 
 ```tsx
-import { state } from '@plexusjs/core';
-import { usePlexus } from '@plexusjs/react';
+import { state } from '@plexusjs/core'
+import { usePlexus } from '@plexusjs/react'
 
 const userState = state({
-  name: 'John',
-  age: 20,
-});
+	name: 'John',
+	age: 20,
+})
 
 function User() {
-  const user = usePlexus(userState);
+	const user = usePlexus(userState)
 
-  return (
-    <div>
-      <p>Name: {user.name}</p>
-      <p>Age: {user.age}</p>
-      <button
-        onClick={() => {
-          userState.patch({
-            name: 'Jane',
-          });
-        }}
-      >
-        Change name
-      </button>
-    </div>
-  );
+	return (
+		<div>
+			<p>Name: {user.name}</p>
+			<p>Age: {user.age}</p>
+			<button
+				onClick={() => {
+					userState.patch({
+						name: 'Jane',
+					})
+				}}
+			>
+				Change name
+			</button>
+		</div>
+	)
 }
 ```
 
@@ -158,41 +162,40 @@ function User() {
 If you want to manipulate the value of a state outside of the `.set()` and/or before patching it to the state, you can use the `.nextValue` property:
 
 ```tsx
-import { state } from '@plexusjs/core';
-import { usePlexus } from '@plexusjs/react';
+import { state } from '@plexusjs/core'
+import { usePlexus } from '@plexusjs/react'
 
-const counterState = state(0);
+const counterState = state(0)
 
-function Counter () {
-  const count = usePlexus(counterState);
+function Counter() {
+	const count = usePlexus(counterState)
 
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button 
-        onClick={() => {
-          counterState.nextValue += 1;
-          // counterState.value is still 0
-          counterState.set(); // Calling .set() without arguments will patch the value from .nextValue
-          // counterState.value is now 1
-        }}
-      >
-        Increment
-      </button>
-    </div>
-  );
+	return (
+		<div>
+			<p>Count: {count}</p>
+			<button
+				onClick={() => {
+					counterState.nextValue += 1
+					// counterState.value is still 0
+					counterState.set() // Calling .set() without arguments will patch the value from .nextValue
+					// counterState.value is now 1
+				}}
+			>
+				Increment
+			</button>
+		</div>
+	)
 }
 ```
-
 
 ## Persisting Data
 
 States can be persisted to local storage, so that they are not lost when the user refreshes the page.
 
 ```tsx
-import { state } from '@plexusjs/core';
+import { state } from '@plexusjs/core'
 
-const counterState = state(0).persist('counter');
+const counterState = state(0).persist('counter')
 ```
 
 ## TypeScript
@@ -200,19 +203,19 @@ const counterState = state(0).persist('counter');
 States automatically infer the type of the initial value passed to the `state` function, resulting in out-of-the-box type safety.
 
 ```tsx
-import { state } from '@plexusjs/core';
+import { state } from '@plexusjs/core'
 
-const counterState = state(0);
+const counterState = state(0)
 // returns: State<number>
 ```
 
 If you want to use a custom type, you can pass it as a generic parameter to the `state` function:
 
 ```tsx
-import { state } from '@plexusjs/core';
+import { state } from '@plexusjs/core'
 
-type LimitedNumber = 0 | 1 | 2 | 3 | 4 | 5;
+type LimitedNumber = 0 | 1 | 2 | 3 | 4 | 5
 
-const counterState = state<LimitedNumber>(0);
+const counterState = state<LimitedNumber>(0)
 // returns: State<LimitedNumber>
 ```

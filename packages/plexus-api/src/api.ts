@@ -277,10 +277,10 @@ export class ApiInstance {
 	 * @param {Record<string, any> | string} body The body of the request (can be a string or object)
 	 * @returns {Promise<PlexusApiRes<unknown>>} The response from the server
 	 */
-	async post<ResponseType = any, BodyType extends Record<string, any> | string = {}>(
-		path: string,
-		body: BodyType = {} as BodyType
-	) {
+	async post<
+		ResponseType = any,
+		BodyType extends Record<string, any> | string = {}
+	>(path: string, body: BodyType = {} as BodyType) {
 		const bodyString = typeof body === 'string' ? body : JSON.stringify(body)
 		const options = {
 			method: 'POST',

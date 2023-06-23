@@ -1,55 +1,53 @@
---- 
-	title: EventInstance 
---- 
+---
+title: EventInstance
+---
 
 [![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
 
 A Plexus Event. This is a trackable event that can be listened to and fired.
 
+- [EventInstance](#EventInstance)
+  - [.once(callback)](#EventInstance+once)
+  - [.on(callback)](#EventInstance+on)
+  - [.emit(payload)](#EventInstance+emit)
+  - [.disable(disable)](#EventInstance+disable)
 
-* [EventInstance](#EventInstance)
-    * [.once(callback)](#EventInstance+once)
-    * [.on(callback)](#EventInstance+on)
-    * [.emit(payload)](#EventInstance+emit)
-    * [.disable(disable)](#EventInstance+disable)
-
-<a name="EventInstance+once"></a>
+<a name='EventInstance+once'></a>
 
 ### .once(callback)
+
 <p>Listen for an event only once</p>
 
-
-| Param | Description |
-| --- | --- |
+| Param    | Description                                         |
+| -------- | --------------------------------------------------- |
 | callback | <p>The function to call when the event is fired</p> |
 
-<a name="EventInstance+on"></a>
+<a name='EventInstance+on'></a>
 
 ### .on(callback)
+
 <p>Listen for an event</p>
 
-
-| Param | Description |
-| --- | --- |
+| Param    | Description                                         |
+| -------- | --------------------------------------------------- |
 | callback | <p>The function to call when the event is fired</p> |
 
-<a name="EventInstance+emit"></a>
+<a name='EventInstance+emit'></a>
 
 ### .emit(payload)
+
 <p>Broadcast an event to all listeners</p>
 
-
-| Param | Description |
-| --- | --- |
+| Param   | Description                                 |
+| ------- | ------------------------------------------- |
 | payload | <p>The payload to send to all listeners</p> |
 
-<a name="EventInstance+disable"></a>
+<a name='EventInstance+disable'></a>
 
 ### .disable(disable)
+
 <p>Turn the Event Manager off/on</p>
 
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
+| Param   | Type                 | Default           | Description                                 |
+| ------- | -------------------- | ----------------- | ------------------------------------------- |
 | disable | <code>boolean</code> | <code>true</code> | <p>Should this event Engine be disabled</p> |
-
