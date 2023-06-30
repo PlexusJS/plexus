@@ -38,3 +38,38 @@ export type PlexusWatchableValueInterpreter<Value> = Value extends (
 ) => any
 	? ReturnType<Value>
 	: Value
+
+export declare type AsyncState<T> =
+	| {
+			loading: boolean
+			error?: undefined
+			value?: undefined
+	  }
+	| {
+			loading: true
+			error?: Error | undefined
+			value?: T
+	  }
+	| {
+			loading: false
+			error: Error
+			value?: undefined
+	  }
+	| {
+			loading: false
+			error?: undefined
+			value: T
+	  }
+
+export declare type FunctionReturningPromise = (...args: any[]) => Promise<any>
+export declare type PromiseType<P extends Promise<any>> = P extends Promise<
+	infer T
+>
+	? T
+	: never
+declare type StateFromFunctionReturningPromise<
+	T extends FunctionReturningPromise
+> = AsyncState<PromiseType<ReturnType<T>>>
+export declare type AsyncFnReturn<
+	T extends FunctionReturningPromise = FunctionReturningPromise
+> = [StateFromFunctionReturningPromise<T>, T]
