@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/next",
-	"version": "1.7.29",
+	"version": "1.7.30",
 	"description": "Next Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
