@@ -10,8 +10,6 @@
 [![Join the Plexus Discord](https://discordapp.com/api/guilds/941858479793123358/embed.png)](https://discord.gg/kWJ2kVnykH)
 [![Follow Plexus on Twitter](https://img.shields.io/twitter/follow/plexusjs?color=%09%231DA1F2&logo=Twitter&logoColor=%09%231DA1F2&style=flat)](https://twitter.com/plexusjs)
 
-### Maintained by [Wander](https://github.com/wandercom)
-
 ## Getting Started 🚀
 
 - [Documentation](https://plexusjs.org)

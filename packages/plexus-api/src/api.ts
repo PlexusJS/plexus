@@ -71,6 +71,7 @@ export class ApiInstance {
 			)
 			this._internalStore._noFetch = true
 		}
+		config.headers && this.setHeaders(config.headers)
 	}
 	private async send<ResponseDataType>(
 		path: string,
