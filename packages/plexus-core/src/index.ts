@@ -1,18 +1,23 @@
-import { instance, PlexusInstance } from './instance/instance'
-import { WatchableMutable } from './watchable'
+import { instance, PlexusInstance, batch } from './instance/instance'
+import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
 import { PlexusScopeConfig } from './scope'
 
+export { gql } from './gql'
+export { scope, PlexusScopeConfig } from './scope'
+export { WatchableMutable as WatchableValue, Watchable } from './watchable'
+export { event, _event, PlexusEventInstance } from './event'
+export { storage, _storage, StorageOverride } from './storage'
+export { state, _state, PlexusStateInstance, StateInstance } from './state'
 export { computed, _computed, PlexusComputedStateInstance } from './computed'
-export { WatchableMutable, Watchable } from './watchable'
-
+export { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 export {
 	action,
 	_action,
 	FunctionType,
 	PlexusAction,
 	PlexusActionHooks,
+	batchAction,
 } from './action'
-
 export {
 	preaction,
 	_preaction,
@@ -20,21 +25,21 @@ export {
 	PlexusPreActionConfig,
 	PreActionInstance,
 } from './preaction'
-
 export {
+	api,
+	PlexusApi,
+	PlexusApiConfig,
+	PlexusApiRes,
+	ApiInstance,
+} from '@plexusjs/api'
+export {
+	collection,
 	_collection,
 	PlexusCollectionConfig,
 	PlexusCollectionInstance,
 	PlexusCollectionSelector,
 	PlexusCollectionGroup,
 } from './collection/collection'
-export { event, _event, PlexusEventInstance } from './event'
-export { storage, _storage, StorageOverride } from './storage'
-export { PlexusScopeConfig, scope } from './scope'
-import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
-
-export { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
-export { state, _state, PlexusStateInstance, StateInstance } from './state'
 
 export function setGlobalCatch(catcher: (err: any) => unknown) {
 	instance()._globalCatch = catcher
@@ -56,19 +61,10 @@ export function usePlugin(
 }
 
 export {
-	api,
-	PlexusApi,
-	PlexusApiConfig,
-	PlexusApiRes,
-	ApiInstance,
-} from '@plexusjs/api'
-export { gql } from './gql'
-
-export {
 	instance,
+	batch,
 	PlexusPlugin,
 	PlexusScopeConfig as PlexusPluginConfig,
 	createPlexusPlugin,
 	PlexusInstance,
-	WatchableMutable as WatchableValue,
 }
