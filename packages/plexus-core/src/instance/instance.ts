@@ -1,7 +1,7 @@
 import { StateInstance } from '../state'
 import { Plugin } from '../plugin'
 import { RuntimeInstance, _runtime } from './runtime'
-import { PlexusStorageInstance, storage } from '../storage'
+import { PlexusStorageInstance, _storage } from '../storage'
 import { CollectionInstance } from '../collection/collection'
 import { deepMerge, genUID, isEqual } from '@plexusjs/utils'
 import { PlexusPreAction } from '../preaction'
@@ -191,7 +191,7 @@ export function instance(
 		// initial instance configuration, do all pre-init stuff here
 		getPlexusInstance(newInstance.name)._storages.set(
 			'default',
-			storage(() => instance(config))
+			_storage(() => instance(config))
 		)
 		getPlexusInstance(newInstance.name).storageEngine = 'default'
 
@@ -214,4 +214,14 @@ export function instance(
 	}
 	// return the instance
 	return getPlexusInstance(config?.id || '') as PlexusInstance
+}
+
+/**
+ * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
+ * @param fn The function to run in a batch
+ */
+export function batch<BatchFunction extends () => any | Promise<any> = any>(
+	fn: BatchFunction
+): ReturnType<BatchFunction> {
+	return instance().runtime.batch(fn)
 }

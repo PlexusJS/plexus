@@ -1,12 +1,13 @@
 // import { isServer } from "@plexusjs/utils/dist/shared"
 import {
+	AlmostAnything,
 	PlexusWatchableValueInterpreter,
 	deepClone,
 	deepMerge,
 	isObject,
 } from '@plexusjs/utils'
 import { concurrentWatch } from './helpers'
-import { PlexusInstance } from './instance/instance'
+import { PlexusInstance, instance } from './instance/instance'
 import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
 import { Watchable } from './watchable'
 
@@ -254,4 +255,22 @@ export function _computed<StateValue extends PlexusValidStateTypes>(
 	deps: Dependency[]
 ) {
 	return new ComputedStateInstance<StateValue>(instance, computeFn, deps)
+}
+
+/**
+ * Generate a Plexus State
+ * @param item The default value to use when we generate the state
+ * @returns A Plexus State Instance
+ */
+export function computed<
+	Override extends PlexusValidStateTypes = never,
+	Value extends PlexusValidStateTypes = Override extends AlmostAnything
+		? Override
+		: any
+>(item: (value?: Value) => Value, dependencies: Array<Watchable> | Watchable) {
+	return _computed(
+		() => instance(),
+		item,
+		!Array.isArray(dependencies) ? [dependencies] : dependencies
+	)
 }

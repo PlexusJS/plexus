@@ -1,11 +1,12 @@
 import {
+	AlmostAnything,
 	PlexusWatchableValueInterpreter,
 	deepClone,
 	deepMerge,
 	isEqual,
 	isObject,
 } from '@plexusjs/utils'
-import { PlexusInstance } from './instance/instance'
+import { PlexusInstance, instance } from './instance/instance'
 import { Fetcher, PlexusInternalWatcher, PlexusValidStateTypes } from './types'
 
 import { WatchableMutable } from './watchable'
@@ -299,4 +300,30 @@ export function _state<StateValue>(
 ) {
 	// Returned Object //
 	return new StateInstance(instance, _init)
+}
+
+// export function state<
+// 	Literal extends PlexusStateType = any,
+// 	Value extends PlexusStateType = Literal extends AlmostAnything
+// 		? Literal
+// 		: TypeOrReturnType<Literal>
+// >(item: Fetcher<Value>): TypeOrReturnType<Value>
+
+// export function state<
+// 	Literal extends PlexusStateType = any,
+// 	Value extends PlexusStateType = Literal extends AlmostAnything
+// 		? Literal
+// 		: TypeOrReturnType<Literal>
+// >(item: Value): StateInstance<Value>
+
+/**
+ * Generate a Plexus State
+ * @param item The default value to use when we generate the state
+ * @returns A Plexus State Instance
+ */
+export function state<
+	Override extends PlexusValidStateTypes = never,
+	Value = Override extends AlmostAnything ? Override : any
+>(item: Value) {
+	return _state(() => instance(), item)
 }

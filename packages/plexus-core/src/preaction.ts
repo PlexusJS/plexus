@@ -1,4 +1,4 @@
-import { PlexusInstance } from './instance/instance'
+import { PlexusInstance, instance } from './instance/instance'
 import { FunctionType, _action } from './action'
 import { genUID } from '@plexusjs/utils'
 type ErrorHandler = (error: any) => unknown
@@ -69,4 +69,16 @@ export function _preaction<Fn extends FunctionType>(
 	config?: PlexusPreActionConfig
 ) {
 	return new PreActionInstance<Fn>(instance, fn, config)
+}
+
+/**
+ * Generate a Plexus Action
+ * @param fn The Plexus action function to run
+ * @returns The intended return value of fn, or null if an error is caught
+ */
+export function preaction<Fn extends FunctionType>(
+	fn: Fn,
+	config?: PlexusPreActionConfig
+) {
+	return _preaction<Fn>(() => instance(), fn, config)
 }
