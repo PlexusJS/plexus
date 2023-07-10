@@ -10,6 +10,7 @@ A Plexus Event. This is a trackable event that can be listened to and fired.
 * [EventInstance](#EventInstance)
     * [.id](#EventInstance+id)
     * [.name](#EventInstance+name)
+    * [.name](#EventInstance+name)
     * [.once(callback)](#EventInstance+once)
     * [.on(callback)](#EventInstance+on)
     * [.emit(payload)](#EventInstance+emit)
@@ -23,7 +24,12 @@ A Plexus Event. This is a trackable event that can be listened to and fired.
 <a name="EventInstance+name"></a>
 
 ### .name
-<p>The name of the state (NOTE: set with the <code>.key()</code> function)</p>
+<p>The name of the state (NOTE: set with the <code>.name(name)</code> function)</p>
+
+<a name="EventInstance+name"></a>
+
+### .name
+<p>Set the key of the state for enhanced internal tracking</p>
 
 <a name="EventInstance+once"></a>
 

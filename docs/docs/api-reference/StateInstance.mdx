@@ -10,9 +10,10 @@ A trackable State
 * [StateInstance](#StateInstance)
     * [.id](#StateInstance+id)
     * [.instanceId](#StateInstance+instanceId)
+    * [.name](#StateInstance+name)
+    * [.name](#StateInstance+name)
     * [.value](#StateInstance+value)
     * [.lastValue](#StateInstance+lastValue)
-    * [.name](#StateInstance+name)
     * [.nextValue](#StateInstance+nextValue)
     * [.initialValue](#StateInstance+initialValue)
     * [.set(value)](#StateInstance+set)
@@ -22,7 +23,7 @@ A trackable State
     * [.reset()](#StateInstance+reset)
     * [.interval(setterFunction, ms)](#StateInstance+interval)
     * [.clearInterval()](#StateInstance+clearInterval)
-    * [.key()](#StateInstance+key)
+    * ~~[.key()](#StateInstance+key)~~
 
 <a name="StateInstance+id"></a>
 
@@ -34,6 +35,16 @@ A trackable State
 ### .instanceId
 <p>The internal id of the state with an instance prefix</p>
 
+<a name="StateInstance+name"></a>
+
+### .name
+<p>Set the name of the state for internal tracking</p>
+
+<a name="StateInstance+name"></a>
+
+### .name
+<p>The name of the state (NOTE: set with the <code>.name(name)</code> function)</p>
+
 <a name="StateInstance+value"></a>
 
 ### .value
@@ -43,11 +54,6 @@ A trackable State
 
 ### .lastValue
 <p>The previous (reactive) value of the state</p>
-
-<a name="StateInstance+name"></a>
-
-### .name
-<p>The name of the state (NOTE: set with the <code>.key()</code> function)</p>
 
 <a name="StateInstance+nextValue"></a>
 
@@ -130,6 +136,8 @@ state.set(); // The state will be { foo: "bar" }
 
 <a name="StateInstance+key"></a>
 
-### .key()
+### ~~.key()~~
+***Deprecated***
+
 <p>Set the key of the state for internal tracking</p>
 

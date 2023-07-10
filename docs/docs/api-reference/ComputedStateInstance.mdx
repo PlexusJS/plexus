@@ -13,6 +13,7 @@ A computed state is a state that is derived from other states
     * [.value](#ComputedStateInstance+value)
     * [.lastValue](#ComputedStateInstance+lastValue)
     * [.name](#ComputedStateInstance+name)
+    * [.name](#ComputedStateInstance+name)
     * [.deps](#ComputedStateInstance+deps)
     * [.refreshDeps()](#ComputedStateInstance+refreshDeps)
     * [.watch(callback)](#ComputedStateInstance+watch) ⇒
@@ -21,7 +22,7 @@ A computed state is a state that is derived from other states
     * [.removeDep(dep)](#ComputedStateInstance+removeDep)
     * [.undo()](#ComputedStateInstance+undo)
     * [.reset()](#ComputedStateInstance+reset)
-    * [.key()](#ComputedStateInstance+key)
+    * ~~[.key()](#ComputedStateInstance+key)~~
     * [.recompute()](#ComputedStateInstance+recompute)
 
 <a name="ComputedStateInstance+id"></a>
@@ -47,7 +48,12 @@ A computed state is a state that is derived from other states
 <a name="ComputedStateInstance+name"></a>
 
 ### .name
-<p>The name of the state (NOTE: set with the <code>.key()</code> function)</p>
+<p>The name of the state (NOTE: set with the <code>.name(name)</code> function)</p>
+
+<a name="ComputedStateInstance+name"></a>
+
+### .name
+<p>Set the name of the state for enhanced internal tracking</p>
 
 <a name="ComputedStateInstance+deps"></a>
 
@@ -112,7 +118,9 @@ A computed state is a state that is derived from other states
 
 <a name="ComputedStateInstance+key"></a>
 
-### .key()
+### ~~.key()~~
+***Deprecated***
+
 <p>Set the key of the state for enhanced internal tracking</p>
 
 <a name="ComputedStateInstance+recompute"></a>

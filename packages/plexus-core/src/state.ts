@@ -239,7 +239,20 @@ export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
 		return this
 	}
 	/**
+	 * Set the name of the state for internal tracking
+	 */
+	set name(name: string) {
+		this._internalStore._name = `state_${name}`
+	}
+	/**
+	 * The name of the state (NOTE: set with the `.name(name)` function)
+	 */
+	get name() {
+		return this._internalStore._name
+	}
+	/**
 	 * Set the key of the state for internal tracking
+	 * @deprecated
 	 */
 	key(key: string) {
 		this._internalStore._name = `state_${key}`
@@ -265,12 +278,7 @@ export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
 	get lastValue() {
 		return deepClone(this._watchableStore._lastValue)
 	}
-	/**
-	 * The name of the state (NOTE: set with the `.key()` function)
-	 */
-	get name() {
-		return this._internalStore._name
-	}
+
 	get watcherRemovers() {
 		return this.instance().runtime.getWatchers(this.id)
 	}

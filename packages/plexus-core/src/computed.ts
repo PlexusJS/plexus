@@ -200,10 +200,16 @@ export class ComputedStateInstance<
 		return deepClone(this._watchableStore._lastValue)
 	}
 	/**
-	 * The name of the state (NOTE: set with the `.key()` function)
+	 * The name of the state (NOTE: set with the `.name(name)` function)
 	 */
 	get name(): string {
 		return this._internalStore._name
+	}
+	/**
+	 * Set the name of the state for enhanced internal tracking
+	 */
+	set name(name: string) {
+		this._internalStore._name = `cState_${name}`
 	}
 	/**
 	 * Returns a list of dependencies for the computed state
@@ -233,6 +239,7 @@ export class ComputedStateInstance<
 	}
 	/**
 	 * Set the key of the state for enhanced internal tracking
+	 * @deprecated
 	 */
 	key(key: string) {
 		this._internalStore._name = `cState_${key}`

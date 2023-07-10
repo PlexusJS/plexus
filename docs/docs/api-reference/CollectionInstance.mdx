@@ -17,6 +17,7 @@ A Collection Instance
     * [.selectors](#CollectionInstance+selectors) : <code>Record.&lt;SelectorNames, PlexusCollectionSelector&gt;</code>
     * [.selectorsValue](#CollectionInstance+selectorsValue) : <code>Record.&lt;SelectorNames, Array.&lt;DataTypeInput&gt;&gt;</code>
     * [.name](#CollectionInstance+name) : <code>string</code>
+    * [.name](#CollectionInstance+name)
     * [.lastUpdatedKey](#CollectionInstance+lastUpdatedKey) : <code>string</code>
     * [.size](#CollectionInstance+size) : <code>number</code>
     * [.collect(data, groups)](#CollectionInstance+collect) ⇒ <code>this</code>
@@ -39,7 +40,7 @@ A Collection Instance
     * [.compute(fn)](#CollectionInstance+compute) ⇒ <code>this</code>
     * [.reCompute(ids)](#CollectionInstance+reCompute) ⇒ <code>this</code>
     * [.reComputeGroups(groupNames)](#CollectionInstance+reComputeGroups) ⇒ <code>this</code>
-    * [.key(key)](#CollectionInstance+key) ⇒ <code>this</code>
+    * ~~[.key(key)](#CollectionInstance+key) ⇒ <code>this</code>~~
 
 <a name="CollectionInstance+id"></a>
 
@@ -85,6 +86,16 @@ A Collection Instance
 
 ### .name : <code>string</code>
 <p>Get the name (generated or custom) of the collection store</p>
+
+<a name="CollectionInstance+name"></a>
+
+### .name
+<p>Set the name of the collection for enhanced internal tracking</p>
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | <p>The key to use for the collection</p> |
 
 <a name="CollectionInstance+lastUpdatedKey"></a>
 
@@ -329,7 +340,9 @@ This is like collect but will not add new items, and can can be used to patch ex
 
 <a name="CollectionInstance+key"></a>
 
-### .key(key) ⇒ <code>this</code>
+### ~~.key(key) ⇒ <code>this</code>~~
+***Deprecated***
+
 <p>Set the key of the collection for enhanced internal tracking</p>
 
 **Returns**: <code>this</code> <p>The new Collection Instance</p>  

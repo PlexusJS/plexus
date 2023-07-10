@@ -30,10 +30,16 @@ export class EventInstance<PayloadType = any> {
 	}
 
 	/**
-	 * The name of the state (NOTE: set with the `.key()` function)
+	 * The name of the state (NOTE: set with the `.name(name)` function)
 	 */
 	get name() {
 		return this._internalStore._name
+	}
+	/**
+	 * Set the key of the state for enhanced internal tracking
+	 */
+	set name(key: string) {
+		this._internalStore._name = `event_${key}`
 	}
 
 	constructor(instance: () => PlexusInstance) {

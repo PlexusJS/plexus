@@ -868,6 +868,7 @@ export class CollectionInstance<
 	 * Set the key of the collection for enhanced internal tracking
 	 * @param {string} key The key to use for the collection
 	 * @returns {this} The new Collection Instance
+	 * @deprecated
 	 */
 	key(key: string): this {
 		this._internalStore._name = key
@@ -976,6 +977,14 @@ export class CollectionInstance<
 	 */
 	get name() {
 		return this._internalStore._name
+	}
+	/**
+	 * Set the name of the collection for enhanced internal tracking
+	 * @param {string} name The key to use for the collection
+	 */
+	set name(name: string) {
+		this._internalStore._name = name
+		this.mount()
 	}
 
 	set lastUpdatedKey(value: string) {

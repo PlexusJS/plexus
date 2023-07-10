@@ -42,12 +42,11 @@ class PlexusController {
 					`Plexus Controller: ${this.name} - ${name} is missing an id`
 				)
 			}
-			if(item?.name) {
-				
+			if (item?.name) {
+				item.name = name
 			}
 			return [name, [id]]
 		})
 		this.linkedIds = new Map(mapping)
-		
 	}
 }
