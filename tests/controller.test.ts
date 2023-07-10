@@ -57,5 +57,6 @@ describe('Controller Basics', () => {
 		expect(myModule.myCollection.value).toEqual([])
 		myModule.myCollection.collect({ id: '1', name: 'test' })
 		expect(myModule.myCollection.value).toEqual([{ id: '1', name: 'test' }])
+		expect(myModule.myCollection.name).toBe('myCollection')
 	})
 })

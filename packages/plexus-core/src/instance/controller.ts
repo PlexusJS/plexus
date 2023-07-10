@@ -47,9 +47,7 @@ export class ControllerInstance<
 					`Plexus Controller: ${this.name} - ${name} is missing an id`
 				)
 			}
-			if (item?.name) {
-				item.name = name
-			}
+			item.name = name
 			return [name, [id]]
 		})
 		this.linkedIds = new Map(mapping)
