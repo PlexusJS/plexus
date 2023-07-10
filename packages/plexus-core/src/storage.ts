@@ -5,7 +5,7 @@ import {
 	isEqual,
 	isObject,
 } from '@plexusjs/utils'
-import { PlexusInstance } from './instance/instance'
+import { PlexusInstance, instance } from './instance/instance'
 import { Watchable, WatchableMutable } from './watchable'
 
 type ExtendedWatchable = Watchable<any> & Record<string, any>
@@ -238,10 +238,20 @@ export class StorageInstance {
 	}
 }
 // storage func -> called from instance OR by integration -> hooks up to the instance
-export function storage(
+export function _storage(
 	instance: () => PlexusInstance,
 	name?: string,
 	override?: StorageOverride
 ): PlexusStorageInstance {
 	return new StorageInstance(instance, name, override)
+}
+
+/**
+ * Create a new Storage Instance
+ * @param name The name of the Storage Module
+ * @param override The function overrides for the Storage Module, if omitted, defaults to localStorage
+ * @returns A storage instance
+ */
+export function storage(name?: string, override?: StorageOverride) {
+	return _storage(() => instance(), name, override)
 }

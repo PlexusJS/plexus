@@ -1,4 +1,4 @@
-import { PlexusInstance } from './instance/instance'
+import { PlexusInstance, instance } from './instance/instance'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusActionHooks {
@@ -190,4 +190,22 @@ export function _action<Fn extends FunctionType>(
 		)
 		throw new Error('An action must be of type Function.')
 	}
+}
+
+/**
+ * Generate a Plexus Action
+ * @param fn The Plexus action function to run
+ * @returns The intended return value of fn, or null if an error is caught
+ */
+export function action<Fn extends FunctionType>(fn: Fn) {
+	return _action<Fn>(() => instance(), fn)
+}
+
+/**
+ * Generate a Plexus Action
+ * @param fn The Plexus action function to run
+ * @returns The intended return value of fn, or null if an error is caught
+ */
+export function batchAction<Fn extends FunctionType>(fn: Fn) {
+	return _action<Fn>(() => instance(), fn, true)
 }

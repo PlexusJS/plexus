@@ -1,11 +1,12 @@
 import {
+	AlmostAnything,
 	PlexusWatchableValueInterpreter,
 	deepClone,
 	deepMerge,
 	isEqual,
 	isObject,
 } from '@plexusjs/utils'
-import { PlexusInstance } from './instance/instance'
+import { PlexusInstance, instance } from './instance/instance'
 import { Fetcher, PlexusInternalWatcher, PlexusValidStateTypes } from './types'
 
 import { WatchableMutable } from './watchable'
@@ -238,7 +239,20 @@ export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
 		return this
 	}
 	/**
+	 * Set the name of the state for internal tracking
+	 */
+	set name(name: string) {
+		this._internalStore._name = `state_${name}`
+	}
+	/**
+	 * The name of the state (NOTE: set with the `.name(name)` function)
+	 */
+	get name() {
+		return this._internalStore._name
+	}
+	/**
 	 * Set the key of the state for internal tracking
+	 * @deprecated
 	 */
 	key(key: string) {
 		this._internalStore._name = `state_${key}`
@@ -264,12 +278,7 @@ export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
 	get lastValue() {
 		return deepClone(this._watchableStore._lastValue)
 	}
-	/**
-	 * The name of the state (NOTE: set with the `.key()` function)
-	 */
-	get name() {
-		return this._internalStore._name
-	}
+
 	get watcherRemovers() {
 		return this.instance().runtime.getWatchers(this.id)
 	}
@@ -299,4 +308,30 @@ export function _state<StateValue>(
 ) {
 	// Returned Object //
 	return new StateInstance(instance, _init)
+}
+
+// export function state<
+// 	Literal extends PlexusStateType = any,
+// 	Value extends PlexusStateType = Literal extends AlmostAnything
+// 		? Literal
+// 		: TypeOrReturnType<Literal>
+// >(item: Fetcher<Value>): TypeOrReturnType<Value>
+
+// export function state<
+// 	Literal extends PlexusStateType = any,
+// 	Value extends PlexusStateType = Literal extends AlmostAnything
+// 		? Literal
+// 		: TypeOrReturnType<Literal>
+// >(item: Value): StateInstance<Value>
+
+/**
+ * Generate a Plexus State
+ * @param item The default value to use when we generate the state
+ * @returns A Plexus State Instance
+ */
+export function state<
+	Override extends PlexusValidStateTypes = never,
+	Value = Override extends AlmostAnything ? Override : any
+>(item: Value) {
+	return _state(() => instance(), item)
 }

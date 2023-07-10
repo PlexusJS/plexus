@@ -1,134 +1,46 @@
-import { instance, PlexusInstance } from './instance/instance'
-import { WatchableMutable, Watchable } from './watchable'
-import { _state, PlexusStateInstance, StateInstance } from './state'
-import { _computed, PlexusComputedStateInstance } from './computed'
-import {
+import { instance, PlexusInstance, batch } from './instance/instance'
+import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
+import { PlexusScopeConfig } from './scope'
+
+export { gql } from './gql'
+export { scope, PlexusScopeConfig } from './scope'
+export { WatchableMutable as WatchableValue, Watchable } from './watchable'
+export { event, _event, PlexusEventInstance } from './event'
+export { storage, _storage, StorageOverride } from './storage'
+export { state, _state, PlexusStateInstance, StateInstance } from './state'
+export { computed, _computed, PlexusComputedStateInstance } from './computed'
+export { controller, ControllerInstance } from './instance/controller'
+export { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
+export {
+	action,
 	_action,
 	FunctionType,
 	PlexusAction,
 	PlexusActionHooks,
+	batchAction,
 } from './action'
-import {
+export {
+	preaction,
+	_preaction,
+	PlexusPreAction,
+	PlexusPreActionConfig,
+	PreActionInstance,
+} from './preaction'
+export {
+	api,
+	PlexusApi,
+	PlexusApiConfig,
+	PlexusApiRes,
+	ApiInstance,
+} from '@plexusjs/api'
+export {
+	collection,
 	_collection,
 	PlexusCollectionConfig,
 	PlexusCollectionInstance,
 	PlexusCollectionSelector,
 	PlexusCollectionGroup,
 } from './collection/collection'
-import { _event, PlexusEventInstance } from './event'
-import { storage as _storage, StorageOverride } from './storage'
-import { PlexusScopeConfig, scope } from './scope'
-import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
-
-import { PlexusPreActionConfig, _preaction } from './preaction'
-import { LiteralType, AlmostAnything } from '@plexusjs/utils'
-export { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
-import { Fetcher, PlexusValidStateTypes } from './types'
-
-// export function state<
-// 	Literal extends PlexusStateType = any,
-// 	Value extends PlexusStateType = Literal extends AlmostAnything
-// 		? Literal
-// 		: TypeOrReturnType<Literal>
-// >(item: Fetcher<Value>): TypeOrReturnType<Value>
-
-// export function state<
-// 	Literal extends PlexusStateType = any,
-// 	Value extends PlexusStateType = Literal extends AlmostAnything
-// 		? Literal
-// 		: TypeOrReturnType<Literal>
-// >(item: Value): StateInstance<Value>
-/**
- * Generate a Plexus State
- * @param item The default value to use when we generate the state
- * @returns A Plexus State Instance
- */
-export function state<
-	Override extends PlexusValidStateTypes = never,
-	Value = Override extends AlmostAnything ? Override : any
->(item: Value) {
-	return _state(() => instance(), item)
-}
-/**
- * Generate a Plexus State
- * @param item The default value to use when we generate the state
- * @returns A Plexus State Instance
- */
-export function computed<
-	Override extends PlexusValidStateTypes = never,
-	Value extends PlexusValidStateTypes = Override extends AlmostAnything
-		? Override
-		: any
->(item: (value?: Value) => Value, dependencies: Array<Watchable> | Watchable) {
-	return _computed(
-		() => instance(),
-		item,
-		!Array.isArray(dependencies) ? [dependencies] : dependencies
-	)
-}
-/**
- * Create a new Storage Instance
- * @param name The name of the Storage Module
- * @param override The function overrides for the Storage Module, if omitted, defaults to localStorage
- * @returns A storage instance
- */
-export function storage(name?: string, override?: StorageOverride) {
-	return _storage(() => instance(), name, override)
-}
-/**
- * Create a new event Engine
- * @returns An Event Instance
- */
-export function event<PayloadType = any>() {
-	return _event<PayloadType>(() => instance())
-}
-
-/**
- * Create a new Collection Instance
- * @param config The configuration for the collection
- * @returns A collection Instance
- */
-export function collection<Type extends { [key: string]: any }>(
-	config?: PlexusCollectionConfig<Type>
-) {
-	return _collection<Type>(() => instance(), config)
-}
-/**
- * Generate a Plexus Action
- * @param fn The Plexus action function to run
- * @returns The intended return value of fn, or null if an error is caught
- */
-export function action<Fn extends FunctionType>(fn: Fn) {
-	return _action<Fn>(() => instance(), fn)
-}
-/**
- * Generate a Plexus Action
- * @param fn The Plexus action function to run
- * @returns The intended return value of fn, or null if an error is caught
- */
-export function batchAction<Fn extends FunctionType>(fn: Fn) {
-	return _action<Fn>(() => instance(), fn, true)
-}
-/**
- * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
- * @param fn The function to run in a batch
- */
-export function batch<BatchFunction extends () => any | Promise<any> = any>(
-	fn: BatchFunction
-): ReturnType<BatchFunction> {
-	return instance().runtime.batch(fn)
-}
-/**
- * Generate a Plexus Action
- * @param fn The Plexus action function to run
- * @returns The intended return value of fn, or null if an error is caught
- */
-export function preaction<Fn extends FunctionType>(
-	fn: Fn,
-	config?: PlexusPreActionConfig
-) {
-	return _preaction<Fn>(() => instance(), fn, config)
-}
 
 export function setGlobalCatch(catcher: (err: any) => unknown) {
 	instance()._globalCatch = catcher
@@ -149,32 +61,11 @@ export function usePlugin(
 	// instance()._plugins.set(plugin.name, plugin)
 }
 
-// export { api, PlexusApi, PlexusApiConfig, PlexusApiRes } from "./api"
-export {
-	api,
-	PlexusApi,
-	PlexusApiConfig,
-	PlexusApiRes,
-	ApiInstance,
-} from '@plexusjs/api'
-export { gql } from './gql'
-
 export {
 	instance,
-	PlexusAction,
+	batch,
 	PlexusPlugin,
-	PlexusActionHooks,
 	PlexusScopeConfig as PlexusPluginConfig,
-	scope,
 	createPlexusPlugin,
-	PlexusCollectionConfig,
-	PlexusCollectionInstance,
-	PlexusEventInstance,
-	PlexusStateInstance,
-	PlexusCollectionGroup,
-	PlexusCollectionSelector,
-	PlexusComputedStateInstance,
 	PlexusInstance,
-	WatchableMutable as WatchableValue,
-	Watchable,
 }

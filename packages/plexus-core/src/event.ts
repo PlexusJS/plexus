@@ -1,11 +1,12 @@
 // import { PlexusInstance } from "./interfaces"
 
-import { PlexusInstance } from './instance/instance'
+import { PlexusInstance, instance } from './instance/instance'
 
 type EventHandler = (v: any) => void
 
 export type PlexusEventInstance<PayloadType = any> = EventInstance<PayloadType>
 interface EventStore {
+	_id: string
 	_events: Map<string, Map<string, EventHandler>>
 	_destroyers: Map<string, () => unknown>
 	_once_destroyers: Map<string, () => unknown>
@@ -21,9 +22,30 @@ interface EventStore {
 export class EventInstance<PayloadType = any> {
 	private _internalStore: EventStore
 	private instance: () => PlexusInstance
+	/**
+	 * The internal id of the event
+	 */
+	get id(): string {
+		return `${this._internalStore._id}`
+	}
+
+	/**
+	 * The name of the state (NOTE: set with the `.name(name)` function)
+	 */
+	get name() {
+		return this._internalStore._name
+	}
+	/**
+	 * Set the key of the state for enhanced internal tracking
+	 */
+	set name(key: string) {
+		this._internalStore._name = `event_${key}`
+	}
+
 	constructor(instance: () => PlexusInstance) {
 		this.instance = instance
 		this._internalStore = {
+			_id: instance().genId(),
 			_events: new Map<string, Map<string, EventHandler>>(),
 			_destroyers: new Map<string, () => unknown>(),
 			_once_destroyers: new Map<string, () => unknown>(),
@@ -96,4 +118,12 @@ export class EventInstance<PayloadType = any> {
 
 export function _event<PayloadType = any>(instance: () => PlexusInstance) {
 	return new EventInstance<PayloadType>(instance)
+}
+
+/**
+ * Create a new event Engine
+ * @returns An Event Instance
+ */
+export function event<PayloadType = any>() {
+	return _event<PayloadType>(() => instance())
 }

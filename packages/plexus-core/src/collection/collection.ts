@@ -1,5 +1,5 @@
 import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
-import { PlexusInstance } from '../instance/instance'
+import { PlexusInstance, instance } from '../instance/instance'
 import { PlexusInternalWatcher } from '../types'
 
 import { _data, PlexusDataInstance, DataKey, CollectionData } from './data'
@@ -497,7 +497,7 @@ export class CollectionInstance<
 			Groups,
 			Selectors &
 				Map<
-					typeof selectorNames[number],
+					(typeof selectorNames)[number],
 					PlexusCollectionSelector<DataTypeInput>
 				>
 		>
@@ -570,7 +570,7 @@ export class CollectionInstance<
 		return this as CollectionInstance<
 			DataTypeInput,
 			Groups &
-				Map<typeof groupNames[number], PlexusCollectionGroup<DataTypeInput>>,
+				Map<(typeof groupNames)[number], PlexusCollectionGroup<DataTypeInput>>,
 			Selectors
 		>
 	}
@@ -868,6 +868,7 @@ export class CollectionInstance<
 	 * Set the key of the collection for enhanced internal tracking
 	 * @param {string} key The key to use for the collection
 	 * @returns {this} The new Collection Instance
+	 * @deprecated
 	 */
 	key(key: string): this {
 		this._internalStore._name = key
@@ -977,6 +978,14 @@ export class CollectionInstance<
 	get name() {
 		return this._internalStore._name
 	}
+	/**
+	 * Set the name of the collection for enhanced internal tracking
+	 * @param {string} name The key to use for the collection
+	 */
+	set name(name: string) {
+		this._internalStore._name = name
+		this.mount()
+	}
 
 	set lastUpdatedKey(value: string) {
 		this._internalStore._lastChanged = value
@@ -1017,4 +1026,15 @@ export function _collection<
 		_config
 	)
 	return collection
+}
+
+/**
+ * Create a new Collection Instance
+ * @param config The configuration for the collection
+ * @returns A collection Instance
+ */
+export function collection<Type extends { [key: string]: any }>(
+	config?: PlexusCollectionConfig<Type>
+) {
+	return _collection<Type>(() => instance(), config)
 }
