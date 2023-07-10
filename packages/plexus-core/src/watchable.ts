@@ -1,4 +1,4 @@
-import { PlexusInstance } from '.'
+import { PlexusInstance } from './instance/instance'
 import {
 	deepClone,
 	isEqual,

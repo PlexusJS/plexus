@@ -1,5 +1,5 @@
 import { AlmostAnything, LiteralType, TypeOrReturnType } from '@plexusjs/utils'
-import { Watchable } from '.'
+import { Watchable } from './watchable'
 import { FunctionType, _action } from './action'
 import { PlexusCollectionConfig, _collection } from './collection/collection'
 import { _computed } from './computed'
