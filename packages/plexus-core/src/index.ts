@@ -9,6 +9,7 @@ export { event, _event, PlexusEventInstance } from './event'
 export { storage, _storage, StorageOverride } from './storage'
 export { state, _state, PlexusStateInstance, StateInstance } from './state'
 export { computed, _computed, PlexusComputedStateInstance } from './computed'
+export { controller, ControllerInstance } from './instance/controller'
 export { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 export {
 	action,
