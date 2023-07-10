@@ -49,10 +49,10 @@ export class Watchable<
 	}
 	constructor(instance: () => PlexusInstance, init: ValueType) {
 		this.instance = instance
-
 		const initialValue = getFetcher(
 			init
 		) as PlexusWatchableValueInterpreter<ValueType>
+
 		this._watchableStore = {
 			_internalId: instance().genId(),
 			_nextValue: initialValue,
@@ -110,7 +110,33 @@ export class WatchableMutable<
 	// constructor(instance: () => PlexusInstance, init: () => ValueType)
 	// constructor(instance: () => PlexusInstance, init: ValueType)
 	constructor(instance: () => PlexusInstance, init: ValueType) {
-		super(instance, init)
+		let initialValue = undefined as PlexusWatchableValueInterpreter<ValueType>
+		// this section of code is kinda gross, but basically it allows us to support both sync and async initializers
+		if (typeof init === 'function') {
+			// get the correct types
+			const setter = init as () =>
+				| PlexusWatchableValueInterpreter<ValueType>
+				| Promise<PlexusWatchableValueInterpreter<ValueType>>
+
+			// call the setter function
+			const value = setter()
+			// if it's a promise, we need to wait for it to resolve; so let's use the scheduler
+			instance().runtime.schedule.addTask(async () => {
+				if (value instanceof Promise) {
+					this.loading = true
+					const awaitedValue = await value
+					this.set(awaitedValue)
+					this.loading = false
+				} else {
+					initialValue = value as PlexusWatchableValueInterpreter<ValueType>
+				}
+			})
+		} 
+		// if it's not a function, just set it
+		else {
+			initialValue = init as PlexusWatchableValueInterpreter<ValueType>
+		}
+		super(instance, initialValue)
 		// this._watchableStore._dataFetcher = () =>
 		// 	getFetcher(init) as PlexusWatchableValueInterpreter<ValueType>
 	}
