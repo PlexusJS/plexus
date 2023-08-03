@@ -418,6 +418,29 @@ describe('testing collection groups', () => {
 
 		expect(myCollection.getGroup('default').value.length).toBe(2)
 	})
+
+	// a unit test for sorting with groups
+	test('Sorting with groups', () => {
+		myCollection
+
+			.createGroup('sorted', {
+				sort(a, b) {
+					return a.thing.localeCompare(b.thing)
+				},
+			})
+			.collect(
+				[
+					{ thing: 'lol', id: 0 },
+					{ thing: 'lol3', id: 2 },
+					{ thing: 'lols', id: 1 },
+				],
+				'sorted'
+			)
+
+		expect(myCollection.getGroup('sorted').value[0].thing).toBe('lol')
+		expect(myCollection.getGroup('sorted').value[1].thing).toBe('lol3')
+		expect(myCollection.getGroup('sorted').value[2].thing).toBe('lols')
+	})
 })
 describe('testing collection selectors', () => {
 	test('Do Selectors Work?', () => {
