@@ -70,6 +70,7 @@ export interface PlexusCollectionConfig<DataType> {
 
 	foreignKeys?: ForeignKeyData<DataType>
 	computeLocations?: Array<'collect' | 'getValue'>
+	sort?: (a: DataType, b: DataType) => number
 }
 interface PlexusCollectionStore<DataType extends Record<string, any>> {
 	_internalId: string
@@ -88,6 +89,7 @@ interface PlexusCollectionStore<DataType extends Record<string, any>> {
 	_computeFn?: (
 		data: PlexusWatchableValueInterpreter<DataType>
 	) => PlexusWatchableValueInterpreter<DataType>
+	sort?: (a: DataType, b: DataType) => number
 }
 
 export type PlexusCollectionInstance<
@@ -166,6 +168,7 @@ export class CollectionInstance<
 			set persist(value: boolean) {
 				this._persist = value
 			},
+			sort: config.sort,
 		}
 		this.mount()
 
@@ -546,7 +549,7 @@ export class CollectionInstance<
 				() => this.instance(),
 				() => this,
 				groupName,
-				config
+				{ ...config, sort: config?.sort || this._internalStore.sort }
 			)
 		)
 
@@ -562,9 +565,12 @@ export class CollectionInstance<
 	 * @param {string[]} groupNamesThe names of the groups to create
 	 * @returns {this} The new Collection Instance
 	 */
-	createGroups<Names extends GroupName>(groupNames: [Names, ...Names[]]) {
+	createGroups<Names extends GroupName>(
+		groupNames: [Names, ...Names[]],
+		config?: PlexusCollectionGroupConfig<DataTypeInput>
+	) {
 		for (const groupName of groupNames) {
-			this.createGroup(groupName)
+			this.createGroup(groupName, config)
 		}
 
 		return this as CollectionInstance<
@@ -881,13 +887,16 @@ export class CollectionInstance<
 	 */
 	get value(): (DataTypeInput & { [key: string]: any })[] {
 		this.mount()
-		const keys: (DataTypeInput & { [key: string]: any })[] = []
+		const values: (DataTypeInput & { [key: string]: any })[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {
-				keys.push(item.value)
+				values.push(item.value)
 			}
 		}
-		return keys
+		return this._internalStore.sort &&
+			typeof this._internalStore.sort === 'function'
+			? values.sort(this._internalStore.sort)
+			: values
 	}
 	/**
 	 * Get all of the collection data keys as an array

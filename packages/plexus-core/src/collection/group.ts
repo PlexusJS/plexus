@@ -8,6 +8,7 @@ import { DataKey, PlexusDataInstance } from './data'
 
 export interface PlexusCollectionGroupConfig<DataType> {
 	addWhen?: (item: PlexusWatchableValueInterpreter<DataType>) => boolean
+	sort?: (a: DataType, b: DataType) => number
 }
 export type GroupName = string
 
@@ -20,6 +21,7 @@ interface CollectionGroupStore<DataType = any> {
 	_collectionId: string
 	_includedKeys: Set<string>
 	_dataWatcherDestroyers: Set<() => void>
+	sort?: (a: DataType, b: DataType) => number
 }
 
 /**
@@ -66,6 +68,7 @@ export class CollectionGroup<
 			_collectionId: collection().id,
 			_includedKeys: new Set(),
 			_dataWatcherDestroyers: new Set(),
+			sort: config?.sort,
 		}
 	}
 	private runWatchers() {
@@ -206,7 +209,10 @@ export class CollectionGroup<
 	 * @type {DataType[]}
 	 */
 	get value() {
-		return super.value
+		return this._internalStore.sort &&
+			typeof this._internalStore.sort === 'function'
+			? super.value.sort(this._internalStore.sort)
+			: super.value
 	}
 	/**
 	 * The data Items in the group
