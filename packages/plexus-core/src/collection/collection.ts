@@ -602,7 +602,8 @@ export class CollectionInstance<
 			const g = _group(
 				() => this.instance(),
 				() => this,
-				name
+				name,
+				{ sort: this._internalStore.sort }
 			)
 			this._internalStore._groups.set(name as GroupName, g)
 			return g
@@ -664,14 +665,16 @@ export class CollectionInstance<
 			}
 			let g = this.getGroup(group as GroupName)
 			// if the group does not exist, create it. This should technically never happen because of getGroup, but leaving here for redundancy
-			if (!g) {
-				g = _group(
-					() => this.instance(),
-					() => this,
-					group
-				)
-				this._internalStore._groups.set(group as GroupName, g)
-			}
+			// ! 08/03 - commenting out to see if we can remove this safely
+			// if (!g) {
+			// 	g = _group(
+			// 		() => this.instance(),
+			// 		() => this,
+			// 		group,
+			// 		{ sort: this._internalStore.sort }
+			// 	)
+			// 	this._internalStore._groups.set(group as GroupName, g)
+			// }
 			g.add(keys)
 		}
 		const parseAndPushGroups = () => {

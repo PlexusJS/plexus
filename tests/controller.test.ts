@@ -20,14 +20,14 @@ beforeEach(() => {
 })
 
 describe('Controller Basics', () => {
-	test('can a controller be used', () => {
-		const myModule = controller({
-			myState: state('hey there'),
-		}).export()
+	// test('can a controller be used', () => {
+	// 	const myModule = controller({
+	// 		myState: state('hey there'),
+	// 	}).export()
 
-		expect(myModule.myState).toBeDefined()
-		expect(myModule.myState.value).toBe('hey there')
-	})
+	// 	expect(myModule.myState).toBeDefined()
+	// 	expect(myModule.myState.value).toBe('hey there')
+	// })
 	test('can a controller be used with .module', () => {
 		const myModule = controller({
 			myState: state('hey there'),

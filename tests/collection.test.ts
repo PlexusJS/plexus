@@ -11,7 +11,12 @@ const myCollection = collection<{
 			name?: string
 		}[]
 	}
-}>({ defaultGroup: true })
+}>({
+	defaultGroup: true,
+	sort(a, b) {
+		return a.thing.localeCompare(b.thing)
+	},
+})
 	.createGroups(['group1', 'group2'])
 	.createSelector('main')
 const myCollectionUndefined = collection<{ thing: string; id: number }>({
@@ -430,16 +435,30 @@ describe('testing collection groups', () => {
 			})
 			.collect(
 				[
-					{ thing: 'lol', id: 0 },
-					{ thing: 'lol3', id: 2 },
-					{ thing: 'lols', id: 1 },
+					{ thing: '0', id: 0 },
+					{ thing: '2', id: 2 },
+					{ thing: '1', id: 1 },
 				],
 				'sorted'
 			)
 
-		expect(myCollection.getGroup('sorted').value[0].thing).toBe('lol')
-		expect(myCollection.getGroup('sorted').value[1].thing).toBe('lol3')
-		expect(myCollection.getGroup('sorted').value[2].thing).toBe('lols')
+		expect(myCollection.getGroup('sorted').value[0].thing).toBe('0')
+		expect(myCollection.getGroup('sorted').value[1].thing).toBe('1')
+		expect(myCollection.getGroup('sorted').value[2].thing).toBe('2')
+	})
+	test('Sorting with dynamic groups', () => {
+		myCollection.collect(
+			[
+				{ thing: '0', id: 0 },
+				{ thing: '2', id: 2 },
+				{ thing: '1', id: 1 },
+			],
+			'dynamic'
+		)
+
+		expect(myCollection.getGroup('dynamic').value[0].thing).toBe('0')
+		expect(myCollection.getGroup('dynamic').value[1].thing).toBe('1')
+		expect(myCollection.getGroup('dynamic').value[2].thing).toBe('2')
 	})
 })
 describe('testing collection selectors', () => {

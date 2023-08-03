@@ -12,10 +12,10 @@ lint:
       level: high
   enabled:
     - git-diff-check
-    - markdownlint@0.32.2
-    - gitleaks@8.15.2
-    - prettier@2.8.1
-    - actionlint@1.6.22
+    - markdownlint@0.35.0
+    - gitleaks@8.17.0
+    - prettier@3.0.0
+    - actionlint@1.6.25
   ignore:
     - linters: [ALL]
       paths:
@@ -24,8 +24,8 @@ lint:
         - .docusaurus/**/*
 runtimes:
   enabled:
-    - go@1.18.3
-    - node@16.14.2
+    - go@1.19.5
+    - node@18.12.1
 actions:
   disabled:
     - trunk-fmt-pre-commit
