@@ -1,7 +1,6 @@
 # PlexusJS - A state orchestrator library for reactive applications
 
 [![npm version](https://badge.fury.io/js/@plexusjs%2Fcore.svg)](https://badge.fury.io/js/@plexusjs%2Fcore)
-[![Node.js Package](https://github.com/PlexusJS/plexus/actions/workflows/npm-publish-github-packages.yml/badge.svg)](https://github.com/PlexusJS/plexus/actions/workflows/npm-publish-github-packages.yml)
 ![npm monthly downloads](https://img.shields.io/npm/dw/@plexusjs/core?style=flat)
 ![npm total downloads](https://img.shields.io/npm/dt/@plexusjs/core?style=flat)
 ![bundle size](https://img.shields.io/bundlephobia/min/@plexusjs/core?style=flat)
