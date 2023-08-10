@@ -8,7 +8,9 @@ interface RuntimeConfig {
 	logLevel: 'debug' | 'warn' | 'error' | 'silent'
 	name: string
 }
-type ListenerFn<Value> = (value: Value, from?: string) => void
+type SubscribeFn<Value> = (value: Value, from?: string) => void
+type ListenerFn<Value> = (key: string, value: Value, from?: string) => void
+
 type LogLevels = Exclude<RuntimeConfig['logLevel'], 'silent'> | 'info'
 type SubscriptionTypes =
 	| 'state'
@@ -55,7 +57,7 @@ export class RuntimeInstance {
 	 */
 	subscribe<Value = PlexusValidStateTypes>(
 		_key: string,
-		_callback: ListenerFn<Value>,
+		_callback: SubscribeFn<Value>,
 		from?: string
 	) {
 		this.log('debug', `Subscribing to changes of ${_key}`)
@@ -68,6 +70,29 @@ export class RuntimeInstance {
 		}
 
 		const unsub = this.engine.on(_key, callback, from)
+
+		// return the watcher unsubscribe function
+		return () => {
+			unsub()
+		}
+	}
+	/**
+	 *
+	 * @param _key The key of the object being watched
+	 * @param _callback The function to call when the value changes
+	 * @returns A function to remove the watcher
+	 */
+	listen<Value = PlexusValidStateTypes>(
+		_callback: ListenerFn<Value>,
+		from?: string
+	) {
+		this.log('debug', `${from || 'Unknown'} Listening to all runtime events`)
+		const callback = (data: { key: string; value: Value }) => {
+			const { key, value } = data
+			_callback?.(key, value, from)
+		}
+
+		const unsub = this.engine.onAny(callback, from)
 
 		// return the watcher unsubscribe function
 		return () => {

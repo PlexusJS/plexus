@@ -77,7 +77,6 @@ export class ApiInstance {
 	 * Send a request to the server
 	 * @param path
 	 * @param options
-	 * @returns
 	 */
 	private async send<ResponseDataType>(
 		path: string,
@@ -212,7 +211,6 @@ export class ApiInstance {
 	 * Do some pre-send stuff
 	 * @param path
 	 * @param options
-	 * @returns
 	 */
 	private async preSend<ResponseDataType>(
 		path: string,

@@ -10,6 +10,9 @@ An API instance is used to make requests to a server. Interact with this by usin
 * [ApiInstance](#ApiInstance)
     * [.headers](#ApiInstance+headers) ⇒ <code>Record.&lt;string, string&gt;</code>
     * [.config](#ApiInstance+config) ⇒ <code>Record.&lt;string, any&gt;</code>
+    * [.send(path, options)](#ApiInstance+send)
+    * [.preSend(path, options)](#ApiInstance+preSend)
+    * [.options(options, overwrite)](#ApiInstance+options) ⇒ <code>this</code>
     * [.get(path, query)](#ApiInstance+get)
     * [.post(path, body)](#ApiInstance+post) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
     * [.put(path, body)](#ApiInstance+put) ⇒ <code>Promise.&lt;PlexusApiRes.&lt;unknown&gt;&gt;</code>
@@ -31,6 +34,40 @@ An API instance is used to make requests to a server. Interact with this by usin
 <p>The configuration of this api</p>
 
 **Returns**: <code>Record.&lt;string, any&gt;</code> <p>The configuration of this api</p>  
+<a name="ApiInstance+send"></a>
+
+### .send(path, options)
+<p>Send a request to the server</p>
+
+
+| Param |
+| --- |
+| path | 
+| options | 
+
+<a name="ApiInstance+preSend"></a>
+
+### .preSend(path, options)
+<p>Do some pre-send stuff</p>
+
+
+| Param |
+| --- |
+| path | 
+| options | 
+
+<a name="ApiInstance+options"></a>
+
+### .options(options, overwrite) ⇒ <code>this</code>
+<p>Set the configuration options for fetch</p>
+
+**Returns**: <code>this</code> <p>The current instance</p>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | <code>RequestInit</code> |  | <p>Same as fetch options</p> |
+| overwrite | <code>boolean</code> | <code>false</code> | <p>(optional) If true, will overwrite the current options object</p> |
+
 <a name="ApiInstance+get"></a>
 
 ### .get(path, query)

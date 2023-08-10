@@ -139,6 +139,7 @@ export class CollectionInstance<
 		this.config = {
 			computeLocations: ['collect', 'getValue'],
 			useBatching: true,
+			primaryKey: 'id',
 			...config,
 			foreignKeys: config.foreignKeys || {},
 		}
