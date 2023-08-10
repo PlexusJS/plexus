@@ -141,7 +141,6 @@ export class CollectionGroup<
 			newKeysAdded = true
 			this._internalStore._includedKeys.add(key)
 		}
-		// this._internalStore._includedKeys.add(key)
 		if (newKeysAdded) {
 			this.rebuildDataWatchers()
 		}

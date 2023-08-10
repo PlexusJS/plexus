@@ -1,0 +1,9 @@
+{
+	"targets": {
+		"build": {
+			"options": {
+				"webpackConfig": "./webpack.config.js"
+			}
+		}
+	}
+}

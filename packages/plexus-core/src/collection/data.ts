@@ -69,7 +69,6 @@ export class CollectionData<
 			this.mount()
 			this.syncForeignKeyData(true)
 		}
-		// this.syncForeignKeyData(!this.provisional)
 	}
 	/**
 	 * The internal id of the state with an instance prefix
@@ -205,26 +204,7 @@ export class CollectionData<
 						makeWatcher(newKey, this.shallowValue?.[idKey] as string)
 					}
 				}
-				// const that = this
-				// this.foreignKeyData = new Proxy<any>(this.foreignKeyData, {
-				// 	get(target, prop, reciever) {
-				// 		console.log('get', prop, target, reciever)
-				// 		if (prop === newKey) {
-				// 			const freshValue =
-				// 				that
-				// 					.instance()
-				// 					.findReference(foreignKeys[idKey]?.reference || '')
-				// 					?.getItem(that.primaryKey).shallowValue || undefined
-				// 			freshValue && delete freshValue[idKey]
-				// 			console.log('freshValue', freshValue)
-				// 			return freshValue
-				// 		}
-				// 		return Reflect.get(target, prop, reciever)
-				// 	},
-				// })
-				// console.log('get', foreignKeys, 'value', this.foreignKeyData?.[newKey])
 			}
-			// this.foreignKeyData = value
 		}
 	}
 	private genValue(incomingValue?: PlexusWatchableValueInterpreter<DataType>) {
@@ -343,7 +323,6 @@ export class CollectionData<
 	delete(): this {
 		this.collection().delete(this.key)
 		return this
-		// delete _internalStore._state
 	}
 	/**
 	 * Clean this data instance (remove all watchers & remove the state from the instance)

@@ -665,17 +665,6 @@ export class CollectionInstance<
 				return this
 			}
 			let g = this.getGroup(group as GroupName)
-			// if the group does not exist, create it. This should technically never happen because of getGroup, but leaving here for redundancy
-			// ! 08/03 - commenting out to see if we can remove this safely
-			// if (!g) {
-			// 	g = _group(
-			// 		() => this.instance(),
-			// 		() => this,
-			// 		group,
-			// 		{ sort: this._internalStore.sort }
-			// 	)
-			// 	this._internalStore._groups.set(group as GroupName, g)
-			// }
 			g.add(keys)
 		}
 		const parseAndPushGroups = () => {
@@ -1018,7 +1007,6 @@ export class CollectionInstance<
 	 */
 	get size() {
 		// should we remove provisional items from the count? If so this is a prototype of how to do it
-		// return this._internalStore._data.size - this._internalStore._provisionalCount
 		return this._internalStore._data.size
 	}
 }
