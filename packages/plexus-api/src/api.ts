@@ -1,6 +1,7 @@
 import { deepClone, deepMerge } from '@plexusjs/utils/dist/shared'
 import {
 	ApiStore,
+	ApiMethod,
 	PlexusApiConfig,
 	PlexusApiOptions,
 	PlexusApiReq,
@@ -19,7 +20,6 @@ if (typeof window === 'undefined') {
 
 // Hoist Blob to top level
 globalThis.Blob = Blob
-// import { instance } from "./ "
 
 export type PlexusApi = ApiInstance
 
@@ -35,7 +35,6 @@ const AuthTypes = ['bearer', 'basic', 'jwt'] as const
  * An API instance is used to make requests to a server. Interact with this by using `api()`
  */
 export class ApiInstance {
-	// private
 	private _internalStore: ApiStore
 	private _headers: Map<string, string> = new Map()
 	private headerGetter: () =>
@@ -43,23 +42,24 @@ export class ApiInstance {
 		| Promise<Record<string, any>> = () => ({})
 
 	private waiting = false
-	private waitingQueue: (() => void)[] = []
+	// "<method>:<path>": [() => void, ...]
+	private waitingQueues: Map<string, (() => Promise<unknown>)[]> = new Map()
 	constructor(
 		baseURL: string = '',
 		config: PlexusApiConfig = { defaultOptions: {} }
 	) {
 		this._internalStore = {
-			_options: config.defaultOptions ?? {},
-			_optionsInit: { ...config.defaultOptions },
-			_timeout: config.timeout || undefined,
-			_baseURL:
+			options: config.defaultOptions ?? {},
+			optionsInit: { ...config.defaultOptions },
+			timeout: config.timeout || undefined,
+			baseURL:
 				baseURL.endsWith('/') && baseURL.length > 1
 					? baseURL.substring(0, baseURL.length - 1)
 					: baseURL,
-			_noFetch: false,
-			_authToken: '',
-			_throws: config.throws ?? false,
-			_silentFail: config.silentFail ?? false,
+			noFetch: false,
+			authToken: '',
+			throws: config.throws ?? false,
+			silentFail: config.silentFail ?? false,
 			onResponse: config.onResponse,
 		}
 		try {
@@ -69,19 +69,25 @@ export class ApiInstance {
 			console.warn(
 				'Fetch is not supported in this environment; api will not work.'
 			)
-			this._internalStore._noFetch = true
+			this._internalStore.noFetch = true
 		}
 		config.headers && this.setHeaders(config.headers)
 	}
+	/**
+	 * Send a request to the server
+	 * @param path
+	 * @param options
+	 * @returns
+	 */
 	private async send<ResponseDataType>(
 		path: string,
 		options: {
-			method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'
+			method: ApiMethod
 			body?: RequestInit['body']
 		}
 	): Promise<PlexusApiRes<ResponseDataType>> {
 		// if we don't have fetch, return a blank response object
-		if (this._internalStore._noFetch)
+		if (this._internalStore.noFetch)
 			return ApiInstance.createEmptyRes<ResponseDataType>()
 
 		const headers = await this.headerGetter()
@@ -102,22 +108,22 @@ export class ApiInstance {
 			const uri =
 				matches && matches?.length > 0
 					? path
-					: `${this._internalStore._baseURL}${
+					: `${this._internalStore.baseURL}${
 							path.startsWith('/') || path?.length === 0 ? path : `/${path}`
 					  }`
 			const requestObject = {
-				...this._internalStore._options,
+				...this._internalStore.options,
 				headers: headers,
 				...options,
 			}
 			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
-			if (this._internalStore._timeout) {
+			if (this._internalStore.timeout) {
 				let to: any
 				const timeout = new Promise<void>((resolve, reject) => {
 					to = setTimeout(() => {
 						timedOut = true
 						resolve()
-					}, this._internalStore._timeout)
+					}, this._internalStore.timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
 					fetch(uri, requestObject)
@@ -135,7 +141,7 @@ export class ApiInstance {
 					res = raceResult
 				} else {
 					// if we're throwing, throw an error
-					if (this._internalStore._throws) throw new Error('Request timed out')
+					if (this._internalStore.throws) throw new Error('Request timed out')
 					// a 504 response status means the programmatic timeout was surpassed
 					return ApiInstance.createEmptyRes<ResponseDataType>(
 						timedOut ? 504 : res?.status ?? 513
@@ -148,7 +154,7 @@ export class ApiInstance {
 			}
 		} catch (e) {
 			// if silentFail is enabled, don't throw the error; Otherwise, throw an error
-			if (!this._internalStore._silentFail) {
+			if (!this._internalStore.silentFail) {
 				throw e
 			}
 		}
@@ -186,7 +192,7 @@ export class ApiInstance {
 				hasCookie,
 			}
 			// if(this._internalStore.onResponse) this._internalStore.onResponse(req, pResponse)
-			if (this._internalStore._throws && !ok) {
+			if (this._internalStore.throws && !ok) {
 				throw pResponse
 			}
 			return pResponse
@@ -202,20 +208,27 @@ export class ApiInstance {
 		}
 	}
 
+	/**
+	 * Do some pre-send stuff
+	 * @param path
+	 * @param options
+	 * @returns
+	 */
 	private async preSend<ResponseDataType>(
 		path: string,
 		options: {
-			method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'
+			method: ApiMethod
 			body?: RequestInit['body']
 		}
 	) {
+		// this.addToQueue(`${this.genKey('GET', path)}`, () => {})
 		const res = await this.send<ResponseDataType>(path, options)
 		const headers = await this.headerGetter()
 		this._internalStore.onResponse?.(
 			{
 				path,
-				baseURL: this._internalStore._baseURL,
-				options: this._internalStore._options,
+				baseURL: this._internalStore.baseURL,
+				options: this._internalStore.options,
 				headers: headers,
 				body: options.body,
 				method: options.method,
@@ -232,6 +245,15 @@ export class ApiInstance {
 		})
 		return headers
 	}
+	private genKey = (method: ApiMethod, path: string) => {
+		return `${method}:${path}`
+	}
+	private addToQueue(key: string, callback: () => Promise<unknown>) {
+		if (!this.waitingQueues.has(key)) {
+			this.waitingQueues.set(key, [])
+		}
+		this.waitingQueues.get(key)?.push(callback)
+	}
 	/**
 	 * Set the configuration options for fetch
 	 * @param {RequestInit} options  - Same as fetch options
@@ -242,14 +264,14 @@ export class ApiInstance {
 	options(options: RequestInit): this
 	options(options: RequestInit, overwrite: boolean = false) {
 		if (overwrite) {
-			this._internalStore._options = deepClone(options) as RequestInit & {
+			this._internalStore.options = deepClone(options) as RequestInit & {
 				headers: Record<string, string>
 			}
 			return this
 		}
 
-		this._internalStore._options = deepMerge(
-			this._internalStore._options,
+		this._internalStore.options = deepMerge(
+			this._internalStore.options,
 			options
 		) as RequestInit & { headers: Record<string, string> }
 
@@ -398,7 +420,7 @@ export class ApiInstance {
 			.replace(/^(B|b)asic /, '')
 			.replace(/^(JWT|jwt) /, '')
 
-		this._internalStore._authToken = token
+		this._internalStore.authToken = token
 		const prefix =
 			typeOrToken === 'jwt' ? 'JWT ' : typeOrToken === 'bearer' ? 'Bearer ' : ''
 		this._headers.set('Authorization', `${prefix}${token}`)
@@ -420,7 +442,7 @@ export class ApiInstance {
 			| Promise<Record<string, any>>
 	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
-		if (this._internalStore._noFetch) return this
+		if (this._internalStore.noFetch) return this
 		if (!inputFnOrObj) return this
 
 		// if the headers are a promise, wait for it to resolve
@@ -480,8 +502,8 @@ export class ApiInstance {
 	 * @returns {this} The current instance
 	 */
 	reset() {
-		this._internalStore._options =
-			deepClone(this._internalStore._optionsInit) || {}
+		this._internalStore.options =
+			deepClone(this._internalStore.optionsInit) || {}
 		return this
 	}
 	/**
@@ -491,7 +513,7 @@ export class ApiInstance {
 	get config() {
 		return Object.freeze(
 			deepClone({
-				...this._internalStore._options,
+				...this._internalStore.options,
 				headers: ApiInstance.parseHeaders(this._headers),
 			})
 		) as {

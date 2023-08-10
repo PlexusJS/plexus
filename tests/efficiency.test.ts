@@ -5,19 +5,14 @@ import { appointments, UserLite, usersLite } from './test-utils'
 import { randFirstName, randUuid } from '@ngneat/falso'
 import { instance } from '@plexusjs/core'
 
-let users: any
-let usersLarge: any
-
-beforeEach(() => {
-	users = Array.from({ length: 1000 }, () => ({
-		id: randUuid(),
-		firstName: randFirstName(),
-	}))
-	usersLarge = Array.from({ length: 10000 }, () => ({
-		id: randUuid(),
-		firstName: randFirstName(),
-	}))
-})
+const users = Array.from({ length: 1000 }, () => ({
+	id: randUuid(),
+	firstName: randFirstName(),
+}))
+const usersLarge = Array.from({ length: 10000 }, () => ({
+	id: randUuid(),
+	firstName: randFirstName(),
+}))
 
 afterEach(() => {
 	usersLite.clear()
@@ -25,7 +20,7 @@ afterEach(() => {
 
 describe('Efficiency tests for ', () => {
 	test('The speed of a plexus collection collecting more than a thousand randomly generated objects into multiple groups', () => {
-		// instance({ logLevel: 'debug' })
+		instance({ logLevel: 'debug' })
 		console.log('Starting test...')
 		console.log('items in collection:', users.length)
 		usersLite.collect(users, ['firstNames'])
@@ -33,10 +28,10 @@ describe('Efficiency tests for ', () => {
 		expect(usersLite.value.length).toBe(1000)
 		expect(usersLite.groups.firstNames.value.length).toBe(1000)
 
-		// instance({ logLevel: undefined })
+		instance({ logLevel: undefined })
 	})
 	test('Testing the same as above but with an absurd amount of data', () => {
-		// instance({ logLevel: 'debug' })
+		instance({ logLevel: 'debug' })
 		console.log('Starting test...')
 		console.log('items in collection:', usersLarge.length)
 		usersLite.collect(usersLarge, ['firstNames'])
@@ -45,6 +40,6 @@ describe('Efficiency tests for ', () => {
 		// const group2 = collectionInstance.group('name')
 		// expect(group1.value.length).toBe(1000)
 		// expect(group2.value.length).toBe(1000)
-		// instance({ logLevel: undefined })
+		instance({ logLevel: undefined })
 	})
 })

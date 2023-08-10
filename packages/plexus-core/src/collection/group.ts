@@ -119,14 +119,14 @@ export class CollectionGroup<
 
 		// loop through each key, get the data associated with it, then add a watcher to that data that runs the group's watchers
 		const keys = Array.from(this._internalStore._includedKeys)
-		keys.forEach((key) => {
+		for (const key of keys) {
 			const destroyer = this.collection()
 				.getItem(key)
 				?.watch(() => {
 					this.runWatchers()
 				}, this.id)
 			if (destroyer) this._internalStore._dataWatcherDestroyers.add(destroyer)
-		})
+		}
 
 		this.runWatchers()
 	}
