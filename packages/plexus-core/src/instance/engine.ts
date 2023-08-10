@@ -44,6 +44,19 @@ export class EventEngine {
 		this.events.get(eventId)?.push(eventWatcher)
 		return () => this.removeListener(eventId, eventWatcher)
 	}
+	onAny(listener: PlexusInternalWatcher, origin?: string) {
+		// create the variables to assign in the events list map
+		const from = origin || 'unknown'
+		const eventWatcher = { from, listener }
+
+		// ensure the global has a list, if not, create it
+		if (!this.events.has('global')) {
+			this.events.set('global', [])
+		}
+
+		this.events.get('global')?.push(eventWatcher)
+		return () => this.removeListener('global', eventWatcher)
+	}
 	removeListener(eventId: string, eventWatcher: EngineEventReceiver) {
 		// If this eventId is not tracked in the event engine
 		if (!this.events.has(eventId)) {
@@ -90,6 +103,10 @@ export class EventEngine {
 		// run the event listeners for this event id
 		this.events
 			.get(eventId)
+			?.forEach((callbackObj) => callbackObj.listener(args))
+		// run the event listeners for the global event id
+		this.events
+			.get('global')
 			?.forEach((callbackObj) => callbackObj.listener(args))
 		// })
 	}

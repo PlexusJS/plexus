@@ -139,6 +139,7 @@ export class CollectionInstance<
 		this.config = {
 			computeLocations: ['collect', 'getValue'],
 			useBatching: true,
+			primaryKey: 'id',
 			...config,
 			foreignKeys: config.foreignKeys || {},
 		}
@@ -848,7 +849,7 @@ export class CollectionInstance<
 			if (!Array.isArray(ids)) ids = [ids as string]
 		} else ids = this.keys.map((v) => v.toString())
 
-		ids.forEach((id) => {
+		for (const id in ids) {
 			const data = this._internalStore._data.get(id)
 			if (data) {
 				data.patch({
@@ -856,7 +857,7 @@ export class CollectionInstance<
 					[this._internalStore._key]: id,
 				} as Partial<PlexusWatchableValueInterpreter<DataTypeInput>>)
 			}
-		})
+		}
 		return this
 	}
 	/**

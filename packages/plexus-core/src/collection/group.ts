@@ -81,6 +81,7 @@ export class CollectionGroup<
 		this._watchableStore._publicValue = keys
 			.map((key) => this.collection().getItemValue(key))
 			.filter((v) => v !== undefined) as DataType[]
+
 		this.instance().runtime.broadcast(this.id, this.value)
 	}
 	private rebuildDataWatchers(startedFromInnerBatch?: boolean) {
@@ -88,7 +89,6 @@ export class CollectionGroup<
 			'info',
 			`Group ${this.instanceId} rebuilding data watcher connections...`
 		)
-
 		// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
 		// if (
 		// 	this.instance().runtime.isBatching &&
@@ -119,14 +119,21 @@ export class CollectionGroup<
 
 		// loop through each key, get the data associated with it, then add a watcher to that data that runs the group's watchers
 		const keys = Array.from(this._internalStore._includedKeys)
-		keys.forEach((key) => {
-			const destroyer = this.collection()
-				.getItem(key)
-				?.watch(() => {
-					this.runWatchers()
-				}, this.id)
-			if (destroyer) this._internalStore._dataWatcherDestroyers.add(destroyer)
-		})
+		// for (const key of keys) {
+		// 	const destroyer = this.collection()
+		// 		.getItem(key)
+		// 		?.watch(() => {
+		// 			this.runWatchers()
+		// 		}, this.id)
+		// 	if (destroyer) this._internalStore._dataWatcherDestroyers.add(destroyer)
+		// }
+		const pk = this.collection().config.primaryKey
+		const destroyer = this.instance().runtime.listen((id, value, from) => {
+			if (keys.includes(id) || (pk ? keys.includes(value?.[pk]) : false)) {
+				this.runWatchers()
+			}
+		}, this.id)
+		if (destroyer) this._internalStore._dataWatcherDestroyers.add(destroyer)
 
 		this.runWatchers()
 	}

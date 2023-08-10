@@ -42,13 +42,15 @@ export interface PlexusApiOptions {
 }
 
 export interface ApiStore {
-	_options: PlexusApiOptions
-	_optionsInit: PlexusApiOptions
-	_timeout: number | undefined
-	_baseURL: string
-	_noFetch: boolean
-	_authToken: string
-	_silentFail: boolean
-	_throws: boolean
+	options: PlexusApiOptions
+	optionsInit: PlexusApiOptions
+	timeout: number | undefined
+	baseURL: string
+	noFetch: boolean
+	authToken: string
+	silentFail: boolean
+	throws: boolean
 	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
 }
+
+export type ApiMethod = 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'

@@ -7,7 +7,6 @@ import {
 	deepMerge,
 	isEqual,
 } from '@plexusjs/utils'
-import { Fetcher } from '../types'
 
 export type PlexusGroupWatcher<V extends any = any> = (
 	value: V,
@@ -29,7 +28,6 @@ export type PlexusDataInstance<
 > = CollectionData<DataType>
 export type DataKey = string
 
-// TODO: Remove the State Instance from the Data Instance's internalStore in favor of watchableValue's internalStore & logic
 type DataObjectType<PK extends string = 'id'> = Record<string, any> & {
 	[Key in PK]: DataKey
 }
