@@ -209,7 +209,6 @@ export class CollectionGroup<
 	 * @type {DataType[]}
 	 */
 	get value() {
-		console.log(this._internalStore.sort)
 		return this._internalStore.sort &&
 			typeof this._internalStore.sort === 'function'
 			? super.value.sort(this._internalStore.sort)
