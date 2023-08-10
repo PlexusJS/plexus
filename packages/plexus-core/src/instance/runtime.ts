@@ -40,7 +40,8 @@ export class RuntimeInstance {
 	}
 	/**
 	 * track a change and propagate to all listening children in instance
-	 *  */
+	 *
+	 * */
 	broadcast<Value = PlexusValidStateTypes>(key: string, value: Value) {
 		this.log('debug', `Broadcasting a change to ${key}`)
 		if (this.batching) {
@@ -50,7 +51,7 @@ export class RuntimeInstance {
 		this.engine.emit(key, { key, value })
 	}
 	/**
-	 *
+	 * Subscribe to a change in the runtime
 	 * @param _key The key of the object being watched
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
@@ -77,8 +78,7 @@ export class RuntimeInstance {
 		}
 	}
 	/**
-	 *
-	 * @param _key The key of the object being watched
+	 * Listen for all events on the runtime
 	 * @param _callback The function to call when the value changes
 	 * @returns A function to remove the watcher
 	 */
