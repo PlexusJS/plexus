@@ -70,6 +70,12 @@ export interface PlexusCollectionConfig<DataType> {
 
 	foreignKeys?: ForeignKeyData<DataType>
 	computeLocations?: Array<'collect' | 'getValue'>
+	/**
+	 * forces data to only be in one group at a time
+	 * @default false
+	 * */
+	uniqueGroups?: boolean
+
 	sort?: (a: DataType, b: DataType) => number
 }
 interface PlexusCollectionStore<DataType extends Record<string, any>> {
@@ -324,6 +330,12 @@ export class CollectionInstance<
 				typeof this.config.defaultGroup === 'string'
 					? this.config.defaultGroup
 					: 'default'
+
+			if (this.config.defaultGroup) {
+				this._internalStore._internalCalledGroupCollect = true
+				// if it is not (undefined or some other string), add to group
+				this.addToGroups(addedKeys, defaultGroupName as any)
+			}
 			// if a group (or groups) is provided, add the item to the group
 			if (groups) {
 				const groupsNorm = Array.isArray(groups) ? groups : [groups]
@@ -332,11 +344,6 @@ export class CollectionInstance<
 					addedKeys,
 					groupsNorm.filter((name) => name !== defaultGroupName)
 				)
-			}
-			if (this.config.defaultGroup) {
-				this._internalStore._internalCalledGroupCollect = true
-				// if it is not (undefined or some other string), add to group
-				this.addToGroups(addedKeys, defaultGroupName as any)
 			}
 			this._internalStore._internalCalledGroupCollect = false
 		}
@@ -615,9 +622,11 @@ export class CollectionInstance<
 	 * @param {string|number} key The data key(s) to use for lookup
 	 * @returns {string[]} An array of Group names that the key is in
 	 */
-	getGroupsOf(key: DataKey) {
+	getGroupsOf(key: DataKey, options?: { excludeDefault?: boolean; exclude?: string[] }) {
 		const inGroups: KeyOfMap<Groups>[] = []
 		for (let group of this._internalStore._groups) {
+			if(options?.exclude?.includes(group[0])) continue
+			if (options?.excludeDefault && group[0] === this.config.defaultGroup) continue
 			if (group[1].has(key)) {
 				inGroups.push(group[0] as KeyOfMap<Groups>)
 			}
@@ -665,12 +674,16 @@ export class CollectionInstance<
 				return this
 			}
 			let g = this.getGroup(group as GroupName)
+			let currentGroups = this.getGroupsOf(group as GroupName)
 			g.add(keys)
 		}
 		const parseAndPushGroups = () => {
 			// normalize the keys to an array
 			const keyArray = Array.isArray(keys) ? keys : [keys]
 			if (Array.isArray(groups)) {
+				if (this.config.uniqueGroups) {
+					groups = groups.filter((g, i) => groups.indexOf(g) === i)
+				}
 				for (let group of groups) {
 					addToGroup(keyArray, group)
 				}
