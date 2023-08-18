@@ -35,7 +35,7 @@ A Collection Instance
     * [.addToGroups(key, groups)](#CollectionInstance+addToGroups) ⇒ <code>this</code>
     * [.watchGroup(name, callback)](#CollectionInstance+watchGroup) ⇒ <code>function</code>
     * [.delete(keys)](#CollectionInstance+delete) ⇒ <code>this</code>
-    * [.removeFromGroup(keys, groups)](#CollectionInstance+removeFromGroup) ⇒ <code>this</code>
+    * [.removeFromGroups(keys, groups)](#CollectionInstance+removeFromGroups) ⇒ <code>this</code>
     * [.clear(groupNames)](#CollectionInstance+clear) ⇒ <code>this</code>
     * [.compute(fn)](#CollectionInstance+compute) ⇒ <code>this</code>
     * [.reCompute(ids)](#CollectionInstance+reCompute) ⇒ <code>this</code>
@@ -282,9 +282,9 @@ This is like collect but will not add new items, and can can be used to patch ex
 | --- | --- | --- |
 | keys | <code>string</code> | <p>The data key(s) to use for lookup</p> |
 
-<a name="CollectionInstance+removeFromGroup"></a>
+<a name="CollectionInstance+removeFromGroups"></a>
 
-### .removeFromGroup(keys, groups) ⇒ <code>this</code>
+### .removeFromGroups(keys, groups) ⇒ <code>this</code>
 <p>Remove a data item from a set of groups</p>
 
 **Returns**: <code>this</code> <p>The new Collection Instance</p>  

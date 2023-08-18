@@ -48,6 +48,12 @@ export const usersLite = collection<UserLite>({
 	name: 'userslite',
 }).createSelector('batched')
 
+export const uniqueGroups = collection<UserLite>({
+	primaryKey: 'id',
+	name: 'userslite',
+	uniqueGroups: true
+}).createSelector('batched')
+
 export const appointments = collection<Appointment>({
 	primaryKey: 'id',
 	name: 'appointments',

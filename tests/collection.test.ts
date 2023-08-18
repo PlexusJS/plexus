@@ -1,6 +1,6 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 import { collection, instance, PlexusCollectionInstance } from '@plexusjs/core'
-import { appointments, users } from './test-utils'
+import { appointments, users, uniqueGroups } from './test-utils'
 
 const myCollection = collection<{
 	thing: string
@@ -358,7 +358,7 @@ describe('testing collection groups', () => {
 		)
 		expect(myCollection.value.length).toBe(3)
 
-		myCollection.removeFromGroup('1', 'group1')
+		myCollection.removeFromGroups('1', 'group1')
 
 		expect(myCollection.value.length).toBe(3)
 
@@ -460,6 +460,23 @@ describe('testing collection groups', () => {
 		expect(myCollection.getGroup('dynamic').value[1].thing).toBe('1')
 		expect(myCollection.getGroup('dynamic').value[2].thing).toBe('2')
 	})
+	test('Unique Groups when setting groups for data', () => {
+		uniqueGroups.collect(
+			[
+				{ firstName: 'Jack', id: '0' },
+				{ firstName: 'Doe', id: '1' },
+				{ firstName: 'Kane', id: '2' },
+			],
+			'dynamic'
+		)
+		// expect(uniqueGroups.getGroup('dynamic').value.length).toBe(3)
+		// should only add to one group
+		uniqueGroups.addToGroups('0', ['group1', 'group2'])
+		console.log(uniqueGroups.getGroupsOf('0'))
+		expect(uniqueGroups.getGroupsOf('0').length).toBe(1)
+		expect(uniqueGroups.getGroup('group1').value.length).toBe(0)
+		expect(uniqueGroups.getGroup('group2').value.length).toBe(1)
+	})
 })
 describe('testing collection selectors', () => {
 	test('Do Selectors Work?', () => {
@@ -480,7 +497,7 @@ describe('testing collection selectors', () => {
 			{ thing: 'lol3', id: 2 },
 			{ thing: 'lols', id: 1 },
 		])
-		instance().settings.logLevel = 'debug'
+		// instance().settings.logLevel = 'debug'
 		myCollection.getSelector('main').select('0')
 		expect(ref.numOfLoops).toBe(1)
 		// console.log(myCollection.getSelector("main").key)
@@ -551,7 +568,7 @@ describe('testing collection selectors', () => {
 		kill()
 	})
 	test('Checking selector history functionality', () => {
-		instance({ logLevel: 'debug' })
+		// instance({ logLevel: 'debug' })
 		myCollection.collect([
 			{ thing: 'lol', id: 0 },
 			{ thing: 'lol3', id: 2 },
@@ -605,9 +622,9 @@ describe('testing collection selectors', () => {
 			thing: 'new',
 			id: '0',
 		})
-		instance({ logLevel: undefined })
+		// instance({ logLevel: undefined })
 
-		instance({ logLevel: 'debug' })
+		// instance({ logLevel: 'debug' })
 		myCollection.selectors.main.patch({
 			thing: 'new',
 			obj: {
@@ -626,7 +643,7 @@ describe('testing collection selectors', () => {
 		})
 		expect(myCollection.selectors.main.value.obj?.arr[0].item1).toBe('2')
 
-		instance({ logLevel: undefined })
+		// instance({ logLevel: undefined })
 	})
 	test('checking if we can initialize a selector with a default primary key', () => {
 		const myCollection = collection<{
@@ -734,7 +751,7 @@ describe('testing collection relations', () => {
 		})
 	})
 	test('do relations work with provisional data?', () => {
-		instance({ logLevel: 'debug' })
+		// instance({ logLevel: 'debug' })
 
 		const c1 = collection<{
 			id: string
@@ -777,7 +794,7 @@ describe('testing collection relations', () => {
 
 		console.log('watcher called', watcherCalled)
 		console.log('c2', c2.getItemValue('1'))
-		instance({ logLevel: undefined })
+		// instance({ logLevel: undefined })
 		expect(watcherCalled).toBe(1)
 
 		expect(c2.getItemValue('1')?.c1s).toMatchObject({

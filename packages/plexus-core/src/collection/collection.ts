@@ -622,16 +622,39 @@ export class CollectionInstance<
 	 * @param {string|number} key The data key(s) to use for lookup
 	 * @returns {string[]} An array of Group names that the key is in
 	 */
-	getGroupsOf(key: DataKey, options?: { excludeDefault?: boolean; exclude?: string[] }) {
+	getGroupsOf(
+		key: DataKey,
+		options?: { excludeDefault?: boolean; exclude?: string[] }
+	) {
 		const inGroups: KeyOfMap<Groups>[] = []
 		for (let group of this._internalStore._groups) {
-			if(options?.exclude?.includes(group[0])) continue
-			if (options?.excludeDefault && group[0] === this.config.defaultGroup) continue
+			if (options?.exclude?.includes(group[0])) continue
+			if (options?.excludeDefault && group[0] === this.config.defaultGroup) {
+				continue
+			}
 			if (group[1].has(key)) {
 				inGroups.push(group[0] as KeyOfMap<Groups>)
 			}
 		}
 		return inGroups
+	}
+	/**
+	 * [DEPRECATED] Add a data item to a group or groups
+	 * @param {string} key The key of the item to add
+	 * @param {string[]|string} groups The group(s) to add the item to
+	 * @returns {this} The new Collection Instance
+	 * @deprecated Use addToGroups instead
+	 */
+	addToGroup(keys: DataKey | DataKey[], groups: GroupName[] | GroupName): this
+	addToGroup(
+		keys: DataKey | DataKey[],
+		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
+	): this
+	addToGroup(
+		keys: DataKey | DataKey[],
+		groups: KeyOfMap<Groups>[] | KeyOfMap<Groups>
+	): this {
+		return this.addToGroups(keys, groups)
 	}
 	/**
 	 * Add a data item to a group or groups
@@ -673,8 +696,20 @@ export class CollectionInstance<
 				})
 				return this
 			}
+			if (this.config.uniqueGroups) {
+				for (const key of keys) {
+					let currentGroups = this.getGroupsOf(key, {
+						excludeDefault: true,
+					})
+					this.instance().runtime.log(
+						'debug',
+						`unique groups is enabled, removing from these groups`,
+						currentGroups
+					)
+					this.removeFromGroups(keys, currentGroups)
+				}
+			}
 			let g = this.getGroup(group as GroupName)
-			let currentGroups = this.getGroupsOf(group as GroupName)
 			g.add(keys)
 		}
 		const parseAndPushGroups = () => {
@@ -682,7 +717,7 @@ export class CollectionInstance<
 			const keyArray = Array.isArray(keys) ? keys : [keys]
 			if (Array.isArray(groups)) {
 				if (this.config.uniqueGroups) {
-					groups = groups.filter((g, i) => groups.indexOf(g) === i)
+					groups = [groups?.[groups.length - 1]]
 				}
 				for (let group of groups) {
 					addToGroup(keyArray, group)
@@ -761,7 +796,7 @@ export class CollectionInstance<
 	 * @param {string[]|string} groups Either a single group or an array of groups to remove the data from
 	 * @returns {this} The new Collection Instance
 	 */
-	removeFromGroup(
+	removeFromGroups(
 		keys: DataKey | DataKey[],
 		groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]
 	): this {
