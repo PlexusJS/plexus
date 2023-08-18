@@ -80,7 +80,7 @@ export class CollectionGroup<
 		// memoization: this updates the groups stored value! This reduces computation as the state of the group is only updated when the data changes
 		this._watchableStore._publicValue = keys
 			.map((key) => this.collection().getItemValue(key))
-			.filter((v) => v !== undefined) as DataType[]
+			.filter(Boolean) as DataType[]
 
 		this.instance().runtime.broadcast(this.id, this.value)
 	}
@@ -162,7 +162,6 @@ export class CollectionGroup<
 		for (const key of keysArray) {
 			this._internalStore._includedKeys.delete(key)
 		}
-		// this._internalStore._includedKeys.delete(key)
 		this.rebuildDataWatchers()
 		return this
 	}

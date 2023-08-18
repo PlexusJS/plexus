@@ -216,7 +216,6 @@ export class CollectionData<
 			  }
 			: undefined
 
-		// console.log('generated value:', value)
 		return value as PlexusWatchableValueInterpreter<DataType> & {
 			[key: string]: any
 		}

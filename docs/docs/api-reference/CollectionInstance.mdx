@@ -32,9 +32,11 @@ A Collection Instance
     * [.createGroups(groupNamesThe)](#CollectionInstance+createGroups) ⇒ <code>this</code>
     * [.getGroup(name)](#CollectionInstance+getGroup) ⇒ <code>this</code>
     * [.getGroupsOf(key)](#CollectionInstance+getGroupsOf) ⇒ <code>Array.&lt;string&gt;</code>
+    * ~~[.addToGroup(key, groups)](#CollectionInstance+addToGroup) ⇒ <code>this</code>~~
     * [.addToGroups(key, groups)](#CollectionInstance+addToGroups) ⇒ <code>this</code>
     * [.watchGroup(name, callback)](#CollectionInstance+watchGroup) ⇒ <code>function</code>
     * [.delete(keys)](#CollectionInstance+delete) ⇒ <code>this</code>
+    * ~~[.removeFromGroup(keys, groups)](#CollectionInstance+removeFromGroup) ⇒ <code>this</code>~~
     * [.removeFromGroups(keys, groups)](#CollectionInstance+removeFromGroups) ⇒ <code>this</code>
     * [.clear(groupNames)](#CollectionInstance+clear) ⇒ <code>this</code>
     * [.compute(fn)](#CollectionInstance+compute) ⇒ <code>this</code>
@@ -247,6 +249,20 @@ This is like collect but will not add new items, and can can be used to patch ex
 | --- | --- | --- |
 | key | <code>string</code> \| <code>number</code> | <p>The data key(s) to use for lookup</p> |
 
+<a name="CollectionInstance+addToGroup"></a>
+
+### ~~.addToGroup(key, groups) ⇒ <code>this</code>~~
+***Deprecated***
+
+<p>[DEPRECATED] Add a data item to a group or groups</p>
+
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> | <p>The key of the item to add</p> |
+| groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>The group(s) to add the item to</p> |
+
 <a name="CollectionInstance+addToGroups"></a>
 
 ### .addToGroups(key, groups) ⇒ <code>this</code>
@@ -281,6 +297,20 @@ This is like collect but will not add new items, and can can be used to patch ex
 | Param | Type | Description |
 | --- | --- | --- |
 | keys | <code>string</code> | <p>The data key(s) to use for lookup</p> |
+
+<a name="CollectionInstance+removeFromGroup"></a>
+
+### ~~.removeFromGroup(keys, groups) ⇒ <code>this</code>~~
+***Deprecated***
+
+<p>[DEPRECATED] Remove a data item from a set of groups</p>
+
+**Returns**: <code>this</code> <p>The new Collection Instance</p>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| keys | <code>string</code> \| <code>Array.&lt;string&gt;</code> | <p>The data key(s) to use for lookup</p> |
+| groups | <code>Array.&lt;string&gt;</code> \| <code>string</code> | <p>Either a single group or an array of groups to remove the data from</p> |
 
 <a name="CollectionInstance+removeFromGroups"></a>
 

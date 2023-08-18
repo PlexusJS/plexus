@@ -331,11 +331,6 @@ export class CollectionInstance<
 					? this.config.defaultGroup
 					: 'default'
 
-			if (this.config.defaultGroup) {
-				this._internalStore._internalCalledGroupCollect = true
-				// if it is not (undefined or some other string), add to group
-				this.addToGroups(addedKeys, defaultGroupName as any)
-			}
 			// if a group (or groups) is provided, add the item to the group
 			if (groups) {
 				const groupsNorm = Array.isArray(groups) ? groups : [groups]
@@ -344,6 +339,11 @@ export class CollectionInstance<
 					addedKeys,
 					groupsNorm.filter((name) => name !== defaultGroupName)
 				)
+			}
+			if (this.config.defaultGroup) {
+				this._internalStore._internalCalledGroupCollect = true
+				// if it is not (undefined or some other string), add to group
+				this.addToGroups(addedKeys, defaultGroupName as any)
 			}
 			this._internalStore._internalCalledGroupCollect = false
 		}
@@ -775,10 +775,7 @@ export class CollectionInstance<
 			// key = this.config.keyTransform(key)
 			key = `${key}`
 			this._internalStore._data.get(key)?.clean()
-
-			for (let groupName of this.getGroupsOf(key)) {
-				this._internalStore._groups.get(groupName)?.remove(key)
-			}
+			this.removeFromGroups(key, this.getGroupsOf(key))
 			this._internalStore._data.delete(key)
 		}
 		// if an array, iterate through the keys and remove them each
@@ -789,6 +786,19 @@ export class CollectionInstance<
 		}
 		this.mount()
 		return this
+	}
+	/**
+	 * [DEPRECATED] Remove a data item from a set of groups
+	 * @param {string | string[]} keys The data key(s) to use for lookup
+	 * @param {string[]|string} groups Either a single group or an array of groups to remove the data from
+	 * @returns {this} The new Collection Instance
+	 * @deprecated Use removeFromGroups instead
+	 */
+	removeFromGroup(
+		keys: DataKey | DataKey[],
+		groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]
+	): this {
+		return this.removeFromGroups(keys, groups)
 	}
 	/**
 	 * Remove a data item from a set of groups
@@ -813,8 +823,6 @@ export class CollectionInstance<
 				if (this.isCreatedGroup(groups)) {
 					this._internalStore._groups.get(groups)?.remove(key)
 				}
-				// for (let groupName of this.getGroupsOf(key)) {
-				// }
 			}
 		}
 

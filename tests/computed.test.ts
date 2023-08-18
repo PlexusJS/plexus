@@ -20,13 +20,13 @@ const collections = {
 		name: string
 		pages: number
 		sku: string
-	}>({ primaryKey: 'sku' })
+	}>({ primaryKey: 'sku', defaultGroup: 'all' })
 		.createSelector('READING')
 		.createGroup('READING'),
 }
 const core = {
 	state: states,
-	collections: collections,
+	collections,
 	computedState: computed(() => {
 		// console.log(`Looking at ${stringState.value}`)
 		states.numberState.set(states.stringState.value.length)
@@ -40,7 +40,19 @@ const core = {
 
 	numOfReading: computed(() => {
 		return collections.books.groupsValue.READING.length
-	}, [collections.books.groups.READING]),
+	}, [
+		collections.books.getSelector('READING'),
+		collections.books.getGroup('READING'),
+	]),
+
+	numOfAll: computed(() => {
+		return collections.books.getGroup('all').value.length
+	}, [collections.books.getGroup('all')]),
+
+	numOfReadingReactiveToAll: computed(() => {
+		console.log('numOfReadingReactiveToAll compute...')
+		return collections.books.getGroup('READING').value.length
+	}, [collections.books.getGroup('all')]),
 }
 
 beforeEach(() => {
@@ -114,5 +126,37 @@ describe('Testing Computed State Function', () => {
 		core.collections.books.delete('t6sawo4bjhkv47839d3')
 
 		expect(core.numOfReading.value).toBe(0)
+	})
+	test('Computed can watch a default collection group', () => {
+		instance({ logLevel: 'debug' })
+		collections.books.getGroup('READING')?.watch((v) => {
+			console.log('READING changed to: ', v)
+		})
+		core.numOfReadingReactiveToAll.watch((v) => {
+			console.log('numOfReadingReactiveToAll.value changed to: ', v)
+		})
+		core.collections.books.collect(
+			{
+				name: 'James Bond',
+				pages: 12,
+				sku: 't6sawo4bjhkv47839d3',
+			},
+			['READING']
+		)
+
+		expect(core.numOfReadingReactiveToAll.value).toBe(1)
+
+		core.collections.books.delete('t6sawo4bjhkv47839d3')
+		console.log(
+			'numOfReadingReactiveToAll.value',
+			core.numOfReadingReactiveToAll.value,
+			core.collections.books.size,
+			core.collections.books.getGroup('READING')?.size,
+			core.collections.books.getGroup('all')?.size
+		)
+
+		expect(core.numOfReadingReactiveToAll.value).toBe(0)
+
+		instance({ logLevel: undefined })
 	})
 })
