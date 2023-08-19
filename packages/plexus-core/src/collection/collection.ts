@@ -673,7 +673,7 @@ export class CollectionInstance<
 	): this {
 		const addToGroup = (
 			keys: DataKey[],
-			group: GroupName,
+			groupName: GroupName,
 			startedFromInnerBatch?: boolean
 		) => {
 			// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
@@ -692,13 +692,13 @@ export class CollectionInstance<
 						'debug',
 						`Collection Batching completed for addToGroups`
 					)
-					return addToGroup(keys, group, true)
+					return addToGroup(keys, groupName, true)
 				})
 				return this
 			}
-			if (this.config.uniqueGroups) {
+			if (this.config.uniqueGroups && groupName !== this.config.defaultGroup) {
 				for (const key of keys) {
-					let currentGroups = this.getGroupsOf(key, {
+					const currentGroups = this.getGroupsOf(key, {
 						excludeDefault: true,
 					})
 					this.instance().runtime.log(
@@ -709,7 +709,7 @@ export class CollectionInstance<
 					this.removeFromGroups(keys, currentGroups)
 				}
 			}
-			let g = this.getGroup(group as GroupName)
+			const g = this.getGroup(groupName as GroupName)
 			g.add(keys)
 		}
 		const parseAndPushGroups = () => {
@@ -719,7 +719,7 @@ export class CollectionInstance<
 				if (this.config.uniqueGroups) {
 					groups = [groups?.[groups.length - 1]]
 				}
-				for (let group of groups) {
+				for (const group of groups) {
 					addToGroup(keyArray, group)
 				}
 			} else {

@@ -26,6 +26,10 @@ export type UserLite = {
 	id: string
 	firstName: string
 }
+export type UserLiteExplicitIdName = {
+	userId: string
+	firstName: string
+}
 export type Appointment = {
 	id: string
 	name: string
@@ -48,9 +52,10 @@ export const usersLite = collection<UserLite>({
 	name: 'userslite',
 }).createSelector('batched')
 
-export const uniqueGroups = collection<UserLite>({
-	primaryKey: 'id',
+export const uniqueGroups = collection<UserLiteExplicitIdName>({
+	primaryKey: 'userId',
 	name: 'userslite',
+	defaultGroup: 'upcoming',
 	uniqueGroups: true
 }).createSelector('batched')
 

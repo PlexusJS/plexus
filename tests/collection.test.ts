@@ -463,9 +463,9 @@ describe('testing collection groups', () => {
 	test('Unique Groups when setting groups for data', () => {
 		uniqueGroups.collect(
 			[
-				{ firstName: 'Jack', id: '0' },
-				{ firstName: 'Doe', id: '1' },
-				{ firstName: 'Kane', id: '2' },
+				{ firstName: 'Jack', userId: '0' },
+				{ firstName: 'Doe', userId: '1' },
+				{ firstName: 'Kane', userId: '2' },
 			],
 			'dynamic'
 		)
@@ -473,9 +473,16 @@ describe('testing collection groups', () => {
 		// should only add to one group
 		uniqueGroups.addToGroups('0', ['group1', 'group2'])
 		console.log(uniqueGroups.getGroupsOf('0'))
-		expect(uniqueGroups.getGroupsOf('0').length).toBe(1)
+		expect(uniqueGroups.getGroupsOf('0').length).toBe(2)
+		expect(uniqueGroups.getGroup('dynamic').value.length).toBe(2)
 		expect(uniqueGroups.getGroup('group1').value.length).toBe(0)
 		expect(uniqueGroups.getGroup('group2').value.length).toBe(1)
+		// recollect the data
+		uniqueGroups.collect([{ firstName: 'Jack', userId: '0' }], 'dynamic')
+		expect(uniqueGroups.getGroupsOf('0').length).toBe(2)
+		expect(uniqueGroups.getGroup('dynamic').value.length).toBe(3)
+		expect(uniqueGroups.getGroup('group1').value.length).toBe(0)
+		expect(uniqueGroups.getGroup('group2').value.length).toBe(0)
 	})
 })
 describe('testing collection selectors', () => {
