@@ -46,6 +46,7 @@ export class CollectionData<
 	private _internalStore: PlexusDataStore
 	private foreignKeyData: Record<string | number | symbol, any> = {}
 	private watchingForeignData: Map<string, () => void>
+	private decayTimeout?: ReturnType<typeof setTimeout>
 
 	constructor(
 		instance: () => PlexusInstance,
@@ -337,12 +338,15 @@ export class CollectionData<
 		this.instance()._collectionData.delete(this)
 		return this
 	}
-	decay(time: number) {
+	decay(time: number | false) {
 		this.instance().runtime.log(
 			'debug',
 			`Data ${this.instanceId} decaying in ${time}ms...`
 		)
-		setTimeout(() => {
+		if (this.decayTimeout) clearTimeout(this.decayTimeout)
+		if (!time) return this
+
+		this.decayTimeout = setTimeout(() => {
 			this.delete()
 		}, time)
 		return this
