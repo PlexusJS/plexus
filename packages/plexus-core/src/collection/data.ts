@@ -338,6 +338,11 @@ export class CollectionData<
 		this.instance()._collectionData.delete(this)
 		return this
 	}
+	/**
+	 * Decay this data instance after a certain amount of time
+	 * @param {boolean|string}time The time to decay in ms
+	 * @returns {this} The data instance
+	 */
 	decay(time: number | false) {
 		this.instance().runtime.log(
 			'debug',
