@@ -14,13 +14,14 @@ export type PlexusGroupWatcher<V extends any = any> = (
 ) => void
 
 interface CollectionDataConfig {
-	prov: boolean
+	prov?: boolean
 	unfoundKeyIsUndefined?: boolean
+	decay?: number
 }
 interface PlexusDataStore {
 	primaryKey: string
 	_wDestroyers: Set<() => void>
-	_config: CollectionDataConfig
+	config: CollectionDataConfig
 }
 
 export type PlexusDataInstance<
@@ -45,6 +46,7 @@ export class CollectionData<
 	private _internalStore: PlexusDataStore
 	private foreignKeyData: Record<string | number | symbol, any> = {}
 	private watchingForeignData: Map<string, () => void>
+	private decayTimeout?: ReturnType<typeof setTimeout>
 
 	constructor(
 		instance: () => PlexusInstance,
@@ -55,7 +57,7 @@ export class CollectionData<
 		config: CollectionDataConfig = { prov: false }
 	) {
 		super(instance, value)
-		this.provisional = config.prov
+		this.provisional = config.prov ?? false
 		this.primaryKey = primaryKey
 		this.key = keyValue + ''
 		this.watchingForeignData = new Map()
@@ -63,11 +65,14 @@ export class CollectionData<
 		this._internalStore = {
 			primaryKey,
 			_wDestroyers: new Set<() => void>(),
-			_config: config,
+			config: config,
 		}
 		if (!this.provisional) {
 			this.mount()
 			this.syncForeignKeyData(true)
+		}
+		if (config.decay) {
+			this.decay(config.decay)
 		}
 	}
 	/**
@@ -331,6 +336,24 @@ export class CollectionData<
 		this._internalStore._wDestroyers.forEach((destroyer) => destroyer())
 		this._internalStore._wDestroyers.clear()
 		this.instance()._collectionData.delete(this)
+		return this
+	}
+	/**
+	 * Decay this data instance after a certain amount of time
+	 * @param {boolean|string}time The time to decay in ms
+	 * @returns {this} The data instance
+	 */
+	decay(time: number | false) {
+		this.instance().runtime.log(
+			'debug',
+			`Data ${this.instanceId} decaying in ${time}ms...`
+		)
+		if (this.decayTimeout) clearTimeout(this.decayTimeout)
+		if (!time) return this
+
+		this.decayTimeout = setTimeout(() => {
+			this.delete()
+		}, time)
 		return this
 	}
 	/**

@@ -75,6 +75,10 @@ export interface PlexusCollectionConfig<DataType> {
 	 * @default false
 	 * */
 	uniqueGroups?: boolean
+	/**
+	 * How long should a data item be allowed to be stale. will automatically clear and remove the data item this many milliseconds after it was last updated
+	 */
+	decay?: number
 
 	sort?: (a: DataType, b: DataType) => number
 }
@@ -283,7 +287,11 @@ export class CollectionInstance<
 							() => this,
 							this._internalStore._key,
 							dataKey,
-							{ ...item, [this._internalStore._key]: dataKey }
+							{
+								...item,
+								[this._internalStore._key]: dataKey,
+							},
+							{ decay: this.config.decay }
 						)
 						// if we get a valid data instance, add it to the collection
 						if (dataInstance) {
@@ -426,6 +434,7 @@ export class CollectionInstance<
 				{
 					prov: true,
 					unfoundKeyIsUndefined: !this.config.unfoundKeyReturnsProvisional,
+					decay: this.config.decay,
 				}
 			)
 			// if we get an invalid data instance, return undefined

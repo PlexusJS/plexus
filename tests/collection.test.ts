@@ -1,6 +1,13 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 import { collection, instance, PlexusCollectionInstance } from '@plexusjs/core'
-import { appointments, users, uniqueGroups } from './test-utils'
+import {
+	appointments,
+	users,
+	uniqueGroups,
+	decayingUsers,
+	DEFAULT_DECAY_RATE,
+} from './test-utils'
+import { s } from 'vitest/dist/types-63abf2e0'
 
 const myCollection = collection<{
 	thing: string
@@ -205,6 +212,22 @@ describe('Testing Collection', () => {
 		myCollection.collect({ thing: 'lol', id: 0 })
 		expect(myCollection.size).toBe(2)
 	})
+	test(
+		'Does decaying data work?',
+		(ctx) =>
+			new Promise((resolve) => {
+				decayingUsers.collect({ firstName: 'Bill', userId: '0' })
+				expect(decayingUsers.value.length).toBe(1)
+				expect(decayingUsers.value[0].firstName).toBe('Bill')
+				expect(decayingUsers.value[0].userId).toBe('0')
+				setTimeout(() => {
+					expect(decayingUsers.value.length).toBe(0)
+					console.log('done! Thing is decayed!')
+					resolve(true)
+				}, DEFAULT_DECAY_RATE + 10)
+			}),
+		DEFAULT_DECAY_RATE + 100
+	)
 })
 describe('testing collection groups', () => {
 	test('Do Groups Work?', () => {
