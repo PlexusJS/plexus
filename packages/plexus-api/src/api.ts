@@ -41,7 +41,7 @@ export class ApiInstance {
 		| Record<string, any>
 		| Promise<Record<string, any>> = () => ({})
 
-	private waiting = false
+	private disabled = false
 	// "<method>:<path>": [() => void, ...]
 	private waitingQueues: Map<string, (() => Promise<unknown>)[]> = new Map()
 	constructor(
@@ -219,6 +219,7 @@ export class ApiInstance {
 			body?: RequestInit['body']
 		}
 	) {
+		if (this.disabled) return ApiInstance.createEmptyRes<ResponseDataType>(0)
 		// this.addToQueue(`${this.genKey('GET', path)}`, () => {})
 		const res = await this.send<ResponseDataType>(path, options)
 		const headers = await this.headerGetter()
@@ -458,7 +459,7 @@ export class ApiInstance {
 						.replace(' ', '-')
 				] = value
 			})
-			this.waiting = false
+			this.disabled = false
 			Object.entries(headers || {}).map(([key, value]) => {
 				// uppercase the dash separated tokens
 				formattedHeaders[
@@ -517,6 +518,9 @@ export class ApiInstance {
 		) as {
 			headers: Record<string, string>
 		} & RequestInit
+	}
+	enabled(status: boolean = true) {
+		this.disabled = !status
 	}
 	private static createEmptyRes<ResponseDataType = any>(status: number = 408) {
 		return {
