@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { collection } from '@plexusjs/core'
+import { state } from '@plexusjs/core'
 
 const AllTheProviders = ({ children }) => {
 	return <>{children} </>
@@ -36,6 +37,33 @@ export type Appointment = {
 	date: number
 	userId: string
 }
+export type ObjectStateExample = Partial<{
+	a: { a?: boolean; b?: boolean }
+	b: boolean
+	c: { b?: boolean }
+}>
+
+// STATE 🧷
+export const initialStateValues = {
+	boolean: true,
+	string: 'Hello Plexus!',
+	object: { a: { a: true, b: true }, b: true },
+	array: [
+		{ item: 'Hello', item2: { subitem: 'World' } },
+		{ item: 'Goodbye', item2: { subitem: 'People' } },
+	],
+	null: null,
+}
+export const booleanState = state(true)
+export const stringState = state('Hello Plexus!')
+export const objectState = state<ObjectStateExample>(initialStateValues.object)
+export const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(
+	initialStateValues.array
+)
+
+export const stateWithFetchFnTest = state(() => {
+	return 'some sort of data'
+})
 export const users = collection<User>({
 	primaryKey: 'id',
 	name: 'users',
@@ -79,3 +107,26 @@ export const appointments = collection<Appointment>({
 		},
 	},
 })
+
+export const myCollection = collection<{
+	thing: string
+	id: number
+	obj?: {
+		arr: {
+			item1: string
+			name?: string
+		}[]
+	}
+}>({
+	defaultGroup: true,
+	sort(a, b) {
+		return a.thing.localeCompare(b.thing)
+	},
+})
+	.createGroups(['group1', 'group2'])
+	.createSelector('main')
+export const myCollectionUndefined = collection<{ thing: string; id: number }>({
+	defaultGroup: true,
+})
+	.createGroups(['group1', 'group2'])
+	.createSelector('main')

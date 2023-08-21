@@ -6,31 +6,10 @@ import {
 	uniqueGroups,
 	decayingUsers,
 	DEFAULT_DECAY_RATE,
+	myCollection,
+	myCollectionUndefined,
 } from './test-utils'
 import { s } from 'vitest/dist/types-63abf2e0'
-
-const myCollection = collection<{
-	thing: string
-	id: number
-	obj?: {
-		arr: {
-			item1: string
-			name?: string
-		}[]
-	}
-}>({
-	defaultGroup: true,
-	sort(a, b) {
-		return a.thing.localeCompare(b.thing)
-	},
-})
-	.createGroups(['group1', 'group2'])
-	.createSelector('main')
-const myCollectionUndefined = collection<{ thing: string; id: number }>({
-	defaultGroup: true,
-})
-	.createGroups(['group1', 'group2'])
-	.createSelector('main')
 
 // instance({ logLevel: "debug" })
 beforeEach(() => {
@@ -38,47 +17,6 @@ beforeEach(() => {
 	myCollectionUndefined.clear()
 })
 describe('Testing Collection', () => {
-	test('Can create collection', () => {
-		expect(myCollection.value.length).toBe(0)
-		// can properly collect data
-		myCollection.collect({ thing: 'lol', id: 0 })
-		expect(myCollection.value.length).toBe(1)
-		// myCollection.getSelector("")
-		// myCollection.getGroup("group1")
-		myCollection.collect([
-			{ thing: 'lol3', id: 2 },
-			{ thing: 'lols', id: 1 },
-		])
-		console.log('reeeee, myCollection.value', myCollection.value)
-		// can return the data values as an array
-		expect(myCollection.value[0].thing).toBe('lol')
-		expect(myCollection.value[1].thing).toBe('lol3')
-		expect(myCollection.value[2].thing).toBe('lols')
-
-		// can properly retrieve data values
-		expect(myCollection.getItemValue('0')?.thing).toBe('lol')
-		expect(myCollection.getItemValue('2')?.thing).toBe('lol3')
-		expect(myCollection.getItemValue('1')?.thing).toBe('lols')
-
-		// does the unfoundKeyReturnsUndefined configuration work
-		expect(myCollectionUndefined.getItemValue('1')).toBeUndefined()
-		console.log('an undefined object', myCollectionUndefined.getItemValue('1'))
-	})
-
-	test('ingest multiple values in collect', () => {
-		expect(myCollectionUndefined.getItemValue('1')).toBeUndefined()
-		myCollectionUndefined.collect([
-			{ thing: 'lol3', id: 2 },
-			{ thing: 'lols', id: 1 },
-		])
-		expect(myCollectionUndefined.value.length).toBe(2)
-		expect(myCollectionUndefined.value.length).toBe(2)
-	})
-	test('Does it pass the vibe check ?', () => {
-		myCollection.collect({ thing: 'xqcL', id: 0 })
-		expect(myCollection.getItem('0').value?.thing).toBe('xqcL')
-	})
-
 	test('Watching Data', () => {
 		myCollection.collect([
 			{ thing: 'lol', id: 0 },
