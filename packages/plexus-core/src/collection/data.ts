@@ -305,7 +305,10 @@ export class CollectionData<
 			)
 		}
 		this.collection().lastUpdatedKey = this.key
-
+		const decayRate = this.collection().config.decay
+		if (decayRate) {
+			this.decay(decayRate)
+		}
 		return this
 	}
 	/**

@@ -16,6 +16,7 @@ A piece of data belonging to a collection
     * [.patch(value)](#CollectionData+patch) ⇒ <code>this</code>
     * [.delete()](#CollectionData+delete) ⇒ <code>this</code>
     * [.clean()](#CollectionData+clean) ⇒ <code>this</code>
+    * [.decay(time)](#CollectionData+decay) ⇒ <code>this</code>
 
 <a name="CollectionData+id"></a>
 
@@ -71,3 +72,14 @@ A piece of data belonging to a collection
 <p>Clean this data instance (remove all watchers &amp; remove the state from the instance)</p>
 
 **Returns**: <code>this</code> <p>The data instance</p>  
+<a name="CollectionData+decay"></a>
+
+### .decay(time) ⇒ <code>this</code>
+<p>Decay this data instance after a certain amount of time</p>
+
+**Returns**: <code>this</code> <p>The data instance</p>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| time | <code>boolean</code> \| <code>string</code> | <p>The time to decay in ms</p> |
+
