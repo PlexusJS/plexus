@@ -56,6 +56,7 @@ export const initialStateValues = {
 }
 export const booleanState = state(true)
 export const stringState = state('Hello Plexus!')
+export const stringStateStartingWithNull = state<string>(null)
 export const objectState = state<ObjectStateExample>(initialStateValues.object)
 export const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(
 	initialStateValues.array

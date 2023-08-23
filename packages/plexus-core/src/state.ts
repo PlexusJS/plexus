@@ -17,8 +17,6 @@ export type PlexusState = <Value extends PlexusValidStateTypes = any>(
 	input: Value
 ) => StateInstance<Value>
 
-type DestroyFn = () => void
-
 export interface StateStore {
 	_name: string
 	_persist: boolean
@@ -329,9 +327,6 @@ export function _state<StateValue>(
  * @param item The default value to use when we generate the state
  * @returns A Plexus State Instance
  */
-export function state<
-	Override extends PlexusValidStateTypes = never,
-	Value = Override extends AlmostAnything ? Override : any
->(item: Value) {
-	return _state(() => instance(), item)
+export function state<Override = never, Value = Override>(init: Value | null) {
+	return _state(() => instance(), init as NonNullable<Value>)
 }

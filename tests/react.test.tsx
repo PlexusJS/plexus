@@ -5,14 +5,7 @@ import { render, act } from './test-utils'
 import { collection, computed, instance, state, event } from '@plexusjs/core'
 import React, { FC, useEffect, useState } from 'react'
 import { useDeposit, usePlexusEvent, usePlexus } from '@plexusjs/react'
-// import * as renderer from "react-test-renderer"
 
-// function toJson(component: renderer.ReactTestRenderer) {
-// 	const result = component.toJSON()
-// 	expect(result).toBeDefined()
-// 	expect(result).not.toBeInstanceOf(Array)
-// 	return result as renderer.ReactTestRendererJSON
-// }
 
 type Payload = {
 	name: string
@@ -20,7 +13,7 @@ type Payload = {
 }
 
 const myEvents = event<Payload>()
-const stringState = state<string>('yes')
+const stringState = state('yes')
 const numberState = state(1)
 const objectState = state<Partial<{ name: string }>>({ name: 'test' })
 instance({ logLevel: 'debug' })
@@ -194,7 +187,7 @@ describe('Test react integration (useDeposit)', () => {
 			const { value, save, edit } = useDeposit(
 				{ ...def },
 				{
-					onEdit(k, v) {},
+					onEdit(k, v) { },
 					onSave(payload) {
 						setVal(payload.name ?? '')
 					},
