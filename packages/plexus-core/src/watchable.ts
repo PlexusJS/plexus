@@ -32,10 +32,7 @@ type HistorySeed<ValueType = any> = {
 	archive_tail: Array<ValueType>
 }
 
-export class Watchable<
-	ValueType = any
-	// ValueType extends AlmostAnything = Input extends Fetcher<infer V> ? V : Input
-> {
+export class Watchable<ValueType = any> {
 	protected _watchableStore: WatchableStore<
 		PlexusWatchableValueInterpreter<ValueType>
 	>
@@ -102,10 +99,7 @@ export class Watchable<
 	}
 }
 
-export class WatchableMutable<
-	// Input = never,
-	ValueType = any
-> extends Watchable<ValueType> {
+export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 	private _history: HistorySeed | undefined
 	// constructor(instance: () => PlexusInstance, init: () => ValueType)
 	// constructor(instance: () => PlexusInstance, init: ValueType)

@@ -31,6 +31,7 @@ export type UnionToIntersection<U> = (
 ) extends (k: infer I) => void
 	? I
 	: never
+	
 export type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true
 
 export type PlexusWatchableValueInterpreter<Value> = Value extends (
@@ -62,14 +63,17 @@ export declare type AsyncState<T> =
 	  }
 
 export declare type FunctionReturningPromise = (...args: any[]) => Promise<any>
+
 export declare type PromiseType<P extends Promise<any>> = P extends Promise<
 	infer T
 >
 	? T
 	: never
+
 declare type StateFromFunctionReturningPromise<
 	T extends FunctionReturningPromise
 > = AsyncState<PromiseType<ReturnType<T>>>
+
 export declare type AsyncFnReturn<
 	T extends FunctionReturningPromise = FunctionReturningPromise
 > = [StateFromFunctionReturningPromise<T>, T]
