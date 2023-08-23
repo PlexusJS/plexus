@@ -11,7 +11,6 @@ import {
 } from './instance/instance'
 import { PlexusPreActionConfig, _preaction } from './preaction'
 import { _state } from './state'
-import { Fetcher, PlexusValidStateTypes } from './types'
 
 export interface PlexusScopeConfig {}
 
@@ -50,10 +49,7 @@ export class Scope {
 	 * @param item The default value to use when we generate the state
 	 * @returns A Plexus State Instance
 	 */
-	state<
-		Override extends PlexusValidStateTypes = never,
-		Value = Override extends AlmostAnything ? Override : any
-	>(item: Value) {
+	state<Override = never, Value = Override>(item: Value) {
 		return _state(this.instance, item)
 	}
 
@@ -62,12 +58,7 @@ export class Scope {
 	 * @param item The default value to use when we generate the state
 	 * @returns A Plexus State Instance
 	 */
-	computed<
-		Override extends PlexusValidStateTypes = never,
-		Value extends PlexusValidStateTypes = Override extends AlmostAnything
-			? Override
-			: any
-	>(
+	computed<Override = never, Value = Override>(
 		item: (value?: Value) => Value,
 		dependencies: Array<Watchable<any>> | Watchable<any>
 	) {

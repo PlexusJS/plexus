@@ -1,5 +1,4 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-// import { collection, PlexusCollectionInstance } from '@plexusjs/core'
 import { appointments, UserLite, usersLite } from './test-utils'
 
 import { randFirstName, randUuid } from '@ngneat/falso'

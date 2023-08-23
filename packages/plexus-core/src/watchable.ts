@@ -4,7 +4,7 @@ import {
 	isEqual,
 	PlexusWatchableValueInterpreter,
 } from '@plexusjs/utils'
-import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
+import { Fetcher, PlexusWatcher } from './types'
 
 const getFetcher = function <ValueType>(
 	subject: ValueType | (() => ValueType)

@@ -1,18 +1,15 @@
 import {
-	AlmostAnything,
 	PlexusWatchableValueInterpreter,
 	deepClone,
 	deepMerge,
-	isEqual,
 	isObject,
 } from '@plexusjs/utils'
 import { PlexusInstance, instance } from './instance/instance'
-import { Fetcher, PlexusInternalWatcher, PlexusValidStateTypes } from './types'
+import { PlexusInternalWatcher } from './types'
 
 import { WatchableMutable } from './watchable'
-// import { PlexusInstance, PlexStateInternalStore, PlexusStateType, PlexusStateInstance, PlexusWatcher } from "./interfaces"
 
-export type PlexusState = <Value extends PlexusValidStateTypes = any>(
+export type PlexusState = <Value = any>(
 	instance: () => PlexusInstance,
 	input: Value
 ) => StateInstance<Value>
@@ -24,8 +21,7 @@ export interface StateStore {
 	_ready: boolean
 	_isSetting: boolean
 }
-export type PlexusStateInstance<Value extends PlexusValidStateTypes = any> =
-	StateInstance<Value>
+export type PlexusStateInstance<Value = any> = StateInstance<Value>
 /**
  * A trackable State
  */
@@ -307,20 +303,6 @@ export function _state<StateValue>(
 	// Returned Object //
 	return new StateInstance(instance, _init)
 }
-
-// export function state<
-// 	Literal extends PlexusStateType = any,
-// 	Value extends PlexusStateType = Literal extends AlmostAnything
-// 		? Literal
-// 		: TypeOrReturnType<Literal>
-// >(item: Fetcher<Value>): TypeOrReturnType<Value>
-
-// export function state<
-// 	Literal extends PlexusStateType = any,
-// 	Value extends PlexusStateType = Literal extends AlmostAnything
-// 		? Literal
-// 		: TypeOrReturnType<Literal>
-// >(item: Value): StateInstance<Value>
 
 /**
  * Generate a Plexus State
