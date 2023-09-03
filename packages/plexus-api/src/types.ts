@@ -41,6 +41,12 @@ export interface PlexusApiOptions {
 	window?: RequestInit['window']
 }
 
+export interface PlexusApiSendOptions extends PlexusApiOptions {
+	method: ApiMethod
+	body?: RequestInit['body']
+	headers?: RequestInit['headers']
+}
+
 export interface ApiStore {
 	options: PlexusApiOptions
 	optionsInit: PlexusApiOptions

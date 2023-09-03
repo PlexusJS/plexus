@@ -6,7 +6,6 @@ import { collection, computed, instance, state, event } from '@plexusjs/core'
 import React, { FC, useEffect, useState } from 'react'
 import { useDeposit, usePlexusEvent, usePlexus } from '@plexusjs/react'
 
-
 type Payload = {
 	name: string
 	status: string
@@ -187,7 +186,7 @@ describe('Test react integration (useDeposit)', () => {
 			const { value, save, edit } = useDeposit(
 				{ ...def },
 				{
-					onEdit(k, v) { },
+					onEdit(k, v) {},
 					onSave(payload) {
 						setVal(payload.name ?? '')
 					},

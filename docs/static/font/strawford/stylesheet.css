@@ -3,7 +3,8 @@
 @font-face {
 	font-family: 'strawfordblack';
 	src: url('strawford-black-webfont.eot');
-	src: url('strawford-black-webfont.eot?#iefix') format('embedded-opentype'),
+	src:
+		url('strawford-black-webfont.eot?#iefix') format('embedded-opentype'),
 		url('strawford-black-webfont.woff2') format('woff2'),
 		url('strawford-black-webfont.woff') format('woff'),
 		url('strawford-black-webfont.ttf') format('truetype');
@@ -14,7 +15,8 @@
 @font-face {
 	font-family: 'strawfordbold';
 	src: url('strawford-bold-webfont.eot');
-	src: url('strawford-bold-webfont.eot?#iefix') format('embedded-opentype'),
+	src:
+		url('strawford-bold-webfont.eot?#iefix') format('embedded-opentype'),
 		url('strawford-bold-webfont.woff2') format('woff2'),
 		url('strawford-bold-webfont.woff') format('woff'),
 		url('strawford-bold-webfont.ttf') format('truetype');
@@ -25,8 +27,8 @@
 @font-face {
 	font-family: 'strawfordextralight';
 	src: url('strawford-extralight-webfont.eot');
-	src: url('strawford-extralight-webfont.eot?#iefix')
-			format('embedded-opentype'),
+	src:
+		url('strawford-extralight-webfont.eot?#iefix') format('embedded-opentype'),
 		url('strawford-extralight-webfont.woff2') format('woff2'),
 		url('strawford-extralight-webfont.woff') format('woff'),
 		url('strawford-extralight-webfont.ttf') format('truetype');
@@ -37,7 +39,8 @@
 @font-face {
 	font-family: 'strawfordlight';
 	src: url('strawford-light-webfont.eot');
-	src: url('strawford-light-webfont.eot?#iefix') format('embedded-opentype'),
+	src:
+		url('strawford-light-webfont.eot?#iefix') format('embedded-opentype'),
 		url('strawford-light-webfont.woff2') format('woff2'),
 		url('strawford-light-webfont.woff') format('woff'),
 		url('strawford-light-webfont.ttf') format('truetype');
@@ -48,7 +51,8 @@
 @font-face {
 	font-family: 'strawfordmedium';
 	src: url('strawford-medium-webfont.eot');
-	src: url('strawford-medium-webfont.eot?#iefix') format('embedded-opentype'),
+	src:
+		url('strawford-medium-webfont.eot?#iefix') format('embedded-opentype'),
 		url('strawford-medium-webfont.woff2') format('woff2'),
 		url('strawford-medium-webfont.woff') format('woff'),
 		url('strawford-medium-webfont.ttf') format('truetype');
@@ -59,7 +63,8 @@
 @font-face {
 	font-family: 'strawford';
 	src: url('strawford-regular-webfont.eot');
-	src: url('strawford-regular-webfont.eot?#iefix') format('embedded-opentype'),
+	src:
+		url('strawford-regular-webfont.eot?#iefix') format('embedded-opentype'),
 		url('strawford-regular-webfont.woff2') format('woff2'),
 		url('strawford-regular-webfont.woff') format('woff'),
 		url('strawford-regular-webfont.ttf') format('truetype');
@@ -70,7 +75,8 @@
 @font-face {
 	font-family: 'strawfordthin';
 	src: url('strawford-thin-webfont.eot');
-	src: url('strawford-thin-webfont.eot?#iefix') format('embedded-opentype'),
+	src:
+		url('strawford-thin-webfont.eot?#iefix') format('embedded-opentype'),
 		url('strawford-thin-webfont.woff2') format('woff2'),
 		url('strawford-thin-webfont.woff') format('woff'),
 		url('strawford-thin-webfont.ttf') format('truetype');

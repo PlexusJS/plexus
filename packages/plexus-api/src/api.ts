@@ -6,6 +6,7 @@ import {
 	PlexusApiOptions,
 	PlexusApiReq,
 	PlexusApiRes,
+	PlexusApiSendOptions,
 } from './types'
 // let's get Blob from Node.js or browser
 let Blob
@@ -78,18 +79,20 @@ export class ApiInstance {
 	 * @param path
 	 * @param options
 	 */
-	private async send<ResponseDataType>(
+	private async makeRequest<ResponseDataType>(
 		path: string,
-		options: {
-			method: ApiMethod
-			body?: RequestInit['body']
-		}
+		options: PlexusApiSendOptions
 	): Promise<PlexusApiRes<ResponseDataType>> {
 		// if we don't have fetch, return a blank response object
 		if (this._internalStore.noFetch)
 			return ApiInstance.createEmptyRes<ResponseDataType>()
 
-		const headers = await this.headerGetter()
+		const pureHeaders = await this.headerGetter()
+
+		const headers = {
+			...pureHeaders,
+			...(options.headers ?? {}),
+		}
 
 		if (!headers['Content-Type']) {
 			if (options.body !== undefined) {
@@ -112,8 +115,8 @@ export class ApiInstance {
 					  }`
 			const requestObject = {
 				...this._internalStore.options,
-				headers: headers,
 				...options,
+				headers,
 			}
 			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
 			if (this._internalStore.timeout) {
@@ -196,7 +199,7 @@ export class ApiInstance {
 			}
 			return pResponse
 		}
-		// if we got a response, but it's not in the 200 range, return it
+		// if we got a response, but it's not in the 200~600 range, return it
 		return {
 			status: res.status,
 			response: res,
@@ -212,16 +215,13 @@ export class ApiInstance {
 	 * @param path
 	 * @param options
 	 */
-	private async preSend<ResponseDataType>(
+	private async send<ResponseDataType>(
 		path: string,
-		options: {
-			method: ApiMethod
-			body?: RequestInit['body']
-		}
+		options: PlexusApiSendOptions
 	) {
 		if (this.disabled) return ApiInstance.createEmptyRes<ResponseDataType>(0)
 		// this.addToQueue(`${this.genKey('GET', path)}`, () => {})
-		const res = await this.send<ResponseDataType>(path, options)
+		const res = await this.makeRequest<ResponseDataType>(path, options)
 		const headers = await this.headerGetter()
 		this._internalStore.onResponse?.(
 			{
@@ -285,7 +285,7 @@ export class ApiInstance {
 	get<ResponseType = any>(path: string, query?: Record<string, any>) {
 		const params = new URLSearchParams(query)
 
-		return this.preSend<ResponseType>(
+		return this.send<ResponseType>(
 			`${path}${params.toString().length > 0 ? `?${params.toString()}` : ''}`,
 			{
 				method: 'GET',
@@ -301,7 +301,7 @@ export class ApiInstance {
 	 */
 	async post<
 		ResponseType = any,
-		BodyType extends Record<string, any> | string = {}
+		BodyType extends Record<string, any> | string = {},
 	>(path: string, body: BodyType = {} as BodyType) {
 		const bodyString = typeof body === 'string' ? body : JSON.stringify(body)
 		const options = {
@@ -314,12 +314,12 @@ export class ApiInstance {
 			headers['Content-Type'] === 'application/x-www-form-urlencoded'
 		) {
 			const params = new URLSearchParams(bodyString)
-			return this.preSend<ResponseType>(
+			return this.send<ResponseType>(
 				`${path}${params.toString().length > 0 ? `?${params.toString()}` : ''}`,
 				options
 			)
 		} else {
-			return this.preSend<ResponseType>(path, options)
+			return this.send<ResponseType>(path, options)
 		}
 	}
 	/**
@@ -335,7 +335,7 @@ export class ApiInstance {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
-		return this.preSend<ResponseType>(path, {
+		return this.send<ResponseType>(path, {
 			method: 'PUT',
 			body,
 		})
@@ -352,7 +352,7 @@ export class ApiInstance {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
-		return this.preSend<ResponseType>(path, {
+		return this.send<ResponseType>(path, {
 			method: 'DELETE',
 			body,
 		})
@@ -370,7 +370,7 @@ export class ApiInstance {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
-		return this.preSend<ResponseType>(path, {
+		return this.send<ResponseType>(path, {
 			method: 'PATCH',
 			body,
 		})
@@ -384,7 +384,7 @@ export class ApiInstance {
 	gql<ResponseType = any>(query: string, variables?: Record<string, any>) {
 		this._headers.set('Content-Type', 'application/json')
 
-		return this.preSend<ResponseType>('', {
+		return this.send<ResponseType>('', {
 			method: 'POST',
 			body: JSON.stringify({
 				query,
@@ -438,7 +438,7 @@ export class ApiInstance {
 	setHeaders<
 		HeaderFunction extends () =>
 			| Record<string, any>
-			| Promise<Record<string, any>>
+			| Promise<Record<string, any>>,
 	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore.noFetch) return this

@@ -26,7 +26,10 @@ export class Scope {
 	// private _internalStore: PlexusScopeStore
 	public instance: () => PlexusInstance
 
-	constructor(public name: string, config?: PlexusScopeConfig) {
+	constructor(
+		public name: string,
+		config?: PlexusScopeConfig
+	) {
 		if (!name || name.length === 0) {
 			throw new Error('Scope name is required')
 		}

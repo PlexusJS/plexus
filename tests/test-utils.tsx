@@ -58,9 +58,9 @@ export const booleanState = state(true)
 export const stringState = state('Hello Plexus!')
 export const stringStateStartingWithNull = state<string>(null)
 export const objectState = state<ObjectStateExample>(initialStateValues.object)
-export const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(
-	initialStateValues.array
-)
+export const arrayState = state<
+	{ item?: string; item2?: { subitem?: string } }[]
+>(initialStateValues.array)
 
 export const stateWithFetchFnTest = state(() => {
 	return 'some sort of data'
@@ -85,7 +85,7 @@ export const uniqueGroups = collection<UserLiteExplicitIdName>({
 	primaryKey: 'userId',
 	name: 'userslite',
 	defaultGroup: 'upcoming',
-	uniqueGroups: true
+	uniqueGroups: true,
 }).createSelector('batched')
 
 export const DEFAULT_DECAY_RATE = 12_000
@@ -94,7 +94,7 @@ export const decayingUsers = collection<UserLiteExplicitIdName>({
 	name: 'userslite',
 	defaultGroup: 'upcoming',
 	uniqueGroups: true,
-	decay: DEFAULT_DECAY_RATE
+	decay: DEFAULT_DECAY_RATE,
 }).createSelector('batched')
 
 export const appointments = collection<Appointment>({
