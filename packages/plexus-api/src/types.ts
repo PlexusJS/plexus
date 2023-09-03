@@ -41,10 +41,13 @@ export interface PlexusApiOptions {
 	window?: RequestInit['window']
 }
 
-export interface PlexusApiSendOptions extends PlexusApiOptions {
+export interface PlexusApiFetchOptions extends PlexusApiOptions {
+	headers?: RequestInit['headers']
+}
+
+export interface PlexusApiSendOptions extends PlexusApiFetchOptions {
 	method: ApiMethod
 	body?: RequestInit['body']
-	headers?: RequestInit['headers']
 }
 
 export interface ApiStore {
