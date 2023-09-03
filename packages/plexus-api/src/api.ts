@@ -282,12 +282,17 @@ export class ApiInstance {
 	 * @param {string} path The url to send the request to
 	 * @param {Record<string, any>} query The url query to send
 	 */
-	get<ResponseType = any>(path: string, query?: Record<string, any>) {
+	get<ResponseType = any>(
+		path: string,
+		query?: Record<string, any>,
+		options?: PlexusApiOptions
+	) {
 		const params = new URLSearchParams(query)
 
 		return this.send<ResponseType>(
 			`${path}${params.toString().length > 0 ? `?${params.toString()}` : ''}`,
 			{
+				...options,
 				method: 'GET',
 			}
 		)
@@ -302,9 +307,14 @@ export class ApiInstance {
 	async post<
 		ResponseType = any,
 		BodyType extends Record<string, any> | string = {},
-	>(path: string, body: BodyType = {} as BodyType) {
+	>(
+		path: string,
+		body: BodyType = {} as BodyType,
+		reqOptions = {} as PlexusApiOptions
+	) {
 		const bodyString = typeof body === 'string' ? body : JSON.stringify(body)
 		const options = {
+			...reqOptions,
 			method: 'POST',
 			body: bodyString,
 		} as const
@@ -330,12 +340,14 @@ export class ApiInstance {
 	 */
 	put<ResponseType = any>(
 		path: string,
-		body: Record<string, any> | string = {}
+		body: Record<string, any> | string = {},
+		options?: PlexusApiOptions
 	) {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
 		return this.send<ResponseType>(path, {
+			...options,
 			method: 'PUT',
 			body,
 		})
@@ -347,12 +359,14 @@ export class ApiInstance {
 	 */
 	delete<ResponseType = any>(
 		path: string,
-		body: Record<string, any> | string = {}
+		body: Record<string, any> | string = {},
+		options?: PlexusApiOptions
 	) {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
 		return this.send<ResponseType>(path, {
+			...options,
 			method: 'DELETE',
 			body,
 		})
@@ -365,12 +379,14 @@ export class ApiInstance {
 	 */
 	patch<ResponseType = any>(
 		path: string,
-		body: Record<string, any> | string = {}
+		body: Record<string, any> | string = {},
+		options?: PlexusApiOptions
 	) {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
 		}
 		return this.send<ResponseType>(path, {
+			...options,
 			method: 'PATCH',
 			body,
 		})
@@ -381,10 +397,15 @@ export class ApiInstance {
 	 * @param {Record<string, any>} variables Variables
 	 * @returns {Promise<PlexusApiRes<unknown>>} The response from the server
 	 */
-	gql<ResponseType = any>(query: string, variables?: Record<string, any>) {
+	gql<ResponseType = any>(
+		query: string,
+		variables?: Record<string, any>,
+		options?: PlexusApiOptions
+	) {
 		this._headers.set('Content-Type', 'application/json')
 
 		return this.send<ResponseType>('', {
+			...options,
 			method: 'POST',
 			body: JSON.stringify({
 				query,
