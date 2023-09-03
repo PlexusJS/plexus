@@ -3,7 +3,6 @@ import {
 	ApiStore,
 	ApiMethod,
 	PlexusApiConfig,
-	PlexusApiOptions,
 	PlexusApiReq,
 	PlexusApiRes,
 	PlexusApiSendOptions,
@@ -285,7 +284,7 @@ export class ApiInstance {
 	get<ResponseType = any>(
 		path: string,
 		query?: Record<string, any>,
-		options?: PlexusApiOptions
+		options?: PlexusApiSendOptions
 	) {
 		const params = new URLSearchParams(query)
 
@@ -310,7 +309,7 @@ export class ApiInstance {
 	>(
 		path: string,
 		body: BodyType = {} as BodyType,
-		reqOptions = {} as PlexusApiOptions
+		reqOptions = {} as PlexusApiSendOptions
 	) {
 		const bodyString = typeof body === 'string' ? body : JSON.stringify(body)
 		const options = {
@@ -341,7 +340,7 @@ export class ApiInstance {
 	put<ResponseType = any>(
 		path: string,
 		body: Record<string, any> | string = {},
-		options?: PlexusApiOptions
+		options?: PlexusApiSendOptions
 	) {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
@@ -360,7 +359,7 @@ export class ApiInstance {
 	delete<ResponseType = any>(
 		path: string,
 		body: Record<string, any> | string = {},
-		options?: PlexusApiOptions
+		options?: PlexusApiSendOptions
 	) {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
@@ -380,7 +379,7 @@ export class ApiInstance {
 	patch<ResponseType = any>(
 		path: string,
 		body: Record<string, any> | string = {},
-		options?: PlexusApiOptions
+		options?: PlexusApiSendOptions
 	) {
 		if (typeof body !== 'string') {
 			body = JSON.stringify(body)
@@ -400,7 +399,7 @@ export class ApiInstance {
 	gql<ResponseType = any>(
 		query: string,
 		variables?: Record<string, any>,
-		options?: PlexusApiOptions
+		options?: PlexusApiSendOptions
 	) {
 		this._headers.set('Content-Type', 'application/json')
 
