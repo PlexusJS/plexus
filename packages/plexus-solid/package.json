@@ -1,6 +1,6 @@
 {
 	"name": "@plexusjs/solid",
-	"version": "1.10.1",
+	"version": "1.10.2",
 	"description": "SolidJS Plugin for PlexusJS",
 	"main": "./dist/index.js",
 	"types": "dist/index.d.ts",
@@ -27,7 +27,7 @@
 	},
 	"gitHead": "192584965efcda8142c23e6f53df2e9f97bfd0df",
 	"dependencies": {
-		"@plexusjs/utils": "1.10.1",
+		"@plexusjs/utils": "1.10.2",
 		"solid-js": "^1.4.7"
 	}
 }
