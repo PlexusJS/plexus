@@ -50,7 +50,11 @@ const core = {
 	}, [collections.books.getGroup('all')]),
 
 	numOfReadingReactiveToAll: computed(() => {
-		console.log('numOfReadingReactiveToAll compute...')
+		console.log(
+			'numOfReadingReactiveToAll compute...',
+			collections.books.getGroup('READING').value.length,
+			collections.books.getGroup('all').value.length
+		)
 		return collections.books.getGroup('READING').value.length
 	}, [collections.books.getGroup('all')]),
 }
@@ -129,9 +133,14 @@ describe('Testing Computed State Function', () => {
 	})
 	test('Computed can watch a default collection group', () => {
 		instance({ logLevel: 'debug' })
+		// start watching the reading group
 		collections.books.getGroup('READING')?.watch((v) => {
 			console.log('READING changed to: ', v)
 		})
+		collections.books.getGroup('all')?.watch((v) => {
+			console.log('ALL changed to: ', v)
+		})
+		// start watching the computed state that is watching the reading group
 		core.numOfReadingReactiveToAll.watch((v) => {
 			console.log('numOfReadingReactiveToAll.value changed to: ', v)
 		})
@@ -152,7 +161,8 @@ describe('Testing Computed State Function', () => {
 			core.numOfReadingReactiveToAll.value,
 			core.collections.books.size,
 			core.collections.books.getGroup('READING')?.size,
-			core.collections.books.getGroup('all')?.size
+			core.collections.books.getGroup('all')?.size,
+			core.collections.books.getGroup('all').value
 		)
 
 		expect(core.numOfReadingReactiveToAll.value).toBe(0)

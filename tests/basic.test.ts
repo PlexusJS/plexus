@@ -2,13 +2,19 @@ import { describe, test } from 'vitest'
 import {
 	DEFAULT_DECAY_RATE,
 	arrayState,
+	objectState,
+	stringState,
 	decayingUsers,
 	myCollection,
 	myCollectionUndefined,
-	objectState,
-	stringState,
 } from './test-utils'
 import { instance, state } from '@plexusjs/core'
+
+beforeEach(() => {
+	stringState.reset()
+	objectState.reset()
+	arrayState.reset()
+})
 
 describe('Collections Core Functionality', () => {
 	test('Can create collection', () => {
@@ -68,19 +74,20 @@ describe('State Core Functionality', () => {
 
 	test('Checking state().set()', () => {
 		// check .set(value: object)
-		objectState.set({ a: { b: false } })
+		objectState.set({ a: { a2: false } })
 		// check if the object is actually merged and children props do get overwritten
-		expect(objectState.value.a?.b).toBe(false)
+		expect(objectState.value.a?.a2).toBe(false)
 	})
 
 	test('Checking state().patch()', () => {
+		objectState.set({ a: { a1: true, a2: true }, b: true })
 		// can the object deep merge?
-		objectState.patch({ a: { b: false } })
-		expect(objectState.value.a?.a).toBe(true)
+		objectState.patch({ a: { a2: false } })
+		expect(objectState.value.a?.a1).toBe(true)
 		// check that other value is still there
 		expect(objectState.value.b).toBe(true)
 		// changed intended value
-		expect(objectState.value.a?.b).toBe(false)
+		expect(objectState.value.a?.a2).toBe(false)
 
 		// console.log(arrayState.value)
 		// check array deep merge

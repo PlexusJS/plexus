@@ -213,7 +213,7 @@ export class RuntimeInstance {
 	}
 
 	/**
-	 *	The batch function allows you to run a series of actions in a single transaction
+	 *	The batch function allows you to run a series of reactive actions in a single transaction
 	 * @param {Function} fn The function to run
 	 */
 	batch<BatchFunction extends () => any | Promise<any>>(
@@ -227,40 +227,22 @@ export class RuntimeInstance {
 			return fn()
 		}
 
-		// hold the reactivity engine and start storing changes
-		// const unhalt = this.engine.halt()
-		this.batching = true
+		this.startBatching()
 		this.instance().runtime.log('info', 'Batch function started!')
-		const releaseBatch = () => {
-			// if we aren't batching anymore, just return
-			if (this.batching === false) {
-				return
-			}
-			// stop storing changes and emit the changes
-			this.batching = false
-			// call all the pending functions and clear the array
-			this.batchedCalls.forEach((pendingFn) => pendingFn())
-			this.batchedCalls.length = 0
-
-			// release the reactivity engine
-			// unhalt()
-
-			this.instance().runtime.log('info', 'Batch function completed!')
-		}
 		// run the function. If it returns a promise, wait for it to resolve
-		const prom = fn()
-		if (prom instanceof Promise) {
+		const pendingResponse = fn()
+		if (pendingResponse instanceof Promise) {
 			return new Promise<ReturnType<BatchFunction>>(async (resolve, reject) => {
 				// wait for the promise to resolve
-				const value = await prom
+				const value = await pendingResponse
 				// release the batch
-				releaseBatch()
+				this.endBatching()
 				// resolve the promise, return the value of the promise
 				return resolve(value)
 			}) as ReturnType<BatchFunction>
 		}
-		releaseBatch()
-		return prom
+		this.endBatching()
+		return pendingResponse
 	}
 
 	/**
@@ -269,6 +251,40 @@ export class RuntimeInstance {
 	 */
 	get isBatching() {
 		return this.batching
+	}
+
+	/**
+	 *	Release the batch
+	 * @returns {void}
+	 */
+	endBatching() {
+		// if we aren't batching anymore, just return
+		if (this.batching === false) {
+			return
+		}
+		// stop storing changes and emit the changes
+		this.batching = false
+		// call all the pending functions and clear the array
+		this.batchedCalls.forEach((pendingFn) => pendingFn())
+		this.batchedCalls.length = 0
+
+		// release the reactivity engine
+		// this.engine.release()
+
+		this.instance().runtime.log('info', 'Batch function completed!')
+	}
+	/**
+	 * Begin batching any calls to the runtime
+	 * @private
+	 * @returns {Function(): void} A function to release the batch
+	 */
+	startBatching() {
+		this.batching = true
+		// hold the reactivity engine and start storing changes
+		// this.engine.halt()
+		return () => {
+			this.endBatching()
+		}
 	}
 }
 /**

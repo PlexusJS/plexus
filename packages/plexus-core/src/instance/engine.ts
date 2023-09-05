@@ -20,12 +20,18 @@ export class EventEngine {
 	halt() {
 		this.batching = true
 		return () => {
-			this.batching = false
-			this.pendingEventPayloads.forEach((args, eventId) => {
-				this.emit(eventId, args)
-			})
-			this.pendingEventPayloads.clear()
+			this.release()
 		}
+	}
+	/**
+	 * Emit all stored concatenated events and resume normal event emitting.
+	 */
+	release() {
+		this.batching = false
+		this.pendingEventPayloads.forEach((args, eventId) => {
+			this.emit(eventId, args)
+		})
+		this.pendingEventPayloads.clear()
 	}
 
 	on(eventId: string, listener: PlexusInternalWatcher, origin?: string) {

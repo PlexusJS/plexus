@@ -179,6 +179,7 @@ export class StorageInstance {
 		}
 	}
 
+	// ! This might be broken? Definitely need to rethink storage procedures
 	sync(checkValue?: any) {
 		this.instance().runtime.log('info', 'Syncing storage...')
 		this._internalStore.tracking.forEach(async (object) => {

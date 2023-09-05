@@ -305,7 +305,7 @@ export class CollectionInstance<
 			return Array.from(addedKeys.values())
 		}
 		const collectFn = (
-			data_: typeof data,
+			dataToCollect: typeof data,
 			groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>,
 			startedFromInnerBatch?: boolean
 		) => {
@@ -325,13 +325,13 @@ export class CollectionInstance<
 						'debug',
 						`Batched collect call fulfilled for collection ${this.instanceId}`
 					)
-					return collectFn(data_, groups, true)
+					return collectFn(dataToCollect, groups, true)
 				})
 				return this
 			}
 
 			const addedKeys: any[] = collectItems(
-				Array.isArray(data_) ? data_ : [data_]
+				Array.isArray(dataToCollect) ? dataToCollect : [dataToCollect]
 			)
 
 			const defaultGroupName =
@@ -355,12 +355,19 @@ export class CollectionInstance<
 			}
 			this._internalStore._internalCalledGroupCollect = false
 		}
+
 		// we only need to call back if the instance is not batching
 		if (this.config.useBatching) {
+			// this.instance().runtime.startBatching()
 			this.instance().runtime.batch(() => collectFn(data, groups))
 		} else {
 			collectFn(data, groups)
 		}
+
+		// if (this.config.useBatching) {
+		// 	this.instance().runtime.endBatching()
+		// }
+
 		this.mount()
 		return this
 	}
@@ -788,10 +795,29 @@ export class CollectionInstance<
 			this._internalStore._data.delete(key)
 		}
 		// if an array, iterate through the keys and remove them each
-		if (Array.isArray(keys)) {
-			keys.forEach(rm)
-		} else {
-			rm(keys)
+		keys = Array.isArray(keys) ? keys : [keys]
+
+		// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
+		if (
+			// this.instance().runtime.isBatching &&
+			this.config.useBatching
+		) {
+			this.instance().runtime.log(
+				'debug',
+				`Batching an delete call for collection ${this.instanceId}`
+			)
+			this.instance().runtime.startBatching()
+		}
+		// run this remove call
+		for (const key of keys) {
+			rm(key)
+		}
+		if (this.config.useBatching) {
+			this.instance().runtime.endBatching()
+			this.instance().runtime.log(
+				'debug',
+				`Batched delete call fulfilled for collection ${this.instanceId}`
+			)
 		}
 		this.mount()
 		return this
@@ -836,10 +862,9 @@ export class CollectionInstance<
 		}
 
 		// if an array, iterate through the keys and remove them from each associated group
-		if (Array.isArray(keys)) {
-			keys.forEach(rm)
-		} else {
-			rm(keys)
+		keys = Array.isArray(keys) ? keys : [keys]
+		for (let key of keys) {
+			rm(key)
 		}
 		return this
 		// ! This is commented out because the user may still want to keep the data in the collection. If they want to completely delete the data, they should use `.delete()`
@@ -856,13 +881,9 @@ export class CollectionInstance<
 	clear(groupNames?: KeyOfMap<Groups> | KeyOfMap<Groups>[]): this {
 		// this means we want to clear a group, not the whole collection
 		if (groupNames) {
-			if (Array.isArray(groupNames)) {
-				groupNames.forEach(
-					(groupName) =>
-						this.isCreatedGroup(groupName) && this.getGroup(groupName).clear()
-				)
-			} else {
-				this.isCreatedGroup(groupNames) && this.getGroup(groupNames).clear()
+			groupNames = Array.isArray(groupNames) ? groupNames : [groupNames]
+			for (const groupName of groupNames) {
+				this.isCreatedGroup(groupName) && this.getGroup(groupName).clear()
 			}
 		} else {
 			this.delete(Array.from(this._internalStore._data.keys()))

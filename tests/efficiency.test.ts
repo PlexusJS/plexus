@@ -1,6 +1,12 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 // import { collection, PlexusCollectionInstance } from '@plexusjs/core'
-import { Appointment, appointments, User, usersLite, users } from './test-utils'
+import {
+	AppointmentType,
+	appointments,
+	UserType,
+	usersLite,
+	users,
+} from './test-utils'
 
 import {
 	randFirstName,
@@ -25,7 +31,7 @@ const users1kRelated = Array.from(
 			id: randUuid(),
 			firstName: randFirstName(),
 			appointmentId: randUuid(),
-		} as User)
+		} as UserType)
 )
 
 const appointments1kRelated = users1kRelated.map(
@@ -35,7 +41,7 @@ const appointments1kRelated = users1kRelated.map(
 			userId: user.id,
 			date: randFutureDate().getTime(),
 			name: randBook().title,
-		} as Appointment)
+		} as AppointmentType)
 )
 
 // check the .cache directory for the generated data. If it doesn't exist, it will be generated. Need users1k.json, users10k.json, users10kRelated.json, appointments10kRelated.json
@@ -52,39 +58,46 @@ afterEach(() => {
 
 describe('Efficiency tests for ', () => {
 	test('The speed of a plexus collection collecting more than a thousand randomly generated objects into multiple groups', () => {
-		instance({ logLevel: 'debug' })
+		instance({ logLevel: 'warn' })
 		console.log('Starting test...')
-		console.log('items in collection:', users1k.length)
+		console.log(`${users1k.length} items being adding to collection`)
+
+		usersLite?.watchGroup('firstNames', (v) => {
+			console.log('items in Collection updated:', v.length)
+		})
 		usersLite.collect(users1k, ['firstNames'])
 		console.log('items in collection:', usersLite.value.length)
 		expect(usersLite.value.length).toBe(1000)
+		console.log(
+			'items in firstNames group:',
+			usersLite.getGroup('firstNames').value
+		)
 		expect(usersLite.groups.firstNames.value.length).toBe(1000)
-
 		instance({ logLevel: undefined })
 	})
-	test('Testing the same as above but with an absurd amount of data', () => {
-		instance({ logLevel: 'debug' })
-		console.log('Starting test...')
-		console.log('items in collection:', users10k.length)
-		usersLite.collect(users10k, ['firstNames'])
-		console.log('items in collection:', usersLite.value.length)
-		// const group1 = collectionInstance.group('appointmentId')
-		// const group2 = collectionInstance.group('name')
-		// expect(group1.value.length).toBe(1000)
-		// expect(group2.value.length).toBe(1000)
-		instance({ logLevel: undefined })
-	})
-	test('An absurd amount of related data', () => {
-		instance({ logLevel: 'debug' })
-		console.log('Starting test...')
-		console.log('items in collection:', users10k.length)
-		users.collect(users1kRelated, ['main'])
-		appointments.collect(appointments1kRelated, ['main'])
-		console.log('items in collection:', users.value.length)
-		// const group1 = collectionInstance.group('appointmentId')
-		// const group2 = collectionInstance.group('name')
-		// expect(group1.value.length).toBe(1000)
-		// expect(group2.value.length).toBe(1000)
-		instance({ logLevel: undefined })
-	})
+	// test('Testing the same as above but with an absurd amount of data', () => {
+	// 	instance({ logLevel: 'debug' })
+	// 	console.log('Starting test...')
+	// 	console.log('items in collection:', users10k.length)
+	// 	usersLite.collect(users10k, ['firstNames'])
+	// 	console.log('items in collection:', usersLite.value.length)
+	// 	// const group1 = collectionInstance.group('appointmentId')
+	// 	// const group2 = collectionInstance.group('name')
+	// 	// expect(group1.value.length).toBe(1000)
+	// 	// expect(group2.value.length).toBe(1000)
+	// 	instance({ logLevel: undefined })
+	// })
+	// test('An absurd amount of related data', () => {
+	// 	instance({ logLevel: 'debug' })
+	// 	console.log('Starting test...')
+	// 	console.log('items in collection:', users10k.length)
+	// 	users.collect(users1kRelated, ['main'])
+	// 	appointments.collect(appointments1kRelated, ['main'])
+	// 	console.log('items in collection:', users.value.length)
+	// 	// const group1 = collectionInstance.group('appointmentId')
+	// 	// const group2 = collectionInstance.group('name')
+	// 	// expect(group1.value.length).toBe(1000)
+	// 	// expect(group2.value.length).toBe(1000)
+	// 	instance({ logLevel: undefined })
+	// })
 })
