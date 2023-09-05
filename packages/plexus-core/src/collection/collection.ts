@@ -105,7 +105,7 @@ interface PlexusCollectionStore<DataType extends Record<string, any>> {
 export type PlexusCollectionInstance<
 	DataType extends Record<string, any> = Record<string, any>,
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
+	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>,
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * A Collection Instance
@@ -114,7 +114,7 @@ export type PlexusCollectionInstance<
 export class CollectionInstance<
 	DataTypeInput extends Record<string, any>,
 	Groups extends GroupMap<DataTypeInput>,
-	Selectors extends SelectorMap<DataTypeInput>
+	Selectors extends SelectorMap<DataTypeInput>,
 	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
 	private _internalStore: PlexusCollectionStore<DataTypeInput>
@@ -1099,7 +1099,7 @@ export class CollectionInstance<
 export function _collection<
 	DataType extends { [key: string]: any },
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
+	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>,
 >(
 	instance: () => PlexusInstance,
 	_config: PlexusCollectionConfig<DataType> = { primaryKey: 'id' } as const

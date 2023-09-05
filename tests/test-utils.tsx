@@ -87,7 +87,7 @@ export const uniqueGroups = collection<UserLiteExplicitIdNameType>({
 	primaryKey: 'userId',
 	name: 'userslite',
 	defaultGroup: 'upcoming',
-	uniqueGroups: true
+	uniqueGroups: true,
 }).createSelector('batched')
 
 export const DEFAULT_DECAY_RATE = 12_000
@@ -96,7 +96,7 @@ export const decayingUsers = collection<UserLiteExplicitIdNameType>({
 	name: 'userslite',
 	defaultGroup: 'upcoming',
 	uniqueGroups: true,
-	decay: DEFAULT_DECAY_RATE
+	decay: DEFAULT_DECAY_RATE,
 }).createSelector('batched')
 
 export const appointments = collection<AppointmentType>({

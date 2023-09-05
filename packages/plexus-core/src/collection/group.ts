@@ -28,7 +28,7 @@ interface CollectionGroupStore<DataType = any> {
  * A group of data
  */
 export class CollectionGroup<
-	DataType extends Record<string, any> = any
+	DataType extends Record<string, any> = any,
 > extends Watchable<DataType[]> {
 	private _internalStore: CollectionGroupStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>

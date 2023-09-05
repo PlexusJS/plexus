@@ -12,14 +12,14 @@ import { Fetcher, PlexusValidStateTypes, PlexusWatcher } from './types'
 import { Watchable } from './watchable'
 
 export type PlexusComputedStateInstance<
-	ValueType extends PlexusValidStateTypes = any
+	ValueType extends PlexusValidStateTypes = any,
 > = ComputedStateInstance<ValueType>
 
 /**
  * A computed state is a state that is derived from other states
  */
 export class ComputedStateInstance<
-	ValueType extends PlexusValidStateTypes = any
+	ValueType extends PlexusValidStateTypes = any,
 > extends Watchable<ValueType> {
 	private _internalStore: {
 		_name: string
@@ -273,7 +273,7 @@ export function computed<
 	Override extends PlexusValidStateTypes = never,
 	Value extends PlexusValidStateTypes = Override extends AlmostAnything
 		? Override
-		: any
+		: any,
 >(item: (value?: Value) => Value, dependencies: Array<Watchable> | Watchable) {
 	return _computed(
 		() => instance(),

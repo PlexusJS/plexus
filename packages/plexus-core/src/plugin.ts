@@ -23,7 +23,7 @@ type PlexusPluginConstructor<
 	T extends Record<string, Watchable | string | Watchable[]> = Record<
 		string,
 		Watchable | string | Watchable[]
-	>
+	>,
 > = (instance: () => PlexusInstance) => T | void
 
 /**

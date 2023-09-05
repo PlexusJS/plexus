@@ -30,7 +30,7 @@ export function useLoader<V extends Watchable[], Fn extends FunctionType>(
 ): PlexusLoaderReturn<PlexusValueArray<V>>
 
 export function useLoader<Fn extends FunctionType>(
-	watchables: typeof usePlexus.arguments[0],
+	watchables: (typeof usePlexus.arguments)[0],
 	action: InnerFunction<Fn>,
 	options?: PlexusLoaderOptions
 ) {

@@ -1,4 +1,4 @@
-const { composePlugins, withNx } = require('@nx/webpack');
+const { composePlugins, withNx } = require('@nx/webpack')
 const { merge } = require('webpack-merge')
 
 module.exports = composePlugins(withNx(), (config, { options, context }) => {
@@ -8,4 +8,4 @@ module.exports = composePlugins(withNx(), (config, { options, context }) => {
 			sideEffects: true,
 		},
 	})
-});
+})

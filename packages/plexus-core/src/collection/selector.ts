@@ -14,7 +14,7 @@ interface CollectionSelectorStore {
 }
 
 export type PlexusCollectionSelector<
-	ValueType extends Record<string, any> = Record<string, any>
+	ValueType extends Record<string, any> = Record<string, any>,
 > = CollectionSelector<ValueType>
 
 /**
@@ -27,7 +27,7 @@ export type PlexusCollectionSelector<
  * ```
  */
 export class CollectionSelector<
-	DataType extends Record<string, any>
+	DataType extends Record<string, any>,
 > extends WatchableMutable<DataType> {
 	private _internalStore: CollectionSelectorStore
 	private collection: () => PlexusCollectionInstance<DataType>
@@ -144,9 +144,10 @@ export class CollectionSelector<
 	set(value: PlexusWatchableValueInterpreter<DataType>): this {
 		this.instance().runtime.log(
 			'info',
-			`Selector ${this.instanceId} has a data instance ${
-				this.data?.instanceId
-			} being set to data value to ${JSON.stringify(value)} on ...`
+			`Selector ${this.instanceId} has a data instance ${this.data
+				?.instanceId} being set to data value to ${JSON.stringify(
+				value
+			)} on ...`
 		)
 		// TODO add a warning here if the key is not set
 		if (this.data) {
@@ -271,7 +272,7 @@ export class CollectionSelector<
 }
 
 export function _selector<
-	ValueType extends Record<string, any> = Record<string, any>
+	ValueType extends Record<string, any> = Record<string, any>,
 >(
 	instance: () => PlexusInstance,
 	collection: () => PlexusCollectionInstance<ValueType>,
