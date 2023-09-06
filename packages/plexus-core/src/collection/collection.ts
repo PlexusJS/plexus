@@ -105,7 +105,7 @@ interface PlexusCollectionStore<DataType extends Record<string, any>> {
 export type PlexusCollectionInstance<
 	DataType extends Record<string, any> = Record<string, any>,
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>,
+	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * A Collection Instance
@@ -114,7 +114,7 @@ export type PlexusCollectionInstance<
 export class CollectionInstance<
 	DataTypeInput extends Record<string, any>,
 	Groups extends GroupMap<DataTypeInput>,
-	Selectors extends SelectorMap<DataTypeInput>,
+	Selectors extends SelectorMap<DataTypeInput>
 	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
 	private _internalStore: PlexusCollectionStore<DataTypeInput>
@@ -305,7 +305,7 @@ export class CollectionInstance<
 			return Array.from(addedKeys.values())
 		}
 		const collectFn = (
-			data_: typeof data,
+			dataToCollect: typeof data,
 			groups?: KeyOfMap<Groups>[] | KeyOfMap<Groups>,
 			startedFromInnerBatch?: boolean
 		) => {
@@ -325,13 +325,13 @@ export class CollectionInstance<
 						'debug',
 						`Batched collect call fulfilled for collection ${this.instanceId}`
 					)
-					return collectFn(data_, groups, true)
+					return collectFn(dataToCollect, groups, true)
 				})
 				return this
 			}
 
 			const addedKeys: any[] = collectItems(
-				Array.isArray(data_) ? data_ : [data_]
+				Array.isArray(dataToCollect) ? dataToCollect : [dataToCollect]
 			)
 
 			const defaultGroupName =
@@ -788,10 +788,9 @@ export class CollectionInstance<
 			this._internalStore._data.delete(key)
 		}
 		// if an array, iterate through the keys and remove them each
-		if (Array.isArray(keys)) {
-			keys.forEach(rm)
-		} else {
-			rm(keys)
+		keys = Array.isArray(keys) ? keys : [keys]
+		for (const key of keys) {
+			rm(key)
 		}
 		this.mount()
 		return this
@@ -819,28 +818,29 @@ export class CollectionInstance<
 		keys: DataKey | DataKey[],
 		groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]
 	): this {
+		// normalize
+		keys = Array.isArray(keys) ? keys : [keys]
+		groups = Array.isArray(groups) ? groups : [groups]
+
+		// abort conditions
+		if (!keys.length || !groups.length) return this
+
 		this.mount()
 		const rm = (key) => {
 			key = `${key}`
-			if (Array.isArray(groups)) {
-				for (let groupName of groups) {
-					if (this.isCreatedGroup(groupName)) {
-						this._internalStore._groups.get(groupName)?.remove(key)
-					}
-				}
-			} else if (typeof groups === 'string') {
-				if (this.isCreatedGroup(groups)) {
-					this._internalStore._groups.get(groups)?.remove(key)
+			for (let groupName of groups) {
+				if (this.isCreatedGroup(groupName)) {
+					this._internalStore._groups.get(groupName)?.remove(key)
 				}
 			}
 		}
 
 		// if an array, iterate through the keys and remove them from each associated group
-		if (Array.isArray(keys)) {
-			keys.forEach(rm)
-		} else {
-			rm(keys)
-		}
+		this.instance().runtime.batch(() => {
+			for (let key of keys) {
+				rm(key)
+			}
+		})
 		return this
 		// ! This is commented out because the user may still want to keep the data in the collection. If they want to completely delete the data, they should use `.delete()`
 		// if it's removed from all groups, delete the data entirely
@@ -856,13 +856,9 @@ export class CollectionInstance<
 	clear(groupNames?: KeyOfMap<Groups> | KeyOfMap<Groups>[]): this {
 		// this means we want to clear a group, not the whole collection
 		if (groupNames) {
-			if (Array.isArray(groupNames)) {
-				groupNames.forEach(
-					(groupName) =>
-						this.isCreatedGroup(groupName) && this.getGroup(groupName).clear()
-				)
-			} else {
-				this.isCreatedGroup(groupNames) && this.getGroup(groupNames).clear()
+			groupNames = Array.isArray(groupNames) ? groupNames : [groupNames]
+			for (const groupName of groupNames) {
+				this.isCreatedGroup(groupName) && this.getGroup(groupName).clear()
 			}
 		} else {
 			this.delete(Array.from(this._internalStore._data.keys()))
@@ -1078,7 +1074,7 @@ export class CollectionInstance<
 export function _collection<
 	DataType extends { [key: string]: any },
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>,
+	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 >(
 	instance: () => PlexusInstance,
 	_config: PlexusCollectionConfig<DataType> = { primaryKey: 'id' } as const

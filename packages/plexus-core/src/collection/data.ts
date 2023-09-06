@@ -25,7 +25,7 @@ interface PlexusDataStore {
 }
 
 export type PlexusDataInstance<
-	DataType extends Record<string, any> = Record<string, any>,
+	DataType extends Record<string, any> = Record<string, any>
 > = CollectionData<DataType>
 export type DataKey = string
 
@@ -38,7 +38,7 @@ type DataObjectType<PK extends string = 'id'> = Record<string, any> & {
  */
 export class CollectionData<
 	DataType extends DataObjectType<PK> = any,
-	PK extends string = string,
+	PK extends string = string
 > extends WatchableMutable<DataType> {
 	private primaryKey: PK
 	readonly key: string

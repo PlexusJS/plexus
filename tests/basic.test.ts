@@ -67,6 +67,7 @@ describe('State Core Functionality', () => {
 	})
 
 	test('Checking state().set()', () => {
+		objectState.reset()
 		// check .set(value: object)
 		objectState.set({ a: { b: false } })
 		// check if the object is actually merged and children props do get overwritten
@@ -74,8 +75,11 @@ describe('State Core Functionality', () => {
 	})
 
 	test('Checking state().patch()', () => {
+		objectState.reset()
+		console.log(objectState.value)
 		// can the object deep merge?
 		objectState.patch({ a: { b: false } })
+		console.log(objectState.value)
 		expect(objectState.value.a?.a).toBe(true)
 		// check that other value is still there
 		expect(objectState.value.b).toBe(true)
