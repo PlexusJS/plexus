@@ -171,6 +171,9 @@ export class StateInstance<StateValue> extends WatchableMutable<StateValue> {
 		if (name) this._internalStore._name = `state_${name}`
 
 		if (this.instance().storage) {
+			this._internalStore._persist = true
+			this.persistSync()
+
 			// Bandaid
 			;(async () => {
 				// this should only run on initial load of the state when this function is called
