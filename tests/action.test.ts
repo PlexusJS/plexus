@@ -69,6 +69,7 @@ describe('Testing Action Function', () => {
 			)
 		})
 		const data = await myAction()
+		console.log(data)
 		expect(data).toBe(successMsg)
 	})
 
@@ -80,7 +81,7 @@ describe('Testing Action Function', () => {
 			if (counter === 2) throw new Error('test error')
 		})
 
-		await myAction()
+		myAction()
 		const data = await myAction()
 		expect(data).toBeDefined()
 	})

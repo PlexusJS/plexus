@@ -169,11 +169,10 @@ export function _action<Returns, Fn extends ActionFunction>(
 				'An error occurred during the execution of an action',
 				{ origin: 'action' }
 			)
-			return
 		}
 	}
 	// return the proxy function
-	return newAction as InnerFunction<typeof fn>
+	return newAction as InnerFunction<Fn>
 
 	// const newAction = async (...args) => {
 	// 	try {
