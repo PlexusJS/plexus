@@ -17,6 +17,8 @@ jobs:
       - name: Cache node modules
         id: cache-yarn
         uses: actions/cache@v2
+        env:
+          cache-name: cache-node-module
         with:
           path: |
             ~/.cache/yarn
