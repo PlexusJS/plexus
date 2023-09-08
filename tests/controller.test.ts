@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect,  } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 
 import {
 	batchAction,
@@ -20,14 +20,17 @@ beforeEach(() => {
 })
 
 describe('Controller Basics', () => {
-	// test('can a controller be used', () => {
-	// 	const myModule = controller({
-	// 		myState: state('hey there'),
-	// 	}).export()
+	test('can a controller be used', () => {
+		const myController = controller('myController', {
+			myState: state('hey there'),
+		})
+		const myModule = myController.module
 
-	// 	expect(myModule.myState).toBeDefined()
-	// 	expect(myModule.myState.value).toBe('hey there')
-	// })
+		expect(myModule.myState).toBeDefined()
+		expect(myModule.myState.value).toBe('hey there')
+
+		expect(myController.name).toBe('myController')
+	})
 	test('can a controller be used with .module', () => {
 		const myModule = controller({
 			myState: state('hey there'),
