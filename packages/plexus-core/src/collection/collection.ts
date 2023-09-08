@@ -310,25 +310,6 @@ export class CollectionInstance<
 			startedFromInnerBatch?: boolean
 		) => {
 			// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
-			// if (
-			// 	this.instance().runtime.isBatching &&
-			// 	this.config.useBatching &&
-			// 	!startedFromInnerBatch
-			// ) {
-			// 	this.instance().runtime.log(
-			// 		'debug',
-			// 		`Batching an collect call for collection ${this.instanceId}`
-			// 	)
-			// 	// store this in the batchedSetters for execution once batching is over
-			// 	// this.instance().runtime.batchedCalls.push(() => {
-			// 	// 	this.instance().runtime.log(
-			// 	// 		'debug',
-			// 	// 		`Batched collect call fulfilled for collection ${this.instanceId}`
-			// 	// 	)
-			// 	// 	return collectFn(dataToCollect, groups, true)
-			// 	// })
-			// 	return this
-			// }
 
 			const addedKeys: any[] = collectItems(
 				Array.isArray(dataToCollect) ? dataToCollect : [dataToCollect]

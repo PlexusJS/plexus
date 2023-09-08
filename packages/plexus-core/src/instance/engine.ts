@@ -1,5 +1,6 @@
 import { deepMerge } from '@plexusjs/utils'
 import { PlexusInternalWatcher } from '../types'
+import { PlexusInstance } from './instance'
 export interface EngineEventReceiver {
 	from: string
 	listener: PlexusInternalWatcher
@@ -12,7 +13,7 @@ export class EventEngine {
 	events: Map<string, Array<EngineEventReceiver>>
 	pendingEventPayloads: Map<string, EventPayload>
 
-	constructor() {
+	constructor(public instance: () => PlexusInstance) {
 		this.events = new Map()
 		this.pendingEventPayloads = new Map()
 	}
@@ -22,8 +23,7 @@ export class EventEngine {
 	 */
 	halt() {
 		this.halts++
-		if (!this.halted) console.log('halting engine...')
-
+		if (!this.halted) this.instance().runtime.log('debug', 'Halting engine...')
 		this.halted = true
 		return () => this.release()
 	}
@@ -36,12 +36,13 @@ export class EventEngine {
 		this.halted = false
 		if (this.pendingEventPayloads.size === 0) return
 		// if (this.batching === false) return
-		const pendingEntries = Array.from(this.pendingEventPayloads.entries())
-		console.log(
-			`releasing ${pendingEntries.length} (${this.pendingEventPayloads.size}) events`
+		this.instance().runtime.log(
+			'debug',
+			`Releasing Engine; collected (${this.pendingEventPayloads.size}) payloads`
 		)
-		for (const [eventId, args] of pendingEntries) {
-			console.log(`releasing ${eventId} stored payload`)
+		for (const [eventId, args] of Array.from(
+			this.pendingEventPayloads.entries()
+		)) {
 			this.emit(eventId, args)
 		}
 
@@ -114,13 +115,6 @@ export class EventEngine {
 			const eventPayload = pendingPayload
 				? deepMerge<EventPayload>(pendingPayload, args)
 				: args
-			// console.log(
-			// 	'Emit occured while batching enabled',
-			// 	eventId,
-			// 	pendingPayload,
-			// 	this.events.get(eventId),
-			// 	eventPayload
-			// )
 			this.pendingEventPayloads.set(eventId, eventPayload)
 			return
 		}

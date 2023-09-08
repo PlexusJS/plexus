@@ -37,7 +37,7 @@ export class RuntimeInstance {
 		protected config: Partial<RuntimeConfig> = {}
 	) {
 		this.instance = instance
-		this._engine = new EventEngine()
+		this._engine = new EventEngine(this.instance)
 		this.schedule = new Scheduler(`${config.name}_runtime`)
 	}
 	/**
@@ -227,8 +227,10 @@ export class RuntimeInstance {
 		}
 		// if we are already batching, add the function to the array and return
 		if (this.batching) {
-			// return fn()
-			console.log('Already batching something, ')
+			this.log(
+				'debug',
+				'Already batching something, adding a function to the list of batched things...'
+			)
 			// ++this.batchesInProgress
 			this.batchedCalls.push(() => fn())
 			return null
@@ -273,30 +275,30 @@ export class RuntimeInstance {
 		--this.batchesInProgress
 		// if there are still batches in progress, just return
 		if (this.batchesInProgress > 0) {
-			console.log(
+			this.log(
+				'debug',
 				`Aborting batch end because ${this.batchesInProgress} batches are still in progress`
 			)
 			return
 		}
-
-		const unhalt = this.engine.halt()
-		console.log(`batchedCalls ${this.batchesInProgress}`, this.batchedCalls)
+		this.engine.halt()
+		this.log(
+			'debug',
+			`Executing batch (${this.batchedCalls.length} calls)`,
+			this.batchedCalls
+		)
 		// call all the pending functions and clear the array
 		this.batching = false
-		const v = this.batchesInProgress
-		for (const pendingFn of this.batchedCalls) {
+		while (this.batchedCalls.length > 0) {
+			const pendingFn = this.batchedCalls.shift()
+			if (!pendingFn) continue
 			pendingFn()
-			console.log(
-				`Running pending function  with ${this.batchesInProgress} others in progress`
-			)
 		}
 
-		this.batchedCalls.length = 0
-
 		// release the reactivity engine
-		unhalt()
+		this.engine.release()
 		// if(this.batchesInProgress === 0) { unhalt() }
-		this.instance().runtime.log('info', 'Batch function completed!')
+		this.log('info', 'Batch function completed!')
 	}
 	/**
 	 * Begin batching any calls to the runtime
@@ -308,7 +310,7 @@ export class RuntimeInstance {
 		++this.batchesInProgress
 		// hold the reactivity engine and start storing changes
 		// this.engine.halt()
-		this.instance().runtime.log('info', 'Batch function started!')
+		this.log('info', 'Batch function started!')
 		return () => {
 			this.endBatching()
 		}
