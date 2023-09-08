@@ -74,10 +74,12 @@ describe('Testing Action Function', () => {
 
 	test(`Can handle async errors`, async () => {
 		const myAction = action(async ({ onCatch }) => {
-			onCatch(console.error)
-			return await new Promise((resolve, reject) =>
+			onCatch(() => {
+				console.log('error caught successfully!')
+			})
+			return await new Promise((resolve, reject) => {
 				setTimeout(() => reject(new Error('test error')), 100)
-			)
+			})
 		})
 		const data = await myAction()
 		expect(data).toBeDefined()

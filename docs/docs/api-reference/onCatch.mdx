@@ -1,0 +1,34 @@
+---
+title: onCatch
+---
+
+[![view on npm](http://img.shields.io/npm/v/@plexusjs/core.svg)](https://www.npmjs.org/package/@plexusjs/core)
+
+Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
+
+<a name='onCatch'></a>
+
+## onCatch(handler?)
+
+<p>
+	Add a new error handler for this action. This will catch any errors that occur
+	during the execution of this action and prevent a crash.
+</p>
+
+| Param    | Description                                                                        |
+| -------- | ---------------------------------------------------------------------------------- |
+| handler? | <p>A function that will be called when an error occurs; omit to fail silently.</p> |
+
+<a name='PlexusActionHelpers+onCatch'></a>
+
+## .onCatch(handler, useGlobal)
+
+<p>
+	Add a new error handler for this action. This will catch any errors that occur
+	during the execution of this action and prevent a crash.
+</p>
+
+| Param     | Default           | Description                                                                        |
+| --------- | ----------------- | ---------------------------------------------------------------------------------- |
+| handler   |                   | <p>A function that will be called when an error occurs; omit to fail silently.</p> |
+| useGlobal | <code>true</code> | <p>Should the global error handler be used? (default: true)</p>                    |

@@ -1,12 +1,17 @@
 import { PlexusInstance, instance } from './instance/instance'
-import { FunctionType, _action } from './action'
+import {
+	FunctionArgs,
+	FunctionType,
+	InnerFunctionArgs,
+	_action,
+} from './action'
 import { genUID } from '@plexusjs/utils'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusPreActionConfig {
 	lazy?: boolean
 }
-export class PreActionInstance<Fn extends FunctionType = FunctionType> {
+export class PreActionInstance<Response> {
 	private _internalStore = {
 		_ran: false,
 		_id: genUID(),
@@ -15,7 +20,7 @@ export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 	/**
 	 * The action associated with this PreAction
 	 */
-	action: ReturnType<typeof _action>
+	action: (...args: InnerFunctionArgs) => Promise<Response> | Response
 	/**
 	 *	The internal id of the PreAction
 	 */
@@ -25,10 +30,10 @@ export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 
 	constructor(
 		private instance: () => PlexusInstance,
-		fn: Fn,
+		fn: (...args: FunctionArgs) => Response | Promise<Response>,
 		config: PlexusPreActionConfig = {}
 	) {
-		this.action = _action<Fn>(instance, fn)
+		this.action = _action(instance, fn)
 		instance()._inits.set(this.id, this)
 		if (!config.lazy) {
 			this.run()
@@ -60,15 +65,14 @@ export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 		return result
 	}
 }
-export type PlexusPreAction<Fn extends FunctionType = FunctionType> =
-	PreActionInstance<Fn>
+export type PlexusPreAction<Fn = any> = PreActionInstance<Fn>
 
-export function _preaction<Fn extends FunctionType>(
+export function _preaction<Response>(
 	instance: () => PlexusInstance,
-	fn: Fn,
+	fn: (...args: FunctionArgs) => Response | Promise<Response>,
 	config?: PlexusPreActionConfig
 ) {
-	return new PreActionInstance<Fn>(instance, fn, config)
+	return new PreActionInstance<Response>(instance, fn, config)
 }
 
 /**
