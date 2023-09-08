@@ -105,7 +105,7 @@ interface PlexusCollectionStore<DataType extends Record<string, any>> {
 export type PlexusCollectionInstance<
 	DataType extends Record<string, any> = Record<string, any>,
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>,
+	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * A Collection Instance
@@ -114,7 +114,7 @@ export type PlexusCollectionInstance<
 export class CollectionInstance<
 	DataTypeInput extends Record<string, any>,
 	Groups extends GroupMap<DataTypeInput>,
-	Selectors extends SelectorMap<DataTypeInput>,
+	Selectors extends SelectorMap<DataTypeInput>
 	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
 	private _internalStore: PlexusCollectionStore<DataTypeInput>
@@ -310,25 +310,25 @@ export class CollectionInstance<
 			startedFromInnerBatch?: boolean
 		) => {
 			// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
-			if (
-				this.instance().runtime.isBatching &&
-				this.config.useBatching &&
-				!startedFromInnerBatch
-			) {
-				this.instance().runtime.log(
-					'debug',
-					`Batching an collect call for collection ${this.instanceId}`
-				)
-				// store this in the batchedSetters for execution once batching is over
-				this.instance().runtime.batchedCalls.push(() => {
-					this.instance().runtime.log(
-						'debug',
-						`Batched collect call fulfilled for collection ${this.instanceId}`
-					)
-					return collectFn(dataToCollect, groups, true)
-				})
-				return this
-			}
+			// if (
+			// 	this.instance().runtime.isBatching &&
+			// 	this.config.useBatching &&
+			// 	!startedFromInnerBatch
+			// ) {
+			// 	this.instance().runtime.log(
+			// 		'debug',
+			// 		`Batching an collect call for collection ${this.instanceId}`
+			// 	)
+			// 	// store this in the batchedSetters for execution once batching is over
+			// 	this.instance().runtime.batchedCalls.push(() => {
+			// 		this.instance().runtime.log(
+			// 			'debug',
+			// 			`Batched collect call fulfilled for collection ${this.instanceId}`
+			// 		)
+			// 		return collectFn(dataToCollect, groups, true)
+			// 	})
+			// 	return this
+			// }
 
 			const addedKeys: any[] = collectItems(
 				Array.isArray(dataToCollect) ? dataToCollect : [dataToCollect]
@@ -348,6 +348,7 @@ export class CollectionInstance<
 					groupsNorm.filter((name) => name !== defaultGroupName)
 				)
 			}
+			// if the default group name is truthy, add the item to the default group
 			if (this.config.defaultGroup) {
 				this._internalStore._internalCalledGroupCollect = true
 				// if it is not (undefined or some other string), add to group
@@ -693,25 +694,25 @@ export class CollectionInstance<
 			startedFromInnerBatch?: boolean
 		) => {
 			// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
-			if (
-				this.instance().runtime.isBatching &&
-				this.config.useBatching &&
-				!startedFromInnerBatch
-			) {
-				this.instance().runtime.log(
-					'debug',
-					`Collection Batching started for addToGroups`
-				)
-				// store this in the batchedSetters for execution once batching is over
-				this.instance().runtime.batchedCalls.push(() => {
-					this.instance().runtime.log(
-						'debug',
-						`Collection Batching completed for addToGroups`
-					)
-					return addToGroup(keys, groupName, true)
-				})
-				return this
-			}
+			// if (
+			// 	this.instance().runtime.isBatching &&
+			// 	this.config.useBatching &&
+			// 	!startedFromInnerBatch
+			// ) {
+			// 	this.instance().runtime.log(
+			// 		'debug',
+			// 		`Collection Batching started for addToGroups`
+			// 	)
+			// 	// store this in the batchedSetters for execution once batching is over
+			// 	this.instance().runtime.batchedCalls.push(() => {
+			// 		this.instance().runtime.log(
+			// 			'debug',
+			// 			`Collection Batching completed for addToGroups`
+			// 		)
+			// 		return addToGroup(keys, groupName, true)
+			// 	})
+			// 	return this
+			// }
 			if (this.config.uniqueGroups && groupName !== this.config.defaultGroup) {
 				for (const key of keys) {
 					const currentGroups = this.getGroupsOf(key, {
@@ -796,28 +797,8 @@ export class CollectionInstance<
 		}
 		// if an array, iterate through the keys and remove them each
 		keys = Array.isArray(keys) ? keys : [keys]
-
-		// if the instance is batching and this collection has batching enabled, add this action to the batchedSetters
-		if (
-			// this.instance().runtime.isBatching &&
-			this.config.useBatching
-		) {
-			this.instance().runtime.log(
-				'debug',
-				`Batching an delete call for collection ${this.instanceId}`
-			)
-			this.instance().runtime.startBatching()
-		}
-		// run this remove call
 		for (const key of keys) {
 			rm(key)
-		}
-		if (this.config.useBatching) {
-			this.instance().runtime.endBatching()
-			this.instance().runtime.log(
-				'debug',
-				`Batched delete call fulfilled for collection ${this.instanceId}`
-			)
 		}
 		this.mount()
 		return this
@@ -845,27 +826,31 @@ export class CollectionInstance<
 		keys: DataKey | DataKey[],
 		groups: KeyOfMap<Groups> | KeyOfMap<Groups>[]
 	): this {
+		// normalize
+		keys = Array.isArray(keys) ? keys : [keys]
+		groups = Array.isArray(groups) ? groups : [groups]
+
+		// abort conditions
+		if (!keys.length || !groups.length) return this
+
 		this.mount()
 		const rm = (key) => {
 			key = `${key}`
-			if (Array.isArray(groups)) {
-				for (let groupName of groups) {
-					if (this.isCreatedGroup(groupName)) {
-						this._internalStore._groups.get(groupName)?.remove(key)
-					}
-				}
-			} else if (typeof groups === 'string') {
-				if (this.isCreatedGroup(groups)) {
-					this._internalStore._groups.get(groups)?.remove(key)
+			for (let groupName of groups) {
+				if (this.isCreatedGroup(groupName)) {
+					this._internalStore._groups.get(groupName)?.remove(key)
 				}
 			}
 		}
 
 		// if an array, iterate through the keys and remove them from each associated group
-		keys = Array.isArray(keys) ? keys : [keys]
-		for (let key of keys) {
-			rm(key)
-		}
+		// this.instance().runtime.engine.halt()
+		// const release = this.instance().runtime.engine.halt()
+		this.instance().runtime.batch(() => {
+			for (let key of keys) {
+				rm(key)
+			}
+		})
 		return this
 		// ! This is commented out because the user may still want to keep the data in the collection. If they want to completely delete the data, they should use `.delete()`
 		// if it's removed from all groups, delete the data entirely
@@ -1099,7 +1084,7 @@ export class CollectionInstance<
 export function _collection<
 	DataType extends { [key: string]: any },
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>,
+	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 >(
 	instance: () => PlexusInstance,
 	_config: PlexusCollectionConfig<DataType> = { primaryKey: 'id' } as const

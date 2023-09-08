@@ -1,12 +1,17 @@
 import { PlexusInstance, instance } from './instance/instance'
-import { FunctionType, _action } from './action'
+import {
+	// FunctionArgs,
+	ActionFunction,
+	// InnerFunctionArgs,
+	_action,
+} from './action'
 import { genUID } from '@plexusjs/utils'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusPreActionConfig {
 	lazy?: boolean
 }
-export class PreActionInstance<Fn extends FunctionType = FunctionType> {
+export class PreActionInstance<Fn extends ActionFunction> {
 	private _internalStore = {
 		_ran: false,
 		_id: genUID(),
@@ -28,7 +33,7 @@ export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 		fn: Fn,
 		config: PlexusPreActionConfig = {}
 	) {
-		this.action = _action<Fn>(instance, fn)
+		this.action = _action(instance, fn)
 		instance()._inits.set(this.id, this)
 		if (!config.lazy) {
 			this.run()
@@ -60,15 +65,15 @@ export class PreActionInstance<Fn extends FunctionType = FunctionType> {
 		return result
 	}
 }
-export type PlexusPreAction<Fn extends FunctionType = FunctionType> =
+export type PlexusPreAction<Fn extends ActionFunction = any> =
 	PreActionInstance<Fn>
 
-export function _preaction<Fn extends FunctionType>(
+export function _preaction<Fn extends ActionFunction>(
 	instance: () => PlexusInstance,
 	fn: Fn,
 	config?: PlexusPreActionConfig
 ) {
-	return new PreActionInstance<Fn>(instance, fn, config)
+	return new PreActionInstance(instance, fn, config)
 }
 
 /**
@@ -76,7 +81,7 @@ export function _preaction<Fn extends FunctionType>(
  * @param fn The Plexus action function to run
  * @returns The intended return value of fn, or null if an error is caught
  */
-export function preaction<Fn extends FunctionType>(
+export function preaction<Fn extends ActionFunction>(
 	fn: Fn,
 	config?: PlexusPreActionConfig
 ) {

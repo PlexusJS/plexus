@@ -14,7 +14,7 @@ export { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 export {
 	action,
 	_action,
-	FunctionType,
+	ActionFunction as FunctionType,
 	PlexusAction,
 	PlexusActionHooks,
 	batchAction,

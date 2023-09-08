@@ -172,4 +172,8 @@ describe('Testing State Function', () => {
 		stateWithFetchFnTest.fetch()
 		expect(stateWithFetchFnTest.value).toBe('a new string!' + 'new value')
 	})
+	test('persist', () => {
+		const value = state(1).persist('test')
+		expect(value.value).toBe(1)
+	})
 })

@@ -131,6 +131,7 @@ describe('Testing Computed State Function', () => {
 
 		expect(core.numOfReading.value).toBe(0)
 	})
+	// currently, this test fails because the default group updates BEFORE the custom group updates. This means we need to update the engine to only emit the event after all the groups have been updated
 	test('Computed can watch a default collection group', () => {
 		instance({ logLevel: 'debug' })
 		// start watching the reading group
@@ -155,7 +156,17 @@ describe('Testing Computed State Function', () => {
 
 		expect(core.numOfReadingReactiveToAll.value).toBe(1)
 
+		console.log(
+			`(t6sawo4bjhkv47839d3) groups pre-delete: ${core.collections.books.getGroupsOf(
+				't6sawo4bjhkv47839d3'
+			)}`
+		)
 		core.collections.books.delete('t6sawo4bjhkv47839d3')
+		console.log(
+			`(t6sawo4bjhkv47839d3) groups post-delete: ${core.collections.books.getGroupsOf(
+				't6sawo4bjhkv47839d3'
+			)}`
+		)
 		console.log(
 			'numOfReadingReactiveToAll.value',
 			core.numOfReadingReactiveToAll.value,

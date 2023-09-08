@@ -229,6 +229,23 @@ export class RuntimeInstance {
 
 		this.startBatching()
 		this.instance().runtime.log('info', 'Batch function started!')
+		const releaseBatch = () => {
+			// if we aren't batching anymore, just return
+			if (this.batching === false) {
+				return
+			}
+			// stop storing changes and emit the changes
+			this.batching = false
+			const unhalt = this.engine.halt()
+			// call all the pending functions and clear the array
+			this.batchedCalls.forEach((pendingFn) => pendingFn())
+			this.batchedCalls.length = 0
+
+			// release the reactivity engine
+			unhalt()
+
+			this.instance().runtime.log('info', 'Batch function completed!')
+		}
 		// run the function. If it returns a promise, wait for it to resolve
 		const pendingResponse = fn()
 		if (pendingResponse instanceof Promise) {

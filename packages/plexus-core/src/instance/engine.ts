@@ -1,13 +1,15 @@
-import { deepClone, deepMerge } from '@plexusjs/utils'
+import { deepMerge } from '@plexusjs/utils'
 import { PlexusInternalWatcher } from '../types'
 export interface EngineEventReceiver {
 	from: string
 	listener: PlexusInternalWatcher
 }
+
+type EventPayload = { key: String; value: any }
 export class EventEngine {
 	private batching: boolean = false
 	events: Map<string, Array<EngineEventReceiver>>
-	pendingEventPayloads: Map<string, any>
+	pendingEventPayloads: Map<string, EventPayload>
 
 	constructor() {
 		this.events = new Map()
@@ -18,19 +20,24 @@ export class EventEngine {
 	 * Pause and store all events until the return function is called. Once called, all events will be emitted.
 	 */
 	halt() {
+		console.log('halting')
 		this.batching = true
-		return () => {
-			this.release()
-		}
+		return () => this.release()
 	}
 	/**
 	 * Emit all stored concatenated events and resume normal event emitting.
 	 */
 	release() {
 		this.batching = false
-		this.pendingEventPayloads.forEach((args, eventId) => {
-			this.emit(eventId, args)
-		})
+		if (this.pendingEventPayloads.size === 0) return
+		// if (this.batching === false) return
+		Array.from(this.pendingEventPayloads.entries()).forEach(
+			([eventId, args]) => {
+				console.log('releasing', eventId, args)
+
+				this.emit(eventId, args)
+			}
+		)
 		this.pendingEventPayloads.clear()
 	}
 
@@ -91,21 +98,26 @@ export class EventEngine {
 			this.events.delete(eventId)
 		}
 	}
-	emit(eventId: string, args: any) {
+	emit(eventId: string, args: EventPayload) {
 		// this.schedule.addTask(() => {
 		// if we're batching, store the event payload
 		if (this.batching) {
-			this.pendingEventPayloads.set(
+			const pendingPayload = this.pendingEventPayloads.get(eventId)
+
+			const eventPayload = pendingPayload
+				? deepMerge<EventPayload>(pendingPayload, args)
+				: args
+			console.log(
+				'Emit occured while batching enabled',
 				eventId,
-				deepMerge(
-					this.pendingEventPayloads.has(eventId)
-						? this.pendingEventPayloads.get(eventId)
-						: args,
-					args
-				)
+				pendingPayload,
+				this.events.get(eventId),
+				eventPayload
 			)
+			this.pendingEventPayloads.set(eventId, eventPayload)
 			return
 		}
+		console.log('Emitting', eventId, args)
 		// run the event listeners for this event id
 		this.events
 			.get(eventId)

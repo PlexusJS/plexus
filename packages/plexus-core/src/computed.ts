@@ -95,7 +95,7 @@ export class ComputedStateInstance<
 
 		this.instance().runtime.log(
 			'info',
-			`Mounting Dependencies (${this.deps
+			`Mounting computed dependencies (${this.deps
 				.map((v) => v?.id ?? 'unknown')
 				.join(', ')}) to Computed state ${this.instanceId}`
 		)

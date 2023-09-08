@@ -90,7 +90,7 @@ export const uniqueGroups = collection<UserLiteExplicitIdNameType>({
 	uniqueGroups: true,
 }).createSelector('batched')
 
-export const DEFAULT_DECAY_RATE = 12_000
+export const DEFAULT_DECAY_RATE = 1_000
 export const decayingUsers = collection<UserLiteExplicitIdNameType>({
 	primaryKey: 'userId',
 	name: 'userslite',

@@ -1,4 +1,4 @@
-import { describe, test } from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 import {
 	DEFAULT_DECAY_RATE,
 	arrayState,
@@ -73,6 +73,7 @@ describe('State Core Functionality', () => {
 	})
 
 	test('Checking state().set()', () => {
+		objectState.reset()
 		// check .set(value: object)
 		objectState.set({ a: { a2: false } })
 		// check if the object is actually merged and children props do get overwritten

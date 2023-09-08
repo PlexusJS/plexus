@@ -202,10 +202,7 @@ export function instance(
 			'info',
 			'Instance initialized'
 		)
-	} else if (
-		config &&
-		!isEqual(config, getPlexusInstance(config?.id || '').settings)
-	) {
+	} else if (config) {
 		getPlexusInstance(config?.id || '').settings = deepMerge(
 			getPlexusInstance(config?.id || '').settings,
 			config

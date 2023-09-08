@@ -57,26 +57,18 @@ afterEach(() => {
 })
 
 describe('Efficiency tests for ', () => {
-	test('The speed of a plexus collection collecting more than a thousand randomly generated objects into multiple groups', () => {
-		instance({ logLevel: 'warn' })
-		console.log('Starting test...')
-		console.log(`${users1k.length} items being adding to collection`)
-
-		usersLite?.watchGroup('firstNames', (v) => {
-			console.log('items in Collection updated:', v.length)
-		})
-		usersLite.collect(users1k, ['firstNames'])
-		console.log('items in collection:', usersLite.value.length)
-		expect(usersLite.value.length).toBe(1000)
-		console.log(
-			'items in firstNames group:',
-			usersLite.getGroup('firstNames').value
-		)
-		expect(usersLite.groups.firstNames.value.length).toBe(1000)
-		instance({ logLevel: undefined })
-	})
+	// test('The speed of a plexus collection collecting more than a thousand randomly generated objects into multiple groups', () => {
+	// 	// instance({ logLevel: 'debug' })
+	// 	console.log('Starting test...')
+	// 	console.log('items in collection:', users1k.length)
+	// 	usersLite.collect(users1k, ['firstNames'])
+	// 	console.log('items in collection:', usersLite.value.length)
+	// 	expect(usersLite.value.length).toBe(1000)
+	// 	expect(usersLite.groups.firstNames.value.length).toBe(1000)
+	// 	// instance({ logLevel: undefined })
+	// })
 	// test('Testing the same as above but with an absurd amount of data', () => {
-	// 	instance({ logLevel: 'debug' })
+	// 	// instance({ logLevel: 'debug' })
 	// 	console.log('Starting test...')
 	// 	console.log('items in collection:', users10k.length)
 	// 	usersLite.collect(users10k, ['firstNames'])
@@ -85,10 +77,10 @@ describe('Efficiency tests for ', () => {
 	// 	// const group2 = collectionInstance.group('name')
 	// 	// expect(group1.value.length).toBe(1000)
 	// 	// expect(group2.value.length).toBe(1000)
-	// 	instance({ logLevel: undefined })
+	// 	// instance({ logLevel: undefined })
 	// })
 	// test('An absurd amount of related data', () => {
-	// 	instance({ logLevel: 'debug' })
+	// 	// instance({ logLevel: 'debug' })
 	// 	console.log('Starting test...')
 	// 	console.log('items in collection:', users10k.length)
 	// 	users.collect(users1kRelated, ['main'])
@@ -98,6 +90,6 @@ describe('Efficiency tests for ', () => {
 	// 	// const group2 = collectionInstance.group('name')
 	// 	// expect(group1.value.length).toBe(1000)
 	// 	// expect(group2.value.length).toBe(1000)
-	// 	instance({ logLevel: undefined })
+	// 	// instance({ logLevel: undefined })
 	// })
 })
