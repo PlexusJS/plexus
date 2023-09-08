@@ -111,21 +111,21 @@ export type InnerFunction<ResultFn extends FunctionType> = ResultFn extends (
 // export type PlexusAction = <ReturnData=FunctionType>(fn: FunctionType) => (...args: any) => ReturnData | Promise<ReturnData>
 export type PlexusAction = typeof _action
 
-export function _action<Response>(
+export function _action<Response, Fn extends FunctionType>(
 	instance: () => PlexusInstance,
-	fn: (...args: FunctionArgs) => Response,
+	fn: ((...args: FunctionArgs) => Response) & Fn,
 	batched?: boolean
 ): (...args: InnerFunctionArgs) => Response
 
-export function _action<Response>(
+export function _action<Response, Fn extends FunctionType>(
 	instance: () => PlexusInstance,
-	fn: (...args: FunctionArgs) => Promise<Response>,
+	fn: ((...args: FunctionArgs) => Promise<Response>) & Fn,
 	batched?: boolean
 ): (...args: InnerFunctionArgs) => Promise<Response>
 
-export function _action<Response>(
+export function _action<Response, Fn extends FunctionType>(
 	instance: () => PlexusInstance,
-	fn: (...args: FunctionArgs) => Promise<Response> | Response,
+	fn: ((...args: FunctionArgs) => Promise<Response> | Response) & Fn,
 	batched?: boolean
 ) {
 	const helpers = new PlexusActionHelpers(instance)
@@ -153,7 +153,6 @@ export function _action<Response>(
 					})
 				}
 			}
-			console.log('hewhewhewhewhewh', batched, args, 'hewhewhewhewhewh')
 			// if the action is batched, run it in a batch
 			if (batched) {
 				return instance().runtime.batch(() => fn(helpers.hooks, ...args))
@@ -164,6 +163,7 @@ export function _action<Response>(
 			// only return the error if there is no handler
 
 			if (!helpers.catchError && !instance()._globalCatch) {
+				console.log('error caught but returning', e)
 				if (e instanceof PlexusError) throw e
 				if (e instanceof Error) {
 					throw new PlexusError(
@@ -172,6 +172,7 @@ export function _action<Response>(
 					)
 				}
 			}
+			console.log('error caught', e)
 			helpers.runErrorHandlers(e)
 
 			// otherwise run the handler and return null
@@ -184,7 +185,7 @@ export function _action<Response>(
 		}
 	}
 	// return the proxy function
-	return newAction
+	return newAction as InnerFunction<Fn>
 	// return proxyFn as InnerFunction<Fn>
 
 	// const newAction = async (...args) => {
@@ -222,10 +223,12 @@ export function _action<Response>(
  * @param fn The Plexus action function to run
  * @returns The intended return value of fn, or null if an error is caught
  */
-export function action<Response>(fn: (...args: FunctionArgs) => Response)
+export function action<Response>(
+	fn: (...args: FunctionArgs) => Response
+): (...args: InnerFunctionArgs) => Response
 export function action<Response>(
 	fn: (...args: FunctionArgs) => Promise<Response>
-)
+): (...args: InnerFunctionArgs) => Promise<Response>
 export function action<Response>(
 	fn: (...args: FunctionArgs) => Promise<Response> | Response
 ) {

@@ -238,12 +238,13 @@ export class RuntimeInstance {
 			}
 			// stop storing changes and emit the changes
 			this.batching = false
+			const unhalt = this.engine.halt()
 			// call all the pending functions and clear the array
 			this.batchedCalls.forEach((pendingFn) => pendingFn())
 			this.batchedCalls.length = 0
 
 			// release the reactivity engine
-			// unhalt()
+			unhalt()
 
 			this.instance().runtime.log('info', 'Batch function completed!')
 		}
