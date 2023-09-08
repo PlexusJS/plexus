@@ -1,14 +1,24 @@
 import { isAsyncFunction } from '@plexusjs/utils'
 import { PlexusInstance, instance } from './instance/instance'
-import { PlexusError } from './error'
+import { PlexusError, handlePlexusError } from './error'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusActionHooks {
+	/**
+	 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
+	 * @param handler? A function that will be called when an error occurs; omit to fail silently.
+	 * @param {boolean}useGlobal Should the global error handler be used? (default: true)
+	 *
+	 */
 	onCatch(handler?: ErrorHandler, useGlobal?: boolean): void
 	/**
 	 * Ignore the default hault preActions
 	 */
 	ignoreInit(): void
+	/**
+	 * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
+	 * @param fn The function to run in a batch
+	 */
 	batch<ReturnType = any>(fn: () => ReturnType): ReturnType
 }
 export type ActionFunction<
@@ -89,21 +99,12 @@ class PlexusActionHelpers {
 	 */
 	get hooks(): PlexusActionHooks {
 		return {
-			/**
-			 * Add a new error handler for this action. This will catch any errors that occur during the execution of this action and prevent a crash.
-			 * @param handler? A function that will be called when an error occurs; omit to fail silently.
-			 *
-			 */
 			onCatch: (handler?: ErrorHandler, useGlobal = true): void => {
 				return this.onCatch(handler, useGlobal)
 			},
 			ignoreInit: (): void => {
 				return this.ignoreInit()
 			},
-			/**
-			 * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
-			 * @param fn The function to run in a batch
-			 */
 			batch: <BatchResponse>(batchFn: () => BatchResponse): BatchResponse => {
 				return this.instance().runtime.batch<any>(batchFn)
 			},
@@ -118,8 +119,6 @@ export function _action<Returns, Fn extends ActionFunction>(
 ): InnerFunction<Fn> {
 	const helpers = new PlexusActionHelpers(instance)
 
-	console.log('function constructor', fn.constructor.name, isAsyncFunction(fn))
-
 	if (typeof fn !== 'function') {
 		console.warn(
 			'%cPlexus WARN:%c An action must be of type Function.',
@@ -128,80 +127,66 @@ export function _action<Returns, Fn extends ActionFunction>(
 		)
 		throw new Error('An action must be of type Function.')
 	}
-
+	/**
+	 * if the instance is not ready, wait for it to be
+	 * */
+	const runInit = () => {
+		if (!instance().ready && !helpers._skipInit) {
+			if (isAsyncFunction(fn)) {
+				// async call; just return the promise
+				return instance().runtime.runInit()
+			}
+			// sync call
+			let hold = true
+			while (hold) {
+				instance().runtime.runInit(() => {
+					hold = false
+				})
+			}
+		}
+	}
+	// we NEED this conditional. I tried to make this fit into one function definition instead of two, but it didn't work; async error catching flops for some reason.
+	if (isAsyncFunction(fn)) {
+		return async function newAction(...args) {
+			try {
+				await runInit()
+				// if the action is batched, run it in a batch
+				return batched
+					? await instance().runtime.batch(
+							async () => await fn(helpers.hooks, ...args)
+					  )
+					: await fn(helpers.hooks, ...args)
+			} catch (e) {
+				// only return the error if there is no handler
+				if (!helpers.catchError && !instance()._globalCatch) {
+					throw handlePlexusError(e)
+				}
+				helpers.runErrorHandlers(e)
+				// otherwise run the handler
+				return handlePlexusError(e)
+			}
+		} as InnerFunction<Fn>
+	}
 	function newAction(...args) {
 		try {
 			// if the instance is not ready, wait for it to be
-			// !NOTE: this is probably not a good way to do this, but it works for now
-			if (!instance().ready && !helpers._skipInit) {
-				let hold = true
-				while (hold) {
-					instance().runtime.runInit(() => {
-						hold = false
-					})
-				}
-			}
-			// if the action is batched, run it in a batch
-			if (batched) {
-				return instance().runtime.batch(() => fn(helpers.hooks, ...args))
-			}
-			// run the function
-			return fn(helpers.hooks, ...args)
+			runInit()
+			// if the action is batched, run it in a batch; otherwise run it normally
+			return batched
+				? instance().runtime.batch(() => fn(helpers.hooks, ...args))
+				: fn(helpers.hooks, ...args)
 		} catch (e) {
 			// only return the error if there is no handler
-
 			if (!helpers.catchError && !instance()._globalCatch) {
-				console.log('error caught but returning', e)
-				if (e instanceof PlexusError) throw e
-				if (e instanceof Error) {
-					throw new PlexusError(
-						`An error occurred during the execution of an action (${e.message})`,
-						{ origin: 'action', stack: e.stack }
-					)
-				}
+				throw handlePlexusError(e)
 			}
-			console.log('error caught', e)
 			helpers.runErrorHandlers(e)
-
-			// otherwise run the handler and return null
-			// TODO: return a PlexusError; needs to be a package wide change
-			return new PlexusError(
-				'An error occurred during the execution of an action',
-				{ origin: 'action' }
-			)
+			// otherwise run the handler
+			return handlePlexusError(e)
 		}
 	}
 	// return the proxy function
 	return newAction as InnerFunction<Fn>
-
-	// const newAction = async (...args) => {
-	// 	try {
-	// 		// if the instance is not ready, wait for it to be
-	// 		if (!instance().ready && !helpers._skipInit) {
-	// 			await instance().runtime.runInit()
-	// 		}
-	// 		// if the action is batched, run it in a batch
-	// 		console.log('(async)hewhewhewhewhewh', batched, 'hewhewhewhewhewh')
-	// 		if (batched) {
-	// 			console.log('using a batch in an async action...')
-	// 			return instance().runtime.batch(async () => {
-	// 				console.log('running the async action in a batch')
-	// 				return await fn(helpers.hooks, ...args)
-	// 			})
-	// 		}
-	// 		// run the function
-	// 		return await fn(helpers.hooks, ...args)
-	// 	} catch (e) {
-	// 		// only return the error if there is no handler
-	// 		if (!helpers.catchError && !instance()._globalCatch) throw e
-	// 		helpers.runErrorHandlers(e)
-	// 		// otherwise run the handler and return null
-	// 		return null
-	// 	}
-	// }
-	// // return the proxy function
-	// return newAction as InnerFunction<Fn>
-	// // return proxyFn as InnerFunction<Fn>
 }
 
 /**
@@ -210,7 +195,7 @@ export function _action<Returns, Fn extends ActionFunction>(
  * @returns The intended return value of fn, or null if an error is caught
  */
 export function action<Fn extends ActionFunction>(fn: Fn): InnerFunction<Fn> {
-	return _action(() => instance(), fn) as InnerFunction<Fn>
+	return _action(() => instance(), fn)
 }
 
 /**
