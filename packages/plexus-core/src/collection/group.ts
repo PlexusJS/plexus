@@ -28,7 +28,7 @@ interface CollectionGroupStore<DataType = any> {
  * A group of data
  */
 export class CollectionGroup<
-	DataType extends Record<string, any> = any,
+	DataType extends Record<string, any> = any
 > extends Watchable<DataType[]> {
 	private _internalStore: CollectionGroupStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>
@@ -85,6 +85,7 @@ export class CollectionGroup<
 		this.instance().runtime.broadcast(this.id, this.value)
 	}
 	private rebuildDataWatchers(startedFromInnerBatch?: boolean) {
+		// this.instance().runtime.batch(() => {
 		this.instance().runtime.log(
 			'info',
 			`Group ${this.instanceId} rebuilding data watcher connections...`
@@ -106,6 +107,7 @@ export class CollectionGroup<
 		if (destroyer) this._internalStore._dataWatcherDestroyers.add(destroyer)
 
 		this.runWatchers()
+		// })
 	}
 	/**
 	 * Check if the group contains the given item
@@ -142,7 +144,9 @@ export class CollectionGroup<
 			this._internalStore._includedKeys.add(key)
 		}
 		if (newKeysAdded) {
+			// this.instance().runtime.batch(() => {
 			this.rebuildDataWatchers()
+			// })
 		}
 		return this
 	}

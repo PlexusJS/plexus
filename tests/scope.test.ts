@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, test, expect } from 'vitest'
-import { appointments, UserLite, usersLite } from './test-utils'
+import { appointments, UserLiteType, usersLite } from './test-utils'
 
 import { randFirstName, randUuid } from '@ngneat/falso'
 import { instance, scope } from '@plexusjs/core'

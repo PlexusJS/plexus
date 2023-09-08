@@ -1,15 +1,19 @@
-import { deepClone, deepMerge } from '@plexusjs/utils'
+import { deepMerge } from '@plexusjs/utils'
 import { PlexusInternalWatcher } from '../types'
+import { PlexusInstance } from './instance'
 export interface EngineEventReceiver {
 	from: string
 	listener: PlexusInternalWatcher
 }
-export class EventEngine {
-	private batching: boolean = false
-	events: Map<string, Array<EngineEventReceiver>>
-	pendingEventPayloads: Map<string, any>
 
-	constructor() {
+type EventPayload = { key: String; value: any }
+export class EventEngine {
+	private halted: boolean = false
+	private halts: number = 0
+	events: Map<string, Array<EngineEventReceiver>>
+	pendingEventPayloads: Map<string, EventPayload>
+
+	constructor(public instance: () => PlexusInstance) {
 		this.events = new Map()
 		this.pendingEventPayloads = new Map()
 	}
@@ -18,17 +22,30 @@ export class EventEngine {
 	 * Pause and store all events until the return function is called. Once called, all events will be emitted.
 	 */
 	halt() {
-		this.batching = true
+		this.halts++
+		if (!this.halted) this.instance().runtime.log('debug', 'Halting engine...')
+		this.halted = true
 		return () => this.release()
 	}
 	/**
 	 * Emit all stored concatenated events and resume normal event emitting.
 	 */
 	release() {
-		this.batching = false
-		this.pendingEventPayloads.forEach((args, eventId) => {
+		this.halts--
+		if (this.halts > 0) return () => null
+		this.halted = false
+		if (this.pendingEventPayloads.size === 0) return
+		// if (this.batching === false) return
+		this.instance().runtime.log(
+			'debug',
+			`Releasing Engine; collected (${this.pendingEventPayloads.size}) payloads`
+		)
+		for (const [eventId, args] of Array.from(
+			this.pendingEventPayloads.entries()
+		)) {
 			this.emit(eventId, args)
-		})
+		}
+
 		this.pendingEventPayloads.clear()
 	}
 
@@ -89,19 +106,16 @@ export class EventEngine {
 			this.events.delete(eventId)
 		}
 	}
-	emit(eventId: string, args: any) {
+	emit(eventId: string, args: EventPayload) {
 		// this.schedule.addTask(() => {
 		// if we're batching, store the event payload
-		if (this.batching) {
-			this.pendingEventPayloads.set(
-				eventId,
-				deepMerge(
-					this.pendingEventPayloads.has(eventId)
-						? this.pendingEventPayloads.get(eventId)
-						: args,
-					args
-				)
-			)
+		if (this.halted) {
+			const pendingPayload = this.pendingEventPayloads.get(eventId)
+
+			const eventPayload = pendingPayload
+				? deepMerge<EventPayload>(pendingPayload, args)
+				: args
+			this.pendingEventPayloads.set(eventId, eventPayload)
 			return
 		}
 		// run the event listeners for this event id
