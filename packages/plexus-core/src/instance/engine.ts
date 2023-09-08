@@ -7,7 +7,8 @@ export interface EngineEventReceiver {
 
 type EventPayload = { key: String; value: any }
 export class EventEngine {
-	private batching: boolean = false
+	private halted: boolean = false
+	private halts: number = 0
 	events: Map<string, Array<EngineEventReceiver>>
 	pendingEventPayloads: Map<string, EventPayload>
 
@@ -20,24 +21,30 @@ export class EventEngine {
 	 * Pause and store all events until the return function is called. Once called, all events will be emitted.
 	 */
 	halt() {
-		console.log('halting')
-		this.batching = true
+		this.halts++
+		if (!this.halted) console.log('halting engine...')
+
+		this.halted = true
 		return () => this.release()
 	}
 	/**
 	 * Emit all stored concatenated events and resume normal event emitting.
 	 */
 	release() {
-		this.batching = false
+		this.halts--
+		if (this.halts > 0) return () => null
+		this.halted = false
 		if (this.pendingEventPayloads.size === 0) return
 		// if (this.batching === false) return
-		Array.from(this.pendingEventPayloads.entries()).forEach(
-			([eventId, args]) => {
-				console.log('releasing', eventId, args)
-
-				this.emit(eventId, args)
-			}
+		const pendingEntries = Array.from(this.pendingEventPayloads.entries())
+		console.log(
+			`releasing ${pendingEntries.length} (${this.pendingEventPayloads.size}) events`
 		)
+		for (const [eventId, args] of pendingEntries) {
+			console.log(`releasing ${eventId} stored payload`)
+			this.emit(eventId, args)
+		}
+
 		this.pendingEventPayloads.clear()
 	}
 
@@ -101,23 +108,22 @@ export class EventEngine {
 	emit(eventId: string, args: EventPayload) {
 		// this.schedule.addTask(() => {
 		// if we're batching, store the event payload
-		if (this.batching) {
+		if (this.halted) {
 			const pendingPayload = this.pendingEventPayloads.get(eventId)
 
 			const eventPayload = pendingPayload
 				? deepMerge<EventPayload>(pendingPayload, args)
 				: args
-			console.log(
-				'Emit occured while batching enabled',
-				eventId,
-				pendingPayload,
-				this.events.get(eventId),
-				eventPayload
-			)
+			// console.log(
+			// 	'Emit occured while batching enabled',
+			// 	eventId,
+			// 	pendingPayload,
+			// 	this.events.get(eventId),
+			// 	eventPayload
+			// )
 			this.pendingEventPayloads.set(eventId, eventPayload)
 			return
 		}
-		console.log('Emitting', eventId, args)
 		// run the event listeners for this event id
 		this.events
 			.get(eventId)

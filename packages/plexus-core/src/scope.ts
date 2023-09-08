@@ -107,7 +107,7 @@ export class Scope {
 	 */
 	batch<BatchFunction extends () => any | Promise<any> = any>(
 		fn: BatchFunction
-	): ReturnType<BatchFunction> {
+	): ReturnType<BatchFunction> | null {
 		return this.instance().runtime.batch(fn)
 	}
 	/**

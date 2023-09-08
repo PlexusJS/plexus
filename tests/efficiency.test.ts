@@ -57,16 +57,18 @@ afterEach(() => {
 })
 
 describe('Efficiency tests for ', () => {
-	// test('The speed of a plexus collection collecting more than a thousand randomly generated objects into multiple groups', () => {
-	// 	// instance({ logLevel: 'debug' })
-	// 	console.log('Starting test...')
-	// 	console.log('items in collection:', users1k.length)
-	// 	usersLite.collect(users1k, ['firstNames'])
-	// 	console.log('items in collection:', usersLite.value.length)
-	// 	expect(usersLite.value.length).toBe(1000)
-	// 	expect(usersLite.groups.firstNames.value.length).toBe(1000)
-	// 	// instance({ logLevel: undefined })
-	// })
+	test('The speed of a plexus collection collecting more than a thousand randomly generated objects into multiple groups', () => {
+		instance({ logLevel: 'debug' })
+		console.log('Starting test...')
+		console.log(`${users1k.length} items being pulled into collection`)
+		usersLite.collect(users1k.slice(0, 30), ['firstNames'])
+		// expect(usersLite.size).toBe(1000)
+		console.log('items in collection:', usersLite.size)
+		expect(usersLite.size).toBe(1000)
+		// expect(usersLite.value.length).toBe(1000)
+		// expect(usersLite.groups.firstNames.value.length).toBe(1000)
+		instance({ logLevel: undefined })
+	})
 	// test('Testing the same as above but with an absurd amount of data', () => {
 	// 	// instance({ logLevel: 'debug' })
 	// 	console.log('Starting test...')

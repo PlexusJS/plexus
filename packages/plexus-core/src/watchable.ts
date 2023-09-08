@@ -116,7 +116,8 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 	 */
 	set(newValue?: PlexusWatchableValueInterpreter<ValueType>): this {
 		if (this.instance().runtime.isBatching) {
-			this.instance().runtime.batchedCalls.push(() => this.set(newValue))
+			// this.instance().runtime.batchedCalls.push(() => this.set(newValue))
+			this.instance().runtime.batch(() => this.set(newValue))
 			return this
 		}
 		this.loading = true

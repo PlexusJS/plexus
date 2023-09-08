@@ -219,6 +219,6 @@ export function instance(
  */
 export function batch<BatchFunction extends () => any | Promise<any> = any>(
 	fn: BatchFunction
-): ReturnType<BatchFunction> {
+): ReturnType<BatchFunction> | null {
 	return instance().runtime.batch(fn)
 }

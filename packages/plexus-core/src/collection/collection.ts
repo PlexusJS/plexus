@@ -320,13 +320,13 @@ export class CollectionInstance<
 			// 		`Batching an collect call for collection ${this.instanceId}`
 			// 	)
 			// 	// store this in the batchedSetters for execution once batching is over
-			// 	this.instance().runtime.batchedCalls.push(() => {
-			// 		this.instance().runtime.log(
-			// 			'debug',
-			// 			`Batched collect call fulfilled for collection ${this.instanceId}`
-			// 		)
-			// 		return collectFn(dataToCollect, groups, true)
-			// 	})
+			// 	// this.instance().runtime.batchedCalls.push(() => {
+			// 	// 	this.instance().runtime.log(
+			// 	// 		'debug',
+			// 	// 		`Batched collect call fulfilled for collection ${this.instanceId}`
+			// 	// 	)
+			// 	// 	return collectFn(dataToCollect, groups, true)
+			// 	// })
 			// 	return this
 			// }
 
@@ -787,18 +787,14 @@ export class CollectionInstance<
 	 * @returns {this} The new Collection Instance
 	 */
 	delete(keys: DataKey | DataKey[]): this {
-		// the function to remove the data
-		const rm = (key: DataKey) => {
+		// if an array, iterate through the keys and remove them each
+		keys = Array.isArray(keys) ? keys : [keys]
+		for (let key of keys) {
 			// key = this.config.keyTransform(key)
 			key = `${key}`
 			this._internalStore._data.get(key)?.clean()
 			this.removeFromGroups(key, this.getGroupsOf(key))
 			this._internalStore._data.delete(key)
-		}
-		// if an array, iterate through the keys and remove them each
-		keys = Array.isArray(keys) ? keys : [keys]
-		for (const key of keys) {
-			rm(key)
 		}
 		this.mount()
 		return this
@@ -834,21 +830,18 @@ export class CollectionInstance<
 		if (!keys.length || !groups.length) return this
 
 		this.mount()
-		const rm = (key) => {
-			key = `${key}`
-			for (let groupName of groups) {
-				if (this.isCreatedGroup(groupName)) {
-					this._internalStore._groups.get(groupName)?.remove(key)
-				}
-			}
-		}
 
 		// if an array, iterate through the keys and remove them from each associated group
 		// this.instance().runtime.engine.halt()
 		// const release = this.instance().runtime.engine.halt()
 		this.instance().runtime.batch(() => {
 			for (let key of keys) {
-				rm(key)
+				key = `${key}`
+				for (let groupName of groups) {
+					if (this.isCreatedGroup(groupName)) {
+						this._internalStore._groups.get(groupName)?.remove(key)
+					}
+				}
 			}
 		})
 		return this
