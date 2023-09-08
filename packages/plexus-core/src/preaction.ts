@@ -1,8 +1,8 @@
 import { PlexusInstance, instance } from './instance/instance'
 import {
-	FunctionArgs,
-	FunctionType,
-	InnerFunctionArgs,
+	// FunctionArgs,
+	ActionFunction,
+	// InnerFunctionArgs,
 	_action,
 } from './action'
 import { genUID } from '@plexusjs/utils'
@@ -11,7 +11,7 @@ type ErrorHandler = (error: any) => unknown
 export interface PlexusPreActionConfig {
 	lazy?: boolean
 }
-export class PreActionInstance<Response> {
+export class PreActionInstance<Fn extends ActionFunction> {
 	private _internalStore = {
 		_ran: false,
 		_id: genUID(),
@@ -20,7 +20,7 @@ export class PreActionInstance<Response> {
 	/**
 	 * The action associated with this PreAction
 	 */
-	action: (...args: InnerFunctionArgs) => Promise<Response> | Response
+	action: ReturnType<typeof _action>
 	/**
 	 *	The internal id of the PreAction
 	 */
@@ -30,7 +30,7 @@ export class PreActionInstance<Response> {
 
 	constructor(
 		private instance: () => PlexusInstance,
-		fn: (...args: FunctionArgs) => Response | Promise<Response>,
+		fn: Fn,
 		config: PlexusPreActionConfig = {}
 	) {
 		this.action = _action(instance, fn)
@@ -65,14 +65,15 @@ export class PreActionInstance<Response> {
 		return result
 	}
 }
-export type PlexusPreAction<Fn = any> = PreActionInstance<Fn>
+export type PlexusPreAction<Fn extends ActionFunction = any> =
+	PreActionInstance<Fn>
 
-export function _preaction<Response>(
+export function _preaction<Fn extends ActionFunction>(
 	instance: () => PlexusInstance,
-	fn: (...args: FunctionArgs) => Response | Promise<Response>,
+	fn: Fn,
 	config?: PlexusPreActionConfig
 ) {
-	return new PreActionInstance<Response>(instance, fn, config)
+	return new PreActionInstance(instance, fn, config)
 }
 
 /**
@@ -80,7 +81,7 @@ export function _preaction<Response>(
  * @param fn The Plexus action function to run
  * @returns The intended return value of fn, or null if an error is caught
  */
-export function preaction<Fn extends FunctionType>(
+export function preaction<Fn extends ActionFunction>(
 	fn: Fn,
 	config?: PlexusPreActionConfig
 ) {

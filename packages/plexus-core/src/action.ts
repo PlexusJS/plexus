@@ -11,6 +11,23 @@ export interface PlexusActionHooks {
 	ignoreInit(): void
 	batch<ReturnType = any>(fn: () => ReturnType): ReturnType
 }
+export type ActionFunction<
+	Params extends any[] | [] = any[],
+	Response = any
+> = (
+	helpers: PlexusActionHooks,
+	...args: Params
+) => Response | Promise<Response>
+
+export type InnerFunction<InputFn extends ActionFunction> = InputFn extends (
+	helpers: PlexusActionHooks,
+	...args: infer Params
+) => ReturnType<InputFn>
+	? (...args: Params) => ReturnType<InputFn>
+	: never
+
+export type PlexusAction = typeof _action
+
 /**
  * The action helpers for a defined plexus action
  */
@@ -94,40 +111,11 @@ class PlexusActionHelpers {
 	}
 }
 
-export type FunctionArgs = [helpers: PlexusActionHooks, ...args: any[]]
-export type InnerFunctionArgs = [helpers?: PlexusActionHooks, ...args: any[]]
-
-export type FunctionType<Response = any> = (
-	...args: FunctionArgs
-) => Response | Promise<Response>
-
-export type InnerFunction<ResultFn extends FunctionType> = ResultFn extends (
-	helpers: PlexusActionHooks,
-	...args: infer Params
-) => ReturnType<ResultFn>
-	? (...args: Params) => ReturnType<ResultFn>
-	: never
-
-// export type PlexusAction = <ReturnData=FunctionType>(fn: FunctionType) => (...args: any) => ReturnData | Promise<ReturnData>
-export type PlexusAction = typeof _action
-
-export function _action<Response, Fn extends FunctionType>(
+export function _action<Returns, Fn extends ActionFunction>(
 	instance: () => PlexusInstance,
-	fn: ((...args: FunctionArgs) => Response) & Fn,
+	fn: Fn & ((helpers: PlexusActionHooks, ...args: any[]) => Returns),
 	batched?: boolean
-): (...args: InnerFunctionArgs) => Response
-
-export function _action<Response, Fn extends FunctionType>(
-	instance: () => PlexusInstance,
-	fn: ((...args: FunctionArgs) => Promise<Response>) & Fn,
-	batched?: boolean
-): (...args: InnerFunctionArgs) => Promise<Response>
-
-export function _action<Response, Fn extends FunctionType>(
-	instance: () => PlexusInstance,
-	fn: ((...args: FunctionArgs) => Promise<Response> | Response) & Fn,
-	batched?: boolean
-) {
+): InnerFunction<Fn> {
 	const helpers = new PlexusActionHelpers(instance)
 
 	console.log('function constructor', fn.constructor.name, isAsyncFunction(fn))
@@ -185,8 +173,7 @@ export function _action<Response, Fn extends FunctionType>(
 		}
 	}
 	// return the proxy function
-	return newAction as InnerFunction<Fn>
-	// return proxyFn as InnerFunction<Fn>
+	return newAction as InnerFunction<typeof fn>
 
 	// const newAction = async (...args) => {
 	// 	try {
@@ -223,16 +210,8 @@ export function _action<Response, Fn extends FunctionType>(
  * @param fn The Plexus action function to run
  * @returns The intended return value of fn, or null if an error is caught
  */
-export function action<Response>(
-	fn: (...args: FunctionArgs) => Response
-): (...args: InnerFunctionArgs) => Response
-export function action<Response>(
-	fn: (...args: FunctionArgs) => Promise<Response>
-): (...args: InnerFunctionArgs) => Promise<Response>
-export function action<Response>(
-	fn: (...args: FunctionArgs) => Promise<Response> | Response
-) {
-	return _action(() => instance(), fn)
+export function action<Fn extends ActionFunction>(fn: Fn): InnerFunction<Fn> {
+	return _action(() => instance(), fn) as InnerFunction<Fn>
 }
 
 /**
@@ -240,12 +219,8 @@ export function action<Response>(
  * @param fn The Plexus action function to run
  * @returns The intended return value of fn, or null if an error is caught
  */
-export function batchAction<Response>(fn: (...args: FunctionArgs) => Response)
-export function batchAction<Response>(
-	fn: (...args: FunctionArgs) => Promise<Response>
-)
-export function batchAction<Response>(
-	fn: (...args: FunctionArgs) => Promise<Response> | Response
-) {
+export function batchAction<Fn extends ActionFunction>(
+	fn: Fn
+): InnerFunction<Fn> {
 	return _action(() => instance(), fn, true)
 }

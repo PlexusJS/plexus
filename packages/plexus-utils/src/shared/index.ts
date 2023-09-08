@@ -8,7 +8,7 @@ export const genUID = () =>
 
 export const isAsyncFunction = <
 	ReturnedValue,
-	Args extends Array<unknown> = any[]
+	Args extends Array<unknown> = any[],
 >(
 	fn: (...args: Args) => ReturnedValue | Promise<ReturnedValue>
 ): fn is (...args: Args) => Promise<ReturnedValue> =>

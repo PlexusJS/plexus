@@ -1,6 +1,6 @@
 import { AlmostAnything, LiteralType, TypeOrReturnType } from '@plexusjs/utils'
 import { Watchable } from '.'
-import { FunctionType, _action } from './action'
+import { ActionFunction, _action } from './action'
 import { PlexusCollectionConfig, _collection } from './collection/collection'
 import { _computed } from './computed'
 import { _event } from './event'
@@ -115,7 +115,7 @@ export class Scope {
 	 * @param fn The Plexus action function to run
 	 * @returns The intended return value of fn, or null if an error is caught
 	 */
-	preaction<Fn extends FunctionType>(fn: Fn, config?: PlexusPreActionConfig) {
+	preaction<Fn extends ActionFunction>(fn: Fn, config?: PlexusPreActionConfig) {
 		return _preaction<Fn>(this.instance, fn, config)
 	}
 }

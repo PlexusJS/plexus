@@ -1,5 +1,5 @@
 import { PlexusAction, Watchable } from '@plexusjs/core'
-import { FunctionType, InnerFunction } from '@plexusjs/core/dist/action'
+import { ActionFunction, InnerFunction } from '@plexusjs/core/dist/action'
 import { useEffect, useState } from 'react'
 import { usePlexus, PlexusValue, PlexusValueArray } from './usePlexus'
 
@@ -17,19 +17,19 @@ export type PlexusLoaderOptions = {
 }
 
 // Singleton argument
-export function useLoader<V extends Watchable, Fn extends FunctionType>(
+export function useLoader<V extends Watchable, Fn extends ActionFunction>(
 	watchables: V,
 	action: InnerFunction<Fn>,
 	options?: PlexusLoaderOptions
 ): PlexusLoaderReturn<PlexusValue<V>>
 // array argument
-export function useLoader<V extends Watchable[], Fn extends FunctionType>(
+export function useLoader<V extends Watchable[], Fn extends ActionFunction>(
 	watchables: V | [],
 	action: InnerFunction<Fn>,
 	options?: PlexusLoaderOptions
 ): PlexusLoaderReturn<PlexusValueArray<V>>
 
-export function useLoader<Fn extends FunctionType>(
+export function useLoader<Fn extends ActionFunction>(
 	watchables: (typeof usePlexus.arguments)[0],
 	action: InnerFunction<Fn>,
 	options?: PlexusLoaderOptions

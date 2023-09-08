@@ -56,7 +56,6 @@ describe('Collection Relations', () => {
 							resolve('')
 						}, 500)
 					})
-
 				})
 				// return new Promise((resolve) => {
 				// 	setTimeout(() => {
@@ -64,9 +63,7 @@ describe('Collection Relations', () => {
 				// 		resolve(val)
 				// 	}, 500)
 				// })
-
 			})
-
 
 			// the related collection value state should be undefined or something because the batch function hasn't finished yet
 			expect(users.getItemValue('1')?.firstName).toBeFalsy()
@@ -92,7 +89,7 @@ describe('Collection Relations', () => {
 	)
 
 	test('Batching race condition with selectors', () => {
-		batch(() => { })
+		batch(() => {})
 	})
 })
 
