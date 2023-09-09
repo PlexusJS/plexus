@@ -7,9 +7,19 @@ on:
   release:
     types: [created]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+    secrets:
+      NPM_ACCESS_TOKEN:
+        required: true
 
 jobs:
   build:
+    name: 🔨 Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,7 +31,7 @@ jobs:
           node-version: 18
           registry-url: https://npm.pkg.github.com/
 
-      - name: Cache node modules
+      - name: 💾 Fetch Cache
         id: cache-yarn
         uses: actions/cache@v3
         env:
@@ -37,7 +47,7 @@ jobs:
         name: 📦 Install Dependencies
         run: NO_YARN_POSTINSTALL=1 yarn install --frozen-lockfile
 
-      - name: Yarn Build
+      - name: 🔨 Build
         run: yarn build
 
   test:
@@ -64,14 +74,16 @@ jobs:
         run: yarn test
 
   publish-gpr:
+    name: 🚀 NPM Publish
     needs: build
+    environment: production
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
       - uses: actions/checkout@v3
-      - name: Cache node modules
+      - name: 💾 Fetch Cache
         id: cache-yarn
         uses: actions/cache@v3
         env:
@@ -87,7 +99,7 @@ jobs:
       - name: 🔨 Build
         run: yarn build
 
-      - run: yarn release-stable
-        name: 🚀 Release Stable
+      - name: 🚀 Release Stable
+        run: yarn release-stable
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_ACCESS_TOKEN}}
