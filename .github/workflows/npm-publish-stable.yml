@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Cache node modules
+      - name: 💾 Fetch Cache
         id: cache-yarn
         uses: actions/cache@v3
         env:
@@ -57,7 +57,11 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock', '**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - run: yarn test
+      - name: 🔨 Build
+        run: yarn build
+
+      - name: 🧪 Test
+        run: yarn test
 
   publish-gpr:
     needs: build
@@ -80,6 +84,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - run: yarn publish-stable
+      - name: 🔨 Build
+        run: yarn build
+
+      - run: yarn release-stable
+        name: 🚀 Release Stable
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_ACCESS_TOKEN}}
