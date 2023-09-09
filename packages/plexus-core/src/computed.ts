@@ -1,4 +1,3 @@
-// import { isServer } from "@plexusjs/utils/dist/shared"
 import {
 	AlmostAnything,
 	PlexusWatchableValueInterpreter,
@@ -71,7 +70,6 @@ export class ComputedStateInstance<
 		this.mount()
 	}
 	private mount() {
-		// if (isServer()) return
 		if (!this.instance()._computedStates.has(this)) {
 			this.instance()._computedStates.add(this)
 			this.instance().runtime.log(

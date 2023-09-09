@@ -1,3 +1,6 @@
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+
 import {
 	instance,
 	PlexusCollectionSelector,
@@ -126,7 +129,9 @@ export function loadServerState(
 }
 
 export function isServer() {
-	return typeof process !== 'undefined' && process?.release?.name === 'node'
+	return (
+		typeof process !== 'undefined' && (process.env.SERVER_SOFTWARE || !window)
+	)
 }
 
 const PlexusNext = createPlexusPlugin('NextJS', () => {

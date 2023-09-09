@@ -14,7 +14,8 @@ type HTMLDivElementPropKeys = keyof HTMLProps<HTMLElement>
 export function usePlexusElementEffect<
 	ElementType extends HTMLElement,
 	PlexusType = any,
-	PropertyKey extends HTMLProps<HTMLElement>[HTMLDivElementPropKeys] = HTMLProps<HTMLElement>[HTMLDivElementPropKeys]
+	PropertyKey extends
+		HTMLProps<HTMLElement>[HTMLDivElementPropKeys] = HTMLProps<HTMLElement>[HTMLDivElementPropKeys],
 >(
 	elRef: MutableRefObject<ElementType>,
 	plexusState: Watchable<PlexusType>,

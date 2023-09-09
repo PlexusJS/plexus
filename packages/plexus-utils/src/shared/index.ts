@@ -1,6 +1,12 @@
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+
 export * from './itemManipulation'
+
 export function isServer() {
-	return typeof process !== 'undefined' && process?.release?.name === 'node'
+	return (
+		typeof process !== 'undefined' && (process.env.SERVER_SOFTWARE || !window)
+	)
 }
 export const genUID = () =>
 	Math.random().toString(36).substring(2, 15) +
