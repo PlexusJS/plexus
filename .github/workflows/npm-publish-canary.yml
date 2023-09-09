@@ -32,18 +32,14 @@ jobs:
           path: |
             ~/.cache/yarn
             node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock', '**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - run: ls -la
-      - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
-        name: Install Dependencies
+            ${{ runner.os }}-yarn-
+      - if: steps.cache-yarn.outputs.cache-hit != 'true'
+        name: 📦 Install Dependencies
         env:
           NO_YARN_POSTINSTALL: 1
-        run: yarn install --ignore-scripts
+        run: yarn install --frozen-lockfile --ignore-scripts
 
       - run: yarn publish-canary
         env:

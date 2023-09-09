@@ -21,26 +21,11 @@ jobs:
           path: |
             ~/.cache/yarn
             node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock', '**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
-        name: List the state of node modules
-        continue-on-error: true
-        run: yarn list
-
-      - name: Check node_modules
-        uses: andstor/file-existence-action@v1
-        with:
-          files: 'node_modules'
-
-      # If the cache is not hit (we don't have a cache for this set of deps), then we need to install the dependencies
-      # We're assuming the build and formatting process was already done
-      - if: steps.check_files.outputs.files_exists != 'true'
-        name: Install Dependencies
+            ${{ runner.os }}-yarn-
+      - if: steps.cache-yarn.outputs.cache-hit != 'true'
+        name: 📦 Install Dependencies
         env:
           NO_YARN_POSTINSTALL: 1
-        run: NO_YARN_POSTINSTALL=1 yarn install --ignore-scripts
+        run: yarn install --frozen-lockfile
