@@ -46,13 +46,8 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - if: ${{ steps.cache-yarn.outputs.cache-hit != 'true' }}
-        name: List the state of node modules
-        continue-on-error: true
-        run: yarn list
-
       - name: Install Dependencies
-        run: NO_YARN_POSTINSTALL=1 yarn install
+        run: NO_YARN_POSTINSTALL=1 yarn install --frozen-lockfile
 
       - name: Yarn Build
         run: yarn build

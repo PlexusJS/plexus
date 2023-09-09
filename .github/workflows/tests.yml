@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run_tests:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,11 +27,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install Dependencies
+      - name: 📦 Install Dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Yarn Build
+      - name: 🔨 Build
         run: yarn build
 
-      - name: Test
+      - name: 🧪 Test
         run: yarn test
