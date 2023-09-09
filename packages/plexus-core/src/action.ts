@@ -23,7 +23,7 @@ export interface PlexusActionHooks {
 }
 export type ActionFunction<
 	Params extends any[] | [] = any[],
-	Response = any
+	Response = any,
 > = (
 	helpers: PlexusActionHooks,
 	...args: Params

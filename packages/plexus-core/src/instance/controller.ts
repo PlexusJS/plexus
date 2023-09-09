@@ -37,7 +37,10 @@ export class ControllerInstance<OriginalObject extends PlexusRecord<any>> {
 		string | ControllerInstance<PlexusRecord<any>>
 	> = Object.freeze({})
 
-	constructor(public name: string, options: ControllerOptions<OriginalObject>) {
+	constructor(
+		public name: string,
+		options: ControllerOptions<OriginalObject>
+	) {
 		const { instance, id, data } = options
 		this.id = id
 		this.instance = instance

@@ -5,7 +5,10 @@ type PlexusErrorOptions = { code: string; source: string; stack: string }
 export class PlexusError extends Error {
 	public name = 'PlexusError'
 	public error = true
-	constructor(message: string, public options?: Partial<PlexusErrorOptions>) {
+	constructor(
+		message: string,
+		public options?: Partial<PlexusErrorOptions>
+	) {
 		super(message)
 	}
 	// custom error format for logging and debugging

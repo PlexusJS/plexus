@@ -31,7 +31,7 @@ const users1kRelated = Array.from(
 			id: randUuid(),
 			firstName: randFirstName(),
 			appointmentId: randUuid(),
-		} as UserType)
+		}) as UserType
 )
 
 const appointments1kRelated = users1kRelated.map(
@@ -41,7 +41,7 @@ const appointments1kRelated = users1kRelated.map(
 			userId: user.id,
 			date: randFutureDate().getTime(),
 			name: randBook().title,
-		} as AppointmentType)
+		}) as AppointmentType
 )
 
 // check the .cache directory for the generated data. If it doesn't exist, it will be generated. Need users1k.json, users10k.json, users10kRelated.json, appointments10kRelated.json

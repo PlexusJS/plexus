@@ -14,7 +14,6 @@ const customRender = (
 	options?: Omit<RenderOptions, 'wrapper'>
 ) => render(ui, { wrapper: AllTheProviders, ...options })
 
-
 // override render method
 export { customRender as render }
 
@@ -59,9 +58,9 @@ export const booleanState = state(true)
 export const stringState = state('Hello Plexus!')
 export const stringStateStartingWithNull = state<string>(null)
 export const objectState = state<ComplexObjectType>(initialStateValues.object)
-export const arrayState = state<{ item?: string; item2?: { subitem?: string } }[]>(
-	initialStateValues.array
-)
+export const arrayState = state<
+	{ item?: string; item2?: { subitem?: string } }[]
+>(initialStateValues.array)
 
 export const stateWithFetchFnTest = state(() => {
 	return 'some sort of data'
