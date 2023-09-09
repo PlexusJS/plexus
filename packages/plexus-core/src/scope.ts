@@ -90,17 +90,17 @@ export class Scope {
 	 * @param fn The Plexus action function to run
 	 * @returns The intended return value of fn, or null if an error is caught
 	 */
-	// action<Fn extends FunctionType>(fn: Fn) {
-	// 	return _action<Fn>(this.instance, fn)
-	// }
-	// /**
-	//  * Generate a Plexus Action
-	//  * @param fn The Plexus action function to run
-	//  * @returns The intended return value of fn, or null if an error is caught
-	//  */
-	// batchAction<Fn extends FunctionType>(fn: Fn) {
-	// 	return _action<Fn>(this.instance, fn, true)
-	// }
+	action<Fn extends ActionFunction>(fn: Fn) {
+		return _action(this.instance, fn)
+	}
+	/**
+	 * Generate a Plexus Action
+	 * @param fn The Plexus action function to run
+	 * @returns The intended return value of fn, or null if an error is caught
+	 */
+	batchAction<Fn extends ActionFunction>(fn: Fn) {
+		return _action(this.instance, fn, true)
+	}
 	/**
 	 * Run a function. During that function's execution, any state changes will be batched and only applied once the function has finished.
 	 * @param fn The function to run in a batch
