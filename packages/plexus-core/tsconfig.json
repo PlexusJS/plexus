@@ -1,8 +1,11 @@
 {
 	"extends": "../tsconfig.shared.json",
 	"compilerOptions": {
+		"lib": ["dom"],
+		"types": ["bun-types"],
 		"rootDir": "./src",
-		"outDir": "./dist"
+		"outDir": "./dist/src",
+		"emitDeclarationOnly": true
 	},
 	"include": ["./src/**/*"]
 }

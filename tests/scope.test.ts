@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
 import { appointments, UserLiteType, usersLite } from './test-utils'
 
 import { randFirstName, randUuid } from '@ngneat/falso'

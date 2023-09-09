@@ -17,7 +17,7 @@ export type PlexusState = <Value = any>(
 export interface StateStore {
 	_name: string
 	_persist: boolean
-	_interval: NodeJS.Timer | null
+	_interval: Timer | null
 	_ready: boolean
 	_isSetting: boolean
 }

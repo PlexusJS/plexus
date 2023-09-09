@@ -68,6 +68,10 @@ export const installPlexus = (tag = '') => {
 	if (existsSync(`${__dirname}/yarn.lock`) || yargs.argv.yarn) {
 		console.log(chalk.cyan.bgWhite(`Using Yarn Package Manager`))
 		installCommand = 'yarn install'
+	}
+	if (existsSync(`${__dirname}/bun.lockb`) || yargs.argv.bun) {
+		console.log(chalk.black.bgWhite(`Using Bun Package Manager`))
+		installCommand = 'bun install'
 	} else {
 		console.log(chalk.cyan.bgWhite('Using NPM Package Manager'))
 	}

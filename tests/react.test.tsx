@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
 import '@testing-library/react'
 import { screen, waitFor, within } from '@testing-library/react'
 import { render, act } from './test-utils'

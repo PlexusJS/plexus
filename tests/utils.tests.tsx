@@ -6,7 +6,7 @@ import {
 	convertStringToThing,
 	convertThingToString,
 } from '@plexusjs/utils'
-import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
 
 const myState = state('')
 const myCollection = collection()

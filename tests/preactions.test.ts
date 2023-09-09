@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
 import { action, preaction, PlexusAction } from '@plexusjs/core'
 
 describe('Testing Action Function', () => {

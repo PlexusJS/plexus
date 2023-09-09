@@ -23,10 +23,11 @@ const helpString = `
 
 	Options:
 		--yarn					Use Yarn as the package manager
+		--bun						Use Bun as the package manager
 		--canary				Use the canary version of plexus
-		--dev					Use the dev version of plexus
-	    --skip-install			Skip the install of the PlexusJS packages
-		--typescript			Create TypeScript files
+		--dev						Use the dev version of plexus
+	  --skip-install	Skip the install of the PlexusJS packages
+		--typescript		Create TypeScript files
 		--react					Install the React package
 		--next					Install the Next package
 		--template=<template>	Choose the template to use to generate a PlexusJS core

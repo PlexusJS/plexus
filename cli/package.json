@@ -10,12 +10,12 @@
 	"scripts": {
 		"precli:build": "rm -rf ./out/bin.js",
 		"build": "rollup --config ./rollup.config.js",
-		"postbuild": "node ./lib/postbuild.js",
-		"preexecute": "yarn build",
-		"execute": "npx .",
-		"prepublish": "yarn build",
+		"postbuild": "bun ./lib/postbuild.js",
+		"preexecute": "bun build",
+		"execute": "bunx .",
+		"prepublish": "bun build",
 		"publish-stable": "yarn publish",
-		"local-install": "yarn build && npm link"
+		"local-install": "bun build && npm link"
 	},
 	"repository": {
 		"type": "git",

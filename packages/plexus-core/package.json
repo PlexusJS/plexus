@@ -2,8 +2,8 @@
 	"name": "@plexusjs/core",
 	"version": "1.10.6",
 	"description": "A library for building modular interconnected applications",
-	"main": "./dist/index.js",
-	"types": "dist/index.d.ts",
+	"main": "./dist/src/index.js",
+	"types": "dist/src/index.d.ts",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -20,8 +20,8 @@
 	"license": "MIT",
 	"scripts": {
 		"prebuild": "rimraf ./dist ./tsconfig.tsbuildinfo",
-		"build": "tsc --build --force && echo \"Build complete.\"",
-		"dev": "tsc --watch"
+		"build": "bun build ./src/* --outdir ./dist/ --splitting --sourcemap=external --target=browser && tsc && echo \"Build complete.\"",
+		"build:legacy": "tsc --build --force && tsc && echo \"Build complete.\""
 	},
 	"gitHead": "192584965efcda8142c23e6f53df2e9f97bfd0df",
 	"devDependencies": {

@@ -1,3 +1,6 @@
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+
 import { instance, PlexusInstance, batch } from './instance/instance'
 import { PlexusPlugin, Plugin, createPlexusPlugin } from './plugin'
 import { PlexusScopeConfig } from './scope'

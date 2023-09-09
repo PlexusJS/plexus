@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { DEFAULT_DECAY_RATE, decayingUsers } from './test-utils'
 
 describe('Ephemeral Collection data', () => {

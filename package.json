@@ -10,22 +10,22 @@
 	"private": true,
 	"scripts": {
 		"postinstall": "test -n \"$NO_YARN_POSTINSTALL\" || yarn run build",
-		"core": "yarn workspace @plexusjs/core",
-		"react": "yarn workspace @plexusjs/react",
-		"next": "yarn workspace @plexusjs/next",
-		"plexus-cli": "yarn workspace plexus-cli",
-		"docs": "yarn workspace plexus-docs",
-		"docs:generate:ref": "ts-node write-documentation.ts",
-		"postdocs:generate:ref": "yarn format --all",
+		"core": "bun workspace @plexusjs/core",
+		"react": "bun workspace @plexusjs/react",
+		"next": "bun workspace @plexusjs/next",
+		"plexus-cli": "bun workspace plexus-cli",
+		"docs": "bun workspace plexus-docs",
+		"docs:generate:ref": "bun write-documentation.ts",
+		"postdocs:generate:ref": "bun format --all",
 		"bootstrap": "lerna bootstrap --use-workspaces",
-		"build": "lerna run build",
-		"postbuild": "yarn docs:generate:ref",
-		"dev": "lerna run build && lerna watch -- lerna run build --scope=$LERNA_PACKAGE_NAME",
+		"build": "bunx --bun lerna run build",
+		"postbuild": "bun docs:generate:ref",
+		"dev": "bunx --bun lerna run build && bunx --bun lerna watch -- lerna run build --scope=$LERNA_PACKAGE_NAME",
 		"prereleaseOnly": "pinst --disable && echo '🚀  Publishing...'",
 		"release-canary": "lerna run build && lerna publish --preid canary --no-private --yes --force-publish --canary",
 		"release-stable": "lerna run build && lerna publish --preid canary --no-private --yes --force-publish",
 		"postrelease": "pinst --enable && echo '🎉  Published!'",
-		"test": "vitest",
+		"test": "bun test",
 		"test-ui": "vitest --ui",
 		"format": "trunk fmt"
 	},
@@ -69,13 +69,14 @@
 		"typescript": "^5.2.2",
 		"vite": "^4.4.9",
 		"vitest": "^0.34.2",
-		"yargs": "^17.4.1"
+		"yargs": "^17.4.1",
+		"bun-types": "latest"
 	},
 	"workspaces": {
 		"packages": [
 			"packages/*",
 			"docs/",
-			"plexus-cli"
+			"cli"
 		]
 	},
 	"publishConfig": {

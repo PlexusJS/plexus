@@ -2,11 +2,12 @@
 	"extends": "./packages/tsconfig.shared.json",
 	"compilerOptions": {
 		"jsx": "react",
-		"types": ["vitest/globals"],
+		"types": ["vitest/globals", "bun-types"],
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"sourceMap": true,
-		"noImplicitThis": true
+		"noImplicitThis": true,
+		"rootDir": "./test"
 	},
 	"include": ["./test"]
 }

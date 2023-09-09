@@ -1,5 +1,5 @@
 'use strict'
-import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
 import { instance, state } from '@plexusjs/core'
 import {
 	initialStateValues,

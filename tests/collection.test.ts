@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
 import { collection, instance, PlexusCollectionInstance } from '@plexusjs/core'
 import {
 	appointments,
@@ -9,7 +9,6 @@ import {
 	myCollection,
 	myCollectionUndefined,
 } from './test-utils'
-import { s } from 'vitest/dist/types-63abf2e0'
 
 // instance({ logLevel: "debug" })
 beforeEach(() => {

@@ -1,4 +1,10 @@
-import { HTMLProps, MutableRefObject, useEffect, useState } from 'react'
+import {
+	HTMLProps,
+	MutableRefObject,
+	useCallback,
+	useEffect,
+	useState,
+} from 'react'
 
 import { Watchable } from '@plexusjs/core'
 // import { PlexusStateType } from '@plexusjs/core/dist/types'
@@ -8,8 +14,7 @@ type HTMLDivElementPropKeys = keyof HTMLProps<HTMLElement>
 export function usePlexusElementEffect<
 	ElementType extends HTMLElement,
 	PlexusType = any,
-	PropertyKey extends
-		HTMLProps<HTMLElement>[HTMLDivElementPropKeys] = HTMLProps<HTMLElement>[HTMLDivElementPropKeys],
+	PropertyKey extends HTMLProps<HTMLElement>[HTMLDivElementPropKeys] = HTMLProps<HTMLElement>[HTMLDivElementPropKeys]
 >(
 	elRef: MutableRefObject<ElementType>,
 	plexusState: Watchable<PlexusType>,
@@ -20,6 +25,12 @@ export function usePlexusElementEffect<
 	additionalReactStatesToWatch: any[] = []
 ) {
 	const [mounted, setMounted] = useState(false)
+	const setter = useCallback(setterFunction, [
+		plexusState.id,
+		setterFunction,
+		...additionalReactStatesToWatch,
+	])
+
 	useEffect(() => {
 		const el = elRef.current
 		if (!el) return
@@ -28,7 +39,7 @@ export function usePlexusElementEffect<
 
 		const callback = (value: PlexusType) => {
 			if (!el) return
-			setterFunction({ value, refEl: el })
+			setter({ value, refEl: el })
 		}
 		// call it initially
 		callback(plexusState.value)
@@ -36,13 +47,7 @@ export function usePlexusElementEffect<
 		return () => {
 			kill()
 		}
-	}, [
-		elRef,
-		elRef.current,
-		plexusState.id,
-		setterFunction,
-		...additionalReactStatesToWatch,
-	])
+	}, [plexusState.id, setter, ...additionalReactStatesToWatch])
 
 	return { mounted }
 }

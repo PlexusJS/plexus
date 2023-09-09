@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
 import { PlexusStateInstance, state } from '@plexusjs/core'
 import { instance } from '@plexusjs/core/src/instance/instance'
 

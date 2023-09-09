@@ -23,6 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -35,7 +38,7 @@ jobs:
         id: cache-yarn
         uses: actions/cache@v3
         env:
-          cache-name: cache-node-module
+          cache-name: cache-node-modules
         with:
           path: |
             ~/.cache/yarn
@@ -55,11 +58,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
       - name: 💾 Fetch Cache
         id: cache-yarn
         uses: actions/cache@v3
         env:
-          cache-name: cache-node-module
+          cache-name: cache-node-modules
         with:
           path: |
             ~/.cache/yarn
@@ -83,11 +89,14 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
       - name: 💾 Fetch Cache
         id: cache-yarn
         uses: actions/cache@v3
         env:
-          cache-name: cache-node-module
+          cache-name: cache-node-modules
         with:
           path: |
             ~/.cache/yarn

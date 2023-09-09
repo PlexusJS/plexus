@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'vitest'
+import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
 // import { collection, PlexusCollectionInstance } from '@plexusjs/core'
 import {
 	AppointmentType,
