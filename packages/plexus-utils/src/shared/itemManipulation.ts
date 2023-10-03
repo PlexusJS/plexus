@@ -62,12 +62,18 @@ export const convertStringToThing = (inp: string) => {
 	}
 }
 // A function to deeply merge two things (objects or arrays).
-export function deepMerge<Thing extends object>(
-	target: Thing,
-	source: Thing,
-	override = false
-): Thing {
-	let output: Thing = Object.assign({}, target)
+export function deepMerge<
+	Thing1 extends Record<string | number | symbol, any> = Record<
+		string | number | symbol,
+		any
+	>,
+	Thing2 extends Record<string | number | symbol, any> = Record<
+		string | number | symbol,
+		any
+	>,
+	Thing extends Thing1 & Thing2 = Thing1 & Thing2
+>(target: Thing1, source: Thing2, override = false): Thing1 & Thing2 {
+	let output = Object.assign({} as Thing2, target)
 	if (
 		(isObject(target) && isObject(source)) ||
 		(Array.isArray(target) && Array.isArray(source))
@@ -82,7 +88,7 @@ export function deepMerge<Thing extends object>(
 				} else {
 					output[key] = deepMerge(
 						target[key] as any,
-						source[key],
+						source[key] as any,
 						override
 					) as any
 				}
@@ -104,7 +110,7 @@ export function deepMerge<Thing extends object>(
 		return Object.values(output) as any as Thing
 	}
 
-	return output
+	return output as Thing
 }
 
 // a deep clone of anything

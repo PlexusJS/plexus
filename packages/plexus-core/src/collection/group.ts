@@ -1,14 +1,14 @@
 import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 import { PlexusCollectionInstance } from '..'
 import { PlexusInstance } from '../instance/instance'
-import { PlexusInternalWatcher } from '../types'
+import { CollectionSorter, PlexusInternalWatcher } from '../types'
 import { Watchable } from '../watchable'
 
 import { DataKey, PlexusDataInstance } from './data'
 
 export interface PlexusCollectionGroupConfig<DataType> {
 	addWhen?: (item: PlexusWatchableValueInterpreter<DataType>) => boolean
-	sort?: (a: DataType, b: DataType) => number
+	sort?: CollectionSorter<DataType>
 }
 export type GroupName = string
 
@@ -21,15 +21,15 @@ interface CollectionGroupStore<DataType = any> {
 	_collectionId: string
 	_includedKeys: Set<string>
 	_dataWatcherDestroyers: Set<() => void>
-	sort?: (a: DataType, b: DataType) => number
+	sort?: CollectionSorter<DataType>
 }
 
 /**
  * A group of data
  */
 export class CollectionGroup<
-	DataType extends Record<string, any> = any,
-> extends Watchable<DataType[]> {
+	DataType extends Record<string, any> = any
+> extends Watchable<PlexusWatchableValueInterpreter<DataType>[]> {
 	private _internalStore: CollectionGroupStore<DataType>
 	private collection: () => PlexusCollectionInstance<DataType>
 	// private instance: () => PlexusInstance
@@ -80,7 +80,7 @@ export class CollectionGroup<
 		// memoization: this updates the groups stored value! This reduces computation as the state of the group is only updated when the data changes
 		this._watchableStore._publicValue = keys
 			.map((key) => this.collection().getItemValue(key))
-			.filter(Boolean) as DataType[]
+			.filter(Boolean) as PlexusWatchableValueInterpreter<DataType>[]
 
 		this.instance().runtime.broadcast(this.id, this.value)
 	}

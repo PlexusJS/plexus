@@ -272,7 +272,7 @@ export class ApiInstance {
 		this._internalStore.options = deepMerge(
 			this._internalStore.options,
 			options
-		) as RequestInit & { headers: Record<string, string> }
+		)
 
 		options.headers && this.setHeaders(options.headers)
 		return this
