@@ -1,4 +1,7 @@
-import { AlmostAnything } from '@plexusjs/utils'
+import {
+	AlmostAnything,
+	PlexusWatchableValueInterpreter,
+} from '@plexusjs/utils'
 import { _event } from './event'
 import { _runtime } from './instance/runtime'
 
@@ -12,4 +15,15 @@ export type PlexusInternalWatcher<V extends any = any> = (
 ) => void
 
 export type PlexusValidStateTypes = NonNullable<AlmostAnything>
-export type Fetcher<Value> = () => Value
+export type Fetcher<Value> = () => Value | Promise<Value>
+
+export type CollectionSorter<DataType> = (
+	a: PlexusWatchableValueInterpreter<DataType>,
+	b: PlexusWatchableValueInterpreter<DataType>
+) => number
+
+export type CollectionFetcher<DataType> = (
+	key: string
+) =>
+	| Promise<PlexusWatchableValueInterpreter<DataType>>
+	| PlexusWatchableValueInterpreter<DataType>
