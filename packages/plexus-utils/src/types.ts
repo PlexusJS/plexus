@@ -34,10 +34,18 @@ export type UnionToIntersection<U> = (
 
 export type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true
 
+/**
+ * A type that calculates...
+ * - If input is of type sync function: The return type
+ * - If input is of type async function: The return type after waiting: PromiseType<ReturnType<T>> -> `returns T`
+ * - If input is not a function: The input type
+ */
 export type PlexusWatchableValueInterpreter<Value> = Value extends (
 	...args: any
-) => any
-	? ReturnType<Value>
+) => infer RT
+	? RT extends Promise<infer PRT>
+		? PRT
+		: RT
 	: Value
 
 export declare type AsyncState<T> =
@@ -71,9 +79,9 @@ export declare type PromiseType<P extends Promise<any>> = P extends Promise<
 	: never
 
 declare type StateFromFunctionReturningPromise<
-	T extends FunctionReturningPromise,
+	T extends FunctionReturningPromise
 > = AsyncState<PromiseType<ReturnType<T>>>
 
 export declare type AsyncFnReturn<
-	T extends FunctionReturningPromise = FunctionReturningPromise,
+	T extends FunctionReturningPromise = FunctionReturningPromise
 > = [StateFromFunctionReturningPromise<T>, T]

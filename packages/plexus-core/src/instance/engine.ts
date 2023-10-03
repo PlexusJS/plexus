@@ -113,7 +113,7 @@ export class EventEngine {
 			const pendingPayload = this.pendingEventPayloads.get(eventId)
 
 			const eventPayload = pendingPayload
-				? deepMerge<EventPayload>(pendingPayload, args)
+				? deepMerge(pendingPayload, args)
 				: args
 			this.pendingEventPayloads.set(eventId, eventPayload)
 			return
