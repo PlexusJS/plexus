@@ -1,6 +1,10 @@
 import { PlexusWatchableValueInterpreter } from '@plexusjs/utils'
 import { PlexusInstance, instance } from '../instance/instance'
-import { PlexusInternalWatcher } from '../types'
+import {
+	CollectionFetcher,
+	CollectionSorter,
+	PlexusInternalWatcher,
+} from '../types'
 
 import { _data, PlexusDataInstance, DataKey, CollectionData } from './data'
 import {
@@ -80,15 +84,31 @@ export interface PlexusCollectionConfig<DataType> {
 	 */
 	decay?: number
 
-	sort?: (a: DataType, b: DataType) => number
+	/**
+	 * Sort function to use for the collection
+	 * @param a	The first item to compare
+	 * @param b	The second item to compare
+	 * @returns	-1 if a should be before b, 1 if a should be after b, 0 if they are equal
+	 */
+	sort?: CollectionSorter<DataType>
+
+	/**
+	 * A function used to fetch data for a given collection key. If a call is made to use an item that doesn't exist in the collection (getItem, getItemValue, etc.), this function will be called to fetch the data. If the function returns a promise, the promise will be awaited before returning the data.
+	 * @param key The key of the item to fetch
+	 * @returns	The data for the item
+	 */
+	dataFetcher?: CollectionFetcher<CollectionData>
 }
 interface PlexusCollectionStore<DataType extends Record<string, any>> {
 	_internalId: string
 	_lastChanged: string
 	_lookup: Map<string, string>
 	_key: string
-	_data: Map<string, PlexusDataInstance<DataType>>
-	_groups: GroupMap<DataType>
+	_data: Map<
+		string,
+		PlexusDataInstance<PlexusWatchableValueInterpreter<DataType>>
+	>
+	_groups: GroupMap<PlexusWatchableValueInterpreter<DataType>>
 	_selectors: SelectorMap<DataType>
 	_name: string
 	_externalName: string
@@ -99,13 +119,18 @@ interface PlexusCollectionStore<DataType extends Record<string, any>> {
 	_computeFn?: (
 		data: PlexusWatchableValueInterpreter<DataType>
 	) => PlexusWatchableValueInterpreter<DataType>
-	sort?: (a: DataType, b: DataType) => number
+	sort?: CollectionSorter<DataType>
+	dataFetcher?: CollectionFetcher<CollectionData>
 }
 
 export type PlexusCollectionInstance<
 	DataType extends Record<string, any> = Record<string, any>,
-	Groups extends GroupMap<DataType> = GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>,
+	Groups extends GroupMap<PlexusWatchableValueInterpreter<DataType>> = GroupMap<
+		PlexusWatchableValueInterpreter<DataType>
+	>,
+	Selectors extends SelectorMap<
+		PlexusWatchableValueInterpreter<DataType>
+	> = SelectorMap<PlexusWatchableValueInterpreter<DataType>>
 > = CollectionInstance<DataType, Groups, Selectors>
 /**
  * A Collection Instance
@@ -113,8 +138,8 @@ export type PlexusCollectionInstance<
  */
 export class CollectionInstance<
 	DataTypeInput extends Record<string, any>,
-	Groups extends GroupMap<DataTypeInput>,
-	Selectors extends SelectorMap<DataTypeInput>,
+	Groups extends GroupMap<PlexusWatchableValueInterpreter<DataTypeInput>>,
+	Selectors extends SelectorMap<PlexusWatchableValueInterpreter<DataTypeInput>>
 	// ForeignRefs extends boolean = this['config']['foreignKeys'] extends {} ? true : false
 > {
 	private _internalStore: PlexusCollectionStore<DataTypeInput>
@@ -160,10 +185,13 @@ export class CollectionInstance<
 			_lookup: new Map<string, string>(),
 			_lastChanged: '',
 			_key: config?.primaryKey || 'id',
-			_data: new Map<string, PlexusDataInstance<DataTypeInput>>(),
+			_data: new Map<
+				string,
+				PlexusDataInstance<PlexusWatchableValueInterpreter<DataTypeInput>>
+			>(),
 			_groups: new Map<
 				GroupName,
-				PlexusCollectionGroup<DataTypeInput>
+				PlexusCollectionGroup<PlexusWatchableValueInterpreter<DataTypeInput>>
 			>() as Groups,
 			_selectors: new Map<
 				SelectorName,
@@ -180,6 +208,7 @@ export class CollectionInstance<
 				this._persist = value
 			},
 			sort: config.sort,
+			dataFetcher: config.dataFetcher,
 		}
 		this.mount()
 
@@ -591,13 +620,17 @@ export class CollectionInstance<
 	 * @param {string} name The Group Name to search for
 	 * @returns {this} The new Collection Instance
 	 */
-	getGroup(name: GroupName): PlexusCollectionGroup<DataTypeInput>
-	getGroup(name: KeyOfMap<Groups>): PlexusCollectionGroup<DataTypeInput>
+	getGroup(
+		name: GroupName
+	): PlexusCollectionGroup<PlexusWatchableValueInterpreter<DataTypeInput>>
+	getGroup(
+		name: KeyOfMap<Groups>
+	): PlexusCollectionGroup<PlexusWatchableValueInterpreter<DataTypeInput>>
 	getGroup(name: KeyOfMap<Groups> | GroupName) {
 		if (this.isCreatedGroup(name)) {
 			const group = this._internalStore._groups.get(
 				name
-			) as PlexusCollectionGroup<DataTypeInput>
+			) as PlexusCollectionGroup<PlexusWatchableValueInterpreter<DataTypeInput>>
 
 			return group
 		} else {
@@ -743,12 +776,21 @@ export class CollectionInstance<
 	 */
 	watchGroup(
 		name: KeyOfMap<Groups>,
-		callback: PlexusInternalWatcher<DataTypeInput[]>
+		callback: PlexusInternalWatcher<
+			PlexusWatchableValueInterpreter<DataTypeInput>[]
+		>
 	)
-	watchGroup(name: string, callback: PlexusInternalWatcher<DataTypeInput[]>)
+	watchGroup(
+		name: string,
+		callback: PlexusInternalWatcher<
+			PlexusWatchableValueInterpreter<DataTypeInput>[]
+		>
+	)
 	watchGroup(
 		name: KeyOfMap<Groups> | string,
-		callback: PlexusInternalWatcher<DataTypeInput[]>
+		callback: PlexusInternalWatcher<
+			PlexusWatchableValueInterpreter<DataTypeInput>[]
+		>
 	) {
 		const group = this.getGroup(name)
 		if (this.isCreatedGroup(name) && group) {
@@ -923,9 +965,13 @@ export class CollectionInstance<
 	 * Get all of the collection data values as an array
 	 * @type {DataTypeInput[]}
 	 */
-	get value(): (DataTypeInput & { [key: string]: any })[] {
+	get value(): (PlexusWatchableValueInterpreter<DataTypeInput> & {
+		[key: string]: any
+	})[] {
 		this.mount()
-		const values: (DataTypeInput & { [key: string]: any })[] = []
+		const values: (PlexusWatchableValueInterpreter<DataTypeInput> & {
+			[key: string]: any
+		})[] = []
 		for (let item of this._internalStore._data.values()) {
 			if (!item.provisional) {
 				values.push(item.value)
@@ -954,10 +1000,10 @@ export class CollectionInstance<
 	 * @type {Record<string, GroupInstance>}
 	 */
 	get groups() {
-		const groups: Record<
+		const groups = {} as Record<
 			KeyOfMap<Groups>,
-			PlexusCollectionGroup<DataTypeInput>
-		> = {} as Record<KeyOfMap<Groups>, PlexusCollectionGroup<DataTypeInput>>
+			PlexusCollectionGroup<PlexusWatchableValueInterpreter<DataTypeInput>>
+		>
 		for (let group of this._internalStore._groups.entries()) {
 			groups[group[0] as KeyOfMap<Groups>] = group[1]
 		}
@@ -1058,7 +1104,7 @@ export class CollectionInstance<
 export function _collection<
 	DataType extends { [key: string]: any },
 	Groups extends GroupMap<DataType> = GroupMap<DataType>,
-	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>,
+	Selectors extends SelectorMap<DataType> = SelectorMap<DataType>
 >(
 	instance: () => PlexusInstance,
 	_config: PlexusCollectionConfig<DataType> = { primaryKey: 'id' } as const

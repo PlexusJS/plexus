@@ -83,9 +83,7 @@ export class Watchable<ValueType = any> {
 	 */
 	get value(): PlexusWatchableValueInterpreter<ValueType> {
 		const value = this._watchableStore._publicValue
-		if (value === undefined && this._watchableStore._dataFetcher) {
-			return this._watchableStore._dataFetcher()
-		}
+
 		return value
 	}
 
@@ -114,7 +112,9 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 	 * @param newValue The new value of this state
 	 * @returns {this} The state instance
 	 */
-	set(newValue?: PlexusWatchableValueInterpreter<ValueType>): this {
+	set(
+		newValue?: ValueType | Fetcher<PlexusWatchableValueInterpreter<ValueType>>
+	): this {
 		if (this.instance().runtime.isBatching) {
 			// this.instance().runtime.batchedCalls.push(() => this.set(newValue))
 			this.instance().runtime.batch(() => this.set(newValue))
@@ -202,7 +202,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 	 * Reset the state to the initial value
 	 */
 	reset() {
-		this.set(this._watchableStore._initialValue)
+		this.set(this._watchableStore._initialValue as any)
 		// disable history if enabled
 		this.history(0)
 		return this
@@ -233,17 +233,11 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 		// no history, so just try to reset to last value; if null, reset to initial value
 		else {
 			if (this._watchableStore._lastValue !== null) {
-				this.set(
-					this._watchableStore
-						._lastValue as PlexusWatchableValueInterpreter<ValueType>
-				)
+				this.set(this._watchableStore._lastValue as any)
 				// last value should now be the current value BEFORE the undo, so set this to next value
 				this._watchableStore._nextValue = this._watchableStore._lastValue
 			} else {
-				this.set(
-					this._watchableStore
-						._initialValue as PlexusWatchableValueInterpreter<ValueType>
-				)
+				this.set(this._watchableStore._initialValue as any)
 			}
 			this._watchableStore._lastValue = null
 		}
@@ -330,7 +324,7 @@ export class WatchableMutable<ValueType = any> extends Watchable<ValueType> {
 	fetch(): this {
 		if (this._watchableStore._dataFetcher) {
 			this.loading = true
-			this.set(this._watchableStore._dataFetcher())
+			this.set(this._watchableStore._dataFetcher)
 			this.loading = false
 		}
 		return this

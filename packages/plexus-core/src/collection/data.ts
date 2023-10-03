@@ -25,7 +25,7 @@ interface PlexusDataStore {
 }
 
 export type PlexusDataInstance<
-	DataType extends Record<string, any> = Record<string, any>,
+	DataType extends Record<string, any> = Record<string, any>
 > = CollectionData<DataType>
 export type DataKey = string
 
@@ -38,7 +38,7 @@ type DataObjectType<PK extends string = 'id'> = Record<string, any> & {
  */
 export class CollectionData<
 	DataType extends DataObjectType<PK> = any,
-	PK extends string = string,
+	PK extends string = string
 > extends WatchableMutable<DataType> {
 	private primaryKey: PK
 	readonly key: string
@@ -66,6 +66,25 @@ export class CollectionData<
 			primaryKey,
 			_wDestroyers: new Set<() => void>(),
 			config: config,
+		}
+		let dataFetcher = this.collection().config.dataFetcher
+		if (this.provisional && dataFetcher) {
+			this.set(dataFetcher(this.key))
+			// const data =
+			// if (data instanceof Promise) {
+			// 	// this.loading = true
+			// 	// data.then((data) => {
+			// 	// 	if (data) {
+			// 	// 		this.set(data)
+			// 	// 		this.loading = false
+			// 	// 	}
+			// 	// })
+			// 	this.set(async () => {
+			// 		return await data
+			// 	})
+			// } else {
+			// 	this.set(data)
+			// }
 		}
 		if (!this.provisional) {
 			this.mount()
@@ -253,7 +272,9 @@ export class CollectionData<
 	 * @param {DataType} value The value to set
 	 * @returns {this} The data instance
 	 */
-	set(value?: Partial<PlexusWatchableValueInterpreter<DataType>>): this {
+	set(
+		value?: PlexusWatchableValueInterpreter<Partial<DataType>> | DataType
+	): this {
 		if (!value) return this
 
 		// if this is provisional, mount to the collection & instance
@@ -316,7 +337,7 @@ export class CollectionData<
 	 * @param {DataType} value A value of the state to merge with the current value
 	 * @returns {this} The data instance
 	 */
-	patch(value: Partial<PlexusWatchableValueInterpreter<DataType>>): this {
+	patch(value: PlexusWatchableValueInterpreter<Partial<DataType>>): this {
 		this.set(deepMerge(this._watchableStore._value, value, true))
 
 		this.collection().lastUpdatedKey = this.key
