@@ -1,5 +1,5 @@
 import { collection, computed, instance, state } from '@plexusjs/core'
-import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 
 const myState = state('')
 const myCollection = collection()

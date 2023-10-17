@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 import { collection, instance, PlexusCollectionInstance } from '@plexusjs/core'
 import {
 	appointments,
@@ -427,6 +427,29 @@ describe('testing collection groups', () => {
 		expect(uniqueGroups.getGroup('dynamic').value.length).toBe(3)
 		expect(uniqueGroups.getGroup('group1').value.length).toBe(0)
 		expect(uniqueGroups.getGroup('group2').value.length).toBe(0)
+	})
+
+	test('Unique Groups should not toggle', () => {
+		uniqueGroups.collect(
+			[
+				{ firstName: 'Jack', userId: '0' },
+				{ firstName: 'Doe', userId: '1' },
+				{ firstName: 'Kane', userId: '2' },
+			],
+			'dynamic'
+		)
+		// should only add to one group
+		uniqueGroups.addToGroups('0', 'group2')
+		console.log(uniqueGroups.getGroupsOf('0'))
+		// two is default and group2 (last group in the array) and
+		expect(uniqueGroups.getGroupsOf('0').length).toBe(2)
+		expect(uniqueGroups.getGroup('dynamic').value.length).toBe(2)
+		expect(uniqueGroups.getGroup('group2').value.length).toBe(1)
+		// recollect the data
+		uniqueGroups.collect([{ firstName: 'Jack', userId: '0' }], 'group2')
+		expect(uniqueGroups.getGroupsOf('0').length).toBe(2)
+		expect(uniqueGroups.getGroup('dynamic').value.length).toBe(2)
+		expect(uniqueGroups.getGroup('group2').value.length).toBe(1)
 	})
 })
 describe('testing collection selectors', () => {

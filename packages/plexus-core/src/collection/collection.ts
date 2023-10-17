@@ -698,6 +698,7 @@ export class CollectionInstance<
 				for (const key of keys) {
 					const currentGroups = this.getGroupsOf(key, {
 						excludeDefault: true,
+						exclude: [groupName],
 					})
 					this.instance().runtime.log(
 						'debug',

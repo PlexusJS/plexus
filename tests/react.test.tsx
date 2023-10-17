@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 import '@testing-library/react'
 import { screen, waitFor, within } from '@testing-library/react'
 import { render, act } from './test-utils'
@@ -186,7 +186,7 @@ describe('Test react integration (useDeposit)', () => {
 			const { value, save, edit } = useDeposit(
 				{ ...def },
 				{
-					onEdit(k, v) {},
+					onEdit(k, v) { },
 					onSave(payload) {
 						setVal(payload.name ?? '')
 					},

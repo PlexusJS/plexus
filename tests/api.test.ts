@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 import { api, PlexusApi } from '@plexusjs/api'
 // only imported here to make sure it works in testing environment (node), not needed by user
 import 'isomorphic-fetch'

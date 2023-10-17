@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, test, expect } from 'bun:test'
+import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 
 import {
 	batchAction,
@@ -89,7 +89,7 @@ describe('Collection Relations', () => {
 	)
 
 	test('Batching race condition with selectors', () => {
-		batch(() => {})
+		batch(() => { })
 	})
 })
 
