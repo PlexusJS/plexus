@@ -10,6 +10,7 @@ export interface PlexusApiRes<DataType = any> {
 export interface PlexusApiConfig {
 	defaultOptions?: PlexusApiOptions
 	timeout?: number
+	abortOnTimeout?: boolean
 	// Deprecated
 	silentFail?: boolean
 
@@ -54,6 +55,7 @@ export interface ApiStore {
 	options: PlexusApiOptions
 	optionsInit: PlexusApiOptions
 	timeout: number | undefined
+	abortOnTimeout: boolean
 	baseURL: string
 	noFetch: boolean
 	authToken: string

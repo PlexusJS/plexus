@@ -53,6 +53,7 @@ export class ApiInstance {
 			options: config.defaultOptions ?? {},
 			optionsInit: { ...config.defaultOptions },
 			timeout: config.timeout || undefined,
+			abortOnTimeout: config.abortOnTimeout ?? false,
 			baseURL:
 				baseURL.endsWith('/') && baseURL.length > 1
 					? baseURL.substring(0, baseURL.length - 1)
@@ -113,10 +114,13 @@ export class ApiInstance {
 					: `${this._internalStore.baseURL}${
 							path.startsWith('/') || path?.length === 0 ? path : `/${path}`
 					  }`
+
+			const controller = new AbortController()
 			const requestObject = {
 				...this._internalStore.options,
 				...options,
 				headers,
+				signal: controller.signal,
 			}
 			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
 			if (this._internalStore.timeout) {
@@ -142,6 +146,8 @@ export class ApiInstance {
 				if (raceResult) {
 					res = raceResult
 				} else {
+					if (this._internalStore.abortOnTimeout) controller.abort()
+
 					// if we're throwing, throw an error
 					if (this._internalStore.throws) throw new Error('Request timed out')
 					// a 504 response status means the programmatic timeout was surpassed
@@ -306,7 +312,7 @@ export class ApiInstance {
 	 */
 	async post<
 		ResponseType = any,
-		BodyType extends Record<string, any> | string = {},
+		BodyType extends Record<string, any> | string = {}
 	>(
 		path: string,
 		body: BodyType = {} as BodyType,
@@ -459,7 +465,7 @@ export class ApiInstance {
 	setHeaders<
 		HeaderFunction extends () =>
 			| Record<string, any>
-			| Promise<Record<string, any>>,
+			| Promise<Record<string, any>>
 	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore.noFetch) return this
