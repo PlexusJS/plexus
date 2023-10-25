@@ -103,7 +103,12 @@ export class ApiInstance {
 			request = this.requestMap.get(path) as ApiRequest
 		}
 
-		const res = await request.send<ResponseDataType>(path, options)
+		// if we don't have fetch, return a blank response object
+
+		const res = this.config.noFetch
+			? ApiRequest.createEmptyRes<ResponseDataType>()
+			: await request.send<ResponseDataType>(path, options)
+
 		const headers = await this.headerGetter()
 		this._internalStore.onResponse?.(
 			{
@@ -188,7 +193,7 @@ export class ApiInstance {
 	 */
 	async post<
 		ResponseType = any,
-		BodyType extends Record<string, any> | string = {},
+		BodyType extends Record<string, any> | string = {}
 	>(
 		path: string,
 		body: BodyType = {} as BodyType,
@@ -341,7 +346,7 @@ export class ApiInstance {
 	setHeaders<
 		HeaderFunction extends () =>
 			| Record<string, any>
-			| Promise<Record<string, any>>,
+			| Promise<Record<string, any>>
 	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore.noFetch) return this

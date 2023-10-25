@@ -22,8 +22,8 @@ describe('Testing Api Function', () => {
 		console.log(myApi.config)
 		// console.log(myApi.config)
 		expect(myApi.config).toBeDefined()
-		expect(myApi.config.headers).toBeDefined()
-		expect(myApi.config.headers['custom']).toBe('header')
+		expect(myApi.config.options.headers).toBeDefined()
+		expect(myApi.config.options.headers['custom']).toBe('header')
 
 		const res = await myApi.get('https://google.com')
 		expect(res?.status).toBeGreaterThan(0)
@@ -43,8 +43,8 @@ describe('Testing Api Function', () => {
 		})
 		// console.log(myApi.config)
 		expect(apiUsingOnResponse.config).toBeDefined()
-		expect(apiUsingOnResponse.config.headers).toBeDefined()
-		expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
+		expect(apiUsingOnResponse.headers).toBeDefined()
+		expect(apiUsingOnResponse.headers['custom']).toBe('header')
 
 		const res = await apiUsingOnResponse.get('https://google.com')
 		expect(res?.status).toBeGreaterThan(0)
@@ -60,10 +60,6 @@ describe('Testing Api Function', () => {
 				custom: 'header',
 			},
 		})
-		// console.log(myApi.config)
-		expect(apiUsingOnResponse.config).toBeDefined()
-		expect(apiUsingOnResponse.config.headers).toBeDefined()
-		expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
 
 		await expect(
 			apiUsingOnResponse.post('https://google.com/this/url/doesnt/exist')
@@ -81,10 +77,6 @@ describe('Testing Api Function', () => {
 				custom: 'header',
 			},
 		})
-		// console.log(myApi.config)
-		expect(apiUsingOnResponse.config).toBeDefined()
-		expect(apiUsingOnResponse.config.headers).toBeDefined()
-		expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
 
 		await expect(
 			apiUsingOnResponse.post('https://google.com/this/url/doesnt/exist')
@@ -129,6 +121,47 @@ describe('Testing Api Function', () => {
 		expect(errorOccurred).toBe(false)
 	})
 }, 10000)
+
+test('Does retry work', async () => {
+		// const value = state(1)
+		const apiUsingOnResponse = api('', {
+			timeout: 1000,
+			throws: true,
+			retry: 3,
+			abortOnTimeout: true,
+		})
+		// should retry 3 times
+		let loopCount = 0
+
+		
+		try {
+			await apiUsingOnResponse.post('http://httpstat.us/526?sleep=2800')
+		} catch (error) {
+			console.log(error)
+			errorOccurred = true
+		}
+		expect(errorOccurred).toBe(true)
+
+		// Wait for the sleep duration of the request endpoint
+		await new Promise((resolve) => setTimeout(resolve, 3000))
+
+		// Check if a second error is thrown
+		errorOccurred = false
+
+		try {
+			await apiUsingOnResponse.post('http://httpstat.us/526?sleep=2800')
+		} catch (error) {
+			console.log(error)
+			if (error instanceof PlexusError) {
+				// if it's a PlexusError, it means this is the timeout error
+				return
+			}
+			errorOccurred = true
+		}
+
+		expect(errorOccurred).toBe(false)
+	})
+}, 10000)
 describe("Test the API's baseURL capabilities", () => {
 	const myApi2 = api('https://google.com').setHeaders({
 		'Content-Type': 'application/json',
@@ -136,7 +169,7 @@ describe("Test the API's baseURL capabilities", () => {
 	test('Can make a request to a sub-path', async () => {
 		const res = await myApi2.post('maps')
 
-		expect(myApi2.config.headers['Content-Type']).toBe('application/json')
+		expect(myApi2.headers['Content-Type']).toBe('application/json')
 		// console.log(JSON.stringify(res, null, 2))
 		expect(res?.status).toBeGreaterThan(0)
 	})
@@ -154,7 +187,7 @@ describe("Test the API's baseURL capabilities", () => {
 
 		const res = await myApi2.post('maps')
 
-		expect(myApi2.config.headers['X-Test']).toBe(intendedValue)
+		expect(myApi2.headers['X-Test']).toBe(intendedValue)
 		// console.log(JSON.stringify(res, null, 2))
 		expect(res?.status).toBeGreaterThan(0)
 	})

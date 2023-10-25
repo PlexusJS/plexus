@@ -28,10 +28,6 @@ export class ApiRequest {
 		path: string,
 		options: PlexusApiSendOptions
 	): Promise<PlexusApiRes<ResponseDataType>> {
-		// if we don't have fetch, return a blank response object
-		if (this.api.config.noFetch)
-			return ApiRequest.createEmptyRes<ResponseDataType>()
-
 		const instanceHeaders = this.api.headers
 
 		const headers = {
@@ -67,13 +63,13 @@ export class ApiRequest {
 				signal: controller.signal,
 			}
 			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
-			if (this.api.config.timeout) {
+			if (this.config.timeout) {
 				let to: any
 				const timeout = new Promise<void>((resolve, reject) => {
 					to = setTimeout(() => {
 						timedOut = true
 						resolve()
-					}, this.api.config.timeout)
+					}, this.config.timeout)
 				})
 				const request = new Promise<Response>((resolve, reject) => {
 					fetch(uri, requestObject)
@@ -90,10 +86,10 @@ export class ApiRequest {
 				if (raceResult) {
 					res = raceResult
 				} else {
-					if (this.api.config.abortOnTimeout) controller.abort()
+					if (this.config.abortOnTimeout) controller.abort()
 
 					// if we're throwing, throw an error
-					if (this.api.config.throws)
+					if (this.config.throws)
 						throw new PlexusError('Request timed out', { type: 'api' })
 					// a 504 response status means the programmatic timeout was surpassed
 					return ApiRequest.createEmptyRes<ResponseDataType>(
@@ -146,7 +142,7 @@ export class ApiRequest {
 				hasCookie,
 			}
 			// if(this._internalStore.onResponse) this._internalStore.onResponse(req, pResponse)
-			if (this.api.config.throws && !ok) {
+			if (this.config.throws && !ok) {
 				throw pResponse
 			}
 			return pResponse
