@@ -11,6 +11,7 @@ export interface PlexusApiConfig {
 	defaultOptions?: PlexusApiOptions
 	timeout?: number
 	retry?: number
+	onRetry?: (currentRetry: number, req: PlexusApiReq) => void
 	abortOnTimeout?: boolean
 	throws?: boolean
 	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
@@ -26,7 +27,7 @@ export interface PlexusApiInstanceConfig extends PlexusApiConfig {
 export interface PlexusApiReq<BodyType = any> {
 	path: string
 	baseURL: string
-	fullURL: string
+	// fullURL: string
 	method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'
 	headers: Record<string, string>
 	body: BodyType

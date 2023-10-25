@@ -1,21 +1,62 @@
 import { PlexusError } from '@plexusjs/utils'
 import { ApiInstance } from './api'
-import { PlexusApiConfig, PlexusApiRes, PlexusApiSendOptions } from './types'
+import {
+	PlexusApiConfig,
+	PlexusApiReq,
+	PlexusApiRes,
+	PlexusApiSendOptions,
+} from './types'
+import { uuid } from './utils'
 
 export class ApiRequest {
 	private attempts = 0
+	private controllerMap: Map<string, AbortController> = new Map()
 	constructor(
 		public api: ApiInstance,
 		public path: string,
-		public config: Partial<{ requestOptions: PlexusApiSendOptions }> &
-			PlexusApiConfig
+		public config: PlexusApiConfig
 	) {}
 
-	private retry<ResponseDataType>(path: string, options: PlexusApiSendOptions) {
-		if (this.config.retry) {
+	public getRequestSchema<BodyType>(
+		method: PlexusApiReq['method'],
+		payload?: {
+			body?: BodyType
+			path?: string
+		}
+	) {
+		const body = payload?.body ?? ({} as BodyType)
+		return {
+			path: this.path,
+			baseURL: this.api.config.baseURL,
+			options: this.api.config.options,
+			headers: this.config.headers,
+			body,
+			method,
+		} as PlexusApiReq<BodyType>
+	}
+
+	/**
+	 * Retry a request
+	 * @param path The path to send the request to
+	 * @param options	The options to send with the request
+	 * @returns undefined if the request can't be retried, otherwise a pending response
+	 */
+	private async retry<ResponseDataType>(
+		path: string,
+		options: PlexusApiSendOptions
+	) {
+		if (!!this.config.retry) {
+			console.log('retrying', this.attempts, this.config.retry)
 			if (this.attempts < this.config.retry) {
+				return false
 				this.attempts++
-				return this.send<ResponseDataType>(path, options)
+				this.config.onRetry?.(
+					this.attempts,
+					this.getRequestSchema(options.method, {
+						body: options.body,
+					})
+				)
+				return await this.send<ResponseDataType>(path, options)
 			}
 		}
 	}
@@ -28,6 +69,7 @@ export class ApiRequest {
 		path: string,
 		options: PlexusApiSendOptions
 	): Promise<PlexusApiRes<ResponseDataType>> {
+		const requestId = uuid()
 		const instanceHeaders = this.api.headers
 
 		const headers = {
@@ -55,6 +97,7 @@ export class ApiRequest {
 							path.startsWith('/') || path?.length === 0 ? path : `/${path}`
 					  }`
 
+			// create a new abort controller and add it to the controller map
 			const controller = new AbortController()
 			const requestObject = {
 				...this.api.config.options,
@@ -62,6 +105,8 @@ export class ApiRequest {
 				headers,
 				signal: controller.signal,
 			}
+			this.controllerMap.set(requestId, controller)
+
 			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
 			if (this.config.timeout) {
 				let to: any
@@ -86,7 +131,12 @@ export class ApiRequest {
 				if (raceResult) {
 					res = raceResult
 				} else {
+					// abort the request
 					if (this.config.abortOnTimeout) controller.abort()
+
+					// if retry returns something (which means it's retrying), return it
+					const retrying = await this.retry<ResponseDataType>(path, options)
+					if (!!this.config.retry && retrying) return retrying
 
 					// if we're throwing, throw an error
 					if (this.config.throws)
@@ -102,12 +152,17 @@ export class ApiRequest {
 				res = await fetch(uri, requestObject)
 			}
 		} catch (e) {
-			this.retry(path, options)
+			// if retry returns something (which means it's retrying), return it
+			const retrying = await this.retry<ResponseDataType>(path, options)
+			if (!!this.config.retry && retrying) return retrying
 			// if silentFail is enabled, don't throw the error; Otherwise, throw an error
 			if (!this.config.throws) {
 				throw e
 			}
 		}
+		// we're successful, reset the retry counter
+		this.attempts = 0
+
 		let data: ResponseDataType
 		let rawData: string
 		let blob: Blob

@@ -4,7 +4,6 @@ import {
 	ApiMethod,
 	PlexusApiConfig,
 	PlexusApiReq,
-	PlexusApiRes,
 	PlexusApiSendOptions,
 	PlexusApiFetchOptions,
 	PlexusApiInstanceConfig,
@@ -28,13 +27,6 @@ globalThis.Blob = Blob
 export type PlexusApi = ApiInstance
 
 const AuthTypes = ['bearer', 'basic', 'jwt'] as const
-// type HeaderCache<CacheValue = Record<string, any>> =
-// 	| [
-// 			CacheValue | Promise<CacheValue> | undefined,
-// 			(() => CacheValue | Promise<CacheValue> | undefined) | undefined
-// 	  ]
-// 	| []
-
 /**
  * An API instance is used to make requests to a server. Interact with this by using `api()`
  */
@@ -97,7 +89,7 @@ export class ApiInstance {
 		// this.addToQueue(`${this.genKey('GET', path)}`, () => {})
 		let request: ApiRequest
 		if (!this.requestMap.has(path)) {
-			request = new ApiRequest(this, path, { requestOptions: options })
+			request = new ApiRequest(this, path, { defaultOptions: options })
 			this.requestMap.set(path, request)
 		} else {
 			request = this.requestMap.get(path) as ApiRequest
@@ -193,7 +185,7 @@ export class ApiInstance {
 	 */
 	async post<
 		ResponseType = any,
-		BodyType extends Record<string, any> | string = {}
+		BodyType extends Record<string, any> | string = {},
 	>(
 		path: string,
 		body: BodyType = {} as BodyType,
@@ -346,7 +338,7 @@ export class ApiInstance {
 	setHeaders<
 		HeaderFunction extends () =>
 			| Record<string, any>
-			| Promise<Record<string, any>>
+			| Promise<Record<string, any>>,
 	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore.noFetch) return this
