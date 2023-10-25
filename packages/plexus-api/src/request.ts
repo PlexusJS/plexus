@@ -21,10 +21,10 @@ export class ApiRequest {
 		if (this.api.config.noFetch)
 			return ApiRequest.createEmptyRes<ResponseDataType>()
 
-		const pureHeaders = await this.api.headerGetter()
+		const instanceHeaders = await this.api.headers
 
 		const headers = {
-			...pureHeaders,
+			...instanceHeaders,
 			...(options.headers ?? {}),
 		}
 
