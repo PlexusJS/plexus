@@ -10,10 +10,9 @@ export interface PlexusApiRes<DataType = any> {
 export interface PlexusApiConfig {
 	defaultOptions?: PlexusApiOptions
 	timeout?: number
+	retry?: number
+	onRetry?: (currentRetry: number, req: PlexusApiReq) => void
 	abortOnTimeout?: boolean
-	// Deprecated
-	silentFail?: boolean
-
 	throws?: boolean
 	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
 	headers?:
@@ -21,10 +20,14 @@ export interface PlexusApiConfig {
 		| (() => Record<string, string>)
 		| (() => Promise<Record<string, string>>)
 }
+export interface PlexusApiInstanceConfig extends PlexusApiConfig {
+	// Deprecated
+	silentFail?: boolean
+}
 export interface PlexusApiReq<BodyType = any> {
 	path: string
 	baseURL: string
-	fullURL: string
+	// fullURL: string
 	method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'
 	headers: Record<string, string>
 	body: BodyType
@@ -55,6 +58,7 @@ export interface ApiStore {
 	options: PlexusApiOptions
 	optionsInit: PlexusApiOptions
 	timeout: number | undefined
+	retry: number | undefined
 	abortOnTimeout: boolean
 	baseURL: string
 	noFetch: boolean

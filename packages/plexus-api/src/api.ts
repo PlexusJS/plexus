@@ -4,11 +4,12 @@ import {
 	ApiMethod,
 	PlexusApiConfig,
 	PlexusApiReq,
-	PlexusApiRes,
 	PlexusApiSendOptions,
 	PlexusApiFetchOptions,
+	PlexusApiInstanceConfig,
 } from './types'
 import { PlexusError } from '@plexusjs/utils'
+import { ApiRequest } from './request'
 // let's get Blob from Node.js or browser
 let Blob
 if (typeof window === 'undefined') {
@@ -26,13 +27,6 @@ globalThis.Blob = Blob
 export type PlexusApi = ApiInstance
 
 const AuthTypes = ['bearer', 'basic', 'jwt'] as const
-// type HeaderCache<CacheValue = Record<string, any>> =
-// 	| [
-// 			CacheValue | Promise<CacheValue> | undefined,
-// 			(() => CacheValue | Promise<CacheValue> | undefined) | undefined
-// 	  ]
-// 	| []
-
 /**
  * An API instance is used to make requests to a server. Interact with this by using `api()`
  */
@@ -43,18 +37,21 @@ export class ApiInstance {
 		| Record<string, any>
 		| Promise<Record<string, any>> = () => ({})
 
+	private requestMap: Map<string, ApiRequest> = new Map()
+
 	private disabled = false
 	// "<method>:<path>": [() => void, ...]
 	private waitingQueues: Map<string, (() => Promise<unknown>)[]> = new Map()
 	constructor(
 		baseURL: string = '',
-		config: PlexusApiConfig = { defaultOptions: {} }
+		config: PlexusApiInstanceConfig = { defaultOptions: {} }
 	) {
 		this._internalStore = {
 			options: config.defaultOptions ?? {},
 			optionsInit: { ...config.defaultOptions },
 			timeout: config.timeout || undefined,
 			abortOnTimeout: config.abortOnTimeout ?? true,
+			retry: config.retry || undefined,
 			baseURL:
 				baseURL.endsWith('/') && baseURL.length > 1
 					? baseURL.substring(0, baseURL.length - 1)
@@ -65,6 +62,8 @@ export class ApiInstance {
 			silentFail: config.silentFail ?? false,
 			onResponse: config.onResponse,
 		}
+
+		// if we don't have fetch, set noFetch to true
 		try {
 			fetch
 		} catch (e) {
@@ -76,150 +75,9 @@ export class ApiInstance {
 		}
 		config.headers && this.setHeaders(config.headers)
 	}
-	/**
-	 * Send a request to the server
-	 * @param path
-	 * @param options
-	 */
-	private async makeRequest<ResponseDataType>(
-		path: string,
-		options: PlexusApiSendOptions
-	): Promise<PlexusApiRes<ResponseDataType>> {
-		// if we don't have fetch, return a blank response object
-		if (this._internalStore.noFetch)
-			return ApiInstance.createEmptyRes<ResponseDataType>()
-
-		const pureHeaders = await this.headerGetter()
-
-		const headers = {
-			...pureHeaders,
-			...(options.headers ?? {}),
-		}
-
-		if (!headers['Content-Type']) {
-			if (options.body !== undefined) {
-				headers['Content-Type'] = 'application/json'
-			} else {
-				headers['Content-Type'] = 'text/html'
-			}
-		}
-		// init values used later
-		let timedOut = false
-		let res: Response | undefined
-		try {
-			// build out the URI
-			const matches = path.match(/^http(s)?/g)
-			const uri =
-				matches && matches?.length > 0
-					? path
-					: `${this._internalStore.baseURL}${
-							path.startsWith('/') || path?.length === 0 ? path : `/${path}`
-					  }`
-
-			const controller = new AbortController()
-			const requestObject = {
-				...this._internalStore.options,
-				...options,
-				headers,
-				signal: controller.signal,
-			}
-			// if we have a timeout set, call fetch and set a timeout. If the fetch takes longer than the timeout length, kill thee request and return a blank response
-			if (this._internalStore.timeout) {
-				let to: any
-				const timeout = new Promise<void>((resolve, reject) => {
-					to = setTimeout(() => {
-						timedOut = true
-						resolve()
-					}, this._internalStore.timeout)
-				})
-				const request = new Promise<Response>((resolve, reject) => {
-					fetch(uri, requestObject)
-						.then((response) => {
-							clearTimeout(to)
-							resolve(response)
-						})
-						.catch(reject)
-				})
-
-				// race the timeout and the request
-				const raceResult = await Promise.race([timeout, request])
-
-				if (raceResult) {
-					res = raceResult
-				} else {
-					if (this._internalStore.abortOnTimeout) controller.abort()
-
-					// if we're throwing, throw an error
-					if (this._internalStore.throws)
-						throw new PlexusError('Request timed out', { type: 'api' })
-					// a 504 response status means the programmatic timeout was surpassed
-					return ApiInstance.createEmptyRes<ResponseDataType>(
-						timedOut ? 504 : res?.status ?? 513
-					)
-				}
-			}
-			// if we don't have a timeout set, just try to fetch
-			else {
-				res = await fetch(uri, requestObject)
-			}
-		} catch (e) {
-			// if silentFail is enabled, don't throw the error; Otherwise, throw an error
-			if (!this._internalStore.silentFail) {
-				throw e
-			}
-		}
-		let data: ResponseDataType
-		let rawData: string
-		let blob: Blob
-		// we never got a response
-		if (res === undefined) {
-			return ApiInstance.createEmptyRes<ResponseDataType>(500)
-		}
-
-		const hasCookie = (cName: string): boolean => {
-			return res?.headers?.get('set-cookie')?.includes(cName) ?? false
-		}
-		const ok = res.status > 199 && res.status < 300
-
-		// if we got a response, parse it and return it
-		if (res.status >= 200 && res.status < 600) {
-			const text = await res.text()
-			let parsed: ResponseDataType = undefined as any
-			try {
-				parsed = JSON.parse(text || '{}') as ResponseDataType
-			} catch (e) {}
-			data = parsed ?? ({} as ResponseDataType)
-			rawData = text
-			blob = new Blob([text], { type: 'text/plain' })
-
-			const pResponse = {
-				status: res.status,
-				response: res,
-				rawData,
-				blob,
-				ok,
-				data,
-				hasCookie,
-			}
-			// if(this._internalStore.onResponse) this._internalStore.onResponse(req, pResponse)
-			if (this._internalStore.throws && !ok) {
-				throw pResponse
-			}
-			return pResponse
-		}
-		// if we got a response, but it's not in the 200~600 range, return it
-		return {
-			status: res.status,
-			response: res,
-			rawData: '',
-			ok,
-			data: {} as ResponseDataType,
-			hasCookie,
-		}
-	}
 
 	/**
-	 * Do some pre-send stuff
+	 * Send a request to the api instance
 	 * @param path
 	 * @param options
 	 */
@@ -227,9 +85,22 @@ export class ApiInstance {
 		path: string,
 		options: PlexusApiSendOptions
 	) {
-		if (this.disabled) return ApiInstance.createEmptyRes<ResponseDataType>(0)
+		if (this.disabled) return ApiRequest.createEmptyRes<ResponseDataType>(0)
 		// this.addToQueue(`${this.genKey('GET', path)}`, () => {})
-		const res = await this.makeRequest<ResponseDataType>(path, options)
+		let request: ApiRequest
+		if (!this.requestMap.has(path)) {
+			request = new ApiRequest(this, path, { defaultOptions: options })
+			this.requestMap.set(path, request)
+		} else {
+			request = this.requestMap.get(path) as ApiRequest
+		}
+
+		// if we don't have fetch, return a blank response object
+
+		const res = this.config.noFetch
+			? ApiRequest.createEmptyRes<ResponseDataType>()
+			: await request.send<ResponseDataType>(path, options)
+
 		const headers = await this.headerGetter()
 		this._internalStore.onResponse?.(
 			{
@@ -541,25 +412,19 @@ export class ApiInstance {
 	get config() {
 		return Object.freeze(
 			deepClone({
-				...this._internalStore.options,
-				headers: ApiInstance.parseHeaders(this._headers),
+				...this._internalStore,
+
+				options: {
+					...this._internalStore.options,
+					headers: ApiInstance.parseHeaders(this._headers),
+				} as {
+					headers: Record<string, string>
+				} & RequestInit,
 			})
-		) as {
-			headers: Record<string, string>
-		} & RequestInit
+		)
 	}
 	enabled(status: boolean = true) {
 		this.disabled = !status
-	}
-	private static createEmptyRes<ResponseDataType = any>(status: number = 408) {
-		return {
-			status,
-			response: {} as Response,
-			rawData: '',
-			data: {} as ResponseDataType,
-			ok: status > 199 && status < 300,
-			hasCookie: (name: string) => false,
-		}
 	}
 }
 
