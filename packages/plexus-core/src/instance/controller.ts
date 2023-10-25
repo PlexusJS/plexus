@@ -1,6 +1,6 @@
+import { handlePlexusError } from '@plexusjs/utils'
 import type { PlexusCollectionInstance } from '../collection/collection'
 import type { PlexusComputedStateInstance } from '../computed'
-import { handlePlexusError } from '../error'
 import type { PlexusEventInstance } from '../event'
 import type { PlexusStateInstance } from '../state'
 import { PlexusInstance, instance } from './instance'

@@ -1,6 +1,6 @@
 import { isAsyncFunction } from '@plexusjs/utils'
 import { PlexusInstance, instance } from './instance/instance'
-import { PlexusError, handlePlexusError } from './error'
+import { handlePlexusError } from '@plexusjs/utils'
 type ErrorHandler = (error: any) => unknown
 
 export interface PlexusActionHooks {

@@ -1,15 +1,23 @@
-import { PlexusInstance } from './instance/instance'
-
-type PlexusErrorOptions = { code: string; source: string; stack: string }
+type PlexusErrorOptions = {
+	code: string
+	source: string
+	stack: string
+	type?: 'general' | 'api' | 'action'
+} & Record<'type', string>
 
 export class PlexusError extends Error {
 	public name = 'PlexusError'
 	public error = true
+	type = 'general'
 	constructor(
 		message: string,
 		public options?: Partial<PlexusErrorOptions>
 	) {
 		super(message)
+		if (options) {
+			this.options = options
+			this.type = options.type || 'general'
+		}
 	}
 	// custom error format for logging and debugging
 	toString() {
