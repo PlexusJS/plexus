@@ -89,7 +89,7 @@ describe('Collection Relations', () => {
 	)
 
 	test('Batching race condition with selectors', () => {
-		batch(() => {})
+		batch(() => { })
 	})
 })
 
