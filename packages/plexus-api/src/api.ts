@@ -8,6 +8,7 @@ import {
 	PlexusApiSendOptions,
 	PlexusApiFetchOptions,
 } from './types'
+import { PlexusError } from '@plexusjs/utils'
 // let's get Blob from Node.js or browser
 let Blob
 if (typeof window === 'undefined') {
@@ -53,7 +54,7 @@ export class ApiInstance {
 			options: config.defaultOptions ?? {},
 			optionsInit: { ...config.defaultOptions },
 			timeout: config.timeout || undefined,
-			abortOnTimeout: config.abortOnTimeout ?? false,
+			abortOnTimeout: config.abortOnTimeout ?? true,
 			baseURL:
 				baseURL.endsWith('/') && baseURL.length > 1
 					? baseURL.substring(0, baseURL.length - 1)
@@ -149,7 +150,8 @@ export class ApiInstance {
 					if (this._internalStore.abortOnTimeout) controller.abort()
 
 					// if we're throwing, throw an error
-					if (this._internalStore.throws) throw new Error('Request timed out')
+					if (this._internalStore.throws)
+						throw new PlexusError('Request timed out', { type: 'api' })
 					// a 504 response status means the programmatic timeout was surpassed
 					return ApiInstance.createEmptyRes<ResponseDataType>(
 						timedOut ? 504 : res?.status ?? 513
@@ -312,7 +314,7 @@ export class ApiInstance {
 	 */
 	async post<
 		ResponseType = any,
-		BodyType extends Record<string, any> | string = {}
+		BodyType extends Record<string, any> | string = {},
 	>(
 		path: string,
 		body: BodyType = {} as BodyType,
@@ -465,7 +467,7 @@ export class ApiInstance {
 	setHeaders<
 		HeaderFunction extends () =>
 			| Record<string, any>
-			| Promise<Record<string, any>>
+			| Promise<Record<string, any>>,
 	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore.noFetch) return this
