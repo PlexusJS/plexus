@@ -2281,15 +2281,33 @@
     os-homedir "^1.0.1"
     regexpu-core "^4.5.4"
 
-"@plexusjs/core@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@plexusjs/core/-/core-1.1.0.tgz#82ba0acf76f915323bed38be213a24154200e331"
-  integrity sha512-RdzUxMu3n9+DzSpjbl/hcH1WU+gBczx3ENSJSkolkOCIHADXVs6bCXRLP/qCVmJwTyZNHOfAsR32avmH4sLmvA==
+"@plexusjs/api@1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@plexusjs/api/-/api-1.7.4.tgz#50f17def2ca71248183063217f5f01233da6ca64"
+  integrity sha512-1gDM2lxQOXMioOhguwoM9Hcrfr+6Swn21+9LvdcsLi125hwLZAiyzfzoeHp33kVUog2H6Cx/2eFiOq3s1LNqJA==
+  dependencies:
+    "@plexusjs/utils" "1.7.4"
 
-"@plexusjs/react@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@plexusjs/react/-/react-1.1.0.tgz#1d6397abec2746ac1f343a7162980883c4b07d2f"
-  integrity sha512-8LyhfroOzkL7FJ1RxGIGHtlfZoe+7r3212vDwTgiLOp9gbxwMxOwweE8pGtKxmgWnJq2WTKMUjYp0sfzGEkapQ==
+"@plexusjs/core@1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@plexusjs/core/-/core-1.7.4.tgz#65cb51de5d4ed64350dd00d7ecd65909678a08bb"
+  integrity sha512-aBRxM9iQ2tijNhR9qcg99pbHnjMSukav6QFuw9hkqDk4x8jGxYPDcZPcIsnRQ3K3gdUgX4nwSDPeSQp/VmaLCg==
+  dependencies:
+    "@plexusjs/api" "1.7.4"
+    "@plexusjs/utils" "1.7.4"
+
+"@plexusjs/react@1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@plexusjs/react/-/react-1.7.4.tgz#d310101d35b127b6348a7023fee5f3bd39f0e2bb"
+  integrity sha512-5U6jPdSBCohAb60iK8r2W8u/LaS5KUmRkhx+OAv7flwbKMuw7h/ktENEvzackxscUReQVsmzxzrdRlELGs5eOw==
+  dependencies:
+    "@plexusjs/utils" "1.7.4"
+    use-sync-external-store "^1.2.0"
+
+"@plexusjs/utils@1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@plexusjs/utils/-/utils-1.7.4.tgz#487796a9f018ed38873f42cf9a3e62a1612dbb0b"
+  integrity sha512-BE24X/qLSQm37hDK42pc4/mEq8hBLTprzyFO1sErOBqPLMv6t21/Q31V+Vy3+7MuLzJnIsVzQIKjuvNYxGxgGQ==
 
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
@@ -5909,10 +5927,10 @@ multicast-dns@^7.2.5:
     dns-packet "^5.2.2"
     thunky "^1.0.2"
 
-nanoid@^3.3.4:
-  version "3.3.4"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
-  integrity sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==
+nanoid@^3.3.6:
+  version "3.3.6"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.6.tgz#443380c856d6e9f9824267d960b4236ad583ea4c"
+  integrity sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==
 
 negotiator@0.6.3:
   version "0.6.3"
@@ -6684,12 +6702,12 @@ postcss-zindex@^5.1.0:
   resolved "https://registry.yarnpkg.com/postcss-zindex/-/postcss-zindex-5.1.0.tgz#4a5c7e5ff1050bd4c01d95b1847dfdcc58a496ff"
   integrity sha512-fgFMf0OtVSBR1va1JNHYgMxYk73yhn/qb4uQDq1DLGYolz8gHCyr/sesEuGUaYs58E3ZJRcpoGuPVoB7Meiq9A==
 
-postcss@^8.3.11, postcss@^8.4.12, postcss@^8.4.13, postcss@^8.4.14, postcss@^8.4.7:
-  version "8.4.14"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.14.tgz#ee9274d5622b4858c1007a74d76e42e56fd21caf"
-  integrity sha512-E398TUmfAYFPBSdzgeieK2Y1+1cpdxJx8yXbK/m57nRhKSmk1GB2tO4lbLBtlkfPQTDKfe4Xqv1ASWPpayPEig==
+postcss@^8.3.11, postcss@^8.4.13, postcss@^8.4.14, postcss@^8.4.31, postcss@^8.4.7:
+  version "8.4.31"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.31.tgz#92b451050a9f914da6755af352bdc0192508656d"
+  integrity sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==
   dependencies:
-    nanoid "^3.3.4"
+    nanoid "^3.3.6"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
@@ -8305,6 +8323,11 @@ use-latest@^1.2.1:
   integrity sha512-xA+AVm/Wlg3e2P/JiItTziwS7FK92LWrDB0p+hgXloIMuVCeJJ8v6f0eeHyPZaJrM+usM1FkFfbNCrJGs8A/zw==
   dependencies:
     use-isomorphic-layout-effect "^1.1.1"
+
+use-sync-external-store@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
+  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
