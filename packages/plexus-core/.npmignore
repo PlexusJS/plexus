@@ -8,3 +8,4 @@ __snapshots__
 tests/
 *.test.*
 src/
+v2/
