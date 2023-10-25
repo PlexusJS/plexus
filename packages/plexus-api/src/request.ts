@@ -1,19 +1,30 @@
 import { PlexusError } from '@plexusjs/utils'
 import { ApiInstance } from './api'
-import { PlexusApiRes, PlexusApiSendOptions } from './types'
+import { PlexusApiConfig, PlexusApiRes, PlexusApiSendOptions } from './types'
 
 export class ApiRequest {
+	private attempts = 0
 	constructor(
 		public api: ApiInstance,
 		public path: string,
-		public options: Partial<{ requestOptions: PlexusApiSendOptions }>
+		public config: Partial<{ requestOptions: PlexusApiSendOptions }> &
+			PlexusApiConfig
 	) {}
+
+	private retry<ResponseDataType>(path: string, options: PlexusApiSendOptions) {
+		if (this.config.retry) {
+			if (this.attempts < this.config.retry) {
+				this.attempts++
+				return this.send<ResponseDataType>(path, options)
+			}
+		}
+	}
 	/**
 	 * Send a request to the server
 	 * @param path
 	 * @param options
 	 */
-	private async send<ResponseDataType>(
+	async send<ResponseDataType>(
 		path: string,
 		options: PlexusApiSendOptions
 	): Promise<PlexusApiRes<ResponseDataType>> {
@@ -21,7 +32,7 @@ export class ApiRequest {
 		if (this.api.config.noFetch)
 			return ApiRequest.createEmptyRes<ResponseDataType>()
 
-		const instanceHeaders = await this.api.headers
+		const instanceHeaders = this.api.headers
 
 		const headers = {
 			...instanceHeaders,
@@ -95,8 +106,9 @@ export class ApiRequest {
 				res = await fetch(uri, requestObject)
 			}
 		} catch (e) {
+			this.retry(path, options)
 			// if silentFail is enabled, don't throw the error; Otherwise, throw an error
-			if (!this.api.config.silentFail) {
+			if (!this.config.throws) {
 				throw e
 			}
 		}

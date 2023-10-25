@@ -12,6 +12,18 @@ export interface PlexusApiConfig {
 	timeout?: number
 	retry?: number
 	abortOnTimeout?: boolean
+	throws?: boolean
+	onResponse?: (req: PlexusApiReq, res: PlexusApiRes) => void
+	headers?:
+		| Record<string, string>
+		| (() => Record<string, string>)
+		| (() => Promise<Record<string, string>>)
+}
+export interface PlexusApiInstanceConfig {
+	defaultOptions?: PlexusApiOptions
+	timeout?: number
+	retry?: number
+	abortOnTimeout?: boolean
 	// Deprecated
 	silentFail?: boolean
 

@@ -7,6 +7,7 @@ import {
 	PlexusApiRes,
 	PlexusApiSendOptions,
 	PlexusApiFetchOptions,
+	PlexusApiInstanceConfig,
 } from './types'
 import { PlexusError } from '@plexusjs/utils'
 import { ApiRequest } from './request'
@@ -51,7 +52,7 @@ export class ApiInstance {
 	private waitingQueues: Map<string, (() => Promise<unknown>)[]> = new Map()
 	constructor(
 		baseURL: string = '',
-		config: PlexusApiConfig = { defaultOptions: {} }
+		config: PlexusApiInstanceConfig = { defaultOptions: {} }
 	) {
 		this._internalStore = {
 			options: config.defaultOptions ?? {},
@@ -69,6 +70,8 @@ export class ApiInstance {
 			silentFail: config.silentFail ?? false,
 			onResponse: config.onResponse,
 		}
+
+		// if we don't have fetch, set noFetch to true
 		try {
 			fetch
 		} catch (e) {
@@ -82,7 +85,7 @@ export class ApiInstance {
 	}
 
 	/**
-	 * Do some pre-send stuff
+	 * Send a request to the api instance
 	 * @param path
 	 * @param options
 	 */
@@ -185,7 +188,7 @@ export class ApiInstance {
 	 */
 	async post<
 		ResponseType = any,
-		BodyType extends Record<string, any> | string = {}
+		BodyType extends Record<string, any> | string = {},
 	>(
 		path: string,
 		body: BodyType = {} as BodyType,
@@ -338,7 +341,7 @@ export class ApiInstance {
 	setHeaders<
 		HeaderFunction extends () =>
 			| Record<string, any>
-			| Promise<Record<string, any>>
+			| Promise<Record<string, any>>,
 	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore.noFetch) return this
