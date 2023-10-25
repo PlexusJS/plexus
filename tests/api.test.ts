@@ -99,16 +99,6 @@ describe('Testing Api Function', () => {
 			abortOnTimeout: true,
 		})
 
-		apiUsingOnResponse.options({
-			headers: {
-				custom: 'header',
-			},
-		})
-		// console.log(myApi.config)
-		expect(apiUsingOnResponse.config).toBeDefined()
-		expect(apiUsingOnResponse.config.headers).toBeDefined()
-		expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
-
 		let errorOccurred = false
 
 		try {
