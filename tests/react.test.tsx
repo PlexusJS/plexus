@@ -186,7 +186,7 @@ describe('Test react integration (useDeposit)', () => {
 			const { value, save, edit } = useDeposit(
 				{ ...def },
 				{
-					onEdit(k, v) { },
+					onEdit(k, v) {},
 					onSave(payload) {
 						setVal(payload.name ?? '')
 					},

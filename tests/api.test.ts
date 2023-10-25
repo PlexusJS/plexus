@@ -2,13 +2,16 @@ import { beforeEach, afterEach, describe, test, expect } from 'vitest'
 import { api, PlexusApi } from '@plexusjs/api'
 // only imported here to make sure it works in testing environment (node), not needed by user
 import 'isomorphic-fetch'
+import { PlexusError } from '@plexusjs/utils'
 
 // if(globalThis.fetch === undefined) globalThis.fetch = fetch as any as (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 
 let myApi: PlexusApi
 
 beforeEach(() => {
-	myApi = api()
+	myApi = api('', {
+		abortOnTimeout: true,
+	})
 })
 describe('Testing Api Function', () => {
 	test('Send a get request to google', async () => {
@@ -87,7 +90,55 @@ describe('Testing Api Function', () => {
 			apiUsingOnResponse.post('https://google.com/this/url/doesnt/exist')
 		).rejects.toThrow()
 	})
-})
+
+	test('can set a timeout with abort', async () => {
+		// const value = state(1)
+		const apiUsingOnResponse = api('', {
+			timeout: 1000,
+			throws: true,
+			abortOnTimeout: true,
+		})
+
+		apiUsingOnResponse.options({
+			headers: {
+				custom: 'header',
+			},
+		})
+		// console.log(myApi.config)
+		expect(apiUsingOnResponse.config).toBeDefined()
+		expect(apiUsingOnResponse.config.headers).toBeDefined()
+		expect(apiUsingOnResponse.config.headers['custom']).toBe('header')
+
+		let errorOccurred = false
+
+		try {
+			await apiUsingOnResponse.post('http://httpstat.us/526?sleep=2800')
+		} catch (error) {
+			console.log(error)
+			errorOccurred = true
+		}
+		expect(errorOccurred).toBe(true)
+
+		// Wait for the sleep duration of the request endpoint
+		await new Promise((resolve) => setTimeout(resolve, 3000))
+
+		// Check if a second error is thrown
+		errorOccurred = false
+
+		try {
+			await apiUsingOnResponse.post('http://httpstat.us/526?sleep=2800')
+		} catch (error) {
+			console.log(error)
+			if (error instanceof PlexusError) {
+				// if it's a PlexusError, it means this is the timeout error
+				return
+			}
+			errorOccurred = true
+		}
+
+		expect(errorOccurred).toBe(false)
+	})
+}, 10000)
 describe("Test the API's baseURL capabilities", () => {
 	const myApi2 = api('https://google.com').setHeaders({
 		'Content-Type': 'application/json',

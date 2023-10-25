@@ -37,11 +37,14 @@ describe('Ephemeral Collection data', () => {
 					expect(decayingUsers.value.length).toBe(1)
 				}, DEFAULT_DECAY_RATE + 10)
 				// and then it should decay past the decay rate
-				setTimeout(() => {
-					expect(decayingUsers.value.length).toBe(0)
-					console.log('done! Thing is decayed!')
-					resolve(true)
-				}, DEFAULT_DECAY_RATE * 2 + 10)
+				setTimeout(
+					() => {
+						expect(decayingUsers.value.length).toBe(0)
+						console.log('done! Thing is decayed!')
+						resolve(true)
+					},
+					DEFAULT_DECAY_RATE * 2 + 10
+				)
 			}),
 		{
 			timeout: DEFAULT_DECAY_RATE * 2 + 100,

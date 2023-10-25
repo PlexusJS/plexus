@@ -77,8 +77,8 @@ describe('Test helper functions from the utils module', () => {
 		expect(merged4).toEqual({ a: 2, b: { c: [{ d: 2, e: [4, 5, 6] }] } })
 	})
 	test('Test isAsyncFunction', () => {
-		expect(isAsyncFunction(async () => { })).toBe(true)
-		expect(isAsyncFunction(() => { })).toBe(false)
+		expect(isAsyncFunction(async () => {})).toBe(true)
+		expect(isAsyncFunction(() => {})).toBe(false)
 	})
 	test('Test convertStringToThing', () => {
 		expect(convertStringToThing('{"a":1}')).toEqual({ a: 1 })
