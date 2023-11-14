@@ -150,7 +150,7 @@ export class ApiInstance {
 					if (this._internalStore.abortOnTimeout) controller.abort()
 
 					// if we're throwing, throw an error
-					if (this._internalStore.throws) throw new WebTransportError('Request timed out')
+					if (this._internalStore.throws) throw new Error('Request timed out')
 					// a 504 response status means the programmatic timeout was surpassed
 					return ApiInstance.createEmptyRes<ResponseDataType>(
 						timedOut ? 504 : res?.status ?? 513
