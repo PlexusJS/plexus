@@ -291,18 +291,22 @@ export class ApiInstance {
 	 */
 	get<ResponseType = any>(
 		path: string,
-		query?: Record<string, any>,
+		query?: Record<string, any> | string,
 		options?: PlexusApiFetchOptions
 	) {
-		const params = new URLSearchParams(query)
+		let params = query ? new URLSearchParams(query).toString() : ''
+		if (typeof query === 'string') {
+			params = query
+		}
 
-		return this.send<ResponseType>(
-			`${path}${params.toString().length > 0 ? `?${params.toString()}` : ''}`,
-			{
-				...options,
-				method: 'GET',
-			}
-		)
+		if (!params.startsWith('?') && params.length > 0) {
+			params = `?${params}`
+		}
+
+		return this.send<ResponseType>(`${path}${params}`, {
+			...options,
+			method: 'GET',
+		})
 	}
 
 	/**
@@ -313,7 +317,7 @@ export class ApiInstance {
 	 */
 	async post<
 		ResponseType = any,
-		BodyType extends Record<string, any> | string = {}
+		BodyType extends Record<string, any> | string = {},
 	>(
 		path: string,
 		body: BodyType = {} as BodyType,
@@ -466,7 +470,7 @@ export class ApiInstance {
 	setHeaders<
 		HeaderFunction extends () =>
 			| Record<string, any>
-			| Promise<Record<string, any>>
+			| Promise<Record<string, any>>,
 	>(inputFnOrObj: HeaderFunction | Record<string, any>) {
 		// if (!_headers) _internalStore._options.headers = {}
 		if (this._internalStore.noFetch) return this
